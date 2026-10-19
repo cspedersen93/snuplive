@@ -42,3 +42,21 @@ export function livekitUrl(raw: string | undefined) {
 }
 
 export const unquoteEnv = unquote;
+
+/** Hvad der er galt med Supabase-opsætningen (uden at vise selve værdierne). */
+export function supabaseSetupProblems() {
+  const problems: string[] = [];
+  const rawUrl = unquote(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const rawKey = unquote(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  if (!rawUrl) problems.push("NEXT_PUBLIC_SUPABASE_URL mangler (eller er ikke slået til for Production).");
+  else if (!SUPABASE_URL)
+    problems.push(
+      /^(sb_|eyJ)/.test(rawUrl)
+        ? "NEXT_PUBLIC_SUPABASE_URL indeholder en nøgle. Den skal være din Project URL, fx https://abcd.supabase.co."
+        : "NEXT_PUBLIC_SUPABASE_URL er ikke en gyldig adresse. Den skal ligne https://abcd.supabase.co.",
+    );
+  if (!rawKey) problems.push("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY mangler (eller er ikke slået til for Production).");
+  else if (/^https?:\/\//i.test(rawKey) || rawKey.endsWith(".supabase.co"))
+    problems.push("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY indeholder en adresse. Den skal være nøglen, der starter med sb_publishable_.");
+  return problems;
+}

@@ -1,12 +1,19 @@
+import { supabaseSetupProblems } from "@/lib/env";
+
 export default function SetupNotice() {
+  const problems = supabaseSetupProblems();
   return (
     <div className="wrap" style={{ paddingBlock: "64px 96px" }}>
-      <div className="notice" role="alert">
-        <span>
-          <b>SnupLive er ikke koblet til databasen endnu.</b> Tjek i Vercel, at{" "}
-          <code>NEXT_PUBLIC_SUPABASE_URL</code> er din Project URL (fx https://abcd.supabase.co), og at{" "}
-          <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> er din Publishable key. Tryk derefter Redeploy.
-        </span>
+      <div className="notice" role="alert" style={{ flexDirection: "column", gap: 8 }}>
+        <b>SnupLive er ikke koblet til databasen endnu.</b>
+        {problems.length ? (
+          <ul style={{ margin: 0, paddingLeft: "1.2em" }}>
+            {problems.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        ) : null}
+        <span>Ret det i Vercel under Settings → Environment Variables, og start en ny deployment af main.</span>
       </div>
     </div>
   );
