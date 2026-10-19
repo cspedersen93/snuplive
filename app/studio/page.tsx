@@ -3,7 +3,8 @@ import Link from "next/link";
 import AccountNav from "@/components/AccountNav";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
-import { category, clock, dayLabel, kr, when } from "@/lib/format";
+import { clock, dayLabel, kr, when } from "@/lib/format";
+import { showImage } from "@/lib/images";
 import { ITEM_COUNT_EMBED } from "@/lib/queries";
 import { SHOW_COLS, type Show } from "@/lib/types";
 import BecomeSeller from "../konto/BecomeSeller";
@@ -99,7 +100,7 @@ export default async function Studio() {
                       <td>
                         <div className="it">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={category(s.category).cover} alt="" />
+                          <img src={showImage({ ...s, seller: { avatar_path: profile.avatar_path } })} alt="" />
                           <strong style={{ fontWeight: 600 }}>{s.title}</strong>
                         </div>
                       </td>

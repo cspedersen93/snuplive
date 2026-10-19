@@ -11,7 +11,8 @@ import {
   useTracks,
 } from "@livekit/components-react";
 import { ConnectionState, MediaDeviceFailure, Track, VideoPresets, type LocalVideoTrack } from "livekit-client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { frameFromVideo } from "@/lib/resizeImage";
 import { IconFlip, IconMic } from "@/components/Icons";
 
 const isSeller = (identity: string) => identity.startsWith("seller:");
@@ -68,7 +69,15 @@ export function ViewerVideo(props: {
 
 /* ── Sælger (studiet) ─────────────────────────────────────────────────── */
 
-function StudioStage({ onViewers, onCamera }: { onViewers: (n: number) => void; onCamera: (ready: boolean) => void }) {
+interface StageProps {
+  onViewers: (n: number) => void;
+  onCamera: (ready: boolean) => void;
+  onSnapshot?: (jpeg: Blob) => void;
+  snapshotEvery?: number | null;
+}
+
+function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery }: StageProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
   const cam = tracks.find((t) => t.participant.isLocal && t.publication?.track);
@@ -79,6 +88,29 @@ function StudioStage({ onViewers, onCamera }: { onViewers: (n: number) => void; 
   const ready = Boolean(cam);
   useEffect(() => onCamera(ready), [ready, onCamera]);
   useEffect(() => () => onCamera(false), [onCamera]);
+
+  // Et stillbillede fra kameraet til forsiden og "Live nu", så kortet viser showet, som det ser ud lige nu.
+  useEffect(() => {
+    if (!ready || !snapshotEvery || !onSnapshot) return;
+    let alive = true;
+    const take = async () => {
+      const v = videoRef.current;
+      if (!v || !alive) return;
+      try {
+        const blob = await frameFromVideo(v, 480, 720);
+        if (blob && alive) onSnapshot(blob);
+      } catch {
+        // Ingen billede denne gang
+      }
+    };
+    const first = setTimeout(take, 4000);
+    const timer = setInterval(take, snapshotEvery);
+    return () => {
+      alive = false;
+      clearTimeout(first);
+      clearInterval(timer);
+    };
+  }, [ready, snapshotEvery, onSnapshot]);
 
   async function flip() {
     const pub = localParticipant.getTrackPublication(Track.Source.Camera);
@@ -100,6 +132,7 @@ function StudioStage({ onViewers, onCamera }: { onViewers: (n: number) => void; 
     <>
       {cam ? (
         <VideoTrack
+          ref={videoRef}
           trackRef={cam}
           className="live-video"
           playsInline
@@ -142,6 +175,8 @@ export function StudioVideo(props: {
   onError: (e: Error) => void;
   onDeviceError: (text: string) => void;
   onCamera: (ready: boolean) => void;
+  onSnapshot?: (jpeg: Blob) => void;
+  snapshotEvery?: number | null;
 }) {
   return (
     <LiveKitRoom
@@ -155,7 +190,7 @@ export function StudioVideo(props: {
       onError={props.onError}
       onMediaDeviceFailure={(f) => props.onDeviceError(deviceErrorText(f))}
     >
-      <StudioStage onViewers={props.onViewers} onCamera={props.onCamera} />
+      <StudioStage onViewers={props.onViewers} onCamera={props.onCamera} onSnapshot={props.onSnapshot} snapshotEvery={props.snapshotEvery} />
     </LiveKitRoom>
   );
 }

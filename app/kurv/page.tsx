@@ -17,7 +17,7 @@ interface Row {
   status: string;
   created_at: string;
   item: { name: string; size: string | null; condition: string | null } | null;
-  show: { id: string; title: string; seller: { handle: string; display_name: string | null } | null } | null;
+  show: { id: string; title: string; seller: { handle: string; display_name: string | null; avatar_path: string | null } | null } | null;
 }
 
 const STATUS: Record<string, string> = {
@@ -36,7 +36,7 @@ export default async function Kurv() {
   const { data } = await supabase
     .from("sales")
     .select(
-      "id,price,status,created_at,item:items(name,size,condition),show:shows(id,title,seller:profiles!shows_seller_id_fkey(handle,display_name))",
+      "id,price,status,created_at,item:items(name,size,condition),show:shows(id,title,seller:profiles!shows_seller_id_fkey(handle,display_name,avatar_path))",
     )
     .eq("buyer_id", uid)
     .order("created_at", { ascending: false })
@@ -85,7 +85,7 @@ export default async function Kurv() {
                   <section className="group" key={key} aria-label={list[0].show?.title ?? "Show"}>
                     <div className="group-head">
                       <div className="seller-row">
-                        <Avatar handle={seller?.handle ?? "s"} />
+                        <Avatar handle={seller?.handle ?? "s"} path={seller?.avatar_path} />
                         <div>
                           <strong>{seller?.handle ?? "Ukendt sælger"}</strong>
                           <span className="muted" style={{ fontSize: ".85rem" }}>{list[0].show?.title}</span>

@@ -11,13 +11,14 @@ import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useMe } from "@/components/useMe";
 import { useShowRealtime } from "@/components/useShowRealtime";
 import { hasSupabase } from "@/lib/env";
-import { category, gradFor, kr, when } from "@/lib/format";
+import { gradFor, kr, when } from "@/lib/format";
+import { showImage } from "@/lib/images";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { Item, Message, Profile, Show } from "@/lib/types";
 
 interface Props {
-  seller: Pick<Profile, "id" | "handle" | "display_name" | "area">;
+  seller: Pick<Profile, "id" | "handle" | "display_name" | "area" | "avatar_path">;
   show: Show;
   items: Item[];
   messages: Message[];
@@ -185,7 +186,7 @@ export default function ShowClient(props: Props) {
     buyDisabled = true;
   }
 
-  const cover = category(show.category).cover;
+  const cover = showImage({ ...show, status: "planned", seller: props.seller });
   const startsIn = show.starts_at ? Date.parse(show.starts_at) - (now + offset) : null;
   const chatLines = messages.slice(-5);
   const soldCount = items.filter((i) => i.status === "sold").length;
@@ -203,7 +204,7 @@ export default function ShowClient(props: Props) {
         <aside className="show-side left" aria-label="Om showet">
           <div className="box seller-box">
             <div className="seller-row">
-              <Avatar handle={handle} />
+              <Avatar handle={handle} path={props.seller.avatar_path} />
               <div>
                 <strong>{handle}</strong>
                 <span className="muted" style={{ fontSize: ".88rem" }}>
@@ -263,7 +264,7 @@ export default function ShowClient(props: Props) {
                 <img className="feed" src={cover} alt="" />
               )}
               <div className="shade" />
-              <ScreenTop handle={handle} area={props.seller.area} live={live} viewers={viewers} />
+              <ScreenTop handle={handle} avatarPath={props.seller.avatar_path} area={props.seller.area} live={live} viewers={viewers} />
 
               {!live ? (
                 <div className="pre-live">

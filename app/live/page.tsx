@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
-import { category, clock, dayLabel } from "@/lib/format";
+import { clock, dayLabel } from "@/lib/format";
+import { showImage } from "@/lib/images";
 import { fetchListing, itemCount } from "@/lib/queries";
 import LiveGrid from "./LiveGrid";
 
@@ -71,11 +72,11 @@ export default async function LiveNu() {
                       {s.starts_at ? dayLabel(s.starts_at) : ""}
                     </time>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={category(s.category).cover} alt="" loading="lazy" />
+                    <img src={showImage(s)} alt="" loading="lazy" />
                     <div>
                       <h3>{s.title}</h3>
                       <span className="handle">
-                        <Avatar handle={handle} />
+                        <Avatar handle={handle} path={s.seller?.avatar_path} />
                         {handle}
                         {n ? ` · ${n} ting` : ""}
                       </span>

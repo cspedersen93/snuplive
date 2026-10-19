@@ -8,7 +8,7 @@ export default function AccountNav({ profile, active, snupCount }: { profile: Pr
   return (
     <nav className="dnav" aria-label="Min konto">
       <div className="me">
-        <Avatar handle={profile.handle} />
+        <Avatar handle={profile.handle} path={profile.avatar_path} />
         <div>
           <strong>{profile.display_name || profile.handle}</strong>
           <span className="muted" style={{ fontSize: ".82rem" }}>@{profile.handle}</span>

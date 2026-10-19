@@ -7,6 +7,7 @@ export interface Profile {
   display_name: string | null;
   area: string | null;
   is_seller: boolean;
+  avatar_path?: string | null;
 }
 
 export interface Show {
@@ -19,11 +20,13 @@ export interface Show {
   started_at: string | null;
   ended_at: string | null;
   current_item_id: string | null;
+  cover_path?: string | null;
+  cover_at?: string | null;
   created_at: string;
 }
 
 export interface ShowWithSeller extends Show {
-  seller: Pick<Profile, "handle" | "display_name" | "area"> | null;
+  seller: Pick<Profile, "handle" | "display_name" | "area" | "avatar_path"> | null;
   items?: { count: number }[];
 }
 
@@ -67,7 +70,7 @@ export interface Message {
 }
 
 export const SHOW_COLS =
-  "id,seller_id,title,category,status,starts_at,started_at,ended_at,current_item_id,created_at";
+  "id,seller_id,title,category,status,starts_at,started_at,ended_at,current_item_id,cover_path,cover_at,created_at";
 export const ITEM_COLS =
   "id,show_id,seller_id,name,size,condition,price,position,status,rush_ends_at,sold_at,created_at";
 export const SALE_COLS = "id,item_id,show_id,seller_id,buyer_id,price,status,created_at";

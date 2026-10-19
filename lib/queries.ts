@@ -2,7 +2,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { SHOW_COLS, type ShowWithSeller } from "@/lib/types";
 
 // Fremmednøgle-hints, så PostgREST ved, hvilken relation vi mener.
-export const SELLER_EMBED = "seller:profiles!shows_seller_id_fkey(handle,display_name,area)";
+export const SELLER_EMBED = "seller:profiles!shows_seller_id_fkey(handle,display_name,area,avatar_path)";
 export const ITEM_COUNT_EMBED = "items:items!items_show_id_fkey(count)";
 
 export interface Listing {

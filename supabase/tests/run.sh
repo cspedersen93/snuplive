@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 psql -q -v ON_ERROR_STOP=1 -U postgres -c "drop database if exists snuptest" -c "create database snuptest"
 psql -q -v ON_ERROR_STOP=1 -U postgres -d snuptest -f supabase_stub.sql
-psql -q -v ON_ERROR_STOP=1 -U postgres -d snuptest -f ../migrations/0001_init.sql
+for f in ../migrations/*.sql; do psql -q -v ON_ERROR_STOP=1 -U postgres -d snuptest -f "$f"; done
 psql -q -tA -v ON_ERROR_STOP=1 -U postgres -d snuptest -f tests.sql 2>&1 | sed -n "s/^psql:[^ ]* //; /OK\|FEJL\|ERROR\|Forkert\|Ingen fejl\|bestået/p"
 
 # Kapløb: Liva og Ole trykker Snup på samme tid. Kun én må få tingen.

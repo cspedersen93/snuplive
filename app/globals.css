@@ -556,3 +556,14 @@ a.stat:hover{border-color:var(--line-2)}
 .studio-ctrl{display:flex;flex-direction:column;gap:12px;margin:14px auto 0;max-width:520px}
 .studio-ctrl .ticker .v{white-space:nowrap}
 @media (max-width:820px){.studio .show-side.left{order:2}.studio>.show-side:not(.left){order:3}}
+.ava-img{object-fit:cover;display:block;flex:none}
+.avatar-edit{display:flex;gap:16px;align-items:center}
+.avatar-edit .ava{width:76px;height:76px;font-size:2rem}
+.file-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.btn.is-busy{opacity:.6;pointer-events:none}
+label.btn{cursor:pointer}
+.file-input:focus-visible+*{outline:2px solid var(--red-text)}
+.icon-btn.has-ava{padding:0;overflow:hidden}
+.icon-btn.has-ava .ava{width:100%;height:100%;font-size:1rem;border-radius:50%}
+.v-seller .ava-img,.handle .ava-img,.seller-row .ava-img,.dnav .me .ava-img,.group-head .ava-img{border-radius:50%}
+.scard img.ava-img,.sched-row img.ava-img{position:static;inset:auto;width:20px;height:20px;border-radius:50%;transform:none;transition:none}

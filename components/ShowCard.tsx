@@ -1,17 +1,17 @@
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
-import { category, clock, dayLabel } from "@/lib/format";
+import { clock, dayLabel } from "@/lib/format";
+import { showImage } from "@/lib/images";
 import { itemCount } from "@/lib/queries";
 import type { ShowWithSeller } from "@/lib/types";
 
 export default function ShowCard({ show, priority = false }: { show: ShowWithSeller; priority?: boolean }) {
   const handle = show.seller?.handle ?? "sælger";
-  const cat = category(show.category);
   const n = itemCount(show);
   return (
     <Link className="scard" href={`/live/${handle}`} data-cat={show.category}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={cat.cover} alt="" loading={priority ? "eager" : "lazy"} />
+      <img src={showImage(show)} alt="" loading={priority ? "eager" : "lazy"} />
       <div className="v-badges">
         {show.status === "live" ? (
           <span className="b-live">
@@ -27,7 +27,7 @@ export default function ShowCard({ show, priority = false }: { show: ShowWithSel
       <div className="scard-info">
         <h3>{show.title}</h3>
         <span className="handle">
-          <Avatar handle={handle} />
+          <Avatar handle={handle} path={show.seller?.avatar_path} />
           {handle}
           {n ? ` · ${n} ting` : ""}
         </span>

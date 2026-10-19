@@ -1,11 +1,11 @@
 import Avatar from "@/components/Avatar";
 import { IconEye } from "@/components/Icons";
 
-export function ScreenTop({ handle, area, live, viewers }: { handle: string; area?: string | null; live: boolean; viewers: number }) {
+export function ScreenTop({ handle, avatarPath, area, live, viewers }: { handle: string; avatarPath?: string | null; area?: string | null; live: boolean; viewers: number }) {
   return (
     <div className="v-top">
       <div className="v-seller">
-        <Avatar handle={handle} />
+        <Avatar handle={handle} path={avatarPath} />
         <span className="v-who">
           {handle}
           {area ? <small>{area}</small> : null}

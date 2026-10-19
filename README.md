@@ -39,7 +39,9 @@ Betaling, fragt og MitID kommer i de næste trin (se nederst). Indtil da er et s
    - Gem database-adgangskoden i din password manager.
 2. Når projektet er klar: åbn **SQL Editor → New query**, indsæt hele indholdet af
    [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql), og tryk **Run**.
-   Der skal stå *Success. No rows returned*.
+   Der skal stå *Success. No rows returned*. Gør derefter det samme med
+   [`supabase/migrations/0002_billeder.sql`](supabase/migrations/0002_billeder.sql) (profilbilleder og live-billeder).
+   Nye SQL-filer i `supabase/migrations` skal altid køres i Supabase, *før* den nye version lægges op på Vercel.
 3. **Authentication → URL Configuration**
    - Site URL: `https://snuplive.dk`
    - Redirect URLs (tilføj alle tre):

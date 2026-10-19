@@ -5,6 +5,7 @@ import { cache } from "react";
 import Avatar from "@/components/Avatar";
 import SetupNotice from "@/components/SetupNotice";
 import { when } from "@/lib/format";
+import { showImage } from "@/lib/images";
 import { createPublicClient } from "@/lib/supabase/public";
 import { ITEM_COLS, MESSAGE_COLS, SHOW_COLS, type Item, type Message, type Profile, type Show } from "@/lib/types";
 import ShowClient from "./ShowClient";
@@ -21,7 +22,7 @@ const load = cache(async (rawHandle: string) => {
 
   const { data: seller } = await sb
     .from("profiles")
-    .select("id,handle,display_name,area,is_seller")
+    .select("id,handle,display_name,area,is_seller,avatar_path")
     .eq("handle", handle)
     .maybeSingle();
   if (!seller) return { setup: true as const, seller: null };
@@ -58,6 +59,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: { absolute: `${d.seller.handle} er live: ${d.show.title}`.slice(0, 60) },
       description: `${name} er live på SnupLive lige nu med ${d.show.title.toLowerCase()}. Se med, stil spørgsmål i chatten, og snup det, du kan lide.`.slice(0, 155),
       alternates: { canonical },
+      openGraph: { images: [showImage({ ...d.show, seller: d.seller })] },
     };
   }
   return {
@@ -86,7 +88,7 @@ export default async function SellerPage({ params }: Params) {
           <span>{d.seller.handle}</span>
         </nav>
         <div className="seller-row" style={{ marginBlock: "28px 18px" }}>
-          <Avatar handle={d.seller.handle} size={56} />
+          <Avatar handle={d.seller.handle} path={d.seller.avatar_path} size={56} />
           <div>
             <h1 className="h2">{d.seller.handle}</h1>
             <span className="muted">{[d.seller.display_name, d.seller.area].filter(Boolean).join(" · ")}</span>
@@ -103,7 +105,7 @@ export default async function SellerPage({ params }: Params) {
   return (
     <ShowClient
       key={d.show.id}
-      seller={{ id: d.seller.id, handle: d.seller.handle, display_name: d.seller.display_name, area: d.seller.area }}
+      seller={{ id: d.seller.id, handle: d.seller.handle, display_name: d.seller.display_name, area: d.seller.area, avatar_path: d.seller.avatar_path }}
       show={d.show}
       items={d.items}
       messages={d.messages}

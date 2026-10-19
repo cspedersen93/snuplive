@@ -8,7 +8,8 @@ import { IconBulb } from "@/components/Icons";
 import { StudioVideo } from "@/components/LiveVideo";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useShowRealtime, sortItems } from "@/components/useShowRealtime";
-import { category, gradFor, kr, when } from "@/lib/format";
+import { gradFor, kr, when } from "@/lib/format";
+import { showImage } from "@/lib/images";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import { ITEM_COLS, type Item, type Message, type Profile, type Show } from "@/lib/types";
@@ -126,6 +127,17 @@ export default function StudioClient(props: Props) {
   const onVideoError = useCallback((e: Error) => setVideoErr(e.message || "Forbindelsen til videoen blev afbrudt."), []);
   const onDeviceError = useCallback((text: string) => setVideoErr(text), []);
 
+  // Stillbillede fra kameraet til kortet under "Live nu" (hvert minut, mens showet er live).
+  const onSnapshot = useCallback(
+    async (jpeg: Blob) => {
+      const path = `${me.id}/${show.id}/live.jpg`;
+      const up = await sb.storage.from("covers").upload(path, jpeg, { upsert: true, contentType: "image/jpeg", cacheControl: "30" });
+      if (up.error) return console.warn("[snuplive] live-billede:", up.error.message);
+      await sb.from("shows").update({ cover_path: path, cover_at: new Date().toISOString() }).eq("id", show.id);
+    },
+    [sb, me.id, show.id],
+  );
+
   async function rpc(name: string, args: Record<string, unknown>, okText?: string) {
     setBusy(true);
     const { error } = await sb.rpc(name, args);
@@ -219,7 +231,7 @@ export default function StudioClient(props: Props) {
     ? Math.max(0, Math.ceil((Date.parse(current.rush_ends_at) - (now + offset)) / 1000))
     : null;
   const saleFor = (itemId: string) => sales.find((s) => s.item_id === itemId);
-  const cover = category(show.category).cover;
+  const cover = showImage({ ...show, status: "planned", seller: { avatar_path: props.profile.avatar_path } });
   const startedMs = show.started_at ? now + offset - Date.parse(show.started_at) : 0;
 
   return (
@@ -331,7 +343,7 @@ export default function StudioClient(props: Props) {
           <div className="player">
             <div className="screen">
               {cameraOn && video ? (
-                <StudioVideo token={video.token} url={video.url} onViewers={setViewers} onError={onVideoError} onDeviceError={onDeviceError} onCamera={setCameraReady} />
+                <StudioVideo token={video.token} url={video.url} onViewers={setViewers} onError={onVideoError} onDeviceError={onDeviceError} onCamera={setCameraReady} onSnapshot={onSnapshot} snapshotEvery={live ? 60000 : null} />
               ) : live ? (
                 <div className="screen-dark" />
               ) : (
@@ -339,7 +351,7 @@ export default function StudioClient(props: Props) {
                 <img className="feed" src={cover} alt="" />
               )}
               <div className="shade" />
-              <ScreenTop handle={props.profile.handle} area={props.profile.area} live={live} viewers={viewers} />
+              <ScreenTop handle={props.profile.handle} avatarPath={props.profile.avatar_path} area={props.profile.area} live={live} viewers={viewers} />
 
               {!live && !ended ? (
                 <div className="pre-live">

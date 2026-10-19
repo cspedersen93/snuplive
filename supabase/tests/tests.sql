@@ -152,5 +152,26 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 select t.throws($$insert into messages (show_id, user_id, body) values ('10000000-0000-0000-0000-000000000001', auth.uid(), 'Er I der?')$$, 'row-level security');
 reset role;
 
+-- ── Billeder ─────────────────────────────────────────────────────────────────
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+update profiles set avatar_path = '00000000-0000-0000-0000-00000000000a/avatar-1.jpg' where id = auth.uid();
+select t.ok((select avatar_path is not null from profiles where id = auth.uid()), 'Maja har et profilbillede');
+select t.throws($$update profiles set avatar_path = 'https://andet-sted.dk/x.jpg' where id = auth.uid()$$, 'check constraint');
+select t.throws($$update profiles set avatar_path = '00000000-0000-0000-0000-00000000000b/avatar.jpg' where id = auth.uid()$$, 'check constraint');
+update shows set cover_path = '00000000-0000-0000-0000-00000000000a/10000000-0000-0000-0000-000000000002/live.jpg', cover_at = now()
+  where id = '10000000-0000-0000-0000-000000000002';
+select t.ok((select cover_path is not null from shows where id = '10000000-0000-0000-0000-000000000002'), 'Maja har et billede af sit show');
+select t.throws($$update shows set cover_path = '00000000-0000-0000-0000-00000000000a/10000000-0000-0000-0000-000000000001/live.jpg' where id = '10000000-0000-0000-0000-000000000002'$$, 'check constraint');
+insert into storage.objects (bucket_id, name) values ('avatars', '00000000-0000-0000-0000-00000000000a/avatar-1.jpg');
+select t.ok((select count(*) from storage.objects where bucket_id = 'avatars') = 1, 'Maja kan lægge et billede i sin egen mappe');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$insert into storage.objects (bucket_id, name) values ('avatars', '00000000-0000-0000-0000-00000000000a/hack.jpg')$$, 'row-level security');
+select t.throws($$insert into storage.objects (bucket_id, name) values ('avatars', 'hack.jpg')$$, 'row-level security');
+delete from storage.objects where name like '00000000-0000-0000-0000-00000000000a/%';
+reset role;
+select t.ok((select count(*) from storage.objects) = 1, 'Liva kan ikke slette Majas billede');
+select t.ok((select public from storage.buckets where id = 'avatars'), 'mappen med profilbilleder er offentlig');
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'
