@@ -171,4 +171,4 @@ ligger i databasen. Browseren kan ikke snyde sig udenom.
 5. **Følg sælgere** og besked, når de går live.
 6. Opgrader Vercel til Pro, før SnupLive tager imod penge.
 
-Husk også at oprette mailadressen `kontakt@snuplive.dk`, som privatlivspolitikken henviser til.
+Husk også at oprette mailadressen `kontakt@snuplive.dk`, som privatlivspolitikken henviser til. 
