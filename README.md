@@ -46,8 +46,18 @@ Betaling, fragt og MitID kommer i de næste trin (se nederst). Indtil da er et s
      - `https://snuplive.dk/**`
      - `https://*.vercel.app/**` (så test-versioner fra Vercel også kan logge ind)
      - `http://localhost:3000/**` (til udvikling på din egen computer)
-4. **Authentication → Emails → Templates**. Ret både **Confirm signup** og **Magic Link**, så mailen
-   indeholder både en kode og et link, der virker på alle enheder:
+4. **Login-mails kan vente.** Med Supabase' egen mail kan du allerede logge ind selv: tryk på linket i mailen
+   i den samme browser, som du bad om det i. Mailen er på engelsk og har ingen kode, men det er fint til at teste.
+   Før andre skal logge ind, skal du sætte din egen mailafsender op (Supabase sender kun til dit eget team og kun få mails i timen):
+   1. Opret en gratis konto hos [Resend](https://resend.com). Gratis-planen giver 3.000 mails om måneden (100 om dagen).
+   2. Tilføj domænet `snuplive.dk` i Resend, og opret de DNS-poster, Resend viser, hos Simply. Vent, til Resend skriver *Verified*.
+   3. Lav en API-nøgle i Resend.
+   4. I Supabase: **Authentication → Emails → SMTP Settings → Enable custom SMTP**:
+      - Sender email: `login@snuplive.dk`, Sender name: `SnupLive`
+      - Host: `smtp.resend.com`, Port: `465`, Username: `resend`, Password: API-nøglen fra Resend
+   5. Sæt grænsen under **Authentication → Rate Limits** op, fx 30 mails i timen.
+5. **Authentication → Emails → Templates** (kan først rettes, når custom SMTP er slået til). Ret både **Confirm signup**
+   og **Magic Link**, så mailen er på dansk og indeholder både en kode og et link, der virker på alle enheder:
 
    Emne: `Log ind på SnupLive`
 
@@ -58,10 +68,6 @@ Betaling, fragt og MitID kommer i de næste trin (se nederst). Indtil da er et s
    <p><a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email">Log ind på SnupLive</a></p>
    <p>Har du ikke bedt om at logge ind, kan du se bort fra mailen.</p>
    ```
-5. **Authentication → Emails → SMTP Settings**: slå **custom SMTP** til.
-   Supabase' indbyggede mail sender kun til dit eget team og kun få mails i timen, så uden dette kan andre ikke logge ind.
-   Brug de SMTP-oplysninger, din mailudbyder giver dig (fx din mail hos Simply eller en tjeneste som Resend eller Brevo).
-   Afsender: fx `login@snuplive.dk`. Sæt bagefter grænsen under **Rate Limits** op, fx 30 mails i timen.
 6. **Project Settings → API Keys**: her finder du **Project URL** og **Publishable key**.
    Dem skal du bruge i trin 3. Brug aldrig *secret*- eller *service_role*-nøglen i SnupLive.
 
