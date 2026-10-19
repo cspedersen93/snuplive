@@ -94,6 +94,10 @@ Betaling, fragt og MitID kommer i de næste trin (se nederst). Indtil da er et s
    | `LIVEKIT_API_SECRET` | API Secret fra LiveKit |
    | `NEXT_PUBLIC_SITE_URL` | `https://snuplive.dk` |
 
+   **Vigtigt om typen:** de tre, der starter med `NEXT_PUBLIC_`, skal have typen **Config**. De skal bruges i browseren,
+   og Vercel bygger ikke værdier af typen *Secret* ind i siden. De tre `LIVEKIT_`-variabler skal være **Secret**.
+   En gemt Secret kan ikke laves om til Config, så slet den og opret den igen, hvis typen er forkert.
+
 4. Tryk **Deploy**. Efter et par minutter får du en adresse som `snuplive.vercel.app`.
 5. Under **Settings → Functions → Function Region** vælger du den region, der ligger tættest på databasen:
    **Dublin (dub1)**, hvis Supabase ligger i Irland (Stockholm (arn1) til Stockholm, Frankfurt (fra1) til Frankfurt).
