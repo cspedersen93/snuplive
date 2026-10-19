@@ -1,0 +1,102 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: { absolute: "Spørgsmål og svar om live shopping | SnupLive" },
+  description:
+    "Svar på de mest stillede spørgsmål om SnupLive: snup, lynrunder, betaling, fragt, tryg handel og hvordan du går live som sælger.",
+  alternates: { canonical: "/faq" },
+};
+
+const GROUPS: { title: string; qa: [string, string][] }[] = [
+  {
+    title: "Køb",
+    qa: [
+      ["Skal jeg hente en app for at købe?", "Nej. Du ser shows, chatter og snupper direkte her på siden, både på telefonen og computeren."],
+      ["Hvad betyder det at snuppe noget?", "Når sælgeren viser en ting frem, kan du trykke Snup. Den første, der trykker, får tingen, og den lander med det samme under Mine snup."],
+      ["Hvad er en lynrunde?", "I en lynrunde har du ti sekunder til at snuppe tingen. Sælgeren starter lynrunder, når mange vil have den samme ting."],
+      ["Kan andre se, hvad jeg snupper?", "Når du snupper noget, bliver dit brugernavn vist i chatten i showet, ligesom på et loppemarked. Din liste over snup kan kun du og sælgeren se."],
+    ],
+  },
+  {
+    title: "Betaling og fragt",
+    qa: [
+      ["Hvordan betaler jeg?", "Betaling med MobilePay og kort åbner inden lanceringen. I beta-perioden bliver der ikke trukket penge, og et snup er en reservation hos sælgeren."],
+      ["Hvad koster fragten?", "Du betaler fragt én gang pr. sælger og show, uanset hvor mange ting du snupper. Du kan også aftale afhentning, hvis I bor tæt på hinanden."],
+      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage."],
+    ],
+  },
+  {
+    title: "Salg",
+    qa: [
+      ["Hvad koster det at sælge?", "Det er gratis at oprette en konto og gå live. Priserne for at sælge bliver offentliggjort, før SnupLive åbner for betaling."],
+      ["Hvad skal jeg bruge for at gå live?", "En telefon eller computer med kamera og en stabil internetforbindelse. Du går live direkte i browseren."],
+      ["Skal jeg være god til at stå foran et kamera?", "Nej. De bedste shows minder om en snak ved et bord på loppemarkedet. Start med et kort show og få ting."],
+    ],
+  },
+  {
+    title: "Tryghed",
+    qa: [
+      ["Hvordan ved jeg, at sælgeren er til at stole på?", "Ved lanceringen bliver alle sælgere verificeret med MitID, og du kan se deres bedømmelser fra tidligere handler."],
+      ["Hvad hvis tingen ikke er som vist?", "Meld det, inden pengene bliver udbetalt, så hjælper vi jer med at finde en løsning."],
+    ],
+  },
+];
+
+export default function Faq() {
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: GROUPS.flatMap((g) =>
+      g.qa.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+    ),
+  };
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <section className="phero" aria-labelledby="h-faq">
+        <div className="wrap">
+          <nav className="crumbs" aria-label="Brødkrummer">
+            <Link href="/">Forside</Link>
+            <span aria-hidden="true">/</span>
+            <span>Spørgsmål og svar</span>
+          </nav>
+          <span className="label">Hjælp</span>
+          <h1 className="h1" id="h-faq">Spørgsmål og svar om SnupLive</h1>
+          <p className="lede">Her finder du svar på de spørgsmål, vi oftest får om at købe og sælge live.</p>
+        </div>
+      </section>
+      <section className="sec tight">
+        <div className="wrap faq">
+          <div className="sec-head">
+            <span className="label">Kan du ikke finde svaret?</span>
+            <h2 className="h2">Se, hvordan det hele hænger sammen</h2>
+            <p className="lede">Guiden viser hele turen for både købere og sælgere.</p>
+            <div className="ctas">
+              <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
+              <Link className="btn btn-red" href="/opret">Opret gratis konto</Link>
+            </div>
+          </div>
+          <div>
+            {GROUPS.map((g, gi) => (
+              <div className="faq-group" key={g.title}>
+                <h2>{g.title}</h2>
+                <div className="faq-list">
+                  {g.qa.map(([q, a], i) => (
+                    <details key={q} open={gi === 0 && i === 0}>
+                      <summary>
+                        <h3>{q}</h3>
+                        <span className="pm" aria-hidden="true">+</span>
+                      </summary>
+                      <p>{a}</p>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

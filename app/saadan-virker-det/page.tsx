@@ -1,0 +1,92 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { IconBox, IconCamera, IconChat, IconShield, IconStar, IconUser } from "@/components/Icons";
+
+export const metadata: Metadata = {
+  title: { absolute: "Sådan virker live shopping | SnupLive" },
+  description:
+    "Sådan køber og sælger du brugte ting live: find et show, spørg i chatten, snup med ét tryk og få det hele samlet i én pakke.",
+  alternates: { canonical: "/saadan-virker-det" },
+};
+
+export default function Saadan() {
+  return (
+    <>
+      <section className="phero" aria-labelledby="h-saadan">
+        <div className="wrap">
+          <nav className="crumbs" aria-label="Brødkrummer">
+            <Link href="/">Forside</Link>
+            <span aria-hidden="true">/</span>
+            <span>Sådan virker det</span>
+          </nav>
+          <span className="label">Guide</span>
+          <h1 className="h1" id="h-saadan">Sådan virker live shopping på SnupLive</h1>
+          <p className="lede">
+            Du ser tingene på video, spørger løs i chatten og snupper med ét tryk. Her er hele turen, fra du finder et
+            show, til pakken ligger i postkassen.
+          </p>
+        </div>
+      </section>
+
+      <section className="sec" aria-labelledby="h-buyer">
+        <div className="wrap split" style={{ alignItems: "start" }}>
+          <div className="sec-head">
+            <span className="label mint">For købere</span>
+            <h2 className="h2" id="h-buyer">Hvordan køber jeg på SnupLive?</h2>
+            <p className="lede">Du behøver ikke en app. Det hele foregår her på siden, både på telefonen og computeren.</p>
+            <div className="ctas"><Link className="btn btn-red" href="/live">Se hvem der er live</Link></div>
+          </div>
+          <ol className="steps">
+            <li><div><h3>Find et show</h3><p>Se hvem der er live under Live nu, eller tjek programmet for shows senere.</p></div></li>
+            <li><div><h3>Spørg i chatten</h3><p>Bed sælgeren vise mærket, målene eller stoffet tæt på. Svaret kommer, mens du ser med.</p></div></li>
+            <li><div><h3>Snup med ét tryk</h3><p>Den første, der trykker Snup, får tingen. Den lander med det samme under Mine snup.</p></div></li>
+            <li><div><h3>Betal samlet</h3><p>Ved lanceringen betaler du med MobilePay eller kort. Alt fra samme sælger i ét show sendes i én pakke.</p></div></li>
+            <li><div><h3>Modtag din pakke</h3><p>Du bekræfter, at alt er i orden, og først derefter bliver pengene udbetalt til sælgeren.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section className="sec band" aria-labelledby="h-seller">
+        <div className="wrap split" style={{ alignItems: "start" }}>
+          <div className="sec-head">
+            <span className="label red">For sælgere</span>
+            <h2 className="h2" id="h-seller">Hvordan sælger jeg på SnupLive?</h2>
+            <p className="lede">Opret et show, læg dine ting i køen, og gå live fra studiet.</p>
+            <div className="ctas">
+              <Link className="btn btn-red" href="/saelg">Læs om at sælge live</Link>
+              <Link className="btn btn-line" href="/studio">Gå til studiet</Link>
+            </div>
+          </div>
+          <ol className="steps">
+            <li><div><h3>Opret en konto</h3><p>Med din e-mail. Ved lanceringen bliver sælgere verificeret med MitID.</p></div></li>
+            <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris. Billeder er ikke nødvendige.</p></div></li>
+            <li><div><h3>Gå live og sælg</h3><p>Vis tingene frem én ad gangen, og svar på spørgsmål i chatten.</p></div></li>
+            <li><div><h3>Send og få penge</h3><p>Du kan se alle salg i studiet. Fragtlabels og udbetaling kommer ved lanceringen.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section className="sec" aria-labelledby="h-tryg" id="tryg-handel">
+        <div className="wrap">
+          <div className="sec-head">
+            <span className="label">Tryg handel</span>
+            <h2 className="h2" id="h-tryg">Hvordan er det trygt at handle live?</h2>
+            <p className="lede">Det er nemt at købe med det samme, når du ser tingen på video. Derfor bygger vi tryghed ind i hvert trin.</p>
+          </div>
+          <div className="feat">
+            <div><IconUser className="ico" /><h3>Sælgere med MitID</h3><p>Ved lanceringen bliver alle sælgere verificeret med MitID, før de kan sælge.</p></div>
+            <div><IconShield /><h3>Pengene holdes tilbage</h3><p>Sælgeren får først pengene, når du har modtaget dine ting.</p></div>
+            <div><IconCamera /><h3>Du ser tingen live</h3><p>Bed om at se mærket, målene og standen tæt på, før du snupper.</p></div>
+            <div><IconStar /><h3>Bedømmelser</h3><p>Efter hver handel kan køberen bedømme sælgeren, så du kan se, hvem du handler med.</p></div>
+            <div><IconBox /><h3>Sporing på pakken</h3><p>Du kan følge pakken fra sælgeren sender den, til den ligger i pakkeshoppen.</p></div>
+            <div><IconChat /><h3>Hjælp, hvis noget går galt</h3><p>Meld en fejl, inden pengene bliver udbetalt, så hjælper vi jer med at finde en løsning.</p></div>
+          </div>
+          <p className="fine" style={{ marginTop: 18 }}>
+            SnupLive er i beta. Betaling, MitID, bedømmelser og sporing bliver slået til inden lanceringen.
+          </p>
+          <div className="ctas" style={{ marginTop: 24 }}><Link className="btn btn-line" href="/faq">Læs spørgsmål og svar</Link></div>
+        </div>
+      </section>
+    </>
+  );
+}
