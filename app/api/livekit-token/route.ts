@@ -1,6 +1,6 @@
 import { AccessToken } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
-import { hasSupabase } from "@/lib/env";
+import { hasSupabase, livekitUrl, unquoteEnv } from "@/lib/env";
 import { createClient, getUserId } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +17,9 @@ function fail(error: string, status: number) {
  * Alle andre må kun se med, og kun mens showet er live.
  */
 export async function POST(req: Request) {
-  const url = process.env.LIVEKIT_URL;
-  const key = process.env.LIVEKIT_API_KEY;
-  const secret = process.env.LIVEKIT_API_SECRET;
+  const url = livekitUrl(process.env.LIVEKIT_URL);
+  const key = unquoteEnv(process.env.LIVEKIT_API_KEY);
+  const secret = unquoteEnv(process.env.LIVEKIT_API_SECRET);
   if (!url || !key || !secret || !hasSupabase) return fail("Video er ikke sat op endnu.", 503);
 
   const body = (await req.json().catch(() => null)) as { showId?: unknown } | null;

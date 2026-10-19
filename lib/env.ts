@@ -1,9 +1,44 @@
 // Offentlige værdier (NEXT_PUBLIC_*) bliver bygget ind i siden. Hemmelige
 // nøgler (LiveKit) læses kun i app/api/livekit-token på serveren.
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://snuplive.dk").replace(/\/$/, "");
+//
+// Værdierne bliver renset, så små fejl ved indtastning i Vercel (mellemrum,
+// anførselstegn, manglende https://) ikke får hele siden til at fejle.
 
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-export const SUPABASE_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const unquote = (v: string | undefined) => (v ?? "").trim().replace(/^["']+|["']+$/g, "").trim();
+
+/** Gør en indtastet adresse til en gyldig origin (fx https://abc.supabase.co), eller "" hvis den er ugyldig. */
+export function cleanOrigin(raw: string | undefined, scheme = "https") {
+  let v = unquote(raw);
+  if (!v) return "";
+  // Kun projekt-id'et (20 små bogstaver) er skrevet ind.
+  if (scheme === "https" && /^[a-z]{20}$/.test(v)) return `https://${v}.supabase.co`;
+  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(v)) v = `${scheme}://${v}`;
+  try {
+    const u = new URL(v);
+    // Har man kopieret adressen på Supabase-dashboardet, finder vi projektets egen adresse.
+    const ref = /^\/dashboard\/project\/([a-z0-9]+)/i.exec(u.pathname)?.[1];
+    if (/(^|\.)supabase\.com$/i.test(u.hostname) && ref) return `https://${ref}.supabase.co`;
+    // En rigtig adresse har et punktum i navnet (fx abc.supabase.co). Ellers er det nok en nøgle i det forkerte felt.
+    if (!u.hostname.includes(".") && u.hostname !== "localhost") return "";
+    return u.origin;
+  } catch {
+    return "";
+  }
+}
+
+export const SITE_URL = cleanOrigin(process.env.NEXT_PUBLIC_SITE_URL) || "https://snuplive.dk";
+
+export const SUPABASE_URL = cleanOrigin(process.env.NEXT_PUBLIC_SUPABASE_URL);
+export const SUPABASE_KEY = unquote(
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+);
 
 export const hasSupabase = Boolean(SUPABASE_URL && SUPABASE_KEY);
+
+/** LiveKit-adressen som wss://… uanset om den er skrevet med https://, wss:// eller uden. */
+export function livekitUrl(raw: string | undefined) {
+  const o = cleanOrigin(raw, "wss");
+  return o.replace(/^http(s?):\/\//i, (_m, s: string) => `ws${s}://`);
+}
+
+export const unquoteEnv = unquote;

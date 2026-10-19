@@ -13,11 +13,11 @@ export interface Listing {
 
 /** Shows, der er live nu, og shows, der starter snart (offentlige data). */
 export async function fetchListing(limitLive = 30, limitUpcoming = 20): Promise<Listing> {
-  const sb = createPublicClient();
-  if (!sb) return { ok: false, live: [], upcoming: [] };
   const sel = `${SHOW_COLS},${SELLER_EMBED},${ITEM_COUNT_EMBED}`;
   const since = new Date(Date.now() - 2 * 3600e3).toISOString();
   try {
+    const sb = createPublicClient();
+    if (!sb) return { ok: false, live: [], upcoming: [] };
     const [live, upcoming] = await Promise.all([
       sb.from("shows").select(sel).eq("status", "live").order("started_at", { ascending: false }).limit(limitLive),
       sb
