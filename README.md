@@ -34,7 +34,8 @@ Betaling, fragt og MitID kommer i de næste trin (se nederst). Indtil da er et s
 
 1. Gå til [supabase.com](https://supabase.com), log ind med GitHub, og tryk **New project**.
    - Navn: `snuplive`
-   - Region: **North EU (Stockholm)**. Det er tættest på Danmark og holder data i EU.
+   - Region: en region i EU. **West EU (Ireland)** er fint, og det samme er Stockholm eller Frankfurt, hvis de kan vælges.
+     Data bliver i EU, og forskellen i hastighed fra Danmark er så lille, at brugerne ikke mærker den.
    - Gem database-adgangskoden i din password manager.
 2. Når projektet er klar: åbn **SQL Editor → New query**, indsæt hele indholdet af
    [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql), og tryk **Run**.
@@ -88,7 +89,9 @@ Betaling, fragt og MitID kommer i de næste trin (se nederst). Indtil da er et s
    | `NEXT_PUBLIC_SITE_URL` | `https://snuplive.dk` |
 
 4. Tryk **Deploy**. Efter et par minutter får du en adresse som `snuplive.vercel.app`.
-5. Valgfrit: under **Settings → Functions** kan du sætte regionen til **Stockholm (arn1)**, så serveren ligger tæt på databasen.
+5. Under **Settings → Functions → Function Region** vælger du den region, der ligger tættest på databasen:
+   **Dublin (dub1)**, hvis Supabase ligger i Irland (Stockholm (arn1) til Stockholm, Frankfurt (fra1) til Frankfurt).
+   Det gør siden hurtigere, fordi serveren og databasen taler sammen mange gange pr. side.
 
 Retter du en nøgle senere, skal du trykke **Redeploy**, før ændringen virker.
 
