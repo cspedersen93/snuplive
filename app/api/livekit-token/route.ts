@@ -20,7 +20,20 @@ export async function POST(req: Request) {
   const url = livekitUrl(process.env.LIVEKIT_URL);
   const key = unquoteEnv(process.env.LIVEKIT_API_KEY);
   const secret = unquoteEnv(process.env.LIVEKIT_API_SECRET);
-  if (!url || !key || !secret || !hasSupabase) return fail("Video er ikke sat op endnu.", 503);
+  if (!hasSupabase) return fail("Databasen er ikke sat op endnu.", 503);
+  const missing: string[] = [];
+  if (!url)
+    missing.push(
+      process.env.LIVEKIT_URL
+        ? "LIVEKIT_URL er ikke en gyldig adresse (den skal ligne wss://dit-projekt.livekit.cloud)"
+        : "LIVEKIT_URL mangler",
+    );
+  if (!key) missing.push("LIVEKIT_API_KEY mangler");
+  if (!secret) missing.push("LIVEKIT_API_SECRET mangler");
+  if (missing.length) {
+    console.error(`[livekit-token] ${missing.join("; ")}`);
+    return fail(`Video er ikke sat op endnu: ${missing.join(", ")}. Ret det i Vercel, og lav en ny deployment.`, 503);
+  }
 
   const body = (await req.json().catch(() => null)) as { showId?: unknown } | null;
   const showId = typeof body?.showId === "string" ? body.showId : "";
