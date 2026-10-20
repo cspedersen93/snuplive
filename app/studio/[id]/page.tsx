@@ -22,7 +22,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
 
   const [items, messages, sales] = await Promise.all([
     supabase.from("items").select(ITEM_COLS).eq("show_id", id).order("position").order("created_at"),
-    supabase.from("messages").select(MESSAGE_COLS).eq("show_id", id).order("id", { ascending: false }).limit(60),
+    supabase.from("messages").select(MESSAGE_COLS).eq("show_id", id).is("removed_at", null).order("id", { ascending: false }).limit(60),
     supabase
       .from("sales")
       .select("id,item_id,price,buyer:profiles!sales_buyer_id_fkey(handle)")

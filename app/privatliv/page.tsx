@@ -27,9 +27,10 @@ export default function Privatliv() {
           <ul>
             <li><b>Konto:</b> din e-mailadresse, dit brugernavn og eventuelt navn og område, hvis du selv skriver dem.</li>
             <li><b>Shows og ting:</b> de shows og ting, du lægger op som sælger.</li>
-            <li><b>Chat:</b> de beskeder, du skriver i et show. De kan ses af alle, der ser showet.</li>
+            <li><b>Chat:</b> de beskeder, du skriver i et show. De kan ses af alle, der ser showet. Fjerner du eller sælgeren en besked, bliver teksten slettet. Blokerer en sælger dig, gemmer vi det, så du ikke kan skrive eller snuppe i sælgerens shows.</li>
             <li><b>Snup og ordrer:</b> hvad du har snuppet, hos hvem og til hvilken pris. Det kan kun du og sælgeren se. Når du snupper, bliver dit brugernavn vist i chatten.</li>
             <li><b>Betaling og levering:</b> når du betaler, får vi dit navn, din adresse og dit telefonnummer fra Stripe, og vi gemmer den pakkeshop, du vælger. Sælgeren ser dem kun for at kunne sende eller aflevere dine ting. Når sælgeren laver fragtlabelen, sender vi dit navn, din adresse, din e-mail og dit telefonnummer til Shipmondo og fragtfirmaet (DAO eller GLS), så de kan levere pakken og give dig besked. Kortoplysninger og MobilePay håndteres af Stripe, og vi ser dem aldrig.</li>
+            <li><b>Problemer med en ordre:</b> melder du et problem, gemmer vi det, du skriver, og sælgeren kan læse det. Vi bruger det kun til at afgøre sagen.</li>
             <li><b>Sælgere:</b> for at få udbetalt penge opretter du en konto hos Stripe, som tjekker din identitet og bankkonto. Din afsenderadresse står på fragtlabelen og deles med Shipmondo og fragtfirmaet.</li>
             <li><b>Video:</b> videoen fra et live-show bliver sendt direkte til seerne og bliver ikke gemt.</li>
           </ul>

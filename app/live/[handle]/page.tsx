@@ -40,7 +40,7 @@ const load = cache(async (rawHandle: string) => {
   if (show) {
     const [i, m] = await Promise.all([
       sb.from("items").select(ITEM_COLS).eq("show_id", show.id).order("position").order("created_at"),
-      sb.from("messages").select(MESSAGE_COLS).eq("show_id", show.id).order("id", { ascending: false }).limit(60),
+      sb.from("messages").select(MESSAGE_COLS).eq("show_id", show.id).is("removed_at", null).order("id", { ascending: false }).limit(60),
     ]);
     items = (i.data ?? []) as Item[];
     messages = ((m.data ?? []) as Message[]).reverse();

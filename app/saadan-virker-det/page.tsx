@@ -79,7 +79,7 @@ export default function Saadan() {
             <div><IconCamera /><h3>Du ser tingen live</h3><p>Bed om at se mærket, målene og standen tæt på, før du snupper.</p></div>
             <div><IconStar /><h3>Bedømmelser</h3><p>Efter hver handel kan køberen bedømme sælgeren, så du kan se, hvem du handler med.</p></div>
             <div><IconBox /><h3>Sporing på pakken</h3><p>Du kan følge pakken fra sælgeren sender den, til den ligger i pakkeshoppen.</p></div>
-            <div><IconChat /><h3>Hjælp, hvis noget går galt</h3><p>Meld en fejl, inden pengene bliver udbetalt, så hjælper vi jer med at finde en løsning.</p></div>
+            <div><IconChat /><h3>Hjælp, hvis noget går galt</h3><p>Tryk Meld et problem på ordren, inden pengene bliver udbetalt. Så holder vi pengene tilbage og hjælper jer med at finde en løsning.</p></div>
           </div>
           <p className="fine" style={{ marginTop: 18 }}>
             SnupLive er i beta. MitID og bedømmelser bliver slået til inden lanceringen.

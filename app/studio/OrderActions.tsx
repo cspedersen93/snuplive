@@ -265,3 +265,21 @@ export function HandedIn({ orderId }: { orderId: string }) {
     </button>
   );
 }
+
+export function UnblockButton({ userId, handle }: { userId: string; handle: string }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  async function unblock() {
+    setBusy(true);
+    const { error } = await getSupabase().rpc("unblock_user", { p_user: userId });
+    setBusy(false);
+    if (error) return toast(errorText(error));
+    toast(`@${handle} kan igen skrive og snuppe i dine shows.`);
+    router.refresh();
+  }
+  return (
+    <button className="linkbtn" type="button" onClick={unblock} disabled={busy}>
+      {busy ? "Fjerner …" : "Fjern blokering"}
+    </button>
+  );
+}

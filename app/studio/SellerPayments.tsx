@@ -2,6 +2,7 @@ import Link from "next/link";
 import { IconBox, IconCard, IconInfo } from "@/components/Icons";
 import { itemMeta } from "@/components/Screen";
 import { CARRIERS, isCarrier, LABEL_WEIGHTS, trackingText } from "@/lib/carriers";
+import { ISSUE_REASONS, isIssueReason } from "@/lib/issues";
 import { clock, dayLabel, kr } from "@/lib/format";
 import { DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS, sellerPayout } from "@/lib/pricing";
 import { hasShipmondo, shipmondoSandbox } from "@/lib/shipmondo";
@@ -39,6 +40,8 @@ interface SellerOrder {
   labelless_code: string | null;
   tracking_status: string | null;
   delivered_at: string | null;
+  issue_open: boolean;
+  issues: { reason: string; message: string; status: string; created_at: string }[];
   buyer: { handle: string } | null;
   show: { title: string } | null;
   sales: { id: string; price: number; item: ItemInfo | null }[];
@@ -54,6 +57,21 @@ interface Reservation {
 }
 
 const at = (iso: string | null) => (iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "");
+
+/** Køberen har meldt et problem: vis det til sælgeren. */
+function IssueNote({ o }: { o: SellerOrder }) {
+  const issue = (o.issues ?? []).find((i) => i.status === "open");
+  if (!o.issue_open || !issue) return null;
+  return (
+    <div className="issue-note" role="status">
+      <b>Køberen har meldt et problem {at(issue.created_at)}</b>
+      <span>
+        {isIssueReason(issue.reason) ? ISSUE_REASONS[issue.reason] : "Problem"}: <q>{issue.message}</q>
+      </span>
+      <span>Pengene holdes tilbage, mens SnupLive kigger på sagen. Du har fået en mail, du kan svare på.</span>
+    </div>
+  );
+}
 
 const NOTICE: Record<string, [string, string]> = {
   klar: ["ok", "Din udbetaling er klar. Pengene fra dine salg går nu til din bankkonto via Stripe."],
@@ -74,7 +92,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
     supabase
       .from("orders")
       .select(
-        "id,status,delivery,items_amount,shipping_amount,total_amount,ship_name,ship_line1,ship_line2,ship_postal_code,ship_city,buyer_phone,carrier,tracking,transfer_status,paid_at,sp_carrier,sp_id,sp_name,sp_address,sp_zipcode,sp_city,shipmondo_shipment_id,labelless_code,tracking_status,delivered_at,buyer:profiles!orders_buyer_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
+        "id,status,delivery,items_amount,shipping_amount,total_amount,ship_name,ship_line1,ship_line2,ship_postal_code,ship_city,buyer_phone,carrier,tracking,transfer_status,paid_at,sp_carrier,sp_id,sp_name,sp_address,sp_zipcode,sp_city,shipmondo_shipment_id,labelless_code,tracking_status,delivered_at,issue_open,issues:order_issues!order_issues_order_id_fkey(reason,message,status,created_at),buyer:profiles!orders_buyer_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
       )
       .eq("seller_id", uid)
       .in("status", ["paid", "shipped", "completed", "refunded"])
@@ -223,6 +241,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                     {o.buyer_phone ? ` på ${o.buyer_phone}` : ""} og aftal tid og sted. Køberen bekræfter i appen, når tingene er hentet.
                   </p>
                 )}
+                <IssueNote o={o} />
                 <RefundButton orderId={o.id} amount={kr(o.total_amount)} />
               </div>
             ))}
@@ -276,6 +295,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                             ? "Modtaget. Pengene venter, til du har tilknyttet udbetaling."
                             : "Modtaget. Udbetalingen bliver forsøgt igen i nat."}
                   </span>
+                  <IssueNote o={o} />
                 </div>
                 <span className="num" style={{ fontWeight: 600 }}>{kr(sellerPayout(o))}</span>
               </li>

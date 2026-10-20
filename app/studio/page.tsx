@@ -9,6 +9,7 @@ import { ITEM_COUNT_EMBED } from "@/lib/queries";
 import { SHOW_COLS, type Show } from "@/lib/types";
 import BecomeSeller from "../konto/BecomeSeller";
 import NewShowForm from "./NewShowForm";
+import BlockedUsers from "./BlockedUsers";
 import SellerPayments from "./SellerPayments";
 
 export const dynamic = "force-dynamic";
@@ -117,6 +118,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
         )}
 
         <SellerPayments uid={uid} search={sp} displayName={profile.display_name ?? ""} />
+        <BlockedUsers uid={uid} />
       </div>
     </div>
   );

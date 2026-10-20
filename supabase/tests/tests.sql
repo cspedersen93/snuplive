@@ -253,5 +253,70 @@ select t.ok((select status = 'shipped' and carrier = 'GLS' and tracking = '01234
             'pakken med label er afleveret og beholder sporingsnummeret');
 reset role;
 
+-- ── Moderation ───────────────────────────────────────────────────────────────
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select set_show_status('10000000-0000-0000-0000-000000000002', 'live');
+insert into items (id, show_id, seller_id, name, price, position)
+  values ('20000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000002', auth.uid(), 'Bordlampe', 200, 1);
+select present_item('20000000-0000-0000-0000-000000000005');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+insert into messages (show_id, user_id, body) values ('10000000-0000-0000-0000-000000000002', auth.uid(), 'Grim besked');
+select pg_sleep(1.1);
+insert into messages (show_id, user_id, body) values ('10000000-0000-0000-0000-000000000002', auth.uid(), 'Endnu en grim');
+select t.throws($$update messages set removed_at = now() where user_id = auth.uid()$$, 'permission denied');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+insert into messages (show_id, user_id, body) values ('10000000-0000-0000-0000-000000000002', auth.uid(), 'Ups, forkert show');
+select remove_message((select id from messages where body = 'Ups, forkert show'));
+select t.ok((select count(*) from messages where user_id = auth.uid() and removed_at is not null) = 1, 'Liva fjerner sin egen besked');
+select t.throws($$select remove_message((select id from messages where body = 'Grim besked'))$$, 'kan ikke fjernes');
+select t.throws($$select block_user('00000000-0000-0000-0000-00000000000c')$$, 'Kun sælgere');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select remove_message((select id from messages where body = 'Grim besked'));
+select t.ok((select count(*) from messages where body = 'Grim besked') = 0, 'sælgeren fjerner en besked, og teksten er væk');
+select t.throws($$select remove_message((select id from messages where kind = 'event' order by id desc limit 1))$$, 'kan ikke fjernes');
+select t.throws($$select block_user(auth.uid())$$, 'dig selv');
+select block_user('00000000-0000-0000-0000-00000000000c');
+select t.ok((select count(*) from seller_blocks) = 1, 'Maja kan se, hvem hun har blokeret');
+select t.ok((select count(*) from messages where user_id = '00000000-0000-0000-0000-00000000000c' and show_id = '10000000-0000-0000-0000-000000000002' and removed_at is null) = 0,
+            'den blokerede brugers beskeder i showet er fjernet');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select pg_sleep(1.1);
+select t.throws($$insert into messages (show_id, user_id, body) values ('10000000-0000-0000-0000-000000000002', auth.uid(), 'Hallo?')$$, 'blokeret dig i chatten');
+select t.throws($$select snup('20000000-0000-0000-0000-000000000005')$$, 'blokeret dig');
+select t.ok((select count(*) from seller_blocks) = 0, 'Ole kan ikke se listen over blokerede');
+select t.throws($$insert into seller_blocks (seller_id, user_id) values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b')$$, 'permission denied');
+select unblock_user('00000000-0000-0000-0000-00000000000c');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select count(*) from seller_blocks) = 1, 'Ole kan ikke selv fjerne blokeringen');
+select unblock_user('00000000-0000-0000-0000-00000000000c');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+insert into messages (show_id, user_id, body) values ('10000000-0000-0000-0000-000000000002', auth.uid(), 'Undskyld');
+select t.ok((select count(*) from messages where body = 'Undskyld' and removed_at is null) = 1, 'Ole kan skrive igen, når blokeringen er fjernet');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select set_show_status('10000000-0000-0000-0000-000000000002', 'ended');
+reset role;
+
+-- ── Meld et problem ──────────────────────────────────────────────────────────
+-- Serveren opretter sagen (her som databasens ejer).
+insert into order_issues (order_id, buyer_id, reason, message)
+  values ('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000b', 'not_as_shown', 'Kjolen har en plet, der ikke blev vist');
+update orders set issue_open = true where id = '30000000-0000-0000-0000-000000000001';
+select t.throws($$insert into order_issues (order_id, buyer_id, reason, message) values ('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000b', 'other', 'En sag mere om det samme')$$, 'duplicate key');
+select t.throws($$insert into order_issues (order_id, buyer_id, reason, message, status) values ('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000b', 'other', 'kort', 'resolved')$$, 'check constraint');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select count(*) from order_issues) = 1, 'Liva kan se sin sag');
+select t.throws($$insert into order_issues (order_id, buyer_id, reason, message) values ('30000000-0000-0000-0000-000000000001', auth.uid(), 'other', 'Jeg prøver selv at oprette en sag')$$, 'permission denied');
+select t.throws($$update orders set issue_open = false where id = '30000000-0000-0000-0000-000000000001' returning 1$$, 'permission denied');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select count(*) from order_issues) = 1, 'sælgeren kan se sagen');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.ok((select count(*) from order_issues) = 0, 'andre kan ikke se sagen');
+reset role;
+set role anon;
+select t.throws($$select * from order_issues$$, 'permission denied');
+reset role;
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

@@ -4,6 +4,9 @@ import AccountNav from "@/components/AccountNav";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
 import { kr } from "@/lib/format";
+import { isAdminEmail } from "@/lib/mail";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getUserInfo } from "@/lib/supabase/server";
 import BecomeSeller from "./BecomeSeller";
 import ProfileForm from "./ProfileForm";
 
@@ -25,6 +28,13 @@ export default async function Konto() {
   const myShows = shows.data ?? [];
   const liveNow = myShows.some((s) => s.status === "live");
 
+  // Admins ser, hvor mange sager der venter.
+  const isAdmin = isAdminEmail((await getUserInfo(supabase))?.email);
+  const adminDb = isAdmin ? createAdminClient() : null;
+  const openCases = adminDb
+    ? ((await adminDb.from("order_issues").select("id", { count: "exact", head: true }).eq("status", "open")).count ?? 0)
+    : 0;
+
   return (
     <div className="wrap dash">
       <AccountNav profile={profile} active="konto" snupCount={snup.length} />
@@ -43,6 +53,15 @@ export default async function Konto() {
             </Link>
           ) : null}
         </div>
+
+        {isAdmin ? (
+          <div className={`notice${openCases ? "" : " ok"}`} role="status">
+            <span>
+              <b>Admin:</b> {openCases ? `${openCases} ${openCases === 1 ? "sag venter" : "sager venter"} på dig.` : "Ingen åbne sager."}{" "}
+              <Link href="/admin">Gå til sager</Link>
+            </span>
+          </div>
+        ) : null}
 
         <div className="stats">
           <Link className="stat" href="/kurv" style={{ textDecoration: "none" }}>

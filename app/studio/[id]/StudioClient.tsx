@@ -458,7 +458,7 @@ export default function StudioClient(props: Props) {
         </div>
 
         <aside className="show-side" aria-label="Styring og chat">
-          <Chat showId={show.id} messages={messages} me={me} live={live} loginHref="/login" hint="Seerne skriver her" />
+          <Chat showId={show.id} messages={messages} me={me} live={live} loginHref="/login" hint="Seerne skriver her" canModerate />
         </aside>
       </div>
 

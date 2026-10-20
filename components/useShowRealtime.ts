@@ -35,7 +35,7 @@ export function useShowRealtime(initial: { show: Show; items: Item[]; messages: 
     const [s, i, m] = await Promise.all([
       sb.from("shows").select(SHOW_COLS).eq("id", id).maybeSingle(),
       sb.from("items").select(ITEM_COLS).eq("show_id", id),
-      sb.from("messages").select(MESSAGE_COLS).eq("show_id", id).order("id", { ascending: false }).limit(60),
+      sb.from("messages").select(MESSAGE_COLS).eq("show_id", id).is("removed_at", null).order("id", { ascending: false }).limit(60),
     ]);
     if (s.data) setShow(s.data as Show);
     if (i.data) setItems(sortItems(i.data as Item[]));
@@ -63,7 +63,13 @@ export function useShowRealtime(initial: { show: Show; items: Item[]; messages: 
       })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `show_id=eq.${id}` }, (p) => {
         const msg = p.new as Message;
+        if ((msg as { removed_at?: string | null }).removed_at) return;
         setMessages((ms) => (ms.some((m) => m.id === msg.id) ? ms : [...ms, msg].slice(-MAX_MESSAGES)));
+      })
+      // En besked, sælgeren (eller afsenderen) har fjernet, forsvinder hos alle.
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages", filter: `show_id=eq.${id}` }, (p) => {
+        const row = p.new as Message & { removed_at?: string | null };
+        if (row.removed_at) setMessages((ms) => ms.filter((m) => m.id !== row.id));
       })
       .subscribe((status) => {
         setOnline(status === "SUBSCRIBED");

@@ -1,5 +1,9 @@
 import type Stripe from "stripe";
 import { CARRIERS, isCarrier } from "@/lib/carriers";
+import { SITE_URL } from "@/lib/env";
+import { kr } from "@/lib/format";
+import { ISSUE_REASONS, type IssueReason } from "@/lib/issues";
+import { adminEmails, sendMail } from "@/lib/mail";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, RESERVATION_DAYS, sellerPayout } from "@/lib/pricing";
 import { cancelLabel, createLabel, ensureTrackingWebhook, hasShipmondo } from "@/lib/shipmondo";
 import { ore } from "@/lib/stripe";
@@ -134,11 +138,21 @@ export async function releaseOrder(admin: AdminClient, stripe: Stripe, orderId: 
 /**
  * Afslut en ordre (køberen har fået sine ting). Kun fra "sendt", eller "betalt" ved afhentning.
  * buyerId sikrer, at kun køberen selv kan gøre det (cron-jobbet sender null).
+ * Er der meldt et problem, afslutter cron-jobbet ikke ordren. Køberen kan stadig selv bekræfte,
+ * og en admin kan sende pengene til sælgeren (byAdmin), når sagen er afgjort.
  */
-export async function completeOrder(admin: AdminClient, stripe: Stripe, orderId: string, buyerId: string | null) {
-  const { data: order } = await admin.from("orders").select("id,buyer_id,status,delivery").eq("id", orderId).maybeSingle();
+export async function completeOrder(
+  admin: AdminClient,
+  stripe: Stripe,
+  orderId: string,
+  buyerId: string | null,
+  opts: { byAdmin?: boolean } = {},
+) {
+  const { data: order } = await admin.from("orders").select("id,buyer_id,status,delivery,issue_open").eq("id", orderId).maybeSingle();
   if (!order || (buyerId && order.buyer_id !== buyerId)) return false;
-  const ready = order.status === "shipped" || (order.status === "paid" && order.delivery === "pickup");
+  if (!buyerId && !opts.byAdmin && order.issue_open) return false;
+  const ready =
+    order.status === "shipped" || (order.status === "paid" && (order.delivery === "pickup" || Boolean(opts.byAdmin)));
   if (!ready) return false;
   // Opdatér kun, hvis status stadig er den samme (så to klik ikke giver to overførsler).
   const { data, error } = await admin
@@ -150,18 +164,19 @@ export async function completeOrder(admin: AdminClient, stripe: Stripe, orderId:
   if (error) throw error;
   if (!data?.length) return false;
   await admin.from("sales").update({ status: "done" }).eq("order_id", orderId).in("status", ["paid", "shipped"]);
+  if (order.issue_open) await resolveIssues(admin, orderId, opts.byAdmin ? "released" : "buyer_confirmed");
   await releaseOrder(admin, stripe, orderId);
   return true;
 }
 
-/** Refundér en ordre, der ikke er afsluttet endnu (sælgeren kan ikke levere). */
-export async function refundOrder(admin: AdminClient, stripe: Stripe, orderId: string, sellerId: string) {
-  const { data: order } = await admin
-    .from("orders")
-    .select(ORDER_COLS)
-    .eq("id", orderId)
-    .eq("seller_id", sellerId)
-    .maybeSingle<OrderRow>();
+/**
+ * Refundér en ordre, der ikke er afsluttet endnu: sælgeren kan ikke levere, eller en admin
+ * har afgjort en sag til køberens fordel (sellerId = null).
+ */
+export async function refundOrder(admin: AdminClient, stripe: Stripe, orderId: string, sellerId: string | null) {
+  let q = admin.from("orders").select(ORDER_COLS).eq("id", orderId);
+  if (sellerId) q = q.eq("seller_id", sellerId);
+  const { data: order } = await q.maybeSingle<OrderRow>();
   if (!order || !["paid", "shipped"].includes(order.status) || !order.stripe_payment_intent) return false;
 
   await stripe.refunds.create(
@@ -175,6 +190,7 @@ export async function refundOrder(admin: AdminClient, stripe: Stripe, orderId: s
   await admin.from("orders").update({ status: "refunded", cancelled_at: nowIso() }).eq("id", order.id);
   await admin.rpc("release_items_for_order", { p_order: order.id });
   await admin.from("sales").update({ status: "cancelled" }).eq("order_id", order.id);
+  await resolveIssues(admin, order.id, "refunded");
   return true;
 }
 
@@ -208,18 +224,26 @@ export async function dailyMaintenance(admin: AdminClient, stripe: Stripe) {
   const days = (n: number) => new Date(Date.now() - n * 864e5).toISOString();
   const result = { completed: 0, transfers: 0, expired: 0, cancelledCheckouts: 0 };
 
-  const { data: shipped } = await admin.from("orders").select("id").eq("status", "shipped").lt("shipped_at", days(AUTO_COMPLETE_DAYS));
+  // Ordrer med et åbent problem venter, til sagen er afgjort.
+  const { data: shipped } = await admin
+    .from("orders")
+    .select("id")
+    .eq("status", "shipped")
+    .eq("issue_open", false)
+    .lt("shipped_at", days(AUTO_COMPLETE_DAYS));
   const { data: pickups } = await admin
     .from("orders")
     .select("id")
     .eq("status", "paid")
     .eq("delivery", "pickup")
+    .eq("issue_open", false)
     .lt("paid_at", days(AUTO_COMPLETE_DAYS));
   // Pakker, der er hentet i pakkeshoppen for mere end to dage siden.
   const { data: delivered } = await admin
     .from("orders")
     .select("id")
     .eq("status", "shipped")
+    .eq("issue_open", false)
     .lt("delivered_at", days(DELIVERED_COMPLETE_DAYS));
   const due = new Set([...(shipped ?? []), ...(pickups ?? []), ...(delivered ?? [])].map((o) => o.id as string));
   for (const id of due) {
@@ -406,4 +430,97 @@ export async function applyTracking(admin: AdminClient, ev: Record<string, unkno
     if (shipped?.length) await admin.from("sales").update({ status: "shipped" }).eq("order_id", order.id).eq("status", "paid");
   }
   return true;
+}
+
+// ── Meld et problem ─────────────────────────────────────────────────────────
+
+export class IssueError extends Error {}
+
+/** Luk de åbne sager på en ordre (refunderet, udbetalt, lukket eller bekræftet af køberen). */
+export async function resolveIssues(
+  admin: AdminClient,
+  orderId: string,
+  resolution: "refunded" | "released" | "closed" | "buyer_confirmed",
+) {
+  await admin
+    .from("order_issues")
+    .update({ status: "resolved", resolution, resolved_at: nowIso() })
+    .eq("order_id", orderId)
+    .eq("status", "open");
+  await admin.from("orders").update({ issue_open: false }).eq("id", orderId);
+}
+
+/** Køberen melder et problem. Pengene holdes tilbage, og admin og sælger får en mail. */
+export async function reportIssue(admin: AdminClient, orderId: string, buyerId: string, reason: IssueReason, message: string) {
+  const { data: order } = await admin
+    .from("orders")
+    .select(
+      "id,buyer_id,seller_id,status,issue_open,total_amount,delivery,tracking,carrier,buyer:profiles!orders_buyer_id_fkey(handle),seller:profiles!orders_seller_id_fkey(handle),show:shows!orders_show_id_fkey(title)",
+    )
+    .eq("id", orderId)
+    .eq("buyer_id", buyerId)
+    .maybeSingle();
+  if (!order) throw new IssueError("Ordren findes ikke.");
+  if (!["paid", "shipped"].includes(order.status as string)) {
+    throw new IssueError("Du kan kun melde et problem, før ordren er afsluttet. Skriv til kontakt@snuplive.dk.");
+  }
+  if (order.issue_open) throw new IssueError("Du har allerede meldt et problem med den her ordre.");
+
+  const { error } = await admin.from("order_issues").insert({ order_id: orderId, buyer_id: buyerId, reason, message });
+  if (error) {
+    if (/duplicate|unique/i.test(error.message)) throw new IssueError("Du har allerede meldt et problem med den her ordre.");
+    throw error;
+  }
+  await admin.from("orders").update({ issue_open: true }).eq("id", orderId);
+
+  const o = order as unknown as {
+    seller_id: string;
+    total_amount: number;
+    buyer: { handle: string } | null;
+    seller: { handle: string } | null;
+    show: { title: string } | null;
+  };
+  const what = ISSUE_REASONS[reason];
+  const admins = adminEmails();
+  await sendMail({
+    to: admins,
+    subject: `Ny sag på SnupLive: ${what}`,
+    text: [
+      `@${o.buyer?.handle ?? "køber"} har meldt et problem med en ordre fra @${o.seller?.handle ?? "sælger"} (${o.show?.title ?? ""}).`,
+      "",
+      `Grund: ${what}`,
+      `Beskrivelse: ${message}`,
+      `Beløb: ${kr(o.total_amount)}`,
+      `Ordre: ${orderId}`,
+      "",
+      `Pengene holdes tilbage. Afgør sagen her: ${SITE_URL}/admin`,
+    ].join("\n"),
+  });
+  const { data: seller } = await admin.auth.admin.getUserById(o.seller_id).catch(() => ({ data: null }));
+  const sellerEmail = seller?.user?.email;
+  if (sellerEmail) {
+    await sendMail({
+      to: [sellerEmail],
+      replyTo: admins,
+      subject: "Køberen har meldt et problem med en ordre",
+      text: [
+        "Hej",
+        "",
+        `@${o.buyer?.handle ?? "køberen"} har meldt et problem med ordren fra dit show "${o.show?.title ?? ""}".`,
+        "",
+        `Grund: ${what}`,
+        `Køberen skriver: ${message}`,
+        "",
+        "Pengene for ordren holdes tilbage, mens SnupLive kigger på sagen. Du kan svare på den her mail, hvis du vil fortælle din side.",
+        "",
+        "Venlig hilsen",
+        "SnupLive",
+      ].join("\n"),
+    });
+  }
+}
+
+/** Admin lukker en sag uden at flytte penge. Ordren kan derefter afsluttes som normalt. */
+export async function closeIssue(admin: AdminClient, orderId: string) {
+  await resolveIssues(admin, orderId, "closed");
 }

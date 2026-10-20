@@ -339,7 +339,7 @@ export default function ShowClient(props: Props) {
         </div>
 
         <aside className="show-side" aria-label="Chat">
-          <Chat showId={show.id} messages={messages} me={me} live={live} loginHref={loginHref} />
+          <Chat showId={show.id} messages={messages} me={me} live={live} loginHref={loginHref} canModerate={Boolean(me && me.id === show.seller_id)} />
           <div style={{ display: "flex", gap: 8 }}>
             <Link className="btn btn-line btn-block" href="/kurv">Mine snup</Link>
             <button className="icon-btn" type="button" onClick={share} aria-label="Del showet">

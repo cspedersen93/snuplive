@@ -24,7 +24,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
       ["Hvordan betaler jeg?", "Under Mine snup betaler du samlet for alt, du har snuppet, med MobilePay, kort, Apple Pay eller Google Pay. Du har 3 dage til at betale."],
       ["Hvad koster fragten?", "49 kr til en DAO- eller GLS-pakkeshop, én gang pr. sælger og show, uanset hvor mange ting du snupper (op til 5 kg). Afhentning hos sælgeren er gratis."],
       ["Hvordan vælger jeg pakkeshop?", "Under Mine snup skriver du dit postnummer, vælger DAO eller GLS og den pakkeshop, du vil hente pakken i. Fragtfirmaet giver dig besked, når pakken er klar, og du kan følge den under Mine snup."],
-      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 2 dage efter, at du har hentet pakken, eller senest 7 dage efter, at den er sendt."],
+      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 2 dage efter, at du har hentet pakken, eller senest 7 dage efter, at den er sendt. Har du meldt et problem, venter pengene, til sagen er afgjort."],
     ],
   },
   {
@@ -39,7 +39,8 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
     title: "Tryghed",
     qa: [
       ["Hvordan ved jeg, at sælgeren er til at stole på?", "Ved lanceringen bliver alle sælgere verificeret med MitID, og du kan se deres bedømmelser fra tidligere handler."],
-      ["Hvad hvis tingen ikke er som vist?", "Skriv til kontakt@snuplive.dk, før du bekræfter, at du har fået tingene. Så holder vi pengene tilbage og hjælper jer med at finde en løsning."],
+      ["Hvad hvis tingen ikke er som vist?", "Tryk Meld et problem på ordren under Mine snup, før du bekræfter, at du har fået tingene. Så holder vi pengene tilbage, sælgeren får besked, og vi hjælper jer med at finde en løsning."],
+      ["Hvad gør jeg, hvis nogen skriver grimme ting i chatten?", "Sælgeren kan fjerne beskeder og blokere brugere i sine shows. En blokeret bruger kan hverken skrive eller snuppe hos sælgeren. Ser du noget, der ikke er i orden, så skriv til kontakt@snuplive.dk."],
     ],
   },
 ];

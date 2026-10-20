@@ -16,6 +16,7 @@ Det hele kører i browseren på snuplive.dk.
 - Profilbilleder og live-billeder fra kameraet på kortene under Live nu
 - Betaling med MobilePay og kort via Stripe. Pengene holdes tilbage, til køberen har fået sine ting, og går derefter til sælgerens bankkonto
 - Fragt til DAO- og GLS-pakkeshops med fragtlabels og sporing via Shipmondo
+- Moderation i chatten (fjern beskeder, blokér brugere) og "Meld et problem" på ordrer med en admin-side til sager
 
 MitID kommer senere (se nederst).
 
@@ -210,6 +211,25 @@ Uden Shipmondo-nøgler virker siden som før: køberen vælger ikke pakkeshop, o
 **Før rigtige labels:** tilknyt et betalingskort i din rigtige Shipmondo-konto (labels betales løbende), lav nye API-nøgler
 dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPMONDO_SANDBOX`.
 
+## Tryghed: moderation og "Meld et problem"
+
+- **Moderation:** sælgeren kan fjerne beskeder i chatten og blokere brugere (menuen ⋯ ved hver besked i studiet eller på sin
+  egen showside). En blokeret bruger kan hverken skrive eller snuppe i sælgerens shows. Blokeringer kan fjernes under Mine shows.
+  Alle kan fjerne deres egne beskeder.
+- **Meld et problem:** køberen kan melde et problem på en ordre under Mine snup, så længe den ikke er afsluttet. Så holdes
+  pengene tilbage (ordren afsluttes ikke automatisk), sælgeren kan se det, og du får en mail. Du afgør sagen på
+  [snuplive.dk/admin](https://snuplive.dk/admin): refundér køberen, send pengene til sælgeren, eller luk sagen.
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0005_tryghed.sql`](supabase/migrations/0005_tryghed.sql).
+2. **Vercel → Environment Variables** (typen **Secret**):
+
+   | Navn | Værdi |
+   | --- | --- |
+   | `ADMIN_EMAILS` | Den e-mail, du logger ind på SnupLive med (flere adskilt med komma) |
+   | `RESEND_API_KEY` | Valgfri. Resend → **API Keys → Create API key** med *Sending access* til snuplive.dk. Uden den bliver der ikke sendt mails om nye sager, men de står stadig på /admin |
+
+3. **Deploy**, log ind med din admin-e-mail, og gå til **Min konto**. Der står, hvor mange sager der venter.
+
 ---
 
 ## Udvikling på din egen computer
@@ -254,10 +274,9 @@ ligger i databasen. Browseren kan ikke snyde sig udenom.
 
 ## Næste trin
 
-1. **MitID** for sælgere via Idura.
-2. **Moderation**: slet beskeder og bloker brugere i chatten.
-3. **Følg sælgere** og besked, når de går live.
-4. **Klager**: en knap til at melde et problem med en ordre, så pengene holdes tilbage.
-5. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
+1. **Følg sælgere** og besked, når de går live.
+2. **MitID** for sælgere via Idura (kræver CVR).
+3. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
+4. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
 
 Husk også at oprette mailadressen `kontakt@snuplive.dk`, som privatlivspolitikken henviser til. 

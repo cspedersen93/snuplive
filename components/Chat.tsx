@@ -17,23 +17,89 @@ interface Props {
   title?: string;
   hint?: string;
   style?: React.CSSProperties;
+  /** Sælgeren af showet kan fjerne alle beskeder og blokere brugere. */
+  canModerate?: boolean;
 }
 
-export function ChatLine({ m, meId }: { m: Message; meId?: string }) {
-  if (m.kind === "event") return <div className="cmsg event">{m.body}</div>;
-  const cls = m.from_seller ? "cmsg seller" : m.user_id && m.user_id === meId ? "cmsg me" : "cmsg";
+/** Menuen på en besked: fjern den (egen besked, eller alle hvis man er sælgeren) og blokér afsenderen. */
+function LineActions({ m, me, canModerate }: { m: Message; me: Me; canModerate: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [ask, setAsk] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const menu = useRef<HTMLDivElement>(null);
+  const own = m.user_id === me.id;
+
+  // Menuen kan ligge nederst i chatten, så den rulles frem, når den åbner.
+  useEffect(() => {
+    if (open) menu.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [open, ask]);
+
+  async function run(fn: "remove_message" | "block_user") {
+    setBusy(true);
+    const args = fn === "remove_message" ? { p_message: m.id } : { p_user: m.user_id };
+    const { error } = await getSupabase().rpc(fn, args);
+    setBusy(false);
+    if (error) return toast(errorText(error));
+    toast(fn === "remove_message" ? "Beskeden er fjernet." : `@${m.handle} er blokeret i dine shows.`);
+    setOpen(false);
+    setAsk(false);
+  }
+
+  if (!open) {
+    return (
+      <button className="cmsg-more" type="button" onClick={() => setOpen(true)} aria-label={`Handlinger for beskeden fra ${m.handle}`}>
+        <span aria-hidden="true">⋯</span>
+      </button>
+    );
+  }
+  if (ask) {
+    return (
+      <div className="cmsg-menu" ref={menu}>
+        <span>Blokér @{m.handle}? Personen kan ikke skrive eller snuppe i dine shows, og beskederne her forsvinder.</span>
+        <div className="row">
+          <button className="btn btn-red btn-sm" type="button" onClick={() => run("block_user")} disabled={busy}>
+            {busy ? "Blokerer …" : "Ja, blokér"}
+          </button>
+          <button className="btn btn-line btn-sm" type="button" onClick={() => setAsk(false)} disabled={busy}>Fortryd</button>
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className={cls}>
-      <i style={{ ["--c" as string]: gradFor(m.handle) }} />
-      <div>
-        <b>{m.handle}</b>
-        {m.body}
+    <div className="cmsg-menu" ref={menu}>
+      <div className="row">
+        <button className="btn btn-line btn-sm" type="button" onClick={() => run("remove_message")} disabled={busy}>
+          {busy ? "Fjerner …" : "Fjern besked"}
+        </button>
+        {canModerate && !own ? (
+          <button className="btn btn-line btn-sm" type="button" onClick={() => setAsk(true)} disabled={busy}>
+            Blokér @{m.handle}
+          </button>
+        ) : null}
+        <button className="linkbtn" type="button" onClick={() => setOpen(false)}>Luk</button>
       </div>
     </div>
   );
 }
 
-export default function Chat({ showId, messages, me, live, loginHref, title = "Chat", hint, style }: Props) {
+export function ChatLine({ m, me, canModerate = false }: { m: Message; me?: Me | null; canModerate?: boolean }) {
+  if (m.kind === "event") return <div className="cmsg event">{m.body}</div>;
+  const meId = me?.id;
+  const cls = m.from_seller ? "cmsg seller" : m.user_id && m.user_id === meId ? "cmsg me" : "cmsg";
+  const actions = me && m.user_id && (canModerate || m.user_id === meId);
+  return (
+    <div className={actions ? `${cls} has-more` : cls}>
+      <i style={{ ["--c" as string]: gradFor(m.handle) }} />
+      <div>
+        <b>{m.handle}</b>
+        {m.body}
+        {actions ? <LineActions m={m} me={me} canModerate={canModerate} /> : null}
+      </div>
+    </div>
+  );
+}
+
+export default function Chat({ showId, messages, me, live, loginHref, title = "Chat", hint, style, canModerate = false }: Props) {
   const log = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
   const [text, setText] = useState("");
@@ -79,7 +145,7 @@ export default function Chat({ showId, messages, me, live, loginHref, title = "C
         }}
       >
         {messages.length ? (
-          messages.map((m) => <ChatLine key={m.id} m={m} meId={me?.id} />)
+          messages.map((m) => <ChatLine key={m.id} m={m} me={me} canModerate={canModerate} />)
         ) : (
           <p className="muted" style={{ fontSize: ".9rem" }}>{live ? "Skriv den første besked." : "Chatten åbner, når showet går live."}</p>
         )}

@@ -7,6 +7,7 @@ import { itemMeta } from "@/components/Screen";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
 import { CARRIERS, isCarrier, trackingText } from "@/lib/carriers";
+import { BUYER_RESOLUTION_TEXT, ISSUE_REASONS, isIssueReason } from "@/lib/issues";
 import { clock, dayLabel, kr } from "@/lib/format";
 import { markCheckoutPaid } from "@/lib/orders";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
@@ -15,6 +16,7 @@ import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import ConfirmReceived from "./ConfirmReceived";
 import PayGroups, { type PayGroup } from "./PayGroups";
+import ReportProblem from "./ReportProblem";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Mine snup", robots: { index: false } };
@@ -54,6 +56,8 @@ interface OrderRow {
   sp_city: string | null;
   tracking_status: string | null;
   delivered_at: string | null;
+  issue_open: boolean;
+  issues: { reason: string; message: string; status: string; resolution: string | null; created_at: string }[];
   seller: Seller | null;
   show: { title: string } | null;
   sales: { id: string; price: number; item: ItemInfo | null }[];
@@ -112,7 +116,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
     supabase
       .from("orders")
       .select(
-        "id,status,delivery,items_amount,shipping_amount,fee_amount,total_amount,carrier,tracking,paid_at,shipped_at,completed_at,sp_carrier,sp_name,sp_address,sp_zipcode,sp_city,tracking_status,delivered_at,seller:profiles!orders_seller_id_fkey(handle,display_name,avatar_path),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
+        "id,status,delivery,items_amount,shipping_amount,fee_amount,total_amount,carrier,tracking,paid_at,shipped_at,completed_at,sp_carrier,sp_name,sp_address,sp_zipcode,sp_city,tracking_status,delivered_at,issue_open,issues:order_issues!order_issues_order_id_fkey(reason,message,status,resolution,created_at),seller:profiles!orders_seller_id_fkey(handle,display_name,avatar_path),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
       )
       .eq("buyer_id", uid)
       .in("status", ["paid", "shipped", "completed", "refunded"])
@@ -224,6 +228,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
 
 function OrderCard({ o }: { o: OrderRow }) {
   const [cls, label] = STATUS[o.status];
+  const issue = [...(o.issues ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
   const seller = o.seller;
   return (
     <section className="group" aria-label={`Ordre fra ${seller?.handle ?? "sælger"}`}>
@@ -288,15 +293,25 @@ function OrderCard({ o }: { o: OrderRow }) {
             </span>
           ) : null}
           {o.status === "completed" ? <span className="muted">Modtaget {when(o.completed_at)}. Tak for handlen!</span> : null}
-          {o.status === "refunded" ? <span className="muted">Sælgeren har annulleret ordren, og du har fået pengene tilbage.</span> : null}
-          {o.status === "shipped" || (o.status === "paid" && o.delivery === "pickup") ? (
-            <>
-              <ConfirmReceived orderId={o.id} pickup={o.delivery === "pickup"} />
-              <span className="fine">
-                Er noget ikke, som det blev vist? Skriv til kontakt@snuplive.dk, før du bekræfter, så holder vi pengene tilbage.
-              </span>
-            </>
+          {o.status === "refunded" && issue?.resolution !== "refunded" ? (
+            <span className="muted">Sælgeren har annulleret ordren, og du har fået pengene tilbage.</span>
           ) : null}
+          {o.issue_open && issue ? (
+            <div className="issue-note" role="status">
+              <b>Du har meldt et problem {when(issue.created_at)}</b>
+              <span>
+                {isIssueReason(issue.reason) ? ISSUE_REASONS[issue.reason] : "Problem"}: <q>{issue.message}</q>
+              </span>
+              <span>Pengene holdes tilbage, mens vi kigger på sagen. Vi skriver til dig på mail.</span>
+            </div>
+          ) : null}
+          {!o.issue_open && issue?.resolution && (o.status === "completed" || o.status === "refunded") ? (
+            <span className="fine">Sagen om ordren er afgjort. {BUYER_RESOLUTION_TEXT[issue.resolution] ?? ""}</span>
+          ) : null}
+          {o.status === "shipped" || (o.status === "paid" && o.delivery === "pickup") ? (
+            <ConfirmReceived orderId={o.id} pickup={o.delivery === "pickup"} />
+          ) : null}
+          {(o.status === "paid" || o.status === "shipped") && !o.issue_open ? <ReportProblem orderId={o.id} /> : null}
         </div>
       </div>
     </section>
