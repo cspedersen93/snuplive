@@ -40,7 +40,7 @@ export default function Saadan() {
             <li><div><h3>Find et show</h3><p>Se hvem der er live under Live nu, eller tjek programmet for shows senere.</p></div></li>
             <li><div><h3>Spørg i chatten</h3><p>Bed sælgeren vise mærket, målene eller stoffet tæt på. Svaret kommer, mens du ser med.</p></div></li>
             <li><div><h3>Snup med ét tryk</h3><p>Den første, der trykker Snup, får tingen. Den lander med det samme under Mine snup.</p></div></li>
-            <li><div><h3>Betal samlet</h3><p>Ved lanceringen betaler du med MobilePay eller kort. Alt fra samme sælger i ét show sendes i én pakke.</p></div></li>
+            <li><div><h3>Betal samlet</h3><p>Betal med MobilePay eller kort under Mine snup. Alt fra samme sælger i ét show sendes i én pakke.</p></div></li>
             <li><div><h3>Modtag din pakke</h3><p>Du bekræfter, at alt er i orden, og først derefter bliver pengene udbetalt til sælgeren.</p></div></li>
           </ol>
         </div>
@@ -61,7 +61,7 @@ export default function Saadan() {
             <li><div><h3>Opret en konto</h3><p>Med din e-mail. Ved lanceringen bliver sælgere verificeret med MitID.</p></div></li>
             <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris. Billeder er ikke nødvendige.</p></div></li>
             <li><div><h3>Gå live og sælg</h3><p>Vis tingene frem én ad gangen, og svar på spørgsmål i chatten.</p></div></li>
-            <li><div><h3>Send og få penge</h3><p>Du kan se alle salg i studiet. Fragtlabels og udbetaling kommer ved lanceringen.</p></div></li>
+            <li><div><h3>Send og få penge</h3><p>Adressen står under Mine shows. Når køberen har fået pakken, går pengene til din bankkonto via Stripe.</p></div></li>
           </ol>
         </div>
       </section>
@@ -82,7 +82,7 @@ export default function Saadan() {
             <div><IconChat /><h3>Hjælp, hvis noget går galt</h3><p>Meld en fejl, inden pengene bliver udbetalt, så hjælper vi jer med at finde en løsning.</p></div>
           </div>
           <p className="fine" style={{ marginTop: 18 }}>
-            SnupLive er i beta. Betaling, MitID, bedømmelser og sporing bliver slået til inden lanceringen.
+            SnupLive er i beta. MitID, bedømmelser og fragtlabels bliver slået til inden lanceringen.
           </p>
           <div className="ctas" style={{ marginTop: 24 }}><Link className="btn btn-line" href="/faq">Læs spørgsmål og svar</Link></div>
         </div>

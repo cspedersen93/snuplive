@@ -333,7 +333,7 @@ export default function ShowClient(props: Props) {
           </div>
           {live ? (
             <p className="fine" style={{ textAlign: "center" }}>
-              Når du snupper, vises dit brugernavn i chatten. Et snup er en bindende reservation.
+              Når du snupper, vises dit brugernavn i chatten. Du betaler samlet under Mine snup inden 3 dage.
             </p>
           ) : null}
         </div>

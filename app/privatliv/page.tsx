@@ -28,7 +28,9 @@ export default function Privatliv() {
             <li><b>Konto:</b> din e-mailadresse, dit brugernavn og eventuelt navn og område, hvis du selv skriver dem.</li>
             <li><b>Shows og ting:</b> de shows og ting, du lægger op som sælger.</li>
             <li><b>Chat:</b> de beskeder, du skriver i et show. De kan ses af alle, der ser showet.</li>
-            <li><b>Snup:</b> hvad du har snuppet, hos hvem og til hvilken pris. Det kan kun du og sælgeren se. Når du snupper, bliver dit brugernavn vist i chatten.</li>
+            <li><b>Snup og ordrer:</b> hvad du har snuppet, hos hvem og til hvilken pris. Det kan kun du og sælgeren se. Når du snupper, bliver dit brugernavn vist i chatten.</li>
+            <li><b>Betaling og levering:</b> når du betaler, får vi dit navn, din adresse og dit telefonnummer fra Stripe. Sælgeren ser dem kun for at kunne sende eller aflevere dine ting. Kortoplysninger og MobilePay håndteres af Stripe, og vi ser dem aldrig.</li>
+            <li><b>Sælgere:</b> for at få udbetalt penge opretter du en konto hos Stripe, som tjekker din identitet og bankkonto.</li>
             <li><b>Video:</b> videoen fra et live-show bliver sendt direkte til seerne og bliver ikke gemt.</li>
           </ul>
 
@@ -36,7 +38,7 @@ export default function Privatliv() {
           <p>Vi bruger oplysningerne til at levere tjenesten: logge dig ind, vise shows, chat og dine snup. Grundlaget er aftalen mellem dig og os, når du opretter en konto.</p>
 
           <h2>Hvem hjælper os?</h2>
-          <p>Vi bruger databehandlere til drift: Supabase (database og login), LiveKit (video), Vercel (hosting) og en mailudbyder til login-mails. De må kun bruge oplysningerne til at hjælpe os.</p>
+          <p>Vi bruger databehandlere til drift: Supabase (database og login), LiveKit (video), Vercel (hosting), Stripe (betaling og udbetaling) og Resend (login-mails). De må kun bruge oplysningerne til at hjælpe os.</p>
 
           <h2>Cookies</h2>
           <p>Vi bruger kun de cookies, der er nødvendige for, at du kan være logget ind. Vi bruger ikke cookies til reklame eller sporing, og vores skrifttyper hentes fra vores egen server.</p>

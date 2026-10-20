@@ -21,15 +21,15 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
   {
     title: "Betaling og fragt",
     qa: [
-      ["Hvordan betaler jeg?", "Betaling med MobilePay og kort åbner inden lanceringen. I beta-perioden bliver der ikke trukket penge, og et snup er en reservation hos sælgeren."],
-      ["Hvad koster fragten?", "Du betaler fragt én gang pr. sælger og show, uanset hvor mange ting du snupper. Du kan også aftale afhentning, hvis I bor tæt på hinanden."],
-      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage."],
+      ["Hvordan betaler jeg?", "Under Mine snup betaler du samlet for alt, du har snuppet, med MobilePay, kort, Apple Pay eller Google Pay. Du har 3 dage til at betale."],
+      ["Hvad koster fragten?", "39 kr til en pakkeshop, én gang pr. sælger og show, uanset hvor mange ting du snupper. Afhentning hos sælgeren er gratis."],
+      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 7 dage efter, at pakken er sendt."],
     ],
   },
   {
     title: "Salg",
     qa: [
-      ["Hvad koster det at sælge?", "Det er gratis at oprette en konto og gå live. Priserne for at sælge bliver offentliggjort, før SnupLive åbner for betaling."],
+      ["Hvad koster det at sælge?", "Det er gratis at oprette en konto, gå live og sælge i beta-perioden. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke."],
       ["Hvad skal jeg bruge for at gå live?", "En telefon eller computer med kamera og en stabil internetforbindelse. Du går live direkte i browseren."],
       ["Skal jeg være god til at stå foran et kamera?", "Nej. De bedste shows minder om en snak ved et bord på loppemarkedet. Start med et kort show og få ting."],
     ],
@@ -38,7 +38,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
     title: "Tryghed",
     qa: [
       ["Hvordan ved jeg, at sælgeren er til at stole på?", "Ved lanceringen bliver alle sælgere verificeret med MitID, og du kan se deres bedømmelser fra tidligere handler."],
-      ["Hvad hvis tingen ikke er som vist?", "Meld det, inden pengene bliver udbetalt, så hjælper vi jer med at finde en løsning."],
+      ["Hvad hvis tingen ikke er som vist?", "Skriv til kontakt@snuplive.dk, før du bekræfter, at du har fået tingene. Så holder vi pengene tilbage og hjælper jer med at finde en løsning."],
     ],
   },
 ];

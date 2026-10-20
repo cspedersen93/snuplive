@@ -173,5 +173,38 @@ reset role;
 select t.ok((select count(*) from storage.objects) = 1, 'Liva kan ikke slette Majas billede');
 select t.ok((select public from storage.buckets where id = 'avatars'), 'mappen med profilbilleder er offentlig');
 
+-- ── Betaling ─────────────────────────────────────────────────────────────────
+-- Serveren opretter en betalt ordre for Livas kjole (sale fra testen ovenfor).
+set role service_role;
+insert into orders (id, checkout_id, buyer_id, seller_id, show_id, status, delivery, items_amount, shipping_amount, fee_amount, total_amount, ship_name, ship_line1, ship_postal_code, ship_city, paid_at)
+  values ('30000000-0000-0000-0000-000000000001', gen_random_uuid(), '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000a',
+          '10000000-0000-0000-0000-000000000001', 'paid', 'ship', 150, 39, 13, 202, 'Liva K', 'Nørrebrogade 1', '2200', 'København N', now());
+update sales set order_id = '30000000-0000-0000-0000-000000000001', status = 'paid' where item_id = '20000000-0000-0000-0000-000000000001';
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select count(*) from orders) = 1, 'Liva kan se sin ordre');
+select t.throws($$update orders set status = 'completed' returning 1$$, 'permission denied');
+select t.throws($$insert into orders (checkout_id, buyer_id, seller_id, show_id, delivery, items_amount, shipping_amount, fee_amount, total_amount) values (gen_random_uuid(), auth.uid(), auth.uid(), '10000000-0000-0000-0000-000000000001', 'ship', 1, 0, 0, 1)$$, 'permission denied');
+select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000001', 'GLS', '123')$$, 'kan ikke markeres');
+select t.ok((select count(*) from payout_accounts) = 0, 'Liva kan ikke se andres udbetalingskonti');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.ok((select count(*) from orders) = 0, 'Ole kan ikke se andres ordrer');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select count(*) from orders) = 1, 'Maja kan se ordren som sælger');
+select t.ok((select ship_city = 'København N' from orders), 'sælgeren kan se leveringsadressen');
+select t.throws($$select cancel_reservation((select id from sales where item_id = '20000000-0000-0000-0000-000000000001'))$$, 'er betalt');
+select t.ok((select status from mark_shipped('30000000-0000-0000-0000-000000000001', 'GLS', ' 00012345 ')) = 'shipped', 'Maja markerer pakken som sendt');
+select t.ok((select tracking = '00012345' from orders), 'sporingsnummeret er gemt uden mellemrum');
+select t.ok((select status from sales where item_id = '20000000-0000-0000-0000-000000000001') = 'shipped', 'snuppet står som sendt');
+select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000001')$$, 'kan ikke markeres');
+-- Oles snup af hørbukserne er ikke betalt, så Maja kan annullere det.
+select cancel_reservation((select id from sales where item_id = '20000000-0000-0000-0000-000000000003'));
+select t.ok((select status from sales where item_id = '20000000-0000-0000-0000-000000000003') = 'cancelled', 'Maja annullerer et ubetalt snup');
+select t.ok((select status from items where id = '20000000-0000-0000-0000-000000000003') = 'unsold', 'tingen kan sælges igen');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select cancel_reservation((select id from sales where item_id = '20000000-0000-0000-0000-000000000003'))$$, 'findes ikke');
+reset role;
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

@@ -98,7 +98,7 @@ export default async function Forside() {
             <ol className="steps">
               <li><div><h3>Sælgeren går live</h3><p>Fra telefonen eller computeren, direkte i browseren. Showet dukker op under Live nu, så snart det starter.</p></div></li>
               <li><div><h3>Du ser med og spørger i chatten</h3><p>Bed om at se mærket, målene eller stoffet tæt på, og få svar med det samme.</p></div></li>
-              <li><div><h3>Du snupper med ét tryk</h3><p>Den første, der trykker Snup, får tingen. Alt, du snupper i samme show, samles ét sted.</p></div></li>
+              <li><div><h3>Du snupper med ét tryk</h3><p>Den første, der trykker Snup, får tingen. Du betaler samlet med MobilePay eller kort, og alt fra samme show kommer i én pakke.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
               <Link className="btn btn-line" href="/saadan-virker-det">Læs mere om, hvordan det virker</Link>
@@ -131,8 +131,8 @@ export default async function Forside() {
               <tbody>
                 <tr><th scope="row">Se tingen live på video</th><td className="us yes">Ja</td><td className="yes">Ja</td><td className="no">Nej, kun billeder</td></tr>
                 <tr><th scope="row">Køb med ét tryk</th><td className="us yes">Ja, Snup-knappen</td><td className="no">Nej, du skriver &quot;solgt&quot;</td><td className="yes">Ja</td></tr>
-                <tr><th scope="row">Samlet fragt for alt fra samme show</th><td className="us yes">Ja, ved lanceringen</td><td className="no">Aftales selv</td><td className="no">Kun ved bundter</td></tr>
-                <tr><th scope="row">Betalingen holdes tilbage, til du har varen</th><td className="us yes">Ja, ved lanceringen</td><td className="no">Nej, du overfører selv</td><td className="yes">Ja</td></tr>
+                <tr><th scope="row">Samlet fragt for alt fra samme show</th><td className="us yes">Ja, automatisk</td><td className="no">Aftales selv</td><td className="no">Kun ved bundter</td></tr>
+                <tr><th scope="row">Betalingen holdes tilbage, til du har varen</th><td className="us yes">Ja</td><td className="no">Nej, du overfører selv</td><td className="yes">Ja</td></tr>
                 <tr><th scope="row">Ingen algoritme, der gemmer showet</th><td className="us yes">Ja, alle live-shows vises</td><td className="no">Afhænger af algoritmen</td><td className="no">Nej</td></tr>
                 <tr><th scope="row">Sælgere verificeret med MitID</th><td className="us yes">Ja, ved lanceringen</td><td className="no">Nej</td><td className="no">Nej</td></tr>
               </tbody>

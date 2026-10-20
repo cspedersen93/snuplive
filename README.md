@@ -3,7 +3,7 @@
 Live shopping med brugte ting: sælgeren går live på video, seerne chatter med og snupper med ét tryk.
 Det hele kører i browseren på snuplive.dk.
 
-## Hvad virker i trin 1?
+## Hvad virker nu?
 
 - Login med e-mail (link eller kode, ingen adgangskode)
 - Profil med brugernavn og en fast side pr. sælger: `snuplive.dk/live/brugernavn`
@@ -13,8 +13,10 @@ Det hele kører i browseren på snuplive.dk.
 - "Live nu" med alle live-shows og et program over kommende shows
 - "Mine snup" for købere og en salgsoversigt for sælgere
 - SEO-sider: forside, Sælg live, Sådan virker det, FAQ (med FAQ-schema), sitemap og robots.txt
+- Profilbilleder og live-billeder fra kameraet på kortene under Live nu
+- Betaling med MobilePay og kort via Stripe. Pengene holdes tilbage, til køberen har fået sine ting, og går derefter til sælgerens bankkonto
 
-Betaling, fragt og MitID kommer i de næste trin (se nederst). Indtil da er et snup en reservation, og der bliver ikke trukket penge.
+Fragtlabels og MitID kommer senere (se nederst).
 
 ## Det skal du bruge
 
@@ -23,6 +25,8 @@ Betaling, fragt og MitID kommer i de næste trin (se nederst). Indtil da er et s
 | GitHub | Koden (dette repo) | Gratis |
 | Supabase | Database, login og realtid | Gratis plan |
 | LiveKit Cloud | Video | Gratis plan |
+| Stripe | Betaling og udbetaling til sælgere | Gratis at oprette. Gebyr pr. betaling |
+| Resend | Login-mails fra snuplive.dk | Gratis op til 3.000 mails om måneden |
 | Vercel | Hosting af siden | Hobby er gratis, men kun til ikke-kommerciel brug. Skift til Pro, før I tager penge |
 | Simply | Domænet snuplive.dk | Har du allerede |
 
@@ -128,6 +132,48 @@ Retter du en nøgle senere, skal du trykke **Redeploy**, før ændringen virker.
 
 ---
 
+## Betaling med Stripe
+
+Køberen betaler alt i kurven på én gang med MobilePay, kort, Apple Pay eller Google Pay. Pengene står hos SnupLive,
+indtil køberen trykker "Jeg har fået mine ting" (eller automatisk 7 dage efter, at sælgeren har markeret pakken som sendt).
+Så sendes beløbet for tingene og fragten til sælgerens Stripe-konto. SnupLive beholder køberbeskyttelsen (5 % + 5 kr pr. pakke).
+
+Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der bliver ikke flyttet rigtige penge.
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0003_betaling.sql`](supabase/migrations/0003_betaling.sql).
+2. **Stripe (testmiljø):**
+   - **Connect → Get started:** vælg platform/marketplace, hvor sælgere får udbetalt.
+   - **Settings → Payment methods:** slå **MobilePay** til (kort, Apple Pay og Google Pay er slået til i forvejen).
+   - **Settings → Payouts:** sæt SnupLives egne udbetalinger til **manuelt** eller **ugentligt**, så der altid er penge til at betale sælgerne.
+   - **Developers → API keys:** kopiér **Secret key** (`sk_test_…`).
+   - **Developers → Webhooks → Add destination:**
+     - *Events from:* **Your account**. Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+       `checkout.session.async_payment_failed`, `checkout.session.expired`.
+     - *Endpoint URL:* `https://snuplive.dk/api/stripe/webhook`. Kopiér **Signing secret** (`whsec_…`).
+     - Lav en destination mere med *Events from:* **Connected accounts**, event `account.updated`, samme URL.
+       Kopiér også dens signing secret.
+3. **Vercel → Environment Variables** (alle af typen **Secret**):
+
+   | Navn | Værdi |
+   | --- | --- |
+   | `SUPABASE_SECRET_KEY` | Supabase → Project Settings → API Keys → Secret key (`sb_secret_…`) |
+   | `STRIPE_SECRET_KEY` | Stripe Secret key (`sk_test_…`) |
+   | `STRIPE_WEBHOOK_SECRET` | Signing secret fra destinationen "Your account" |
+   | `STRIPE_CONNECT_WEBHOOK_SECRET` | Signing secret fra destinationen "Connected accounts" |
+   | `CRON_SECRET` | Et langt, tilfældigt kodeord (fx 40 tegn fra din password manager) |
+
+4. **Deploy** en ny version af `main`. Vercel kører nu `/api/cron/daily` én gang i døgnet (se `vercel.json`). Jobbet afslutter
+   gamle ordrer, sender ventende udbetalinger og annullerer snup, der ikke er betalt efter 3 dage.
+5. **Test:**
+   - Som sælger: gå til **Mine shows → Tilknyt udbetaling**. I testmiljøet har Stripe knapper til at udfylde med testdata.
+   - Som køber (en anden konto): snup noget, gå til **Mine snup**, og betal med kortnummer `4242 4242 4242 4242`.
+   - Som sælger: markér pakken som sendt. Som køber: tryk **Jeg har fået mine ting**. Overførslen kan ses i Stripe under **Connect → Transfers**.
+
+**Før rigtige penge:** aktivér Stripe-kontoen med virksomhedsoplysninger (CVR og bankkonto), skift til de rigtige nøgler
+(`sk_live_…` og nye webhook-secrets), opgrader Vercel til Pro, og få en revisor til at se på moms af køberbeskyttelsen.
+
+---
+
 ## Udvikling på din egen computer
 
 ```bash
@@ -170,11 +216,10 @@ ligger i databasen. Browseren kan ikke snyde sig udenom.
 
 ## Næste trin
 
-1. **Betaling**: Stripe Connect med MobilePay og kort, så pengene holdes tilbage, til køberen har fået sine ting.
-2. **Fragt**: labels og pakkeshops via Shipmondo, samlet fragt pr. sælger og show.
-3. **MitID** for sælgere via Idura.
-4. **Moderation**: slet beskeder og bloker brugere i chatten.
-5. **Følg sælgere** og besked, når de går live.
-6. Opgrader Vercel til Pro, før SnupLive tager imod penge.
+1. **Fragt**: labels og pakkeshops via Shipmondo, så sælgeren kan printe labelen direkte.
+2. **MitID** for sælgere via Idura.
+3. **Moderation**: slet beskeder og bloker brugere i chatten.
+4. **Følg sælgere** og besked, når de går live.
+5. **Klager**: en knap til at melde et problem med en ordre, så pengene holdes tilbage.
 
 Husk også at oprette mailadressen `kontakt@snuplive.dk`, som privatlivspolitikken henviser til. 

@@ -567,3 +567,29 @@ label.btn{cursor:pointer}
 .icon-btn.has-ava .ava{width:100%;height:100%;font-size:1rem;border-radius:50%}
 .v-seller .ava-img,.handle .ava-img,.seller-row .ava-img,.dnav .me .ava-img,.group-head .ava-img{border-radius:50%}
 .scard img.ava-img,.sched-row img.ava-img{position:static;inset:auto;width:20px;height:20px;border-radius:50%;transform:none;transition:none}
+.notice.ok{border-color:rgba(185,217,198,.4);background:rgba(185,217,198,.08);color:#DDEFE4}
+.notice.ok .ico{stroke:var(--mint)}
+.notice b{color:inherit}
+.sec-mini{display:flex;flex-direction:column;gap:12px}
+.sec-mini>h2{margin-top:6px}
+.deliv{border:0;margin:0;padding:14px 20px;border-bottom:1px solid var(--line)}
+.deliv legend{font-weight:600;font-size:.9rem;padding:0;margin-bottom:8px}
+.deliv .opts{margin-top:0}
+.order-info{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px 24px;padding:14px 20px;background:rgba(255,255,255,.02)}
+.order-lines{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--muted)}
+.order-lines b{color:var(--text);font-weight:600}
+.order-state{display:flex;flex-direction:column;gap:10px;align-items:flex-start;max-width:46ch;font-size:.92rem}
+.confirm-ask{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line-2);background:var(--bg)}
+.ship-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.ship-form .field{min-width:140px;flex:1}
+.ship-form .field input{padding:.6em .8em}
+.addr{font-style:normal;line-height:1.45;font-size:.92rem}
+.payout{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px}
+.seller-order{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.so-head{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline}
+.so-head .muted{font-size:.88rem}
+.so-head .chip{margin-left:auto}
+.so-items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+.so-items li{display:flex;justify-content:space-between;gap:12px}
+.group-head{flex-wrap:wrap}
+@media (max-width:560px){.group-head .chip{white-space:normal}}

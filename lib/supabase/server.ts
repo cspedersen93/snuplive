@@ -29,3 +29,11 @@ export async function getUserId(supabase: ServerClient): Promise<string | null> 
   const sub = data?.claims?.sub;
   return typeof sub === "string" ? sub : null;
 }
+
+/** Den indloggede brugers id og e-mail (fra den verificerede JWT). */
+export async function getUserInfo(supabase: ServerClient): Promise<{ id: string; email: string | null } | null> {
+  const { data } = await supabase.auth.getClaims();
+  const c = data?.claims;
+  if (!c || typeof c.sub !== "string") return null;
+  return { id: c.sub, email: typeof c.email === "string" ? c.email : null };
+}

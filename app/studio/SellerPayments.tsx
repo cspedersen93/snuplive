@@ -1,0 +1,231 @@
+import Link from "next/link";
+import { IconCard, IconInfo } from "@/components/Icons";
+import { itemMeta } from "@/components/Screen";
+import { clock, dayLabel, kr } from "@/lib/format";
+import { DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
+import { getStripe, stripeTestMode } from "@/lib/stripe";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { CancelReservation, RefundButton, ShipForm } from "./OrderActions";
+
+type ItemInfo = { name: string; size: string | null; condition: string | null };
+
+interface SellerOrder {
+  id: string;
+  status: "paid" | "shipped" | "completed" | "refunded";
+  delivery: "ship" | "pickup";
+  items_amount: number;
+  shipping_amount: number;
+  total_amount: number;
+  ship_name: string | null;
+  ship_line1: string | null;
+  ship_line2: string | null;
+  ship_postal_code: string | null;
+  ship_city: string | null;
+  buyer_phone: string | null;
+  carrier: string | null;
+  tracking: string | null;
+  transfer_status: "none" | "pending" | "done" | "failed";
+  paid_at: string | null;
+  buyer: { handle: string } | null;
+  show: { title: string } | null;
+  sales: { id: string; price: number; item: ItemInfo | null }[];
+}
+
+interface Reservation {
+  id: string;
+  price: number;
+  created_at: string;
+  item: ItemInfo | null;
+  buyer: { handle: string } | null;
+  order: { status: string } | null;
+}
+
+const at = (iso: string | null) => (iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "");
+
+const NOTICE: Record<string, [string, string]> = {
+  klar: ["ok", "Din udbetaling er klar. Pengene fra dine salg går nu til din bankkonto via Stripe."],
+  mangler: ["", "Stripe mangler stadig nogle oplysninger. Tryk “Fortsæt hos Stripe” for at gøre det færdigt."],
+  fejl: ["", "Vi kunne ikke åbne Stripe. Prøv igen om lidt."],
+  "ikke-sat-op": ["", "Betaling er ikke sat op på SnupLive endnu."],
+};
+
+export default async function SellerPayments({ uid, search }: { uid: string; search: string | null }) {
+  const supabase = await createClient();
+  const ready = Boolean(getStripe() && createAdminClient());
+
+  const [acctQ, ordersQ, resQ] = await Promise.all([
+    supabase.from("payout_accounts").select("payouts_enabled,details_submitted").eq("user_id", uid).maybeSingle(),
+    supabase
+      .from("orders")
+      .select(
+        "id,status,delivery,items_amount,shipping_amount,total_amount,ship_name,ship_line1,ship_line2,ship_postal_code,ship_city,buyer_phone,carrier,tracking,transfer_status,paid_at,buyer:profiles!orders_buyer_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
+      )
+      .eq("seller_id", uid)
+      .in("status", ["paid", "shipped", "completed", "refunded"])
+      .order("paid_at", { ascending: false })
+      .limit(60),
+    supabase
+      .from("sales")
+      .select("id,price,created_at,item:items(name,size,condition),buyer:profiles!sales_buyer_id_fkey(handle),order:orders!sales_order_id_fkey(status)")
+      .eq("seller_id", uid)
+      .eq("status", "reserved")
+      .order("created_at", { ascending: true }),
+  ]);
+
+  const acct = acctQ.data as { payouts_enabled: boolean; details_submitted: boolean } | null;
+  const orders = (ordersQ.data ?? []) as unknown as SellerOrder[];
+  const reservations = ((resQ.data ?? []) as unknown as Reservation[]).filter(
+    (r) => !r.order || ["pending", "cancelled"].includes(r.order.status),
+  );
+  const toHandle = orders.filter((o) => o.status === "paid");
+  const sent = orders.filter((o) => o.status === "shipped");
+  const finished = orders.filter((o) => o.status === "completed" || o.status === "refunded");
+  const earned = orders.filter((o) => o.status === "completed").reduce((a, o) => a + o.items_amount + o.shipping_amount, 0);
+  const notice = search ? NOTICE[search] : null;
+
+  return (
+    <>
+      {notice ? (
+        <div className={`notice ${notice[0]}`} role="status">
+          <IconInfo />
+          <span>{notice[1]}</span>
+        </div>
+      ) : null}
+
+      {ready ? (
+        <div className="box payout">
+          <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+            <IconCard />
+            <div>
+              <h2 className="h3">Udbetaling</h2>
+              <p className="muted" style={{ fontSize: ".92rem", maxWidth: "52ch" }}>
+                {acct?.payouts_enabled
+                  ? "Klar. Når køberen har fået sine ting, går pengene for tingene og fragten til din bankkonto."
+                  : acct?.details_submitted
+                    ? "Stripe er ved at tjekke dine oplysninger, eller der mangler noget. Dine penge venter sikkert hos SnupLive imens."
+                    : "Tilknyt din bankkonto via Stripe, så du kan få pengene fra dine salg. Det tager et par minutter og kræver MitID eller ID."}
+                {stripeTestMode() ? " (Testmiljø: brug Stripes testoplysninger.)" : ""}
+              </p>
+            </div>
+          </div>
+          {acct?.payouts_enabled ? (
+            <a className="btn btn-line btn-sm" href="/api/stripe/dashboard">Åbn Stripe</a>
+          ) : (
+            <a className="btn btn-red btn-sm" href="/api/stripe/connect">{acct ? "Fortsæt hos Stripe" : "Tilknyt udbetaling"}</a>
+          )}
+        </div>
+      ) : null}
+
+      <div className="box">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6, gap: 12, flexWrap: "wrap" }}>
+          <h2 className="h3">Skal sendes</h2>
+          <span className="muted" style={{ fontSize: ".9rem" }}>{earned ? `${kr(earned)} tjent i alt` : ""}</span>
+        </div>
+        {toHandle.length ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {toHandle.map((o) => (
+              <div className="seller-order" key={o.id}>
+                <div className="so-head">
+                  <strong>@{o.buyer?.handle ?? "køber"}</strong>
+                  <span className="muted">{o.show?.title} · betalt {at(o.paid_at)}</span>
+                  <span className="chip warn">{DELIVERY[o.delivery].short}</span>
+                </div>
+                <ul className="so-items">
+                  {o.sales.map((s) => (
+                    <li key={s.id}>
+                      <span>{s.item?.name}{s.item && itemMeta(s.item) ? ` · ${itemMeta(s.item)}` : ""}</span>
+                      <span className="num">{kr(s.price)}</span>
+                    </li>
+                  ))}
+                </ul>
+                {o.delivery === "ship" ? (
+                  <>
+                    <address className="addr">
+                      <b>Send til:</b> {o.ship_name}
+                      <br />
+                      {o.ship_line1}
+                      {o.ship_line2 ? `, ${o.ship_line2}` : ""}
+                      <br />
+                      {o.ship_postal_code} {o.ship_city}
+                      {o.buyer_phone ? (
+                        <>
+                          <br />
+                          Tlf. {o.buyer_phone}
+                        </>
+                      ) : null}
+                    </address>
+                    <p className="fine">Send til nærmeste pakkeshop ved adressen (fx med GLS, PostNord eller DAO). Køberen har betalt {kr(o.shipping_amount)} i fragt, som du får sammen med tingene.</p>
+                    <ShipForm orderId={o.id} />
+                  </>
+                ) : (
+                  <p className="addr">
+                    <b>Afhentning:</b> kontakt {o.ship_name ?? `@${o.buyer?.handle}`}
+                    {o.buyer_phone ? ` på ${o.buyer_phone}` : ""} og aftal tid og sted. Køberen bekræfter i appen, når tingene er hentet.
+                  </p>
+                )}
+                <RefundButton orderId={o.id} amount={kr(o.total_amount)} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="muted" style={{ fontSize: ".95rem" }}>Når nogen har betalt for dine ting, står pakkerne her med adressen.</p>
+        )}
+      </div>
+
+      {sent.length || finished.length ? (
+        <div className="box">
+          <h2 className="h3" style={{ marginBottom: 6 }}>Sendt og afsluttet</h2>
+          <ul className="list">
+            {[...sent, ...finished].map((o) => (
+              <li key={o.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
+                <div>
+                  <strong>@{o.buyer?.handle ?? "køber"} · {o.sales.length} {o.sales.length === 1 ? "ting" : "ting"}</strong>
+                  <span>
+                    {o.status === "shipped"
+                      ? `Sendt${o.tracking ? ` · ${o.carrier ?? ""} ${o.tracking}` : ""}. Venter på, at køberen bekræfter.`
+                      : o.status === "refunded"
+                        ? "Refunderet til køberen."
+                        : o.transfer_status === "done"
+                          ? "Modtaget. Pengene er sendt til din Stripe-konto."
+                          : o.transfer_status === "pending"
+                            ? "Modtaget. Pengene venter, til du har tilknyttet udbetaling."
+                            : "Modtaget. Udbetalingen bliver forsøgt igen i nat."}
+                  </span>
+                </div>
+                <span className="num" style={{ fontWeight: 600 }}>{kr(o.items_amount + o.shipping_amount)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {reservations.length ? (
+        <div className="box">
+          <h2 className="h3" style={{ marginBottom: 4 }}>Snuppet, men ikke betalt endnu</h2>
+          <p className="muted" style={{ fontSize: ".9rem", marginBottom: 6 }}>
+            Køberen har {RESERVATION_DAYS} dage til at betale. Derefter bliver snuppet annulleret af sig selv.
+          </p>
+          <ul className="list">
+            {reservations.map((r) => (
+              <li key={r.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto auto", gap: 14 }}>
+                <div>
+                  <strong>{r.item?.name}</strong>
+                  <span>@{r.buyer?.handle ?? "køber"} · snuppet {at(r.created_at)}</span>
+                </div>
+                <span className="num">{kr(r.price)}</span>
+                <CancelReservation saleId={r.id} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {!ready ? (
+        <p className="fine">
+          Betaling er ikke slået til endnu. <Link href="/kurv">Mine snup</Link> viser køberne, at betaling kommer snart.
+        </p>
+      ) : null}
+    </>
+  );
+}

@@ -53,7 +53,7 @@ export default function Saelg() {
               <li><div><h3>Opret et show</h3><p>Giv det en titel, vælg kategori og tidspunkt. Showet kommer i programmet under Live nu.</p></div></li>
               <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris. Du behøver ikke tage billeder, for køberne ser tingen på video.</p></div></li>
               <li><div><h3>Gå live fra studiet</h3><p>Vis tingene frem én ad gangen. Køberne snupper med ét tryk, og du kan starte lynrunder, når stemningen er god.</p></div></li>
-              <li><div><h3>Se, hvem der snuppede hvad</h3><p>Alle salg står i studiet med køberens brugernavn, så du ved, hvad der skal pakkes.</p></div></li>
+              <li><div><h3>Pak, send og få pengene</h3><p>Når køberen har betalt, får du adressen. Send pakken, og når køberen har fået den, går pengene til din bankkonto.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
               <Link className="btn btn-red" href="/studio">Opret dit første show</Link>
@@ -73,7 +73,7 @@ export default function Saelg() {
             <div><IconList /><h3>Kø af varer</h3><p>Dine ting står klar i rækkefølge, og du viser den næste med ét tryk.</p></div>
             <div><IconBolt /><h3>Lynrunder</h3><p>Ti sekunder, og den første, der trykker, får tingen. Det giver liv i showet.</p></div>
             <div><IconBox /><h3>Fragtlabels med ét tryk</h3><p>Køberens adresse og pakkeshop er udfyldt. Du printer og afleverer.</p>{soon}</div>
-            <div><IconCard /><h3>Udbetaling til din konto</h3><p>Pengene udbetales, når køberen har fået sine ting.</p>{soon}</div>
+            <div><IconCard /><h3>Udbetaling til din konto</h3><p>Tilknyt din bankkonto via Stripe. Pengene udbetales, når køberen har fået sine ting.</p></div>
             <div><IconDoc /><h3>Usolgt bliver til annonce</h3><p>Med et klip fra showet, så salget fortsætter, når du har slukket kameraet.</p>{soon}</div>
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function Saelg() {
             <p className="lede">Flere svar finder du under <Link href="/faq">spørgsmål og svar</Link>.</p>
           </div>
           <div className="faq-list">
-            <details open><summary><h3>Hvad koster det at sælge?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det er gratis at oprette en konto og gå live. Priserne for at sælge bliver offentliggjort, før SnupLive åbner for betaling, så du kender dem, inden du sælger noget.</p></details>
+            <details open><summary><h3>Hvad koster det at sælge?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det er gratis at oprette en konto, gå live og sælge i beta-perioden. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke. Hvis vi senere indfører et salgsgebyr, får du besked, før det gælder.</p></details>
             <details><summary><h3>Hvad skal jeg bruge for at gå live?</h3><span className="pm" aria-hidden="true">+</span></summary><p>En telefon eller computer med kamera og en stabil internetforbindelse. Et stativ og et ringlys gør billedet bedre, men det er ikke et krav.</p></details>
             <details><summary><h3>Hvor længe skal et show vare?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det bestemmer du. Mange starter med 20 minutter og 10 til 15 ting.</p></details>
             <details><summary><h3>Kan en genbrugsbutik også sælge live?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Ja. Butikker kan oprette en konto og gå live fra butikken, fx med ugens nye varer.</p></details>

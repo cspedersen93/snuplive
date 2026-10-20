@@ -2,59 +2,142 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AccountNav from "@/components/AccountNav";
 import Avatar from "@/components/Avatar";
-import { IconInfo, IconShield } from "@/components/Icons";
+import { IconInfo } from "@/components/Icons";
 import { itemMeta } from "@/components/Screen";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
 import { clock, dayLabel, kr } from "@/lib/format";
+import { markCheckoutPaid } from "@/lib/orders";
+import { AUTO_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
+import { getStripe, stripeTestMode } from "@/lib/stripe";
+import { createAdminClient } from "@/lib/supabase/admin";
+import ConfirmReceived from "./ConfirmReceived";
+import PayGroups, { type PayGroup } from "./PayGroups";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Mine snup", robots: { index: false } };
 
-interface Row {
+type Seller = { handle: string; display_name: string | null; avatar_path: string | null };
+type ItemInfo = { name: string; size: string | null; condition: string | null };
+
+interface SaleRow {
   id: string;
   price: number;
-  status: string;
   created_at: string;
-  item: { name: string; size: string | null; condition: string | null } | null;
-  show: { id: string; title: string; seller: { handle: string; display_name: string | null; avatar_path: string | null } | null } | null;
+  seller_id: string;
+  show_id: string;
+  item: ItemInfo | null;
+  show: { title: string } | null;
+  seller: Seller | null;
+  order: { status: string } | null;
 }
 
-const STATUS: Record<string, string> = {
-  reserved: "Reserveret",
-  paid: "Betalt",
-  shipped: "Sendt",
-  done: "Modtaget",
-  cancelled: "Annulleret",
+interface OrderRow {
+  id: string;
+  status: "paid" | "shipped" | "completed" | "refunded";
+  delivery: "ship" | "pickup";
+  items_amount: number;
+  shipping_amount: number;
+  fee_amount: number;
+  total_amount: number;
+  carrier: string | null;
+  tracking: string | null;
+  paid_at: string | null;
+  shipped_at: string | null;
+  completed_at: string | null;
+  seller: Seller | null;
+  show: { title: string } | null;
+  sales: { id: string; price: number; item: ItemInfo | null }[];
+}
+
+const STATUS: Record<OrderRow["status"], [string, string]> = {
+  paid: ["warn", "Betalt"],
+  shipped: ["live", "Sendt"],
+  completed: ["ok", "Modtaget"],
+  refunded: ["sold", "Refunderet"],
 };
 
-export default async function Kurv() {
+function deadline(iso: string) {
+  const d = new Date(Date.parse(iso) + RESERVATION_DAYS * 864e5).toISOString();
+  return `${dayLabel(d).toLowerCase()} kl. ${clock(d)}`;
+}
+
+function when(iso: string | null) {
+  return iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "";
+}
+
+export default async function Kurv({ searchParams }: { searchParams: Promise<{ betaling?: string }> }) {
   const ctx = await requireProfile("/kurv");
   if (!ctx) return <SetupNotice />;
   const { supabase, uid, profile } = ctx;
+  const { betaling } = await searchParams;
 
-  const { data } = await supabase
-    .from("sales")
-    .select(
-      "id,price,status,created_at,item:items(name,size,condition),show:shows(id,title,seller:profiles!shows_seller_id_fkey(handle,display_name,avatar_path))",
-    )
-    .eq("buyer_id", uid)
-    .order("created_at", { ascending: false })
-    .limit(200);
-  const rows = (data ?? []) as unknown as Row[];
-  const open = rows.filter((r) => r.status === "reserved");
+  const stripe = getStripe();
+  const admin = createAdminClient();
+  const ready = Boolean(stripe && admin);
 
-  // Gruppér efter show: alt fra samme sælger i samme show sendes i én pakke.
-  const groups = new Map<string, Row[]>();
-  for (const r of rows) {
-    const key = r.show?.id ?? "ukendt";
-    groups.set(key, [...(groups.get(key) ?? []), r]);
+  // Kommer køberen tilbage fra Stripe, tjekker vi betalingen med det samme (webhooken kan være lidt bagud).
+  let banner: "ok" | "afbrudt" | "venter" | null = null;
+  if (betaling === "annulleret") banner = "afbrudt";
+  else if (betaling?.startsWith("cs_") && stripe && admin) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(betaling);
+      if (session.metadata?.buyer_id === uid) {
+        banner = session.payment_status === "paid" ? "ok" : "venter";
+        if (session.payment_status === "paid") await markCheckoutPaid(admin, stripe, session);
+      }
+    } catch {
+      banner = "venter";
+    }
   }
-  const total = open.reduce((a, r) => a + r.price, 0);
+
+  const [salesQ, ordersQ] = await Promise.all([
+    supabase
+      .from("sales")
+      .select(
+        "id,price,created_at,seller_id,show_id,item:items(name,size,condition),show:shows(title),seller:profiles!sales_seller_id_fkey(handle,display_name,avatar_path),order:orders!sales_order_id_fkey(status)",
+      )
+      .eq("buyer_id", uid)
+      .eq("status", "reserved")
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("orders")
+      .select(
+        "id,status,delivery,items_amount,shipping_amount,fee_amount,total_amount,carrier,tracking,paid_at,shipped_at,completed_at,seller:profiles!orders_seller_id_fkey(handle,display_name,avatar_path),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
+      )
+      .eq("buyer_id", uid)
+      .in("status", ["paid", "shipped", "completed", "refunded"])
+      .order("paid_at", { ascending: false })
+      .limit(50),
+  ]);
+
+  const toPay = ((salesQ.data ?? []) as unknown as SaleRow[]).filter(
+    (s) => !s.order || ["pending", "cancelled"].includes(s.order.status),
+  );
+  const orders = (ordersQ.data ?? []) as unknown as OrderRow[];
+
+  const groupsMap = new Map<string, PayGroup>();
+  for (const s of toPay) {
+    const key = `${s.seller_id}:${s.show_id}`;
+    const g =
+      groupsMap.get(key) ??
+      ({
+        key,
+        seller: s.seller ?? { handle: "sælger", display_name: null, avatar_path: null },
+        showTitle: s.show?.title ?? "",
+        deadline: deadline(s.created_at),
+        items: [],
+      } satisfies PayGroup);
+    g.items.push({ id: s.id, name: s.item?.name ?? "Ting", meta: s.item ? itemMeta(s.item) : "", price: s.price });
+    groupsMap.set(key, g);
+  }
+  const groups = [...groupsMap.values()];
+  const active = orders.filter((o) => o.status === "paid" || o.status === "shipped");
+  const done = orders.filter((o) => o.status === "completed" || o.status === "refunded");
 
   return (
     <div className="wrap dash">
-      <AccountNav profile={profile} active="kurv" snupCount={open.length} />
+      <AccountNav profile={profile} active="kurv" snupCount={toPay.length} />
       <div className="dpanel">
         <div className="dpanel-head">
           <div>
@@ -63,74 +146,130 @@ export default async function Kurv() {
           </div>
         </div>
 
-        {rows.length === 0 ? (
+        {banner === "ok" ? (
+          <div className="notice ok" role="status">
+            <IconInfo />
+            <span><b>Tak for din betaling!</b> Sælgeren får besked og pakker dine ting. Du kan følge ordren herunder.</span>
+          </div>
+        ) : banner === "venter" ? (
+          <div className="notice" role="status">
+            <IconInfo />
+            <span>Vi venter på bekræftelse fra Stripe. Opdatér siden om lidt.</span>
+          </div>
+        ) : banner === "afbrudt" ? (
+          <div className="notice" role="status">
+            <IconInfo />
+            <span>Betalingen blev afbrudt. Dine snup er stadig reserveret, så du kan prøve igen.</span>
+          </div>
+        ) : null}
+
+        {groups.length ? (
+          <>
+            <div className="sec-mini">
+              <h2 className="h3">Til betaling</h2>
+              <p className="muted" style={{ fontSize: ".92rem" }}>
+                Betal inden {RESERVATION_DAYS} dage, ellers bliver snuppet annulleret, og sælgeren kan sælge tingen igen.
+              </p>
+            </div>
+            {ready && stripeTestMode() ? (
+              <div className="notice" role="note">
+                <IconInfo />
+                <span>
+                  <b>Testbetaling:</b> der bliver ikke trukket rigtige penge. Brug kortnummer 4242 4242 4242 4242, en
+                  udløbsdato i fremtiden og en vilkårlig kode.
+                </span>
+              </div>
+            ) : null}
+            <PayGroups groups={groups} ready={ready} />
+          </>
+        ) : null}
+
+        {active.length ? (
+          <div className="sec-mini">
+            <h2 className="h3">På vej til dig</h2>
+            {active.map((o) => (
+              <OrderCard key={o.id} o={o} />
+            ))}
+          </div>
+        ) : null}
+
+        {done.length ? (
+          <div className="sec-mini">
+            <h2 className="h3">Tidligere køb</h2>
+            {done.map((o) => (
+              <OrderCard key={o.id} o={o} />
+            ))}
+          </div>
+        ) : null}
+
+        {!groups.length && !orders.length ? (
           <div className="empty">
             <p style={{ marginBottom: 14 }}>Du har ikke snuppet noget endnu.</p>
             <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
           </div>
-        ) : (
-          <div className="cart-grid" style={{ paddingBlock: 0 }}>
-            <div style={{ minWidth: 0 }}>
-              <div className="notice">
-                <IconInfo />
-                <span>
-                  SnupLive er i beta, så der bliver ikke trukket penge endnu. Et snup er en bindende reservation hos
-                  sælgeren. Betaling med MobilePay og kort samt fragtlabels kommer inden lanceringen.
-                </span>
-              </div>
-              {[...groups.entries()].map(([key, list]) => {
-                const seller = list[0].show?.seller;
-                const sub = list.filter((r) => r.status === "reserved").reduce((a, r) => a + r.price, 0);
-                return (
-                  <section className="group" key={key} aria-label={list[0].show?.title ?? "Show"}>
-                    <div className="group-head">
-                      <div className="seller-row">
-                        <Avatar handle={seller?.handle ?? "s"} path={seller?.avatar_path} />
-                        <div>
-                          <strong>{seller?.handle ?? "Ukendt sælger"}</strong>
-                          <span className="muted" style={{ fontSize: ".85rem" }}>{list[0].show?.title}</span>
-                        </div>
-                      </div>
-                      {seller ? <Link className="linkbtn" href={`/live/${seller.handle}`}>Til sælgeren</Link> : null}
-                    </div>
-                    {list.map((r) => (
-                      <div className="citem" key={r.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
-                        <div style={{ minWidth: 0 }}>
-                          <strong>{r.item?.name ?? "Ting"}</strong>
-                          <span className="from">
-                            {[r.item ? itemMeta(r.item) : "", `Snuppet ${dayLabel(r.created_at).toLowerCase()} kl. ${clock(r.created_at)}`]
-                              .filter(Boolean)
-                              .join(" · ")}
-                          </span>
-                        </div>
-                        <div className="right">
-                          <span className="num" style={{ fontWeight: 600 }}>{kr(r.price)}</span>
-                          <span className={`chip${r.status === "reserved" ? " warn" : r.status === "cancelled" ? " sold" : " ok"}`}>{STATUS[r.status] ?? r.status}</span>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="group-foot">
-                      <span>Sendes i én pakke</span>
-                      <b>{sub ? kr(sub) : "Afsluttet"}</b>
-                    </div>
-                  </section>
-                );
-              })}
-            </div>
-            <aside className="summary" aria-label="Oversigt">
-              <h2 className="h3">Oversigt</h2>
-              <div className="sum-row"><span>Reserverede ting</span><span className="num">{open.length}</span></div>
-              <div className="sum-row"><span>Fragt</span><span className="num">Ved betaling</span></div>
-              <div className="sum-row total"><span>I alt</span><span className="num">{kr(total)}</span></div>
-              <button className="btn btn-red btn-block" type="button" disabled>Betaling åbner snart</button>
-              <div className="protect">
-                <IconShield />
-                <span>Ved lanceringen holder vi pengene tilbage, til du har fået dine ting.</span>
-              </div>
-            </aside>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
+  );
+}
+
+function OrderCard({ o }: { o: OrderRow }) {
+  const [cls, label] = STATUS[o.status];
+  const seller = o.seller;
+  return (
+    <section className="group" aria-label={`Ordre fra ${seller?.handle ?? "sælger"}`}>
+      <div className="group-head">
+        <div className="seller-row">
+          <Avatar handle={seller?.handle ?? "s"} path={seller?.avatar_path} />
+          <div>
+            <strong>{seller?.handle ?? "Sælger"}</strong>
+            <span className="muted" style={{ fontSize: ".85rem" }}>{o.show?.title}</span>
+          </div>
+        </div>
+        <span className={`chip ${cls}`}>{label}</span>
+      </div>
+      {o.sales.map((s) => (
+        <div className="citem" key={s.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
+          <div style={{ minWidth: 0 }}>
+            <strong>{s.item?.name ?? "Ting"}</strong>
+            {s.item && itemMeta(s.item) ? <span className="from">{itemMeta(s.item)}</span> : null}
+          </div>
+          <div className="right"><span className="num">{kr(s.price)}</span></div>
+        </div>
+      ))}
+      <div className="order-info">
+        <div className="order-lines">
+          <span>{DELIVERY[o.delivery].label}: {kr(o.shipping_amount)}</span>
+          <span>Køberbeskyttelse: {kr(o.fee_amount)}</span>
+          <b>Betalt i alt: {kr(o.total_amount)}</b>
+        </div>
+        <div className="order-state">
+          {o.status === "paid" && o.delivery === "ship" ? (
+            <span className="muted">Betalt {when(o.paid_at)}. Sælgeren pakker din pakke.</span>
+          ) : null}
+          {o.status === "paid" && o.delivery === "pickup" ? (
+            <span className="muted">Sælgeren kontakter dig om afhentning. Bekræft, når du har hentet tingene.</span>
+          ) : null}
+          {o.status === "shipped" ? (
+            <span className="muted">
+              Sendt {when(o.shipped_at)}
+              {o.carrier ? ` med ${o.carrier}` : ""}
+              {o.tracking ? ` · Sporingsnummer ${o.tracking}` : ""}. Bekræfter du ikke selv, afsluttes ordren automatisk efter{" "}
+              {AUTO_COMPLETE_DAYS} dage.
+            </span>
+          ) : null}
+          {o.status === "completed" ? <span className="muted">Modtaget {when(o.completed_at)}. Tak for handlen!</span> : null}
+          {o.status === "refunded" ? <span className="muted">Sælgeren har annulleret ordren, og du har fået pengene tilbage.</span> : null}
+          {o.status === "shipped" || (o.status === "paid" && o.delivery === "pickup") ? (
+            <>
+              <ConfirmReceived orderId={o.id} pickup={o.delivery === "pickup"} />
+              <span className="fine">
+                Er noget ikke, som det blev vist? Skriv til kontakt@snuplive.dk, før du bekræfter, så holder vi pengene tilbage.
+              </span>
+            </>
+          ) : null}
+        </div>
+      </div>
+    </section>
   );
 }

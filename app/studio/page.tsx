@@ -3,24 +3,16 @@ import Link from "next/link";
 import AccountNav from "@/components/AccountNav";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
-import { clock, dayLabel, kr, when } from "@/lib/format";
+import { clock, dayLabel, when } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { ITEM_COUNT_EMBED } from "@/lib/queries";
 import { SHOW_COLS, type Show } from "@/lib/types";
 import BecomeSeller from "../konto/BecomeSeller";
 import NewShowForm from "./NewShowForm";
+import SellerPayments from "./SellerPayments";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Mine shows", robots: { index: false } };
-
-interface SaleRow {
-  id: string;
-  price: number;
-  created_at: string;
-  item: { name: string } | null;
-  show: { title: string } | null;
-  buyer: { handle: string } | null;
-}
 
 const STATUS_CHIP: Record<string, [string, string]> = {
   live: ["live", "Live"],
@@ -28,7 +20,8 @@ const STATUS_CHIP: Record<string, [string, string]> = {
   ended: ["sold", "Slut"],
 };
 
-export default async function Studio() {
+export default async function Studio({ searchParams }: { searchParams: Promise<{ udbetaling?: string }> }) {
+  const sp = (await searchParams).udbetaling ?? null;
   const ctx = await requireProfile("/studio");
   if (!ctx) return <SetupNotice />;
   const { supabase, uid, profile } = ctx;
@@ -52,17 +45,13 @@ export default async function Studio() {
     );
   }
 
-  const [showsQ, salesQ] = await Promise.all([
-    supabase.from("shows").select(`${SHOW_COLS},${ITEM_COUNT_EMBED}`).eq("seller_id", uid).order("created_at", { ascending: false }).limit(50),
-    supabase
-      .from("sales")
-      .select("id,price,created_at,item:items(name),show:shows(title),buyer:profiles!sales_buyer_id_fkey(handle)")
-      .eq("seller_id", uid)
-      .order("created_at", { ascending: false })
-      .limit(50),
-  ]);
+  const showsQ = await supabase
+    .from("shows")
+    .select(`${SHOW_COLS},${ITEM_COUNT_EMBED}`)
+    .eq("seller_id", uid)
+    .order("created_at", { ascending: false })
+    .limit(50);
   const shows = (showsQ.data ?? []) as unknown as (Show & { items: { count: number }[] })[];
-  const sales = (salesQ.data ?? []) as unknown as SaleRow[];
   const order = { live: 0, planned: 1, ended: 2 } as const;
   shows.sort((a, b) => order[a.status] - order[b.status]);
 
@@ -127,27 +116,7 @@ export default async function Studio() {
           <div className="empty">Du har ikke oprettet nogen shows endnu. Start med formularen ovenfor.</div>
         )}
 
-        <div className="box">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-            <h2 className="h3">Seneste salg</h2>
-            <span className="muted" style={{ fontSize: ".9rem" }}>{sales.length ? `${kr(sales.reduce((a, b) => a + b.price, 0))} i alt` : ""}</span>
-          </div>
-          {sales.length ? (
-            <ul className="list">
-              {sales.map((s) => (
-                <li key={s.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
-                  <div>
-                    <strong>{s.item?.name}</strong>
-                    <span>@{s.buyer?.handle ?? "ukendt"} · {s.show?.title} · {dayLabel(s.created_at)} {clock(s.created_at)}</span>
-                  </div>
-                  <span className="num" style={{ fontWeight: 600 }}>{kr(s.price)}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="muted" style={{ fontSize: ".95rem" }}>Når nogen snupper dine ting, kan du se det her.</p>
-          )}
-        </div>
+        <SellerPayments uid={uid} search={sp} />
       </div>
     </div>
   );

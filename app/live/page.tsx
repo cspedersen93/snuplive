@@ -103,8 +103,8 @@ export default async function LiveNu() {
               og stand tæt på.
             </p>
             <p className="lede">
-              Når du snupper noget, lander det under Mine snup. Ved lanceringen betaler du samlet med MobilePay eller
-              kort, og pengene bliver først udbetalt til sælgeren, når du har fået dine ting.
+              Når du snupper noget, lander det under Mine snup. Du betaler samlet med MobilePay eller kort, og pengene
+              bliver først udbetalt til sælgeren, når du har fået dine ting.
             </p>
             <div className="ctas">
               <Link className="btn btn-red" href="/opret">Opret gratis konto</Link>
