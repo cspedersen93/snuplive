@@ -143,6 +143,8 @@ Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der 
 1. **Supabase → SQL Editor:** kør [`supabase/migrations/0003_betaling.sql`](supabase/migrations/0003_betaling.sql).
 2. **Stripe (testmiljø):**
    - **Connect → Get started:** vælg platform/marketplace, hvor sælgere får udbetalt.
+   - **Settings → Developers → API policies:** slå **Accounts v1 support** til. SnupLive opretter sælgernes
+     udbetalingskonti med den version af Stripes API, og nye Stripe-konti har den slået fra.
    - **Settings → Payment methods:** slå **MobilePay** til (kort, Apple Pay og Google Pay er slået til i forvejen).
    - **Settings → Payouts:** sæt SnupLives egne udbetalinger til **manuelt** eller **ugentligt**, så der altid er penge til at betale sælgerne.
    - **Developers → API keys:** kopiér **Secret key** (`sk_test_…`).
@@ -170,7 +172,7 @@ Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der 
    - Som sælger: markér pakken som sendt. Som køber: tryk **Jeg har fået mine ting**. Overførslen kan ses i Stripe under **Connect → Transfers**.
 
 **Før rigtige penge:** aktivér Stripe-kontoen med virksomhedsoplysninger (CVR og bankkonto), skift til de rigtige nøgler
-(`sk_live_…` og nye webhook-secrets), opgrader Vercel til Pro, og få en revisor til at se på moms af køberbeskyttelsen.
+(`sk_live_…` og nye webhook-secrets), tjek at **Accounts v1 support** også er slået til uden for testmiljøet, opgrader Vercel til Pro, og få en revisor til at se på moms af køberbeskyttelsen.
 
 ---
 
