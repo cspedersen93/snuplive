@@ -192,13 +192,14 @@ export default async function ItemPage({ params }: Params) {
                 <>
                   <p>
                     {state === "showing" ? (
-                      <b>Den bliver vist lige nu.</b>
+                      <>
+                        <b>Den bliver vist lige nu.</b> Gå ind i showet og snup den.
+                      </>
                     ) : (
                       <>
-                        <b>{seller.handle} er live nu.</b> Tingen er i køen.
+                        <b>{seller.handle} er live nu.</b> Tingen er i køen. Gå ind i showet og snup den, når den bliver vist.
                       </>
-                    )}{" "}
-                    Gå ind i showet og snup den, når den bliver vist.
+                    )}
                   </p>
                   <Link className="btn btn-red btn-block" href={liveHref}>
                     <span className="live-dot white" aria-hidden="true" />

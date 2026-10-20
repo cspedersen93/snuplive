@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import CategoryIcon from "@/components/CategoryIcon";
 import ItemCard from "@/components/ItemCard";
 import ShowCard from "@/components/ShowCard";
+import { CATEGORY_PAGES } from "@/lib/categoryPages";
 import { CATEGORIES, categoryBySlug } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
 import { fetchFeed, fetchListing } from "@/lib/queries";
@@ -32,6 +33,7 @@ const FOR_SALE = 20;
 export default async function Kategori({ params }: Params) {
   const cat = categoryBySlug((await params).slug);
   if (!cat) notFound();
+  const copy = CATEGORY_PAGES[cat.key];
 
   const [{ live, upcoming }, soon, forSale] = await Promise.all([
     fetchListing(10, 10, cat.key),
@@ -40,8 +42,7 @@ export default async function Kategori({ params }: Params) {
   ]);
   const shows = [...live, ...upcoming].slice(0, 10);
   const forSaleTotal = feedTotal(forSale);
-  const word = cat.word;
-  const nothing = !shows.length && !soon.length && !forSale.length;
+  const allForSale = `/til-salg?kategori=${cat.slug}`;
 
   return (
     <>
@@ -59,7 +60,7 @@ export default async function Kategori({ params }: Params) {
             {live.length ? `${live.length} live nu` : cat.label}
           </span>
           <h1 className="h1" id="h-kat">{cat.h1}</h1>
-          <p className="lede">{cat.blurb} Spørg sælgeren i chatten, og snup det med ét tryk, mens det bliver vist.</p>
+          <p className="lede">{copy.intro}</p>
           <div className="ctas">
             {forSale.length ? (
               <a className="btn btn-red" href="#til-salg">Køb nu til fast pris</a>
@@ -75,7 +76,10 @@ export default async function Kategori({ params }: Params) {
         <section className="sec tight" aria-labelledby="h-kat-shows">
           <div className="wrap">
             <div className="row-head">
-              <h2 className="h3" id="h-kat-shows">{live.length ? `Live nu og snart: ${word}` : `Næste shows med ${word}`}</h2>
+              <div className="sec-head">
+                <h2 className="h3" id="h-kat-shows">{copy.who}</h2>
+                <p className="muted">Her er de shows, der er live nu, og dem, der starter snart.</p>
+              </div>
               <Link className="linkbtn" href="/live">Alle shows</Link>
             </div>
             <div className="cards-scroll">
@@ -94,7 +98,7 @@ export default async function Kategori({ params }: Params) {
           <div className="wrap">
             <div className="row-head">
               <div className="sec-head">
-                <h2 className="h3" id="h-kat-snart">Snart i et live-show</h2>
+                <h2 className="h3" id="h-kat-snart">{copy.soon}</h2>
                 <p className="muted">Tryk Husk mig, så får du en mail, når showet starter. Du kan snuppe tingen, mens den bliver vist.</p>
               </div>
             </div>
@@ -113,11 +117,11 @@ export default async function Kategori({ params }: Params) {
         <div className="wrap">
           <div className="row-head">
             <div className="sec-head">
-              <h2 className="h3" id="h-kat-salg">Til salg nu: {word} fra tidligere shows</h2>
-              <p className="muted">Ting, der er vist frem live, men ikke blev snuppet. Du kan købe dem med det samme.</p>
+              <h2 className="h3" id="h-kat-salg">{copy.sale}</h2>
+              <p className="muted">Ting, der er vist frem live, men ikke blev snuppet. Du kan købe dem med det samme til den pris, der står på.</p>
             </div>
             {forSaleTotal > forSale.length ? (
-              <Link className="btn btn-line btn-sm" href={`/til-salg?kategori=${cat.slug}`}>Se alle {forSaleTotal}</Link>
+              <Link className="btn btn-line btn-sm" href={allForSale}>{copy.saleAll}</Link>
             ) : null}
           </div>
           {forSale.length ? (
@@ -129,9 +133,7 @@ export default async function Kategori({ params }: Params) {
           ) : (
             <div className="empty">
               <p style={{ marginBottom: 14 }}>
-                {nothing
-                  ? `Der er intet i ${cat.label.toLowerCase()} lige nu. Kig forbi igen snart, eller se hvem der er live.`
-                  : `Der er intet til salg i ${cat.label.toLowerCase()} lige nu. Usolgte ting lander her, når et show er slut.`}
+                Der er intet til salg i {cat.label.toLowerCase()} lige nu. Usolgte ting lander her, når et show er slut.
               </p>
               <Link className="btn btn-line" href="/til-salg">Se alt til salg</Link>
             </div>
@@ -139,10 +141,33 @@ export default async function Kategori({ params }: Params) {
         </div>
       </section>
 
-      <section className="sec band" aria-labelledby="h-kat-how">
+      <section className="sec band" aria-labelledby="h-kat-tips">
         <div className="wrap split-text">
           <div className="sec-head" style={{ marginBottom: 0 }}>
-            <h2 className="h2" id="h-kat-how">Hvordan køber man brugt {word} live?</h2>
+            <h2 className="h2" id="h-kat-tips">{copy.tipsH2}</h2>
+            <p className="lede">På video kan du bede sælgeren om at vise præcis det, du er i tvivl om. Her er det, der er værd at spørge om.</p>
+          </div>
+          <div>
+            <div className="tips">
+              {copy.tips.map((t) => (
+                <div key={t.h}>
+                  <h3>{t.h}</h3>
+                  <p>{t.p}</p>
+                </div>
+              ))}
+            </div>
+            {copy.note ? <p className="muted" style={{ marginTop: 18 }}>{copy.note}</p> : null}
+            <div className="ctas" style={{ marginTop: 24 }}>
+              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="sec" aria-labelledby="h-kat-how">
+        <div className="wrap split-text">
+          <div className="sec-head" style={{ marginBottom: 0 }}>
+            <h2 className="h2" id="h-kat-how">{copy.howH2}</h2>
           </div>
           <div>
             <ol className="steps">
@@ -173,7 +198,23 @@ export default async function Kategori({ params }: Params) {
         </div>
       </section>
 
-      <section className="sec tight" aria-labelledby="h-kat-andre">
+      {copy.sellH2 ? (
+        <section className="sec tight" style={{ paddingTop: 0 }} aria-labelledby="h-kat-saelg">
+          <div className="wrap">
+            <div className="cta-band">
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560 }}>
+                <h2 className="h2" id="h-kat-saelg">{copy.sellH2}</h2>
+                <p className="muted">Gå live fra stuen, og sælg en hel bunke på én aften. Det, der ikke bliver solgt, kommer automatisk til salg bagefter.</p>
+              </div>
+              <div className="ctas">
+                <Link className="btn btn-red" href="/saelg">Sælg det live</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="sec tight" style={{ paddingTop: copy.sellH2 ? undefined : 0 }} aria-labelledby="h-kat-andre">
         <div className="wrap">
           <h2 className="h3" id="h-kat-andre" style={{ marginBottom: 16 }}>Andre kategorier</h2>
           <nav className="filters" aria-label="Andre kategorier">
@@ -183,9 +224,6 @@ export default async function Kategori({ params }: Params) {
               </Link>
             ))}
           </nav>
-          <p className="muted" style={{ marginTop: 8 }}>
-            Har du selv {word}, der skal videre? <Link href="/saelg">Sælg det live på SnupLive</Link>.
-          </p>
         </div>
       </section>
     </>

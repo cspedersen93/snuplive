@@ -103,8 +103,8 @@ export default async function Forside() {
               <span className="label">Kategorier</span>
               <h2 className="h2" id="h-kategorier">Hvad kan du købe brugt på SnupLive?</h2>
               <p className="lede">
-                Det meste af det, der bliver solgt brugt i Danmark, passer i fem kategorier. Det er tingene, hvor det hjælper at se
-                dem på video: om stoffet er tyndslidt, om lampen har skår, eller om pladen er ridset.
+                Vi har samlet de fem kategorier, hvor det giver mest mening at se tingen på video. Er stoffet tyndslidt? Har lampen
+                et skår? Er pladen ridset? Det ser du, før du køber.
               </p>
             </div>
             <Link className="btn btn-line" href="/kategori">Alle kategorier</Link>
@@ -250,10 +250,10 @@ export default async function Forside() {
         <div className="wrap">
           <div className="sec-head">
             <span className="label">Live shopping med brugt</span>
-            <h2 className="h2" id="h-compare">Hvad er forskellen på SnupLive, DBA, Vinted og Facebook-grupper?</h2>
+            <h2 className="h2" id="h-compare">Hvad er forskellen på at købe brugt live og en almindelig annonce?</h2>
             <p className="lede">
-              På de andre ser du billeder og skriver frem og tilbage med sælgeren. På SnupLive ser du tingen på video, får svar med
-              det samme og køber, mens den bliver vist.
+              På en almindelig annonce ser du billeder og skriver frem og tilbage med sælgeren. På SnupLive ser du tingen på video,
+              får svar med det samme og køber, mens den bliver vist.
             </p>
           </div>
           <div className="table-wrap">
@@ -262,23 +262,20 @@ export default async function Forside() {
                 <tr>
                   <th scope="col">Sådan handler du</th>
                   <th scope="col" className="us">SnupLive</th>
-                  <th scope="col">DBA</th>
-                  <th scope="col">Vinted</th>
-                  <th scope="col">Facebook-grupper</th>
+                  <th scope="col">Almindelige annoncer</th>
+                  <th scope="col">Salgsgrupper på sociale medier</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <th scope="row">Se tingen på video, før du køber</th>
                   <td className="us yes">Ja, live</td>
-                  <td className="no">Nej, billeder</td>
-                  <td className="no">Nej, billeder</td>
+                  <td className="no">Nej, kun billeder</td>
                   <td className="no">Kun hvis sælgeren går live</td>
                 </tr>
                 <tr>
                   <th scope="row">Spørg og få svar med det samme</th>
                   <td className="us yes">Ja, i chatten</td>
-                  <td className="no">Beskeder frem og tilbage</td>
                   <td className="no">Beskeder frem og tilbage</td>
                   <td className="no">Kommentarer og beskeder</td>
                 </tr>
@@ -286,14 +283,12 @@ export default async function Forside() {
                   <th scope="row">Køb, mens tingen bliver vist</th>
                   <td className="us yes">Ja, med Snup-knappen</td>
                   <td className="no">Nej</td>
-                  <td className="no">Nej</td>
                   <td className="no">Du skriver &quot;solgt&quot; i en kommentar</td>
                 </tr>
                 <tr>
                   <th scope="row">Alt fra samme sælger i én pakke</th>
                   <td className="us yes">Ja, automatisk</td>
                   <td className="no">Aftales med sælgeren</td>
-                  <td className="yes">Ja, som bundt</td>
                   <td className="no">Aftales selv</td>
                 </tr>
               </tbody>

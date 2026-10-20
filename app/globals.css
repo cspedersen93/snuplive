@@ -211,7 +211,7 @@ em.s{font-style:normal;color:var(--red-text)}
 
 /* Filters */
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
-.fchip{border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:99px;padding:.55em 1em;font-weight:600;font-size:.92rem;cursor:pointer}
+.fchip{text-decoration:none;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:99px;padding:.55em 1em;font-weight:600;font-size:.92rem;cursor:pointer}
 .fchip:hover{color:var(--text);border-color:var(--muted)}
 .fchip[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:var(--bg)}
 .empty{padding:28px;border:1px dashed var(--line-2);border-radius:16px;color:var(--muted);text-align:center}
@@ -807,3 +807,13 @@ img.v-thumb{object-fit:cover}
   .catcards li:last-child:nth-child(odd) .catcard{aspect-ratio:16/9}
   .icards-scroll .icards{grid-template-columns:repeat(var(--n,6),156px)}
 }
+.tips{display:flex;flex-direction:column}
+.tips>div{padding:18px 0;border-top:1px solid var(--line)}
+.tips>div:last-child{border-bottom:1px solid var(--line)}
+.tips h3{font-size:1.15rem;letter-spacing:-.015em;line-height:1.25;margin-bottom:6px}
+.tips p{color:var(--muted)}
+.salg-faq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 40px}
+.salg-faq h2{margin-bottom:10px}
+.salg-faq .ctas{grid-column:1/-1}
+.plain-steps{margin:0;padding-left:1.2em;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+@media (max-width:860px){.salg-faq{grid-template-columns:minmax(0,1fr)}}

@@ -13,7 +13,7 @@ const NAV = [
   { href: "/live", label: "Live nu" },
   { href: "/til-salg", label: "Til salg" },
   { href: "/kategori", label: "Kategorier" },
-  { href: "/saadan-virker-det", label: "Sådan køber du" },
+  { href: "/saadan-virker-det", label: "Sådan virker det" },
 ];
 
 export default function Header() {

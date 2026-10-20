@@ -19,7 +19,7 @@ export default function Footer() {
               <li><Link href="/live">Live nu</Link></li>
               <li><Link href="/til-salg">Til salg</Link></li>
               <li><Link href="/kategori">Kategorier</Link></li>
-              <li><Link href="/saadan-virker-det">Sådan køber du</Link></li>
+              <li><Link href="/saadan-virker-det">Sådan virker det</Link></li>
               <li><Link href="/kurv">Mine snup</Link></li>
             </ul>
           </div>
