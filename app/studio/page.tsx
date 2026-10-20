@@ -116,7 +116,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           <div className="empty">Du har ikke oprettet nogen shows endnu. Start med formularen ovenfor.</div>
         )}
 
-        <SellerPayments uid={uid} search={sp} />
+        <SellerPayments uid={uid} search={sp} displayName={profile.display_name ?? ""} />
       </div>
     </div>
   );

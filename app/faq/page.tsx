@@ -22,8 +22,9 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
     title: "Betaling og fragt",
     qa: [
       ["Hvordan betaler jeg?", "Under Mine snup betaler du samlet for alt, du har snuppet, med MobilePay, kort, Apple Pay eller Google Pay. Du har 3 dage til at betale."],
-      ["Hvad koster fragten?", "39 kr til en pakkeshop, én gang pr. sælger og show, uanset hvor mange ting du snupper. Afhentning hos sælgeren er gratis."],
-      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 7 dage efter, at pakken er sendt."],
+      ["Hvad koster fragten?", "49 kr til en DAO- eller GLS-pakkeshop, én gang pr. sælger og show, uanset hvor mange ting du snupper (op til 5 kg). Afhentning hos sælgeren er gratis."],
+      ["Hvordan vælger jeg pakkeshop?", "Under Mine snup skriver du dit postnummer, vælger DAO eller GLS og den pakkeshop, du vil hente pakken i. Fragtfirmaet giver dig besked, når pakken er klar, og du kan følge den under Mine snup."],
+      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 2 dage efter, at du har hentet pakken, eller senest 7 dage efter, at den er sendt."],
     ],
   },
   {

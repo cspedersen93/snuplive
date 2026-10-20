@@ -6,9 +6,11 @@ import { IconInfo } from "@/components/Icons";
 import { itemMeta } from "@/components/Screen";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
+import { CARRIERS, isCarrier, trackingText } from "@/lib/carriers";
 import { clock, dayLabel, kr } from "@/lib/format";
 import { markCheckoutPaid } from "@/lib/orders";
-import { AUTO_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
+import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
+import { hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import ConfirmReceived from "./ConfirmReceived";
@@ -45,6 +47,13 @@ interface OrderRow {
   paid_at: string | null;
   shipped_at: string | null;
   completed_at: string | null;
+  sp_carrier: string | null;
+  sp_name: string | null;
+  sp_address: string | null;
+  sp_zipcode: string | null;
+  sp_city: string | null;
+  tracking_status: string | null;
+  delivered_at: string | null;
   seller: Seller | null;
   show: { title: string } | null;
   sales: { id: string; price: number; item: ItemInfo | null }[];
@@ -103,7 +112,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
     supabase
       .from("orders")
       .select(
-        "id,status,delivery,items_amount,shipping_amount,fee_amount,total_amount,carrier,tracking,paid_at,shipped_at,completed_at,seller:profiles!orders_seller_id_fkey(handle,display_name,avatar_path),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
+        "id,status,delivery,items_amount,shipping_amount,fee_amount,total_amount,carrier,tracking,paid_at,shipped_at,completed_at,sp_carrier,sp_name,sp_address,sp_zipcode,sp_city,tracking_status,delivered_at,seller:profiles!orders_seller_id_fkey(handle,display_name,avatar_path),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
       )
       .eq("buyer_id", uid)
       .in("status", ["paid", "shipped", "completed", "refunded"])
@@ -180,7 +189,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
                 </span>
               </div>
             ) : null}
-            <PayGroups groups={groups} ready={ready} />
+            <PayGroups groups={groups} ready={ready} pakkeshop={hasShipmondo()} />
           </>
         ) : null}
 
@@ -244,18 +253,38 @@ function OrderCard({ o }: { o: OrderRow }) {
           <b>Betalt i alt: {kr(o.total_amount)}</b>
         </div>
         <div className="order-state">
+          {o.sp_name ? (
+            <span className="muted">
+              Til {isCarrier(o.sp_carrier) ? `${CARRIERS[o.sp_carrier].name}-pakkeshop` : "pakkeshop"}: <b style={{ color: "var(--text)" }}>{o.sp_name}</b>
+              {o.sp_address ? `, ${o.sp_address}` : ""}
+              {o.sp_zipcode ? `, ${o.sp_zipcode} ${o.sp_city ?? ""}` : ""}
+            </span>
+          ) : null}
           {o.status === "paid" && o.delivery === "ship" ? (
-            <span className="muted">Betalt {when(o.paid_at)}. Sælgeren pakker din pakke.</span>
+            <span className="muted">
+              Betalt {when(o.paid_at)}. {o.sp_name ? "Sælgeren pakker og afleverer din pakke." : "Sælgeren pakker din pakke."}
+            </span>
           ) : null}
           {o.status === "paid" && o.delivery === "pickup" ? (
             <span className="muted">Sælgeren kontakter dig om afhentning. Bekræft, når du har hentet tingene.</span>
           ) : null}
           {o.status === "shipped" ? (
             <span className="muted">
-              Sendt {when(o.shipped_at)}
-              {o.carrier ? ` med ${o.carrier}` : ""}
-              {o.tracking ? ` · Sporingsnummer ${o.tracking}` : ""}. Bekræfter du ikke selv, afsluttes ordren automatisk efter{" "}
-              {AUTO_COMPLETE_DAYS} dage.
+              {o.sp_name && trackingText(o.tracking_status) ? `${trackingText(o.tracking_status)} ` : `Sendt ${when(o.shipped_at)}. `}
+              {o.tracking ? (
+                <>
+                  Sporingsnummer{" "}
+                  {isCarrier(o.sp_carrier) ? (
+                    <a href={CARRIERS[o.sp_carrier].track(o.tracking)} target="_blank" rel="noopener noreferrer">{o.tracking}</a>
+                  ) : (
+                    o.tracking
+                  )}
+                  {o.carrier && !o.sp_name ? ` (${o.carrier})` : ""}.{" "}
+                </>
+              ) : null}
+              {o.delivered_at
+                ? `Bekræfter du ikke selv, afsluttes ordren automatisk ${DELIVERED_COMPLETE_DAYS} dage efter, at du har hentet pakken.`
+                : `Bekræfter du ikke selv, afsluttes ordren automatisk efter ${AUTO_COMPLETE_DAYS} dage.`}
             </span>
           ) : null}
           {o.status === "completed" ? <span className="muted">Modtaget {when(o.completed_at)}. Tak for handlen!</span> : null}

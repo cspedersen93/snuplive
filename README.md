@@ -15,8 +15,9 @@ Det hele kører i browseren på snuplive.dk.
 - SEO-sider: forside, Sælg live, Sådan virker det, FAQ (med FAQ-schema), sitemap og robots.txt
 - Profilbilleder og live-billeder fra kameraet på kortene under Live nu
 - Betaling med MobilePay og kort via Stripe. Pengene holdes tilbage, til køberen har fået sine ting, og går derefter til sælgerens bankkonto
+- Fragt til DAO- og GLS-pakkeshops med fragtlabels og sporing via Shipmondo
 
-Fragtlabels og MitID kommer senere (se nederst).
+MitID kommer senere (se nederst).
 
 ## Det skal du bruge
 
@@ -26,6 +27,7 @@ Fragtlabels og MitID kommer senere (se nederst).
 | Supabase | Database, login og realtid | Gratis plan |
 | LiveKit Cloud | Video | Gratis plan |
 | Stripe | Betaling og udbetaling til sælgere | Gratis at oprette. Gebyr pr. betaling |
+| Shipmondo | Pakkeshops, fragtlabels og sporing | Gratis plan. Du betaler pr. label |
 | Resend | Login-mails fra snuplive.dk | Gratis op til 3.000 mails om måneden |
 | Vercel | Hosting af siden | Hobby er gratis, men kun til ikke-kommerciel brug. Skift til Pro, før I tager penge |
 | Simply | Domænet snuplive.dk | Har du allerede |
@@ -136,7 +138,8 @@ Retter du en nøgle senere, skal du trykke **Redeploy**, før ændringen virker.
 
 Køberen betaler alt i kurven på én gang med MobilePay, kort, Apple Pay eller Google Pay. Pengene står hos SnupLive,
 indtil køberen trykker "Jeg har fået mine ting" (eller automatisk 7 dage efter, at sælgeren har markeret pakken som sendt).
-Så sendes beløbet for tingene og fragten til sælgerens Stripe-konto. SnupLive beholder køberbeskyttelsen (5 % + 5 kr pr. pakke).
+Så sendes beløbet for tingene til sælgerens Stripe-konto (og fragten, hvis sælgeren selv har sendt pakken uden SnupLives label).
+SnupLive beholder køberbeskyttelsen (5 % + 5 kr pr. pakke).
 
 Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der bliver ikke flyttet rigtige penge.
 
@@ -173,6 +176,39 @@ Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der 
 
 **Før rigtige penge:** aktivér Stripe-kontoen med virksomhedsoplysninger (CVR og bankkonto), skift til de rigtige nøgler
 (`sk_live_…` og nye webhook-secrets), tjek at **Accounts v1 support** også er slået til uden for testmiljøet, opgrader Vercel til Pro, og få en revisor til at se på moms af køberbeskyttelsen.
+
+## Fragt med Shipmondo
+
+Køberen vælger en **DAO- eller GLS-pakkeshop** i kurven og betaler 49 kr i fragt pr. pakke (op til 5 kg). Sælgeren trykker
+**Lav fragtlabel** under Mine shows, printer labelen og afleverer pakken. SnupLive betaler labelen hos Shipmondo med de penge,
+køberen har betalt i fragt, og sælgeren får beløbet for tingene. Sporingen kommer fra Shipmondo, så ordren skifter selv til
+"Sendt", når pakken bliver scannet, og afsluttes 2 dage efter, at køberen har hentet den.
+
+Uden Shipmondo-nøgler virker siden som før: køberen vælger ikke pakkeshop, og sælgeren sender selv og får fragten.
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0004_fragt.sql`](supabase/migrations/0004_fragt.sql).
+2. **Shipmondo:**
+   - Opret en gratis konto på [shipmondo.com](https://shipmondo.com) (planen **Free** er nok).
+   - Skriv til Shipmondos support og bed om en **testkonto (sandbox)**: dit navn, din e-mail, adresse og land, sprog (dansk)
+     og grunden ("tester integration til markedsplads"). Du får login til `sandbox.shipmondo.com` på mail.
+   - Log ind på testkontoen → **Indstillinger → API → Adgang**. Kopiér **API-bruger** og **API-nøgle**.
+3. **Vercel → Environment Variables** (alle af typen **Secret**):
+
+   | Navn | Værdi |
+   | --- | --- |
+   | `SHIPMONDO_API_USER` | API-brugeren fra Shipmondo |
+   | `SHIPMONDO_API_KEY` | API-nøglen fra Shipmondo |
+   | `SHIPMONDO_SANDBOX` | `1` (så længe du bruger testkontoen) |
+
+4. **Deploy** en ny version af `main`. Første gang en sælger laver en label, opretter SnupLive selv webhooken til sporing hos
+   Shipmondo (du kan se den under Indstillinger → Webhooks som "SnupLive sporing").
+5. **Test:**
+   - Som køber: snup noget, gå til **Mine snup**, skriv dit postnummer, vælg DAO eller GLS og en pakkeshop, og betal.
+   - Som sælger: udfyld **Fragt og afsenderadresse** under Mine shows, og tryk **Lav fragtlabel** på ordren. Labelen er mærket
+     "SANDBOX" og kan ikke bruges.
+
+**Før rigtige labels:** tilknyt et betalingskort i din rigtige Shipmondo-konto (labels betales løbende), lav nye API-nøgler
+dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPMONDO_SANDBOX`.
 
 ---
 
@@ -218,10 +254,10 @@ ligger i databasen. Browseren kan ikke snyde sig udenom.
 
 ## Næste trin
 
-1. **Fragt**: labels og pakkeshops via Shipmondo, så sælgeren kan printe labelen direkte.
-2. **MitID** for sælgere via Idura.
-3. **Moderation**: slet beskeder og bloker brugere i chatten.
-4. **Følg sælgere** og besked, når de går live.
-5. **Klager**: en knap til at melde et problem med en ordre, så pengene holdes tilbage.
+1. **MitID** for sælgere via Idura.
+2. **Moderation**: slet beskeder og bloker brugere i chatten.
+3. **Følg sælgere** og besked, når de går live.
+4. **Klager**: en knap til at melde et problem med en ordre, så pengene holdes tilbage.
+5. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
 
 Husk også at oprette mailadressen `kontakt@snuplive.dk`, som privatlivspolitikken henviser til. 

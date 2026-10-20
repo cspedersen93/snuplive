@@ -72,7 +72,7 @@ export default function Saelg() {
             <div><IconCamera /><h3>Studie i browseren</h3><p>Gå live fra telefonen eller computeren uden at installere noget. Skift mellem for- og bagkamera.</p></div>
             <div><IconList /><h3>Kø af varer</h3><p>Dine ting står klar i rækkefølge, og du viser den næste med ét tryk.</p></div>
             <div><IconBolt /><h3>Lynrunder</h3><p>Ti sekunder, og den første, der trykker, får tingen. Det giver liv i showet.</p></div>
-            <div><IconBox /><h3>Fragtlabels med ét tryk</h3><p>Køberens adresse og pakkeshop er udfyldt. Du printer og afleverer.</p>{soon}</div>
+            <div><IconBox /><h3>Fragtlabels med ét tryk</h3><p>Køberen har valgt pakkeshop og betalt fragten. Du printer labelen og afleverer pakken hos DAO eller GLS.</p></div>
             <div><IconCard /><h3>Udbetaling til din konto</h3><p>Tilknyt din bankkonto via Stripe. Pengene udbetales, når køberen har fået sine ting.</p></div>
             <div><IconDoc /><h3>Usolgt bliver til annonce</h3><p>Med et klip fra showet, så salget fortsætter, når du har slukket kameraet.</p>{soon}</div>
           </div>

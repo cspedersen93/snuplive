@@ -206,5 +206,52 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 select t.throws($$select cancel_reservation((select id from sales where item_id = '20000000-0000-0000-0000-000000000003'))$$, 'findes ikke');
 reset role;
 
+-- ── Fragt ────────────────────────────────────────────────────────────────────
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+insert into seller_addresses (user_id, name, address1, zipcode, city, phone)
+  values (auth.uid(), 'Maja Holm', 'Jagtvej 10, 2. tv', '2200', 'København N', '+45 22 33 44 55');
+select t.ok((select count(*) from seller_addresses) = 1, 'Maja gemmer sin afsenderadresse');
+update seller_addresses set city = 'København Ø' where user_id = auth.uid();
+select t.ok((select city from seller_addresses) = 'København Ø', 'Maja retter sin afsenderadresse');
+select t.throws($$update seller_addresses set zipcode = '22' where user_id = auth.uid()$$, 'check constraint');
+select t.throws($$insert into seller_addresses (user_id, name, address1, zipcode, city) values ('00000000-0000-0000-0000-00000000000b', 'Liva', 'Vej 1', '2200', 'Kbh')$$, 'row-level security');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select count(*) from seller_addresses) = 0, 'Liva kan ikke se Majas afsenderadresse');
+update seller_addresses set city = 'Hacket' where user_id = '00000000-0000-0000-0000-00000000000a';
+reset role;
+select t.ok((select city from seller_addresses) = 'København Ø', 'Liva kan ikke ændre Majas afsenderadresse');
+set role anon;
+select t.throws($$select * from seller_addresses$$, 'permission denied');
+reset role;
+-- Ordrer til pakkeshop: uden label kan de ikke markeres som sendt, med label beholder de labelens sporingsnummer.
+set role service_role;
+insert into orders (id, checkout_id, buyer_id, seller_id, show_id, status, delivery, items_amount, shipping_amount, fee_amount, total_amount,
+                    ship_name, ship_line1, ship_postal_code, ship_city, paid_at, sp_carrier, sp_id, sp_name)
+  values ('30000000-0000-0000-0000-000000000002', gen_random_uuid(), '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000a',
+          '10000000-0000-0000-0000-000000000001', 'paid', 'ship', 100, 49, 10, 159, 'Liva K', 'Nørrebrogade 1', '2200', 'København N', now(),
+          'gls', '95892', '7-Eleven Nørrebrogade');
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select sp_name from orders where id = '30000000-0000-0000-0000-000000000002') = '7-Eleven Nørrebrogade', 'sælgeren kan se pakkeshoppen');
+select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000002')$$, 'kan ikke markeres');
+select t.throws($$update orders set shipmondo_shipment_id = 1 where id = '30000000-0000-0000-0000-000000000002' returning 1$$, 'permission denied');
+select t.throws($$select * from shipping_labels$$, 'permission denied');
+reset role;
+set role service_role;
+update orders set shipmondo_shipment_id = 4242, carrier = 'GLS', tracking = '0123456789' where id = '30000000-0000-0000-0000-000000000002';
+insert into shipping_labels (order_id, shipment_id, carrier, product_code, weight, price)
+  values ('30000000-0000-0000-0000-000000000002', 4242, 'gls', 'GLSDK_SD', 1000, 43.50);
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000002')$$, 'kan ikke markeres');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select mark_shipped('30000000-0000-0000-0000-000000000002');
+select t.ok((select status = 'shipped' and carrier = 'GLS' and tracking = '0123456789' from orders where id = '30000000-0000-0000-0000-000000000002'),
+            'pakken med label er afleveret og beholder sporingsnummeret');
+reset role;
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

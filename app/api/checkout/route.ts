@@ -1,9 +1,11 @@
 import { randomUUID } from "node:crypto";
 import type Stripe from "stripe";
 import { fail, json } from "@/lib/api";
+import { CARRIERS, isCarrier, type Pakkeshop } from "@/lib/carriers";
 import { SITE_URL } from "@/lib/env";
 import { cancelCheckout, markCheckoutPaid } from "@/lib/orders";
 import { DELIVERY, isDelivery, orderAmounts, type Delivery } from "@/lib/pricing";
+import { findPakkeshops, hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, ore } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserInfo } from "@/lib/supabase/server";
@@ -25,7 +27,7 @@ interface SaleRow {
 
 /**
  * Start en betaling for alle køberens ubetalte snup.
- * Body: { deliveries: { "<sælger-id>:<show-id>": "ship" | "pickup" } }
+ * Body: { deliveries: { "<sælger-id>:<show-id>": "ship" | "pickup" }, pakkeshop?: { carrier, id, zipcode } }
  * Beløbene regnes ud her på serveren, ikke i browseren.
  */
 export async function POST(req: Request) {
@@ -37,7 +39,10 @@ export async function POST(req: Request) {
   const user = await getUserInfo(supabase);
   if (!user) return fail("Log ind for at betale.", 401);
 
-  const body = (await req.json().catch(() => ({}))) as { deliveries?: Record<string, unknown> };
+  const body = (await req.json().catch(() => ({}))) as {
+    deliveries?: Record<string, unknown>;
+    pakkeshop?: { carrier?: unknown; id?: unknown; zipcode?: unknown };
+  };
   const deliveries = body.deliveries ?? {};
 
   const { data, error } = await admin
@@ -76,6 +81,28 @@ export async function POST(req: Request) {
     const key = `${s.seller_id}:${s.show_id}`;
     groups.set(key, [...(groups.get(key) ?? []), s]);
   }
+  const deliveryOf = (key: string): Delivery => (isDelivery(deliveries[key]) ? (deliveries[key] as Delivery) : "ship");
+
+  // Med Shipmondo vælger køberen selv pakkeshoppen. Vi slår den op igen, så navn og adresse er rigtige.
+  let shop: Pakkeshop | null = null;
+  if (hasShipmondo() && [...groups.keys()].some((k) => deliveryOf(k) === "ship")) {
+    const p = body.pakkeshop ?? {};
+    const zip = typeof p.zipcode === "string" ? p.zipcode.trim() : "";
+    if (!isCarrier(p.carrier) || typeof p.id !== "string" || !/^[0-9]{4}$/.test(zip)) {
+      return fail("Vælg den pakkeshop, pakken skal sendes til.", 400);
+    }
+    try {
+      const carrier = p.carrier;
+      const id = p.id.slice(0, 40);
+      shop = (await findPakkeshops(carrier, zip)).find((x) => x.id === id) ?? null;
+      // Ligger shoppen ikke blandt de 10 nærmeste ved postnummeret, slår vi den op direkte.
+      shop ??= (await findPakkeshops(carrier, zip, { id }).catch(() => [])).find((x) => x.id === id) ?? null;
+    } catch (e) {
+      console.error("[snuplive] pakkeshop-tjek fejlede", e);
+      return fail("Vi kunne ikke tjekke pakkeshoppen lige nu. Prøv igen om lidt.", 502);
+    }
+    if (!shop) return fail("Pakkeshoppen blev ikke fundet. Vælg den igen.", 400);
+  }
 
   const checkoutId = randomUUID();
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
@@ -84,7 +111,7 @@ export async function POST(req: Request) {
   const created: string[] = [];
 
   for (const [key, sales] of groups) {
-    const delivery: Delivery = isDelivery(deliveries[key]) ? (deliveries[key] as Delivery) : "ship";
+    const delivery = deliveryOf(key);
     if (delivery === "ship") anyShip = true;
     const items = sales.reduce((a, s) => a + s.price, 0);
     const amounts = orderAmounts(items, delivery);
@@ -103,6 +130,16 @@ export async function POST(req: Request) {
         shipping_amount: amounts.shipping,
         fee_amount: amounts.fee,
         total_amount: amounts.total,
+        ...(delivery === "ship" && shop
+          ? {
+              sp_carrier: shop.carrier,
+              sp_id: shop.id,
+              sp_name: shop.name,
+              sp_address: shop.address,
+              sp_zipcode: shop.zipcode,
+              sp_city: shop.city,
+            }
+          : {}),
       })
       .select("id")
       .single();
@@ -132,7 +169,12 @@ export async function POST(req: Request) {
         price_data: {
           currency: "dkk",
           unit_amount: ore(amounts.shipping),
-          product_data: { name: `Fragt fra @${handle}`, description: DELIVERY[delivery].label },
+          product_data: {
+            name: `Fragt fra @${handle}`,
+            description: shop
+              ? `${CARRIERS[shop.carrier].name}-pakkeshop: ${shop.name}, ${shop.address}, ${shop.zipcode} ${shop.city}`.slice(0, 300)
+              : DELIVERY[delivery].label,
+          },
         },
       });
     }

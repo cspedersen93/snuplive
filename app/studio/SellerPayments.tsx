@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { IconCard, IconInfo } from "@/components/Icons";
+import { IconBox, IconCard, IconInfo } from "@/components/Icons";
 import { itemMeta } from "@/components/Screen";
+import { CARRIERS, isCarrier, LABEL_WEIGHTS, trackingText } from "@/lib/carriers";
 import { clock, dayLabel, kr } from "@/lib/format";
-import { DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
+import { DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS, sellerPayout } from "@/lib/pricing";
+import { hasShipmondo, shipmondoSandbox } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { CancelReservation, RefundButton, ShipForm } from "./OrderActions";
+import { CancelReservation, HandedIn, LabelMaker, RefundButton, SenderAddressForm, ShipForm } from "./OrderActions";
 
 type ItemInfo = { name: string; size: string | null; condition: string | null };
 
@@ -27,6 +29,16 @@ interface SellerOrder {
   tracking: string | null;
   transfer_status: "none" | "pending" | "done" | "failed";
   paid_at: string | null;
+  sp_carrier: string | null;
+  sp_id: string | null;
+  sp_name: string | null;
+  sp_address: string | null;
+  sp_zipcode: string | null;
+  sp_city: string | null;
+  shipmondo_shipment_id: number | null;
+  labelless_code: string | null;
+  tracking_status: string | null;
+  delivered_at: string | null;
   buyer: { handle: string } | null;
   show: { title: string } | null;
   sales: { id: string; price: number; item: ItemInfo | null }[];
@@ -50,16 +62,19 @@ const NOTICE: Record<string, [string, string]> = {
   "ikke-sat-op": ["", "Betaling er ikke sat op på SnupLive endnu."],
 };
 
-export default async function SellerPayments({ uid, search }: { uid: string; search: string | null }) {
+type SenderAddress = { name: string; address1: string; address2: string | null; zipcode: string; city: string; phone: string | null };
+
+export default async function SellerPayments({ uid, search, displayName }: { uid: string; search: string | null; displayName: string }) {
   const supabase = await createClient();
   const ready = Boolean(getStripe() && createAdminClient());
+  const labels = ready && hasShipmondo();
 
-  const [acctQ, ordersQ, resQ] = await Promise.all([
+  const [acctQ, ordersQ, resQ, addrQ] = await Promise.all([
     supabase.from("payout_accounts").select("payouts_enabled,details_submitted").eq("user_id", uid).maybeSingle(),
     supabase
       .from("orders")
       .select(
-        "id,status,delivery,items_amount,shipping_amount,total_amount,ship_name,ship_line1,ship_line2,ship_postal_code,ship_city,buyer_phone,carrier,tracking,transfer_status,paid_at,buyer:profiles!orders_buyer_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
+        "id,status,delivery,items_amount,shipping_amount,total_amount,ship_name,ship_line1,ship_line2,ship_postal_code,ship_city,buyer_phone,carrier,tracking,transfer_status,paid_at,sp_carrier,sp_id,sp_name,sp_address,sp_zipcode,sp_city,shipmondo_shipment_id,labelless_code,tracking_status,delivered_at,buyer:profiles!orders_buyer_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
       )
       .eq("seller_id", uid)
       .in("status", ["paid", "shipped", "completed", "refunded"])
@@ -71,7 +86,11 @@ export default async function SellerPayments({ uid, search }: { uid: string; sea
       .eq("seller_id", uid)
       .eq("status", "reserved")
       .order("created_at", { ascending: true }),
+    labels
+      ? supabase.from("seller_addresses").select("name,address1,address2,zipcode,city,phone").eq("user_id", uid).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
+  const address = (addrQ.data ?? null) as SenderAddress | null;
 
   const acct = acctQ.data as { payouts_enabled: boolean; details_submitted: boolean } | null;
   const orders = (ordersQ.data ?? []) as unknown as SellerOrder[];
@@ -81,7 +100,8 @@ export default async function SellerPayments({ uid, search }: { uid: string; sea
   const toHandle = orders.filter((o) => o.status === "paid");
   const sent = orders.filter((o) => o.status === "shipped");
   const finished = orders.filter((o) => o.status === "completed" || o.status === "refunded");
-  const earned = orders.filter((o) => o.status === "completed").reduce((a, o) => a + o.items_amount + o.shipping_amount, 0);
+  const earned = orders.filter((o) => o.status === "completed").reduce((a, o) => a + sellerPayout(o), 0);
+  const needsLabel = toHandle.some((o) => o.sp_id && !o.shipmondo_shipment_id);
   const notice = search ? NOTICE[search] : null;
 
   return (
@@ -101,7 +121,7 @@ export default async function SellerPayments({ uid, search }: { uid: string; sea
               <h2 className="h3">Udbetaling</h2>
               <p className="muted" style={{ fontSize: ".92rem", maxWidth: "52ch" }}>
                 {acct?.payouts_enabled
-                  ? "Klar. Når køberen har fået sine ting, går pengene for tingene og fragten til din bankkonto."
+                  ? "Klar. Når køberen har fået sine ting, går pengene for tingene til din bankkonto."
                   : acct?.details_submitted
                     ? "Stripe er ved at tjekke dine oplysninger, eller der mangler noget. Dine penge venter sikkert hos SnupLive imens."
                     : "Tilknyt din bankkonto via Stripe, så du kan få pengene fra dine salg. Det tager et par minutter og kræver MitID eller ID."}
@@ -139,7 +159,46 @@ export default async function SellerPayments({ uid, search }: { uid: string; sea
                     </li>
                   ))}
                 </ul>
-                {o.delivery === "ship" ? (
+                {o.delivery === "ship" && o.sp_id ? (
+                  <>
+                    <p className="addr">
+                      <b>Til {isCarrier(o.sp_carrier) ? `${CARRIERS[o.sp_carrier].name}-pakkeshop` : "pakkeshop"}:</b> {o.sp_name}
+                      {o.sp_address ? `, ${o.sp_address}` : ""}, {o.sp_zipcode} {o.sp_city}
+                      <br />
+                      <b>Modtager:</b> {o.ship_name ?? `@${o.buyer?.handle}`}
+                    </p>
+                    {o.shipmondo_shipment_id ? (
+                      <div className="label-box">
+                        <div className="row">
+                          <a className="btn btn-red btn-sm" href={`/api/orders/${o.id}/label?format=a4`} target="_blank" rel="noopener">
+                            Hent label (A4)
+                          </a>
+                          <a className="btn btn-line btn-sm" href={`/api/orders/${o.id}/label?format=10x19`} target="_blank" rel="noopener">
+                            Labelprinter 10×19
+                          </a>
+                        </div>
+                        {o.labelless_code ? (
+                          <p className="fine">
+                            Ingen printer? Skriv koden <span className="code-big">{o.labelless_code}</span> tydeligt på pakken.
+                          </p>
+                        ) : null}
+                        <p className="fine">
+                          Pak tingene godt ind, sæt labelen på, og aflever pakken i en {isCarrier(o.sp_carrier) ? CARRIERS[o.sp_carrier].name : ""}-pakkeshop.
+                          Ordren skifter selv til &quot;Sendt&quot;, når pakken bliver scannet.
+                          {o.tracking ? ` Sporingsnummer ${o.tracking}.` : ""}
+                        </p>
+                        <div className="row">
+                          <HandedIn orderId={o.id} />
+                        </div>
+                      </div>
+                    ) : labels ? (
+                      <LabelMaker orderId={o.id} weights={LABEL_WEIGHTS} hasAddress={Boolean(address)} />
+                    ) : (
+                      <p className="fine">Fragtlabels er ikke slået til lige nu. Prøv igen senere.</p>
+                    )}
+                    <p className="fine">Køberen har betalt fragten. Du får {kr(sellerPayout(o))} for tingene, når køberen har fået pakken.</p>
+                  </>
+                ) : o.delivery === "ship" ? (
                   <>
                     <address className="addr">
                       <b>Send til:</b> {o.ship_name}
@@ -173,6 +232,29 @@ export default async function SellerPayments({ uid, search }: { uid: string; sea
         )}
       </div>
 
+      {labels ? (
+        <div className="box" id="afsender">
+          <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
+            <IconBox />
+            <div>
+              <h2 className="h3">Fragt og afsenderadresse</h2>
+              <p className="muted" style={{ fontSize: ".92rem", maxWidth: "56ch" }}>
+                Køberen vælger en DAO- eller GLS-pakkeshop og betaler fragten. Du laver labelen her med ét tryk. Din adresse står
+                som afsender, og pakken kommer retur hertil, hvis den ikke bliver hentet.
+                {shipmondoSandbox() ? " (Testmiljø: labels er mærket SANDBOX og kan ikke bruges.)" : ""}
+              </p>
+            </div>
+          </div>
+          {needsLabel && !address ? (
+            <div className="notice" role="status">
+              <IconInfo />
+              <span>Du har pakker, der venter på en label. Udfyld din adresse først.</span>
+            </div>
+          ) : null}
+          <SenderAddressForm uid={uid} initial={address} fallbackName={displayName} />
+        </div>
+      ) : null}
+
       {sent.length || finished.length ? (
         <div className="box">
           <h2 className="h3" style={{ marginBottom: 6 }}>Sendt og afsluttet</h2>
@@ -183,7 +265,9 @@ export default async function SellerPayments({ uid, search }: { uid: string; sea
                   <strong>@{o.buyer?.handle ?? "køber"} · {o.sales.length} {o.sales.length === 1 ? "ting" : "ting"}</strong>
                   <span>
                     {o.status === "shipped"
-                      ? `Sendt${o.tracking ? ` · ${o.carrier ?? ""} ${o.tracking}` : ""}. Venter på, at køberen bekræfter.`
+                      ? o.sp_id && trackingText(o.tracking_status)
+                        ? `${trackingText(o.tracking_status)}${o.delivered_at ? ` Ordren afsluttes senest ${DELIVERED_COMPLETE_DAYS} dage efter.` : ""}`
+                        : `Sendt${o.tracking ? ` · ${o.carrier ?? ""} ${o.tracking}` : ""}. Venter på, at køberen bekræfter.`
                       : o.status === "refunded"
                         ? "Refunderet til køberen."
                         : o.transfer_status === "done"
@@ -193,7 +277,7 @@ export default async function SellerPayments({ uid, search }: { uid: string; sea
                             : "Modtaget. Udbetalingen bliver forsøgt igen i nat."}
                   </span>
                 </div>
-                <span className="num" style={{ fontWeight: 600 }}>{kr(o.items_amount + o.shipping_amount)}</span>
+                <span className="num" style={{ fontWeight: 600 }}>{kr(sellerPayout(o))}</span>
               </li>
             ))}
           </ul>
