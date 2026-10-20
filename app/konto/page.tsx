@@ -20,7 +20,7 @@ export default async function Konto() {
 
   const [mine, sales, shows] = await Promise.all([
     supabase.from("sales").select("price").eq("buyer_id", uid).eq("status", "reserved"),
-    profile.is_seller ? supabase.from("sales").select("price").eq("seller_id", uid) : Promise.resolve({ data: [] as { price: number }[] }),
+    profile.is_seller ? supabase.from("sales").select("price").eq("seller_id", uid).neq("status", "cancelled") : Promise.resolve({ data: [] as { price: number }[] }),
     profile.is_seller ? supabase.from("shows").select("id,status").eq("seller_id", uid) : Promise.resolve({ data: [] as { id: string; status: string }[] }),
   ]);
   const snup = mine.data ?? [];
@@ -58,7 +58,7 @@ export default async function Konto() {
           <div className={`notice${openCases ? "" : " ok"}`} role="status">
             <span>
               <b>Admin:</b> {openCases ? `${openCases} ${openCases === 1 ? "sag venter" : "sager venter"} på dig.` : "Ingen åbne sager."}{" "}
-              <Link href="/admin">Gå til sager</Link>
+              <Link href="/admin/sager">Gå til sager</Link> · <Link href="/admin">Backoffice</Link>
             </span>
           </div>
         ) : null}

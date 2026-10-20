@@ -112,6 +112,7 @@ export default function ShowClient(props: Props) {
       .select("item_id")
       .eq("show_id", show.id)
       .eq("buyer_id", me.id)
+      .neq("status", "cancelled")
       .then(({ data }) => {
         if (data) setMine(new Set(data.map((d) => d.item_id as string)));
       });

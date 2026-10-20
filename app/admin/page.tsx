@@ -1,149 +1,289 @@
-import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import Avatar from "@/components/Avatar";
 import SetupNotice from "@/components/SetupNotice";
-import { CARRIERS, isCarrier, trackingText } from "@/lib/carriers";
+import { num, PERIODS, periodStart, requireAdmin } from "@/lib/admin";
 import { clock, dayLabel, kr } from "@/lib/format";
-import { ISSUE_REASONS, isIssueReason, RESOLUTION_TEXT } from "@/lib/issues";
-import { isAdminEmail } from "@/lib/mail";
-import { DELIVERY, sellerPayout } from "@/lib/pricing";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient, getUserInfo } from "@/lib/supabase/server";
-import AdminActions from "./AdminActions";
+import OverviewChart, { type Bucket } from "./OverviewChart";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Sager", robots: { index: false, follow: false } };
+export const metadata = { title: "Overblik" };
 
-interface IssueRow {
-  id: string;
-  reason: string;
-  message: string;
-  status: "open" | "resolved";
-  resolution: string | null;
-  created_at: string;
-  resolved_at: string | null;
-  order: {
-    id: string;
-    status: string;
-    delivery: "ship" | "pickup";
-    items_amount: number;
-    shipping_amount: number;
-    total_amount: number;
-    sp_id: string | null;
-    sp_name: string | null;
-    sp_carrier: string | null;
-    carrier: string | null;
-    tracking: string | null;
-    tracking_status: string | null;
-    paid_at: string | null;
-    shipped_at: string | null;
-    delivered_at: string | null;
-    buyer: { handle: string } | null;
-    seller: { handle: string } | null;
-    show: { title: string } | null;
-    sales: { id: string; price: number; item: { name: string } | null }[];
-  } | null;
+interface Overview {
+  members_total: number;
+  members_new: number;
+  sellers_total: number;
+  sellers_payout_ready: number;
+  shows_held: number;
+  shows_live: number;
+  shows_planned: number;
+  items_sold: number;
+  orders: number;
+  buyers: number;
+  gmv: number;
+  items_value: number;
+  fees: number;
+  shipping_labels_paid: number;
+  label_cost: number;
+  labels: number;
+  refunded: number;
+  refunded_count: number;
+  paid_out: number;
+  held_now: number;
+  held_orders: number;
+  awaiting_payout: number;
+  open_issues: number;
+  unpaid_snups: number;
+  unpaid_value: number;
 }
 
-const STATUS_TEXT: Record<string, string> = { paid: "Betalt", shipped: "Sendt", completed: "Afsluttet", refunded: "Refunderet" };
+interface Day {
+  day: string;
+  orders: number;
+  gmv: number;
+  fees: number;
+  signups: number;
+}
 
-const at = (iso: string | null) => (iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "–");
+const ORDER_STATUS: Record<string, [string, string]> = {
+  paid: ["warn", "Betalt"],
+  shipped: ["live", "Sendt"],
+  completed: ["ok", "Afsluttet"],
+  refunded: ["sold", "Refunderet"],
+};
 
-const SELECT =
-  "id,reason,message,status,resolution,created_at,resolved_at,order:orders!order_issues_order_id_fkey(id,status,delivery,items_amount,shipping_amount,total_amount,sp_id,sp_name,sp_carrier,carrier,tracking,tracking_status,paid_at,shipped_at,delivered_at,buyer:profiles!orders_buyer_id_fkey(handle),seller:profiles!orders_seller_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name)))";
+const longDay = new Intl.DateTimeFormat("da-DK", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+const monthShort = new Intl.DateTimeFormat("da-DK", { month: "short", timeZone: "UTC" });
+const monthLong = new Intl.DateTimeFormat("da-DK", { month: "long", year: "numeric", timeZone: "UTC" });
 
-/** Sager, hvor en køber har meldt et problem. Kun for e-mails i ADMIN_EMAILS. */
-export default async function Admin() {
-  const user = await getUserInfo(await createClient());
-  if (!user) redirect("/login?next=/admin");
-  if (!isAdminEmail(user.email)) notFound();
-  const admin = createAdminClient();
+function isoWeek(d: Date) {
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - day);
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return Math.ceil(((t.getTime() - y0.getTime()) / 864e5 + 1) / 7);
+}
+
+/** Dage → søjler: pr. dag op til en måned, pr. uge op til fire måneder, ellers pr. måned. */
+function toBuckets(days: Day[]): { unit: string; buckets: Bucket[] } {
+  const unit = days.length <= 31 ? "dag" : days.length <= 120 ? "uge" : "måned";
+  const map = new Map<string, Bucket>();
+  for (const r of days) {
+    const d = new Date(`${String(r.day).slice(0, 10)}T00:00:00Z`);
+    let key: string, label: string, title: string;
+    if (unit === "dag") {
+      key = r.day;
+      label = `${d.getUTCDate()}/${d.getUTCMonth() + 1}`;
+      title = longDay.format(d);
+    } else if (unit === "uge") {
+      const w = isoWeek(d);
+      key = `${d.getUTCFullYear()}-${w}`;
+      label = `uge ${w}`;
+      title = `Uge ${w}`;
+    } else {
+      key = `${d.getUTCFullYear()}-${d.getUTCMonth()}`;
+      label = monthShort.format(d);
+      title = monthLong.format(d);
+    }
+    const b = map.get(key) ?? { label, title, gmv: 0, orders: 0, fees: 0, signups: 0 };
+    b.gmv += Number(r.gmv);
+    b.orders += Number(r.orders);
+    b.fees += Number(r.fees);
+    b.signups += Number(r.signups);
+    map.set(key, b);
+  }
+  return { unit, buckets: [...map.values()] };
+}
+
+const when = (iso: string | null) => (iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "");
+
+export default async function Overblik({ searchParams }: { searchParams: Promise<{ periode?: string }> }) {
+  const { admin } = await requireAdmin("/admin");
   if (!admin) return <SetupNotice />;
+  const period = periodStart((await searchParams).periode);
+  const from = period.from.toISOString();
 
-  const [openQ, doneQ] = await Promise.all([
-    admin.from("order_issues").select(SELECT).eq("status", "open").order("created_at", { ascending: true }),
-    admin.from("order_issues").select(SELECT).eq("status", "resolved").order("resolved_at", { ascending: false }).limit(20),
+  const [ovQ, dailyQ, topQ, ordersQ, membersQ] = await Promise.all([
+    admin.rpc("admin_overview", { p_from: from }),
+    admin.rpc("admin_daily", { p_from: from }),
+    admin.rpc("admin_top_sellers", { p_from: from, p_limit: 5 }),
+    admin
+      .from("orders")
+      .select("id,status,total_amount,paid_at,issue_open,buyer:profiles!orders_buyer_id_fkey(handle),seller:profiles!orders_seller_id_fkey(handle)")
+      .in("status", ["paid", "shipped", "completed", "refunded"])
+      .order("paid_at", { ascending: false })
+      .limit(6),
+    admin.from("profiles").select("id,handle,display_name,avatar_path,is_seller,created_at").order("created_at", { ascending: false }).limit(6),
   ]);
-  const open = (openQ.data ?? []) as unknown as IssueRow[];
-  const done = (doneQ.data ?? []) as unknown as IssueRow[];
+  if (ovQ.error) {
+    return (
+      <div className="notice" role="alert">
+        <span>
+          Tallene kunne ikke hentes. Har du kørt <code>supabase/migrations/0006_backoffice.sql</code> i Supabase? ({ovQ.error.message})
+        </span>
+      </div>
+    );
+  }
+  const o = Object.fromEntries(Object.entries((ovQ.data ?? {}) as Record<string, unknown>).map(([k, v]) => [k, Number(v ?? 0)])) as unknown as Overview;
+  const { unit, buckets } = toBuckets((dailyQ.data ?? []) as Day[]);
+  const top = (topQ.data ?? []) as { seller_id: string; handle: string; avatar_path: string | null; orders: number; items: number; items_value: number }[];
+  const latest = (ordersQ.data ?? []) as unknown as {
+    id: string;
+    status: string;
+    total_amount: number;
+    paid_at: string | null;
+    issue_open: boolean;
+    buyer: { handle: string } | null;
+    seller: { handle: string } | null;
+  }[];
+  const members = (membersQ.data ?? []) as { id: string; handle: string; display_name: string | null; avatar_path: string | null; is_seller: boolean; created_at: string }[];
+
+  const shippingMargin = o.shipping_labels_paid - o.label_cost;
+  const earnings = o.fees + shippingMargin;
 
   return (
-    <div className="wrap" style={{ paddingBlock: "32px 64px", display: "flex", flexDirection: "column", gap: 18, maxWidth: 900 }}>
-      <div>
-        <span className="label">Admin</span>
-        <h1 style={{ fontSize: "clamp(1.6rem,3vw,2.2rem)", letterSpacing: "-.035em", lineHeight: 1.05, marginTop: 6 }}>Sager</h1>
-        <p className="muted" style={{ marginTop: 6 }}>
-          {open.length ? `${open.length} ${open.length === 1 ? "åben sag" : "åbne sager"}. Pengene holdes tilbage, indtil du afgør dem.` : "Ingen åbne sager lige nu."}
-        </p>
+    <div className="adm-page">
+      <div className="adm-head">
+        <h1>Overblik</h1>
+        <nav className="adm-periods" aria-label="Periode">
+          {PERIODS.map((p) => (
+            <Link key={p.key} href={p.key === "30" ? "/admin" : `/admin?periode=${p.key}`} className="fchip" aria-current={p.key === period.key ? "page" : undefined}>
+              {p.label}
+            </Link>
+          ))}
+        </nav>
       </div>
 
-      {open.map((i) => {
-        const o = i.order;
-        if (!o) return null;
-        return (
-          <section className="box" key={i.id} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 12px", alignItems: "baseline" }}>
-              <strong>{isIssueReason(i.reason) ? ISSUE_REASONS[i.reason] : i.reason}</strong>
-              <span className="muted" style={{ fontSize: ".88rem" }}>Meldt {at(i.created_at)}</span>
-              <span className="chip warn" style={{ marginLeft: "auto" }}>{STATUS_TEXT[o.status] ?? o.status}</span>
-            </div>
-            <div className="issue-note">
-              <span>
-                @{o.buyer?.handle ?? "køber"} skriver: <q>{i.message}</q>
-              </span>
-            </div>
-            <div className="addr">
-              <b>Sælger:</b> @{o.seller?.handle} · {o.show?.title}
-              <br />
-              <b>Ting:</b> {o.sales.map((s) => `${s.item?.name ?? "Ting"} (${kr(s.price)})`).join(", ")}
-              <br />
-              <b>Levering:</b> {DELIVERY[o.delivery].label}
-              {o.sp_name ? ` · ${isCarrier(o.sp_carrier) ? CARRIERS[o.sp_carrier].name : ""} ${o.sp_name}` : ""}
-              {o.tracking ? (
-                <>
-                  {" · "}
-                  {isCarrier(o.sp_carrier) ? (
-                    <a href={CARRIERS[o.sp_carrier].track(o.tracking)} target="_blank" rel="noopener noreferrer">{o.tracking}</a>
-                  ) : (
-                    `${o.carrier ?? ""} ${o.tracking}`
-                  )}
-                </>
-              ) : null}
-              {trackingText(o.tracking_status) ? ` · ${trackingText(o.tracking_status)}` : ""}
-              <br />
-              <b>Betalt:</b> {at(o.paid_at)} · <b>Sendt:</b> {at(o.shipped_at)} · <b>Hentet:</b> {at(o.delivered_at)}
-              <br />
-              <b>Beløb:</b> køberen betalte {kr(o.total_amount)}, sælgeren skal have {kr(sellerPayout(o))}
-              <br />
-              <span className="muted" style={{ fontSize: ".82rem" }}>Ordre {o.id}</span>
-            </div>
-            <AdminActions
-              orderId={o.id}
-              refundText={kr(o.total_amount)}
-              releaseText={kr(sellerPayout(o))}
-              canRelease={o.status === "paid" || o.status === "shipped"}
-            />
-          </section>
-        );
-      })}
+      {o.open_issues ? (
+        <div className="notice" role="status">
+          <span>
+            <b>{o.open_issues} {o.open_issues === 1 ? "åben sag" : "åbne sager"}</b> venter på dig. <Link href="/admin/sager">Gå til sager</Link>
+          </span>
+        </div>
+      ) : null}
 
-      {done.length ? (
+      <section className="adm-hero" aria-label="Omsætning">
+        <span className="k">Omsætning · {period.label.toLowerCase()}</span>
+        <span className="v">{kr(o.gmv)}</span>
+        <span className="d">
+          {num(o.orders)} {o.orders === 1 ? "ordre" : "ordrer"} fra {num(o.buyers)} {o.buyers === 1 ? "køber" : "købere"} · ting for {kr(o.items_value)}
+        </span>
+      </section>
+
+      <div className="stats adm-kpis">
+        <div className="stat">
+          <span className="k">Din indtjening</span>
+          <span className="v">{kr(earnings)}</span>
+          <span className="d muted">
+            Køberbeskyttelse {kr(o.fees)}
+            {o.labels ? ` · fragt minus labels ${kr(shippingMargin)}` : ""}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="k">Udbetalt til sælgere</span>
+          <span className="v">{kr(o.paid_out)}</span>
+          <span className="d muted">{o.awaiting_payout ? `${kr(o.awaiting_payout)} venter på udbetaling` : "Ingen udbetalinger venter"}</span>
+        </div>
+        <div className="stat">
+          <span className="k">Holdes tilbage lige nu</span>
+          <span className="v">{kr(o.held_now)}</span>
+          <span className="d muted">{num(o.held_orders)} {o.held_orders === 1 ? "ordre" : "ordrer"} på vej til køberen</span>
+        </div>
+        <div className="stat">
+          <span className="k">Refunderet</span>
+          <span className="v">{kr(o.refunded)}</span>
+          <span className="d muted">{num(o.refunded_count)} {o.refunded_count === 1 ? "ordre" : "ordrer"}</span>
+        </div>
+        <Link className="stat" href="/admin/medlemmer" style={{ textDecoration: "none" }}>
+          <span className="k">Medlemmer</span>
+          <span className="v">{num(o.members_total)}</span>
+          <span className="d">+{num(o.members_new)} i perioden</span>
+        </Link>
+        <div className="stat">
+          <span className="k">Sælgere</span>
+          <span className="v">{num(o.sellers_total)}</span>
+          <span className="d muted">{num(o.sellers_payout_ready)} med udbetaling klar</span>
+        </div>
+        <Link className="stat" href="/admin/shows" style={{ textDecoration: "none" }}>
+          <span className="k">Shows holdt</span>
+          <span className="v">{num(o.shows_held)}</span>
+          <span className="d muted">
+            {num(o.shows_live)} live nu · {num(o.shows_planned)} planlagt
+          </span>
+        </Link>
+        <div className="stat">
+          <span className="k">Solgte ting</span>
+          <span className="v">{num(o.items_sold)}</span>
+          <span className="d muted">
+            {o.unpaid_snups ? `${num(o.unpaid_snups)} snup for ${kr(o.unpaid_value)} venter på betaling` : "Ingen snup venter på betaling"}
+          </span>
+        </div>
+      </div>
+      <p className="fine">
+        Indtjeningen er før Stripes gebyrer og moms. Gebyrerne kan du se i Stripe under Balances. Omsætningen er det, køberne
+        har betalt (ting, fragt og køberbeskyttelse) for ordrer, der ikke er refunderet.
+      </p>
+
+      <OverviewChart buckets={buckets} unit={unit} />
+
+      <div className="cols2">
         <div className="box">
-          <h2 className="h3" style={{ marginBottom: 6 }}>Afgjorte sager</h2>
+          <h2 className="h3" style={{ marginBottom: 6 }}>Mest solgt · {period.label.toLowerCase()}</h2>
+          {top.length ? (
+            <ul className="list">
+              {top.map((t) => (
+                <li key={t.seller_id}>
+                  <Avatar handle={t.handle} path={t.avatar_path} />
+                  <div>
+                    <strong><Link href={`/admin/medlemmer/${t.seller_id}`}>@{t.handle}</Link></strong>
+                    <span>{num(t.items)} ting i {num(t.orders)} {Number(t.orders) === 1 ? "ordre" : "ordrer"}</span>
+                  </div>
+                  <span className="num">{kr(Number(t.items_value))}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted" style={{ fontSize: ".92rem" }}>Ingen salg i perioden endnu.</p>
+          )}
+        </div>
+        <div className="box">
+          <h2 className="h3" style={{ marginBottom: 6 }}>Nyeste medlemmer</h2>
           <ul className="list">
-            {done.map((i) => (
-              <li key={i.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
+            {members.map((m) => (
+              <li key={m.id}>
+                <Avatar handle={m.handle} path={m.avatar_path} />
                 <div>
-                  <strong>
-                    @{i.order?.buyer?.handle} ← @{i.order?.seller?.handle} · {isIssueReason(i.reason) ? ISSUE_REASONS[i.reason] : i.reason}
-                  </strong>
-                  <span>{i.resolution ? RESOLUTION_TEXT[i.resolution] : ""} Afgjort {at(i.resolved_at)}.</span>
+                  <strong><Link href={`/admin/medlemmer/${m.id}`}>@{m.handle}</Link></strong>
+                  <span>{m.display_name ? `${m.display_name} · ` : ""}{m.is_seller ? "sælger · " : ""}{when(m.created_at)}</span>
                 </div>
-                <span className="num">{i.order ? kr(i.order.total_amount) : ""}</span>
+                <span />
               </li>
             ))}
           </ul>
         </div>
-      ) : null}
+      </div>
+
+      <div className="box">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
+          <h2 className="h3">Seneste ordrer</h2>
+          <Link href="/admin/ordrer" style={{ fontSize: ".9rem" }}>Se alle ordrer</Link>
+        </div>
+        {latest.length ? (
+          <ul className="list">
+            {latest.map((r) => (
+              <li key={r.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto auto" }}>
+                <div>
+                  <strong>@{r.buyer?.handle} køber hos @{r.seller?.handle}</strong>
+                  <span>{when(r.paid_at)}{r.issue_open ? " · problem meldt" : ""}</span>
+                </div>
+                <span className={`chip ${ORDER_STATUS[r.status]?.[0] ?? ""}`}>{ORDER_STATUS[r.status]?.[1] ?? r.status}</span>
+                <span className="num">{kr(r.total_amount)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="muted" style={{ fontSize: ".92rem" }}>Ingen ordrer endnu.</p>
+        )}
+      </div>
     </div>
   );
 }

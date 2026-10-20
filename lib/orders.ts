@@ -493,7 +493,7 @@ export async function reportIssue(admin: AdminClient, orderId: string, buyerId: 
       `Beløb: ${kr(o.total_amount)}`,
       `Ordre: ${orderId}`,
       "",
-      `Pengene holdes tilbage. Afgør sagen her: ${SITE_URL}/admin`,
+      `Pengene holdes tilbage. Afgør sagen her: ${SITE_URL}/admin/sager`,
     ].join("\n"),
   });
   const { data: seller } = await admin.auth.admin.getUserById(o.seller_id).catch(() => ({ data: null }));

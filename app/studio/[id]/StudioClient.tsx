@@ -112,6 +112,7 @@ export default function StudioClient(props: Props) {
     sb.from("sales")
       .select(SALE_SELECT)
       .eq("show_id", show.id)
+      .neq("status", "cancelled")
       .order("created_at", { ascending: false })
       .then(({ data }) => data && setSales(data as unknown as StudioSale[]));
   }, [soldKey, show.id, sb]);

@@ -218,7 +218,7 @@ dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPM
   Alle kan fjerne deres egne beskeder.
 - **Meld et problem:** køberen kan melde et problem på en ordre under Mine snup, så længe den ikke er afsluttet. Så holdes
   pengene tilbage (ordren afsluttes ikke automatisk), sælgeren kan se det, og du får en mail. Du afgør sagen på
-  [snuplive.dk/admin](https://snuplive.dk/admin): refundér køberen, send pengene til sælgeren, eller luk sagen.
+  [snuplive.dk/admin/sager](https://snuplive.dk/admin/sager): refundér køberen, send pengene til sælgeren, eller luk sagen.
 
 1. **Supabase → SQL Editor:** kør [`supabase/migrations/0005_tryghed.sql`](supabase/migrations/0005_tryghed.sql).
 2. **Vercel → Environment Variables** (typen **Secret**):
@@ -229,6 +229,19 @@ dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPM
    | `RESEND_API_KEY` | Valgfri. Resend → **API Keys → Create API key** med *Sending access* til snuplive.dk. Uden den bliver der ikke sendt mails om nye sager, men de står stadig på /admin |
 
 3. **Deploy**, log ind med din admin-e-mail, og gå til **Min konto**. Der står, hvor mange sager der venter.
+
+## Backoffice
+
+På [snuplive.dk/admin](https://snuplive.dk/admin) (kun for e-mails i `ADMIN_EMAILS`) er der:
+
+- **Overblik:** omsætning, din indtjening (køberbeskyttelse og fragt minus labels, før Stripes gebyrer og moms), udbetalt til
+  sælgere, penge der holdes tilbage, refunderinger, medlemmer, sælgere, shows og solgte ting for 7 dage, 30 dage, 90 dage, i år
+  eller altid, plus en graf pr. dag, uge eller måned, de sælgere der har solgt mest, nyeste medlemmer og seneste ordrer.
+- **Sager**, **Ordrer** (med filtre), **Medlemmer** (søg på brugernavn, navn eller e-mail, og se køb, salg og shows for hver)
+  og **Shows**.
+
+Kør [`supabase/migrations/0006_backoffice.sql`](supabase/migrations/0006_backoffice.sql) i Supabase først. Filen retter også en
+fejl, så en ting, der er blevet annulleret eller refunderet, kan snuppes igen.
 
 ---
 

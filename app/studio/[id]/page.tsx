@@ -27,6 +27,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
       .from("sales")
       .select("id,item_id,price,buyer:profiles!sales_buyer_id_fkey(handle)")
       .eq("show_id", id)
+      .neq("status", "cancelled")
       .order("created_at", { ascending: false }),
   ]);
 

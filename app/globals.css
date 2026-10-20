@@ -634,3 +634,58 @@ label.btn{cursor:pointer}
 .issue-note{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:12px;border:1px solid rgba(242,196,107,.35);background:rgba(242,196,107,.07);color:#F6DFAE;font-size:.9rem}
 .issue-note b{color:inherit}
 .issue-note q{color:var(--text)}
+/* Backoffice */
+.adm{display:flex;flex-direction:column;gap:18px;padding-block:24px 64px}
+.adm-nav{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.adm-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.adm-tabs::-webkit-scrollbar{display:none}
+.adm-tab{display:inline-flex;align-items:center;gap:8px;padding:.55em .95em;border-radius:10px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.95rem;white-space:nowrap}
+.adm-tab:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.adm-tab[aria-current=page]{color:var(--text);background:var(--bg-2);box-shadow:inset 0 0 0 1px var(--line-2)}
+.adm-tab .count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--red);color:#fff;font-size:.72rem}
+.adm-page{display:flex;flex-direction:column;gap:18px;min-width:0}
+.adm-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+.adm-head h1{font-size:clamp(1.6rem,3vw,2.2rem);letter-spacing:-.035em;line-height:1.05}
+.adm-periods{display:flex;flex-wrap:wrap;gap:6px}
+.adm-periods .fchip{text-decoration:none}
+.fchip[aria-current=page]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.adm-hero{display:flex;flex-direction:column;gap:6px;padding:22px;border-radius:20px;border:1px solid var(--line);background:var(--bg-2)}
+.adm-hero .k{font-size:.9rem;color:var(--muted)}
+.adm-hero .v{font-size:clamp(2.6rem,6vw,3.6rem);font-weight:700;letter-spacing:-.04em;line-height:1}
+.adm-hero .d{font-size:.92rem;color:var(--muted)}
+.stat .d.muted{color:var(--muted)}
+.stat{min-width:0}
+.adm-chart{display:flex;flex-direction:column;gap:12px}
+.adm-chart-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px}
+.adm-chart .seg span{padding:.45em .8em;font-size:.85rem}
+.adm-plot{position:relative}
+.adm-plot svg{display:block;width:100%;height:auto;overflow:visible}
+.adm-plot .bar{fill:var(--red)}
+.adm-plot .bar.on{fill:var(--red-text)}
+.adm-plot .grid{stroke:var(--line);stroke-width:1}
+.adm-plot .axis{stroke:var(--line-2);stroke-width:1}
+.adm-plot .tick{fill:var(--muted);font-size:12px;font-family:var(--mono)}
+.adm-plot .hit{fill:transparent;outline:none;cursor:default}
+.adm-plot .hit:focus-visible{stroke:var(--red-text);stroke-width:2}
+.adm-tip{position:absolute;top:-6px;transform:translate(-50%,-100%);pointer-events:none;display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line-2);box-shadow:0 10px 30px -12px rgba(0,0,0,.8);white-space:nowrap;font-size:.82rem;color:var(--muted)}
+.adm-tip b{color:var(--text);font-size:.95rem}
+.adm-table-toggle summary{display:inline-flex;cursor:pointer;font-size:.88rem;color:var(--muted);padding:0;border:0}
+.adm-table-toggle summary::-webkit-details-marker{display:none}
+.adm-table-toggle{border:0}
+.adm-search{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.adm-search .field{flex:1;min-width:200px}
+.adm-pager{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.9rem;color:var(--muted)}
+.dtable td .sub{display:block;font-size:.8rem;color:var(--muted)}
+.dtable a{color:var(--text)}
+.adm-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px 18px;font-size:.92rem}
+.adm-facts div{display:flex;flex-direction:column;gap:2px}
+.adm-facts dt{color:var(--muted);font-size:.8rem}
+.adm-facts dd{margin:0}
+.adm-nav>*{min-width:0}
+.adm-chart .seg{flex-wrap:wrap;min-width:0;max-width:100%}
+@media (max-width:560px){.adm-chart-head .seg{width:100%}.adm-chart-head .seg label{flex:1 1 auto}.adm-chart-head .seg span{text-align:center}}
+.adm-plot svg{width:100%;height:240px}
+.adm-tip{top:0}
+.adm .list .ava{width:36px;height:36px;font-size:.85rem}
+.dtable .it .ava{width:36px;height:36px;font-size:.85rem}
+.adm .list img.ava-img,.dtable .it img.ava-img{width:36px;height:36px;border-radius:50%}

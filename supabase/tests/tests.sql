@@ -318,5 +318,30 @@ set role anon;
 select t.throws($$select * from order_issues$$, 'permission denied');
 reset role;
 
+-- ── Backoffice ───────────────────────────────────────────────────────────────
+-- En ting med et annulleret snup kan snuppes igen, men kun én ad gangen.
+insert into sales (item_id, show_id, seller_id, buyer_id, price)
+  values ('20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', 90);
+select t.ok((select count(*) from sales where item_id = '20000000-0000-0000-0000-000000000003') = 2, 'en annulleret ting kan snuppes igen');
+select t.throws($$insert into sales (item_id, show_id, seller_id, buyer_id, price) values ('20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000c', 90)$$, 'duplicate key');
+select t.ok((admin_overview(now() - interval '1 day') ->> 'members_total')::int = 5, 'overblikket tæller medlemmer');
+select t.ok((admin_overview(now() - interval '1 day') ->> 'items_sold')::int = 2, 'overblikket tæller solgte ting (ikke annullerede)');
+select t.ok((select count(*) from admin_daily(now() - interval '2 days')) = 3, 'en række pr. dag');
+select t.ok((select email from admin_members('liva')) = 'Liva.K@gmail.com', 'medlemmer kan søges på brugernavn og har e-mail');
+select t.ok((select count(*) from admin_members('gmail.com')) = 1, 'medlemmer kan søges på e-mail');
+select t.ok((select count(*) from admin_members('%')) = 0, 'procenttegn i søgningen er bare et tegn');
+select t.ok((select total from admin_members(null, 2, 0) limit 1) = 5, 'medlemslisten kender det samlede antal');
+select t.ok((select handle from admin_members(null, 50, 0, '00000000-0000-0000-0000-00000000000a')) = 'majasgarderobe', 'ét medlem kan hentes');
+select t.ok((select count(*) from admin_shows()) = 2, 'shows-listen');
+select t.ok((select handle from admin_top_sellers(now() - interval '1 day') limit 1) = 'majasgarderobe', 'top-sælgere');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.throws($$select admin_overview(now())$$, 'permission denied');
+select t.throws($$select * from admin_members('maja')$$, 'permission denied');
+reset role;
+set role anon;
+select t.throws($$select * from admin_shows()$$, 'permission denied');
+reset role;
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'
