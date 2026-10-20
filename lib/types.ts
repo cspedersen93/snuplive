@@ -49,6 +49,12 @@ export interface Item {
   for_sale: boolean;
   listed_at: string | null;
   sale_type: "fixed" | "auction";
+  /** Budsalg: hvornår uret står på 0, det højeste bud, og hvem der har det. */
+  auction_ends_at: string | null;
+  high_bid: number | null;
+  high_bidder: string | null;
+  high_handle: string | null;
+  bid_count: number;
 }
 
 /** En ting fra items_feed (med show og sælger). */
@@ -73,6 +79,8 @@ export interface FeedItem {
   handle: string;
   avatar_path: string | null;
   area: string | null;
+  high_bid: number | null;
+  bid_count: number;
   total: number;
 }
 
@@ -103,6 +111,6 @@ export interface Message {
 export const SHOW_COLS =
   "id,seller_id,title,category,status,starts_at,started_at,ended_at,current_item_id,cover_path,cover_at,created_at";
 export const ITEM_COLS =
-  "id,show_id,seller_id,name,size,condition,price,position,status,rush_ends_at,sold_at,created_at,category,description,images,for_sale,listed_at,sale_type";
+  "id,show_id,seller_id,name,size,condition,price,position,status,rush_ends_at,sold_at,created_at,category,description,images,for_sale,listed_at,sale_type,auction_ends_at,high_bid,high_bidder,high_handle,bid_count";
 export const SALE_COLS = "id,item_id,show_id,seller_id,buyer_id,price,status,created_at";
 export const MESSAGE_COLS = "id,show_id,user_id,handle,body,kind,from_seller,created_at";

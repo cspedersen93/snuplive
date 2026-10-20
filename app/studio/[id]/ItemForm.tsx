@@ -33,6 +33,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   const [cond, setCond] = useState(item?.condition ?? "");
   const [price, setPrice] = useState(item ? String(item.price) : "");
   const [cat, setCat] = useState(item?.category ?? showCategory);
+  const [saleType, setSaleType] = useState<"fixed" | "auction">(item?.sale_type ?? "fixed");
   const [desc, setDesc] = useState(item?.description ?? "");
   const [photos, setPhotos] = useState<Photo[]>(() => (item?.images ?? []).map((path) => ({ kind: "old", path })));
   const [more, setMore] = useState(Boolean(item?.description || item?.images?.length));
@@ -93,6 +94,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         size: size.trim() || null,
         condition: cond.trim() || null,
         price: p,
+        sale_type: saleType,
         category: cat === showCategory ? null : cat,
         description: desc.trim() || null,
         images: paths,
@@ -129,13 +131,25 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         <label htmlFor={`ni-name-${uid}`}>Hvad er det?</label>
         <input id={`ni-name-${uid}`} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Fx Uldfrakke, kamel" />
       </div>
+      <span className="flabel" aria-hidden="true">Salgsform</span>
+      <fieldset className="seg sale-seg">
+        <legend className="sr-only">Salgsform</legend>
+        <label>
+          <input type="radio" name={`ni-type-${uid}`} checked={saleType === "fixed"} onChange={() => setSaleType("fixed")} />
+          <span>Fast pris</span>
+        </label>
+        <label>
+          <input type="radio" name={`ni-type-${uid}`} checked={saleType === "auction"} onChange={() => setSaleType("auction")} />
+          <span>Budsalg</span>
+        </label>
+      </fieldset>
       <div className="fgrid" style={{ marginTop: 0 }}>
         <div className="field">
           <label htmlFor={`ni-size-${uid}`}>Str.</label>
           <input id={`ni-size-${uid}`} value={size} onChange={(e) => setSize(e.target.value)} maxLength={20} placeholder="M" />
         </div>
         <div className="field">
-          <label htmlFor={`ni-price-${uid}`}>Pris (kr)</label>
+          <label htmlFor={`ni-price-${uid}`}>{saleType === "auction" ? "Startpris (kr)" : "Pris (kr)"}</label>
           <input id={`ni-price-${uid}`} value={price} onChange={(e) => setPrice(e.target.value)} inputMode="numeric" placeholder="150" />
         </div>
         <div className="field full">
@@ -143,6 +157,11 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
           <input id={`ni-cond-${uid}`} value={cond} onChange={(e) => setCond(e.target.value)} maxLength={40} placeholder="Fx Som ny" />
         </div>
       </div>
+      {saleType === "auction" ? (
+        <p className="fine" style={{ marginTop: -4 }}>
+          Buddene starter ved startprisen, og det højeste bud vinder. Byder ingen, kan tingen købes til startprisen efter showet.
+        </p>
+      ) : null}
       {more ? (
         <>
           <div className="field">

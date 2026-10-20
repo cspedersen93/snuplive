@@ -12,6 +12,7 @@ import { SITE_URL } from "@/lib/env";
 import { category, clock, dayLabel, gradFor, kr } from "@/lib/format";
 import { itemImages } from "@/lib/images";
 import { idFromSlug, itemHref, itemSlug, itemState, type ItemState } from "@/lib/items";
+import { isAuction, soldPrice } from "@/lib/auction";
 import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
@@ -57,19 +58,22 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const cat = category(it.category ?? it.show?.category);
   const state = stateOf(it);
   const meta = itemMeta(it);
+  const bid = isAuction(it) && (state === "upcoming" || state === "live" || state === "showing");
   const where =
     state === "for_sale"
       ? "Køb den nu til fast pris"
       : state === "upcoming" && it.show?.starts_at
-        ? `Vises live ${dayLabel(it.show.starts_at).toLowerCase()} kl. ${clock(it.show.starts_at)}`
+        ? `${bid ? "På budsalg" : "Vises"} live ${dayLabel(it.show.starts_at).toLowerCase()} kl. ${clock(it.show.starts_at)}`
         : state === "live" || state === "showing"
-          ? "Sælgeren er live nu"
+          ? bid
+            ? "Budsalg live nu"
+            : "Sælgeren er live nu"
           : "Se lignende ting";
   const title = `${it.name} – brugt ${cat.word}, ${kr(it.price)}`;
   const images = itemImages(it);
   return {
     title: title.length <= 48 ? title : it.name.slice(0, 48),
-    description: `${it.name}${meta ? ` (${meta})` : ""} til ${kr(it.price)} hos ${it.seller?.handle}. ${where}. Beskyttet betaling på SnupLive.`.slice(0, 155),
+    description: `${it.name}${meta ? ` (${meta})` : ""} ${bid ? "fra" : "til"} ${kr(it.price)} hos ${it.seller?.handle}. ${where}. Beskyttet betaling på SnupLive.`.slice(0, 155),
     alternates: { canonical: itemHref(it) },
     // Solgte og fjernede ting skal ikke ligge i Google.
     robots: state === "sold" || state === "off" ? { index: false, follow: true } : undefined,
@@ -93,6 +97,8 @@ export default async function ItemPage({ params }: Params) {
   const meta = itemMeta(it);
   const href = itemHref(it);
   const liveHref = `/live/${seller.handle}`;
+  // Budsalg før og under showet. Efter showet er en usolgt ting til salg til startprisen som alle andre.
+  const bid = isAuction(it) && (state === "upcoming" || state === "live" || state === "showing");
 
   const [fromSeller, similar] = await Promise.all([
     fetchFeed(state === "upcoming" ? "upcoming" : "for_sale", { seller: it.seller_id, exclude: it.id, limit: 5 }),
@@ -164,20 +170,48 @@ export default async function ItemPage({ params }: Params) {
 
           <div className="item-info">
             <div className="item-head">
-              <StateChip state={state} startsAt={show.starts_at} />
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {bid ? <span className="chip bid">Budsalg</span> : null}
+                <StateChip state={state} startsAt={show.starts_at} />
+              </div>
               <h1 className="item-h1">{it.name}</h1>
-              <p className="item-price num">{kr(it.price)}</p>
+              <p className="item-price num">
+                {bid ? (
+                  it.high_bid ? (
+                    <>
+                      <span className="muted item-price-k">Højeste bud</span> {kr(it.high_bid)}
+                    </>
+                  ) : (
+                    <>
+                      <span className="muted item-price-k">Startpris</span> {kr(it.price)}
+                    </>
+                  )
+                ) : (
+                  kr(state === "sold" ? soldPrice(it) : it.price)
+                )}
+              </p>
               {meta ? <p className="muted">{meta}</p> : null}
             </div>
 
             <div className="box item-cta">
               {state === "for_sale" ? (
                 <>
+                  {isAuction(it) ? <p>Ingen bød på den i showet, så nu kan du købe den til startprisen.</p> : null}
                   <BuyNow itemId={it.id} price={it.price} next={href} sellerId={it.seller_id} />
                   <p className="fine">
                     Tingen bliver reserveret til dig, og du betaler under Mine snup. Fragt {DELIVERY.ship.price} kr til pakkeshop, eller
                     hent den gratis hos sælgeren.
                   </p>
+                </>
+              ) : state === "upcoming" && bid ? (
+                <>
+                  <p>
+                    Den kommer på budsalg live{" "}
+                    {show.starts_at ? `${dayLabel(show.starts_at).toLowerCase()} kl. ${clock(show.starts_at)}` : "snart"} i{" "}
+                    <Link href={liveHref}>{show.title}</Link>. Buddene starter ved {kr(it.price)}, og det højeste bud vinder.
+                  </p>
+                  <RemindButton showId={show.id} itemId={it.id} next={href} className="btn btn-red btn-block" />
+                  <p className="fine">Vi sender dig en mail, når showet starter. Du forpligter dig ikke til at byde.</p>
                 </>
               ) : state === "upcoming" ? (
                 <>
@@ -191,9 +225,17 @@ export default async function ItemPage({ params }: Params) {
               ) : state === "live" || state === "showing" ? (
                 <>
                   <p>
-                    {state === "showing" ? (
+                    {state === "showing" && bid ? (
+                      <>
+                        <b>Budsalget er i gang.</b> Gå ind i showet og byd, før tiden løber ud.
+                      </>
+                    ) : state === "showing" ? (
                       <>
                         <b>Den bliver vist lige nu.</b> Gå ind i showet og snup den.
+                      </>
+                    ) : bid ? (
+                      <>
+                        <b>{seller.handle} er live nu.</b> Budsalget starter, når tingen bliver vist.
                       </>
                     ) : (
                       <>
@@ -203,13 +245,14 @@ export default async function ItemPage({ params }: Params) {
                   </p>
                   <Link className="btn btn-red btn-block" href={liveHref}>
                     <span className="live-dot white" aria-hidden="true" />
-                    Se med og snup
+                    {bid ? "Se med og byd" : "Se med og snup"}
                   </Link>
                 </>
               ) : state === "sold" ? (
                 <>
                   <p>
-                    <b>Den er solgt.</b> Se om der er noget lignende i kategorien, eller kig forbi, når {seller.handle} går live igen.
+                    <b>{isAuction(it) && it.high_bid ? `Den blev solgt på budsalg for ${kr(it.high_bid)}.` : "Den er solgt."}</b> Se om der er
+                    noget lignende i kategorien, eller kig forbi, når {seller.handle} går live igen.
                   </p>
                   <Link className="btn btn-line btn-block" href={`/kategori/${cat.slug}`}>
                     Se mere {cat.word}

@@ -19,11 +19,14 @@ export const metadata: Metadata = {
 };
 
 export default async function Forside() {
-  const [{ live, upcoming }, soon, forSale] = await Promise.all([
+  const [{ live, upcoming }, upcomingItems, auctions, forSale] = await Promise.all([
     fetchListing(10, 10),
-    fetchFeed("upcoming", { limit: 10 }),
+    fetchFeed("upcoming", { limit: 20 }),
+    fetchFeed("auctions", { limit: 10 }),
     fetchFeed("for_sale", { limit: 10 }),
   ]);
+  // Ting på budsalg har deres egen række, så de ikke står to gange.
+  const soon = upcomingItems.filter((it) => it.sale_type !== "auction").slice(0, 10);
   const shows = [...live, ...upcoming].slice(0, 10);
 
   const ld = {
@@ -112,6 +115,31 @@ export default async function Forside() {
           <CategoryCards />
         </div>
       </section>
+
+      {auctions.length ? (
+        <section className="sec tight" aria-labelledby="h-budsalg">
+          <div className="wrap">
+            <div className="row-head">
+              <div className="sec-head">
+                <span className="label" style={{ color: "var(--amber)" }}>Budsalg</span>
+                <h2 className="h2" id="h-budsalg">Kommende budsalg – byd live</h2>
+                <p className="lede">
+                  Buddene starter ved den pris, der står på. Når tingen bliver vist, har du 30 sekunder til at byde, og det højeste
+                  bud vinder. Byder nogen i de sidste 10 sekunder, får alle 10 sekunder mere.
+                </p>
+              </div>
+              <Link className="btn btn-line" href="/live">Se programmet</Link>
+            </div>
+            <div className="icards-scroll" style={{ "--n": auctions.length } as React.CSSProperties}>
+              <div className="icards">
+                {auctions.map((it) => (
+                  <ItemCard key={it.id} item={it} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {soon.length ? (
         <section className="sec tight" aria-labelledby="h-snart">

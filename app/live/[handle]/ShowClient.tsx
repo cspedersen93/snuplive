@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Avatar from "@/components/Avatar";
 import Chat from "@/components/Chat";
 import { IconBox, IconShare } from "@/components/Icons";
@@ -12,6 +12,7 @@ import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useMe } from "@/components/useMe";
 import { useShowRealtime } from "@/components/useShowRealtime";
 import { hasSupabase } from "@/lib/env";
+import { auctionLeft, isAuction, nextBid, soldPrice } from "@/lib/auction";
 import { gradFor, kr, when } from "@/lib/format";
 import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
@@ -46,6 +47,13 @@ function countdown(ms: number) {
 }
 
 function LotChip({ item, mine, ended }: { item: Item; mine: boolean; ended: boolean }) {
+  if (item.status === "live" && isAuction(item))
+    return (
+      <span className="chip live">
+        <span className="live-dot white" />
+        Budsalg
+      </span>
+    );
   if (item.status === "live")
     return (
       <span className="chip live">
@@ -56,6 +64,7 @@ function LotChip({ item, mine, ended }: { item: Item; mine: boolean; ended: bool
   if (item.status === "sold") return <span className={`chip ${mine ? "mine" : "sold"}`}>{mine ? "Din" : "Solgt"}</span>;
   if (item.status === "unsold" && ended && item.for_sale) return <span className="chip ok">Køb nu</span>;
   if (item.status === "unsold") return <span className="chip">Ikke solgt</span>;
+  if (isAuction(item)) return <span className="chip bid">Budsalg</span>;
   return <span className="chip">I køen</span>;
 }
 
@@ -72,7 +81,7 @@ export default function ShowClient(props: Props) {
 
   const live = show.status === "live";
   const current = items.find((i) => i.id === show.current_item_id) ?? null;
-  const rushing = Boolean(current?.rush_ends_at);
+  const rushing = Boolean(current?.rush_ends_at || (current?.auction_ends_at && current.status === "live"));
   const now = useNow(rushing ? 250 : live ? 5000 : 30000);
   const handle = props.seller.handle;
   const loginHref = `/login?next=${encodeURIComponent(`/live/${handle}`)}`;
@@ -147,6 +156,59 @@ export default function ShowClient(props: Props) {
     ? Math.max(0, Math.ceil((Date.parse(current.rush_ends_at) - (now + offset)) / 1000))
     : null;
 
+  // Budsalg på den ting, der bliver vist.
+  const auction = current && isAuction(current) ? current : null;
+  const bidLeft = auction ? auctionLeft(auction, now + offset) : null;
+  const bidRunning = Boolean(auction && auction.status === "live" && bidLeft !== null && bidLeft > 0);
+  const leading = Boolean(me && auction?.high_bidder === me.id);
+  const bidAmount = auction ? nextBid(auction.price, auction.high_bid) : 0;
+
+  // Når uret står på 0, beder seerne også om at lukke budsalget (med lidt forskudt tid, så ikke alle gør det på én gang).
+  const closing = useRef<string | null>(null);
+  useEffect(() => {
+    if (!auction || auction.status !== "live" || bidLeft !== 0 || !hasSupabase) return;
+    const key = `${auction.id}:${auction.auction_ends_at}`;
+    if (closing.current === key) return;
+    closing.current = key;
+    const t = setTimeout(() => {
+      void getSupabase()
+        .rpc("close_auction", { p_item: auction.id })
+        .then(({ data }) => {
+          if ((data as { status?: string } | null)?.status === "live") setTimeout(() => (closing.current = null), 1000);
+        });
+    }, 1200 + Math.random() * 1500);
+    return () => clearTimeout(t);
+    // Kun når budsalget eller uret skifter, ikke ved hver ny tegning.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auction?.id, auction?.auction_ends_at, auction?.status, bidLeft]);
+
+  // Vinder du budsalget, får du besked med det samme.
+  const won = useRef<string | null>(null);
+  const lastStatus = useRef<string | null>(null);
+  useEffect(() => {
+    const before = lastStatus.current;
+    lastStatus.current = auction ? `${auction.id}:${auction.status}` : null;
+    // Kun når budsalget slutter, mens du ser med (ikke hvis du åbner siden bagefter).
+    if (!me || !auction || auction.status !== "sold" || auction.high_bidder !== me.id || won.current === auction.id) return;
+    if (before !== `${auction.id}:live`) return;
+    won.current = auction.id;
+    setMine((s) => new Set(s).add(auction.id));
+    window.dispatchEvent(new Event("snup:changed"));
+    toast(`Du vandt ${auction.name} for ${kr(soldPrice(auction))}!`, "/kurv", "Mine snup");
+  }, [me, auction]);
+
+  async function bid() {
+    if (!auction || busy) return;
+    if (!me) {
+      router.push(loginHref);
+      return;
+    }
+    setBusy(true);
+    const { error } = await getSupabase().rpc("place_bid", { p_item: auction.id, p_amount: bidAmount });
+    setBusy(false);
+    if (error) toast(errorText(error));
+  }
+
   async function snup() {
     if (!current || busy) return;
     if (!me) {
@@ -183,8 +245,22 @@ export default function ShowClient(props: Props) {
   let buyLabel = me === null ? `Log ind og snup` : `Snup ${current ? kr(current.price) : ""}`;
   let buyDisabled = busy || !current || !live;
   if (current && sold) {
-    buyLabel = isMine ? "Din!" : "Solgt";
+    buyLabel = isMine || leading ? "Din!" : "Solgt";
     buyDisabled = true;
+  } else if (auction) {
+    if (!auction.auction_ends_at) {
+      buyLabel = "Starter snart";
+      buyDisabled = true;
+    } else if (!bidRunning) {
+      buyLabel = auction.status === "unsold" ? "Ingen bud" : "Slut";
+      buyDisabled = true;
+    } else if (leading) {
+      buyLabel = "Du fører";
+      buyDisabled = true;
+    } else {
+      buyLabel = me === null ? "Log ind og byd" : `Byd ${kr(bidAmount)}`;
+      buyDisabled = busy || !live;
+    }
   } else if (rushLeft === 0) {
     buyLabel = "Slut";
     buyDisabled = true;
@@ -194,6 +270,7 @@ export default function ShowClient(props: Props) {
   const startsIn = show.starts_at ? Date.parse(show.starts_at) - (now + offset) : null;
   const chatLines = messages.slice(-5);
   const soldCount = items.filter((i) => i.status === "sold").length;
+  const isMineItem = (it: Item) => mine.has(it.id) || Boolean(me && it.status === "sold" && it.high_bidder === me.id);
   const ended = show.status === "ended";
   const forSaleCount = ended ? items.filter((i) => i.status === "unsold" && i.for_sale).length : 0;
   const currentImg = current ? itemImage(current) : null;
@@ -250,8 +327,14 @@ export default function ShowClient(props: Props) {
                         <span>{itemMeta(it) || " "}</span>
                       </div>
                       <div className="lot-r">
-                        <span className="price">{kr(it.price)}</span>
-                        <LotChip item={it} mine={mine.has(it.id)} ended={ended} />
+                        <span className="price">
+                          {isAuction(it) && it.status === "live" && it.high_bid
+                            ? `bud ${kr(it.high_bid)}`
+                            : isAuction(it) && it.status !== "sold" && !(ended && it.for_sale)
+                              ? `fra ${kr(it.price)}`
+                              : kr(soldPrice(it))}
+                        </span>
+                        <LotChip item={it} mine={isMineItem(it)} ended={ended} />
                       </div>
                     </li>
                   );
@@ -330,10 +413,21 @@ export default function ShowClient(props: Props) {
                       ),
                     )}
                   </div>
-                  {current && sold && isMine ? <div className="v-flag">Du snuppede den!</div> : null}
+                  {current && sold && (isMine || leading) ? (
+                    <div className="v-flag">{auction ? "Du vandt budsalget!" : "Du snuppede den!"}</div>
+                  ) : current && sold && auction?.high_handle ? (
+                    <div className="v-flag">Solgt til {auction.high_handle}</div>
+                  ) : bidRunning && leading ? (
+                    <div className="v-flag">Du har det højeste bud</div>
+                  ) : null}
                   {current && !sold && rushLeft !== null && rushLeft > 0 ? (
                     <div className="v-rush" role="timer">
                       Lynrunde <span>{rushLeft}</span>
+                    </div>
+                  ) : null}
+                  {bidRunning ? (
+                    <div className="v-rush bid" role="timer" aria-label={`Budsalg, ${bidLeft} sekunder tilbage`}>
+                      Budsalg <span>{bidLeft}</span>
                     </div>
                   ) : null}
                   <div className="v-card">
@@ -346,12 +440,20 @@ export default function ShowClient(props: Props) {
                       </span>
                     )}
                     <div style={{ minWidth: 0 }}>
-                      <div className="v-pin">{current ? "Vises nu" : "Om lidt"}</div>
+                      <div className="v-pin">{current ? (auction ? "Budsalg" : "Vises nu") : "Om lidt"}</div>
                       <div className="v-name">{current ? current.name : "Sælgeren finder næste ting frem"}</div>
-                      <div className="v-meta">{current ? itemMeta(current) || kr(current.price) : "Hold øje med chatten"}</div>
+                      <div className="v-meta" aria-live="polite">
+                        {auction
+                          ? auction.high_bid
+                            ? `${auction.status === "sold" ? "Solgt for" : "Højeste bud"} ${kr(auction.high_bid)} · ${auction.high_handle}`
+                            : `Start ${kr(auction.price)}`
+                          : current
+                            ? itemMeta(current) || kr(current.price)
+                            : "Hold øje med chatten"}
+                      </div>
                     </div>
                     {current ? (
-                      <button className="v-buy" type="button" onClick={snup} disabled={buyDisabled}>
+                      <button className="v-buy" type="button" onClick={auction ? bid : snup} disabled={buyDisabled}>
                         {buyLabel}
                       </button>
                     ) : null}
@@ -362,7 +464,9 @@ export default function ShowClient(props: Props) {
           </div>
           {live ? (
             <p className="fine" style={{ textAlign: "center" }}>
-              Når du snupper, vises dit brugernavn i chatten. Du betaler samlet under Mine snup inden 3 dage.
+              {auction
+                ? "Dit bud er bindende. Vinder du, lander tingen under Mine snup, og du betaler inden 3 dage."
+                : "Når du snupper, vises dit brugernavn i chatten. Du betaler samlet under Mine snup inden 3 dage."}
             </p>
           ) : null}
         </div>

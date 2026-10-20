@@ -16,6 +16,8 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
       ["Hvad betyder det at snuppe noget?", "Når sælgeren viser en ting frem, kan du trykke Snup. Den første, der trykker, får tingen, og den lander med det samme under Mine snup."],
       ["Hvad betyder Husk mig?", "Sælgerne kan lægge deres ting på SnupLive før showet. Trykker du Husk mig på en ting eller et show, sender vi dig en mail, når showet starter. Du kan købe tingen, mens den bliver vist live."],
       ["Hvad er Køb nu?", "Ting, der ikke bliver snuppet i et live-show, kan købes bagefter til fast pris. Tryk Køb nu på tingens side, så er den din, og du betaler under Mine snup."],
+      ["Hvordan virker budsalg?", "Nogle ting sælges på budsalg. Buddene starter ved startprisen, og når sælgeren starter budsalget, har du 30 sekunder til at byde. Hvert bud er et fast trin højere: 5 kr under 100 kr, 10 kr op til 500 kr, 25 kr op til 1.000 kr og 50 kr derover. Byder nogen i de sidste 10 sekunder, får alle 10 sekunder mere. Det højeste bud vinder."],
+      ["Er mit bud bindende?", "Ja. Vinder du budsalget, lander tingen under Mine snup til dit bud, og du betaler inden 3 dage, ligesom når du snupper. Byder ingen, kan tingen købes bagefter til startprisen."],
       ["Hvad er en lynrunde?", "I en lynrunde har du ti sekunder til at snuppe tingen. Sælgeren starter lynrunder, når mange vil have den samme ting."],
       ["Kan andre se, hvad jeg snupper?", "Når du snupper noget, bliver dit brugernavn vist i chatten i showet, ligesom på et loppemarked. Din liste over snup kan kun du og sælgeren se."],
     ],

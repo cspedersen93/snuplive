@@ -43,7 +43,7 @@ export function itemCount(s: ShowWithSeller) {
 
 /** Ting til forsiden, kategorier og "Til salg" (se items_feed i databasen). */
 export async function fetchFeed(
-  kind: "upcoming" | "live" | "for_sale",
+  kind: "upcoming" | "live" | "for_sale" | "auctions",
   opts: { category?: string | null; limit?: number; offset?: number; seller?: string; exclude?: string } = {},
 ): Promise<FeedItem[]> {
   try {

@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Chat from "@/components/Chat";
 import { IconBulb } from "@/components/Icons";
 import { StudioVideo } from "@/components/LiveVideo";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useShowRealtime, sortItems } from "@/components/useShowRealtime";
+import { AUCTION_SECONDS, auctionLeft, isAuction, soldPrice } from "@/lib/auction";
 import { gradFor, kr, when } from "@/lib/format";
 import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
@@ -71,15 +72,16 @@ export default function StudioClient(props: Props) {
   const ended = show.status === "ended";
   const current = items.find((i) => i.id === show.current_item_id) ?? null;
   const sold = items.filter((i) => i.status === "sold");
-  const revenue = sold.reduce((a, i) => a + i.price, 0);
+  const revenue = sold.reduce((a, i) => a + soldPrice(i), 0);
   const queued = items.filter((i) => i.status === "queued");
   const next = queued[0] ?? items.find((i) => i.status === "unsold" && i.id !== current?.id) ?? null;
   const shareUrl = `/live/${props.profile.handle}`;
 
+  const fast = Boolean(current?.rush_ends_at || (current?.auction_ends_at && current.status === "live"));
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), current?.rush_ends_at ? 250 : 1000);
+    const t = setInterval(() => setNow(Date.now()), fast ? 250 : 1000);
     return () => clearInterval(t);
-  }, [current?.rush_ends_at]);
+  }, [fast]);
 
   // Videoadgang til sælgeren, når kameraet tændes.
   useEffect(() => {
@@ -236,6 +238,23 @@ export default function StudioClient(props: Props) {
   const rushLeft = current?.rush_ends_at
     ? Math.max(0, Math.ceil((Date.parse(current.rush_ends_at) - (now + offset)) / 1000))
     : null;
+  // Budsalg på den ting, der bliver vist.
+  const auction = current && isAuction(current) ? current : null;
+  const bidLeft = auction ? auctionLeft(auction, now + offset) : null;
+  const bidRunning = Boolean(auction && auction.status === "live" && bidLeft !== null && bidLeft > 0);
+  // Når uret står på 0, lukker studiet budsalget, så vinderen får tingen med det samme.
+  const closing = useRef<string | null>(null);
+  useEffect(() => {
+    if (!auction || auction.status !== "live" || bidLeft !== 0) return;
+    const key = `${auction.id}:${auction.auction_ends_at}`;
+    if (closing.current === key) return;
+    closing.current = key;
+    void sb.rpc("close_auction", { p_item: auction.id }).then(({ data }) => {
+      // Går urene en smule forkert, er budsalget måske ikke slut i databasen endnu: prøv igen om lidt.
+      if ((data as { status?: string } | null)?.status === "live") setTimeout(() => (closing.current = null), 700);
+      void resync();
+    });
+  }, [auction, bidLeft, now, sb, resync]);
   const saleFor = (itemId: string) => sales.find((s) => s.item_id === itemId);
   const cover = showImage({ ...show, status: "planned", seller: { avatar_path: props.profile.avatar_path } });
   const startedMs = show.started_at ? now + offset - Date.parse(show.started_at) : 0;
@@ -280,7 +299,7 @@ export default function StudioClient(props: Props) {
                       <div style={{ minWidth: 0 }}>
                         <strong>{it.name}</strong>
                         <span>
-                          {kr(it.price)}
+                          {isAuction(it) ? (it.status === "sold" ? `Solgt for ${kr(soldPrice(it))}` : `Budsalg fra ${kr(it.price)}`) : kr(it.price)}
                           {itemMeta(it) ? ` · ${itemMeta(it)}` : ""}
                           {sale?.buyer ? ` · @${sale.buyer.handle}` : ""}
                         </span>
@@ -291,9 +310,11 @@ export default function StudioClient(props: Props) {
                         ) : it.status === "sold" ? (
                           <span className="chip mine">Solgt</span>
                         ) : canShow ? (
-                          <button className="btn btn-ghost btn-sm" type="button" disabled={busy} onClick={() => present(it.id)}>Vis</button>
+                          <button className="btn btn-ghost btn-sm" type="button" disabled={busy || bidRunning} onClick={() => present(it.id)}>Vis</button>
                         ) : (
-                          <span className="chip">{it.status === "unsold" ? "Ikke solgt" : "I køen"}</span>
+                          <span className={`chip${isAuction(it) && it.status === "queued" ? " bid" : ""}`}>
+                            {it.status === "unsold" ? "Ikke solgt" : isAuction(it) ? "Budsalg" : "I køen"}
+                          </span>
                         )}
                         {canRemove ? (
                           <span style={{ display: "flex", gap: 10 }}>
@@ -413,7 +434,15 @@ export default function StudioClient(props: Props) {
               {live ? (
                 <>
                   {current?.status === "sold" ? (
-                    <div className="v-flag">Solgt{saleFor(current.id)?.buyer ? ` til @${saleFor(current.id)?.buyer?.handle}` : ""}!</div>
+                    <div className="v-flag">
+                      Solgt{saleFor(current.id)?.buyer ? ` til @${saleFor(current.id)?.buyer?.handle}` : current.high_handle ? ` til @${current.high_handle}` : ""}
+                      {isAuction(current) ? ` for ${kr(soldPrice(current))}` : ""}!
+                    </div>
+                  ) : auction && auction.status === "unsold" && auction.auction_ends_at ? (
+                    <div className="v-flag">Ingen bud</div>
+                  ) : null}
+                  {bidRunning ? (
+                    <div className="v-rush bid" role="timer">Budsalg <span>{bidLeft}</span></div>
                   ) : null}
                   {current && current.status !== "sold" && rushLeft !== null ? (
                     <div className="v-rush" role="timer">{rushLeft > 0 ? <>Lynrunde <span>{rushLeft}</span></> : "Lynrunden er slut"}</div>
@@ -431,11 +460,23 @@ export default function StudioClient(props: Props) {
                       {current && !itemImage(current) ? String(items.indexOf(current) + 1).padStart(2, "0") : current ? "" : "…"}
                     </span>
                     <div style={{ minWidth: 0 }}>
-                      <div className="v-pin">{current ? "Vises nu" : "Ingen ting vises"}</div>
+                      <div className="v-pin">{current ? (auction ? "Budsalg" : "Vises nu") : "Ingen ting vises"}</div>
                       <div className="v-name">{current ? current.name : next ? `Næste: ${next.name}` : "Køen er tom"}</div>
-                      <div className="v-meta">{current ? itemMeta(current) || " " : "Tryk Vis næste"}</div>
+                      <div className="v-meta">
+                        {auction
+                          ? auction.high_bid
+                            ? `Højeste bud: ${auction.high_handle} · ${auction.bid_count} ${auction.bid_count === 1 ? "bud" : "bud"}`
+                            : auction.auction_ends_at
+                              ? "Ingen bud endnu"
+                              : `Start ${kr(auction.price)} · Tryk Start budsalg`
+                          : current
+                            ? itemMeta(current) || " "
+                            : "Tryk Vis næste"}
+                      </div>
                     </div>
-                    {current ? <span className="v-buy" aria-hidden="true">{kr(current.price)}</span> : null}
+                    {current ? (
+                      <span className="v-buy" aria-hidden="true">{kr(auction?.high_bid ?? current.price)}</span>
+                    ) : null}
                   </div>
                 </>
               ) : null}
@@ -451,17 +492,28 @@ export default function StudioClient(props: Props) {
             </div>
             <div className="box" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <div className="ctrl">
-                <button className="btn btn-ghost" type="button" disabled={!live || busy || !next} onClick={() => next && present(next.id)}>
+                <button className="btn btn-ghost" type="button" disabled={!live || busy || !next || bidRunning} onClick={() => next && present(next.id)}>
                   Vis næste
                 </button>
-                <button
-                  className="btn btn-ghost"
-                  type="button"
-                  disabled={!live || busy || !current || current.status === "sold" || (rushLeft ?? 0) > 0}
-                  onClick={() => current && rpc("start_rush", { p_item: current.id, p_seconds: 10 })}
-                >
-                  Lynrunde 10 s
-                </button>
+                {auction ? (
+                  <button
+                    className="btn btn-red"
+                    type="button"
+                    disabled={!live || busy || auction.status !== "live" || Boolean(auction.auction_ends_at)}
+                    onClick={() => rpc("start_auction", { p_item: auction.id, p_seconds: AUCTION_SECONDS })}
+                  >
+                    {bidRunning ? `Budsalg ${bidLeft} s` : auction.auction_ends_at ? "Budsalget er slut" : `Start budsalg ${AUCTION_SECONDS} s`}
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-ghost"
+                    type="button"
+                    disabled={!live || busy || !current || current.status === "sold" || (rushLeft ?? 0) > 0}
+                    onClick={() => current && rpc("start_rush", { p_item: current.id, p_seconds: 10 })}
+                  >
+                    Lynrunde 10 s
+                  </button>
+                )}
               </div>
               <button className="btn btn-line btn-block" type="button" disabled={!live || busy} onClick={() => setConfirmEnd(true)}>
                 Afslut show

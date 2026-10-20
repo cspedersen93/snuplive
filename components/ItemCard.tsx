@@ -2,6 +2,7 @@ import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import { itemMeta } from "@/components/Screen";
 import { clock, dayLabel, gradFor, kr } from "@/lib/format";
+import { isAuction, soldPrice } from "@/lib/auction";
 import { itemImage } from "@/lib/images";
 import { itemHref, itemState } from "@/lib/items";
 import type { FeedItem } from "@/lib/types";
@@ -11,6 +12,15 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
   const img = itemImage(item);
   const state = itemState(item);
   const meta = itemMeta(item);
+  const bid = isAuction(item) && (state === "upcoming" || state === "live" || state === "showing");
+  const price =
+    state === "sold"
+      ? kr(soldPrice(item))
+      : bid
+        ? item.high_bid
+          ? `Bud ${kr(item.high_bid)}`
+          : `Fra ${kr(item.price)}`
+        : kr(item.price);
   return (
     <Link className="icard" href={itemHref(item)}>
       <div className="icard-img" style={img ? undefined : { background: gradFor(item.id) }}>
@@ -21,6 +31,7 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
           <span className="icard-name" aria-hidden="true">{item.name}</span>
         )}
         <span className="icard-badge">
+          {bid ? <span className="b-bid">Budsalg</span> : null}
           {state === "live" || state === "showing" ? (
             <span className="b-live">
               <span className="live-dot white" />
@@ -38,7 +49,7 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
         </span>
       </div>
       <div className="icard-info">
-        <strong className="num">{kr(item.price)}</strong>
+        <strong className="num">{price}</strong>
         <span className="icard-title">{item.name}</span>
         {meta ? <span className="icard-meta">{meta}</span> : null}
         <span className="handle">

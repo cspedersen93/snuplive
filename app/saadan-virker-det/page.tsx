@@ -40,6 +40,7 @@ export default function Saadan() {
             <li><div><h3>Find et show eller en ting</h3><p>Se hvem der er live under Live nu, eller find en ting, der bliver vist snart, og tryk Husk mig. Så får du en mail, når showet starter.</p></div></li>
             <li><div><h3>Spørg i chatten</h3><p>Bed sælgeren vise mærket, målene eller stoffet tæt på. Svaret kommer, mens du ser med.</p></div></li>
             <li><div><h3>Snup med ét tryk</h3><p>Den første, der trykker Snup, får tingen. Den lander med det samme under Mine snup.</p></div></li>
+            <li><div><h3>Eller byd på budsalg</h3><p>Står der Budsalg på tingen, byder du i stedet for at snuppe. Du har 30 sekunder, og det højeste bud vinder.</p></div></li>
             <li><div><h3>Eller køb bagefter</h3><p>Ting, der ikke blev snuppet i showet, kommer <Link href="/til-salg">til salg</Link> til fast pris. Tryk Køb nu, så er tingen din.</p></div></li>
             <li><div><h3>Betal samlet</h3><p>Betal med MobilePay eller kort under Mine snup. Alt fra samme sælger sendes i én pakke.</p></div></li>
             <li><div><h3>Modtag din pakke</h3><p>Du bekræfter, at alt er i orden, og først derefter bliver pengene udbetalt til sælgeren.</p></div></li>
@@ -60,7 +61,7 @@ export default function Saadan() {
           </div>
           <ol className="steps">
             <li><div><h3>Opret en konto</h3><p>Med din e-mail. Ved lanceringen bliver sælgere verificeret med MitID.</p></div></li>
-            <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris. Tilføj gerne billeder og en beskrivelse, så købere kan finde tingene og trykke Husk mig før showet.</p></div></li>
+            <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris, og om den skal sælges til fast pris eller på budsalg. Tilføj gerne billeder og en beskrivelse, så købere kan finde tingene og trykke Husk mig før showet.</p></div></li>
             <li><div><h3>Gå live og sælg</h3><p>Vis tingene frem én ad gangen, og svar på spørgsmål i chatten. Det, der ikke bliver solgt, kommer automatisk til salg til fast pris bagefter.</p></div></li>
             <li><div><h3>Send og få penge</h3><p>Lav fragtlabelen under Mine shows, og aflever pakken i en pakkeshop. Når køberen har fået pakken, går pengene til din bankkonto via Stripe.</p></div></li>
           </ol>

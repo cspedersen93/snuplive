@@ -20,6 +20,7 @@ Det, der ikke bliver snuppet, kan købes bagefter til fast pris. Det hele kører
 - Backoffice på /admin med tal, ordrer, medlemmer og shows
 - En forside til købere, fem kategorier (`/kategori/...`) og en side for hver ting (`/ting/...`) med billeder, beskrivelse og pris
 - "Husk mig" på ting og shows før showet (mail, når showet starter) og "Køb nu" til fast pris for det, der ikke blev solgt
+- Budsalg live: 30 sekunder, faste budtrin og 10 sekunder ekstra ved sene bud. "Kommende budsalg" på forsiden
 
 MitID kommer senere (se nederst).
 
@@ -253,7 +254,23 @@ Sådan virker det:
   Mine snup. Sælgeren kan rette prisen eller tage en ting af salg under **Mine shows → Til salg**. Bliver et snup ikke betalt, eller
   annullerer sælgeren det, kommer tingen til salg igen. Refunderede ting skal sælgeren selv sætte til salg igen.
 - **Én pakke pr. sælger:** alt, køberen har købt hos samme sælger, betales og sendes samlet, også når det er fra flere shows.
-- Databasen er forberedt til budsalg (`sale_type`), men det er ikke slået til endnu.
+
+## Budsalg
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0008_budsalg.sql`](supabase/migrations/0008_budsalg.sql), **før** den nye
+   version kommer på Vercel (0007 skal være kørt først). Filen kan køres igen uden at gøre skade. Der er ingen nye nøgler.
+
+Sådan virker det:
+
+- **I studiet** vælger sælgeren *Fast pris* eller *Budsalg* på hver ting. Ved budsalg er prisen startprisen.
+- **Live:** sælgeren viser tingen frem og trykker **Start budsalg 30 s**. Køberne trykker **Byd**, som altid byder næste trin:
+  5 kr under 100 kr, 10 kr op til 500 kr, 25 kr op til 1.000 kr og 50 kr derover. Man kan ikke byde over sig selv.
+  Kommer der et bud i de sidste 10 sekunder, står uret på 10 igen. Næste ting kan først vises, når budsalget er slut.
+- **Når uret står på 0**, lukker studiet budsalget. Det højeste bud bliver til et snup i køberens Mine snup til buddets pris,
+  og vinderen står i chatten. Afslutter sælgeren showet midt i et budsalg, vinder det højeste bud.
+- **Ingen bud:** tingen kommer til salg til startprisen med Køb nu, når showet slutter.
+- Alt det, der afgør et budsalg (tid, trin, vinder), sker i databasen, så det er det samme for alle, og ingen kan snyde.
+  Alle bud gemmes i tabellen `bids`.
 
 ## Backoffice
 
@@ -289,7 +306,8 @@ PGHOST=localhost PGPORT=5432 ./supabase/tests/run.sh
 ```
 
 Testene tjekker blandt andet, at kun sælgeren kan styre sit show, at ingen kan skrive i andres navn i chatten,
-at man ikke kan snuppe sine egne ting, at en lynrunde lukker til tiden, og at kun én får tingen, når to trykker samtidig.
+at man ikke kan snuppe sine egne ting, at en lynrunde lukker til tiden, at kun én får tingen, når to trykker samtidig,
+og at kun ét bud går igennem, når to byder det samme på samme tid.
 
 ## Sådan hænger det sammen
 
@@ -306,17 +324,17 @@ Browser ──► Vercel (Next.js 16)
 - `components/` fælles dele (chat, video, header, realtid).
 - `supabase/migrations/0001_init.sql` hele databasen: tabeller, adgangsregler og funktionerne
   `set_show_status`, `present_item`, `start_rush` og `snup`. De senere filer bygger videre (billeder, betaling, fragt,
-  tryghed, backoffice og `0007_varer.sql` med `buy_now`, `items_feed` og påmindelser).
+  tryghed, backoffice, `0007_varer.sql` med `buy_now`, `items_feed` og påmindelser, og `0008_budsalg.sql` med
+  `start_auction`, `place_bid` og `close_auction`).
 
 Al logik, der skal være til at stole på (hvem der fik tingen, om lynrunden er slut, hvem der må styre et show),
 ligger i databasen. Browseren kan ikke snyde sig udenom.
 
 ## Næste trin
 
-1. **Budsalg live:** en nedtælling på 30 sekunder, bud i faste trin og 10 sekunder ekstra ved sene bud, plus "Kommende budsalg" på forsiden.
-2. **Forhåndsbud, følg sælgere og lukkede shows** (kun med et hemmeligt link).
-3. **MitID** for sælgere via Idura (kræver CVR).
-4. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
-5. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
+1. **Forhåndsbud og maks-bud, følg sælgere og lukkede shows** (kun med et hemmeligt link).
+2. **MitID** for sælgere via Idura (kræver CVR).
+3. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
+4. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
 
 Husk også at oprette mailadressen `kontakt@snuplive.dk`, som privatlivspolitikken henviser til. 

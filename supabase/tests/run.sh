@@ -23,3 +23,24 @@ else
   echo "FEJL: kapløbstesten"; exit 1
 fi
 rm -f /tmp/race_b.txt /tmp/race_c.txt
+
+# Kapløb om et bud: Liva og Ole byder det samme beløb på samme tid. Kun ét bud må gå igennem.
+psql -q -tA -v ON_ERROR_STOP=1 -U postgres -d snuptest >/dev/null <<'SQL'
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+insert into items (id, show_id, seller_id, name, price, sale_type) values ('20000000-0000-0000-0000-000000000029', '10000000-0000-0000-0000-000000000003', auth.uid(), 'Wegner-stol', 100, 'auction');
+select status from present_item('20000000-0000-0000-0000-000000000029');
+select status from start_auction('20000000-0000-0000-0000-000000000029');
+SQL
+bid_as() { psql -q -tA -U postgres -d snuptest -c "begin; set local role authenticated; select set_config('request.jwt.claims', '{\"sub\":\"$1\"}', true); select high_bid from place_bid('20000000-0000-0000-0000-000000000029', 100); select pg_sleep($2); commit;" 2>&1 | grep -v '^$' | tr '\n' ' ' || true; }
+bid_as 00000000-0000-0000-0000-00000000000b 1.5 > /tmp/bid_b.txt &
+sleep 0.3
+bid_as 00000000-0000-0000-0000-00000000000c 0 > /tmp/bid_c.txt
+wait
+state=$(psql -tA -U postgres -d snuptest -c "select high_bid || '|' || high_handle || '|' || (select count(*) from bids where item_id = i.id) from items i where id = '20000000-0000-0000-0000-000000000029'")
+if grep -q "} 100" /tmp/bid_b.txt && grep -q "mindste bud er nu 110" /tmp/bid_c.txt && [ "$state" = "100|liva.k|1" ]; then
+  echo "OK: kun ét bud går igennem, når to byder samtidig"
+else
+  echo "FEJL: kapløb om bud ($state) Liva: $(cat /tmp/bid_b.txt) Ole: $(cat /tmp/bid_c.txt)"; exit 1
+fi
+rm -f /tmp/bid_b.txt /tmp/bid_c.txt

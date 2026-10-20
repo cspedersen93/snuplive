@@ -392,5 +392,78 @@ select t.ok((select count(*) from items_feed('for_sale', null, 50)) >= 2, 'alle 
 select t.throws($$insert into reminders (user_id, show_id) values (null, '10000000-0000-0000-0000-000000000007')$$, 'permission denied');
 reset role;
 
+-- ── Budsalg: start, bud i trin, +10 sekunder, vinder, ingen bud ─────────────
+select t.ok(bid_step(95) = 5 and bid_step(100) = 10 and bid_step(499) = 10 and bid_step(500) = 25 and bid_step(1000) = 50, 'budtrin efter pris');
+select t.ok(next_bid(100, null) = 100 and next_bid(100, 100) = 110 and next_bid(80, 95) = 100, 'næste bud');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+insert into items (id, show_id, seller_id, name, price, position, sale_type) values
+  ('20000000-0000-0000-0000-000000000017', '10000000-0000-0000-0000-000000000007', auth.uid(), 'Teak-skænk', 100, 2, 'auction'),
+  ('20000000-0000-0000-0000-000000000018', '10000000-0000-0000-0000-000000000007', auth.uid(), 'Kähler-vase', 200, 3, 'auction'),
+  ('20000000-0000-0000-0000-000000000019', '10000000-0000-0000-0000-000000000007', auth.uid(), 'Arne Jacobsen-stol', 50, 4, 'auction');
+select t.throws($$update items set sale_type = 'bud' where id = '20000000-0000-0000-0000-000000000017'$$, 'check constraint');
+select t.ok((select count(*) from items_feed('auctions')) = 3, 'kommende budsalg kan ses');
+select set_show_status('10000000-0000-0000-0000-000000000007', 'live');
+select present_item('20000000-0000-0000-0000-000000000017');
+select t.throws($$select start_rush('20000000-0000-0000-0000-000000000017')$$, 'egen nedtælling');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select place_bid('20000000-0000-0000-0000-000000000017', 100)$$, 'ikke startet');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select auction_ends_at > now() + interval '29 seconds' from start_auction('20000000-0000-0000-0000-000000000017')), 'budsalget kører i 30 sekunder');
+select t.throws($$select start_auction('20000000-0000-0000-0000-000000000017')$$, 'allerede startet');
+select t.throws($$select place_bid('20000000-0000-0000-0000-000000000017', 100)$$, 'egne ting');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select place_bid('20000000-0000-0000-0000-000000000017', 90)$$, 'mindste bud er nu 100');
+select t.ok((select high_bid = 100 and high_handle = 'liva.k' and bid_count = 1 from place_bid('20000000-0000-0000-0000-000000000017', 100)), 'Liva byder startprisen');
+select t.throws($$select place_bid('20000000-0000-0000-0000-000000000017', 110)$$, 'allerede det højeste bud');
+select t.throws($$select snup('20000000-0000-0000-0000-000000000017')$$, 'på budsalg');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select place_bid('20000000-0000-0000-0000-000000000017', 100)$$, 'mindste bud er nu 110');
+select t.ok((select high_bid = 110 and high_handle = 'olesnup' from place_bid('20000000-0000-0000-0000-000000000017', 110)), 'Ole byder over');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.throws($$select present_item('20000000-0000-0000-0000-000000000018')$$, 'Vent, til budsalget er slut');
+reset role;
+update items set auction_ends_at = now() + interval '3 seconds' where id = '20000000-0000-0000-0000-000000000017';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select auction_ends_at > now() + interval '9 seconds' from place_bid('20000000-0000-0000-0000-000000000017', 120)), 'et sent bud giver 10 sekunder ekstra');
+select t.ok((select count(*) from bids) = 2, 'Liva kan se sine egne bud');
+select t.ok((select status from close_auction('20000000-0000-0000-0000-000000000017')) = 'live', 'budsalget lukker ikke før tid');
+reset role;
+update items set auction_ends_at = now() - interval '1 second' where id = '20000000-0000-0000-0000-000000000017';
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.ok((select status from close_auction('20000000-0000-0000-0000-000000000017')) = 'sold', 'budsalget lukker, når tiden er gået');
+select t.ok((select status from close_auction('20000000-0000-0000-0000-000000000017')) = 'sold', 'at lukke igen gør ingenting');
+select t.throws($$select place_bid('20000000-0000-0000-0000-000000000017', 130)$$, 'permission denied');
+reset role;
+select t.ok((select count(*) from sales where item_id = '20000000-0000-0000-0000-000000000017' and buyer_id = '00000000-0000-0000-0000-00000000000b' and price = 120 and status = 'reserved') = 1, 'vinderen får tingen i sin kurv til sit bud');
+select t.ok((select count(*) from messages where body = 'liva.k vandt Teak-skænk for 120 kr') = 1, 'vinderen står i chatten');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select count(*) from bids) = 3, 'sælgeren kan se alle bud på sine ting');
+select present_item('20000000-0000-0000-0000-000000000018');
+select start_auction('20000000-0000-0000-0000-000000000018');
+reset role;
+update items set auction_ends_at = now() - interval '1 second' where id = '20000000-0000-0000-0000-000000000018';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select present_item('20000000-0000-0000-0000-000000000019');
+select t.ok((select status from items where id = '20000000-0000-0000-0000-000000000018') = 'unsold', 'ingen bud: tingen er usolgt');
+select start_auction('20000000-0000-0000-0000-000000000019');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select place_bid('20000000-0000-0000-0000-000000000019', 50);
+select t.ok((select count(*) from items_feed('auctions') where id = '20000000-0000-0000-0000-000000000019') = 1, 'budsalg, der kører, er med i listen');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select set_show_status('10000000-0000-0000-0000-000000000007', 'ended');
+reset role;
+select t.ok((select status from items where id = '20000000-0000-0000-0000-000000000019') = 'sold', 'showet slutter: det højeste bud vinder');
+select t.ok((select buyer_id = '00000000-0000-0000-0000-00000000000c' and price = 50 from sales where item_id = '20000000-0000-0000-0000-000000000019' and status = 'reserved'), 'Ole får stolen til 50 kr');
+select t.ok((select for_sale and status = 'unsold' and price = 200 from items where id = '20000000-0000-0000-0000-000000000018'), 'uden bud kommer tingen til salg til startprisen');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select status from buy_now('20000000-0000-0000-0000-000000000018')) = 'sold', 'og kan købes med Køb nu');
+reset role;
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

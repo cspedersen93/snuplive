@@ -817,3 +817,14 @@ img.v-thumb{object-fit:cover}
 .salg-faq .ctas{grid-column:1/-1}
 .plain-steps{margin:0;padding-left:1.2em;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (max-width:860px){.salg-faq{grid-template-columns:minmax(0,1fr)}}
+/* Budsalg */
+.sale-seg{display:flex;width:100%}
+.sale-seg label{flex:1 1 0}
+.sale-seg span{text-align:center}
+.chip.bid{border-color:rgba(242,196,107,.55);color:var(--amber)}
+.b-bid{display:flex;align-items:center;background:var(--amber);color:#1d1404 !important;font-family:var(--mono);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.icard-badge .b-bid{font-size:.68rem;padding:.35em .6em;border-radius:6px}
+.v-rush.bid{background:#fff;color:#1b0c10}
+.v-rush.bid span{color:var(--red)}
+.v-lead{font-size:.82em;opacity:.9}
+.item-price-k{font-size:.9rem;font-weight:500;letter-spacing:0;margin-right:4px}
