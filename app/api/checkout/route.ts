@@ -27,7 +27,7 @@ interface SaleRow {
 
 /**
  * Start en betaling for alle køberens ubetalte snup.
- * Body: { deliveries: { "<sælger-id>:<show-id>": "ship" | "pickup" }, pakkeshop?: { carrier, id, zipcode } }
+ * Body: { deliveries: { "<sælger-id>": "ship" | "pickup" }, pakkeshop?: { carrier, id, zipcode } }
  * Beløbene regnes ud her på serveren, ikke i browseren.
  */
 export async function POST(req: Request) {
@@ -75,10 +75,10 @@ export async function POST(req: Request) {
     await cancelCheckout(admin, checkoutId);
   }
 
-  // Én ordre pr. sælger og show (alt sendes i én pakke).
+  // Én ordre pr. sælger: alt fra samme sælger sendes i én pakke, også når det er købt i flere shows.
   const groups = new Map<string, SaleRow[]>();
   for (const s of payable) {
-    const key = `${s.seller_id}:${s.show_id}`;
+    const key = s.seller_id;
     groups.set(key, [...(groups.get(key) ?? []), s]);
   }
   const deliveryOf = (key: string): Delivery => (isDelivery(deliveries[key]) ? (deliveries[key] as Delivery) : "ship");

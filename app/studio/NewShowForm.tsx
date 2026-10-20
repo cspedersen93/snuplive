@@ -16,7 +16,7 @@ function defaultStart() {
 export default function NewShowForm({ sellerId }: { sellerId: string }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
-  const [cat, setCat] = useState<string>("toej");
+  const [cat, setCat] = useState<string>("dametoej");
   const [start, setStart] = useState(defaultStart);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

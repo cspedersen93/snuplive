@@ -7,12 +7,14 @@ import Avatar from "@/components/Avatar";
 import Chat from "@/components/Chat";
 import { IconBox, IconShare } from "@/components/Icons";
 import { ViewerVideo } from "@/components/LiveVideo";
+import RemindButton from "@/components/RemindButton";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useMe } from "@/components/useMe";
 import { useShowRealtime } from "@/components/useShowRealtime";
 import { hasSupabase } from "@/lib/env";
 import { gradFor, kr, when } from "@/lib/format";
-import { showImage } from "@/lib/images";
+import { itemImage, showImage } from "@/lib/images";
+import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { Item, Message, Profile, Show } from "@/lib/types";
@@ -43,7 +45,7 @@ function countdown(ms: number) {
   return `om ${Math.round(h / 24)} dage`;
 }
 
-function LotChip({ item, mine }: { item: Item; mine: boolean }) {
+function LotChip({ item, mine, ended }: { item: Item; mine: boolean; ended: boolean }) {
   if (item.status === "live")
     return (
       <span className="chip live">
@@ -52,6 +54,7 @@ function LotChip({ item, mine }: { item: Item; mine: boolean }) {
       </span>
     );
   if (item.status === "sold") return <span className={`chip ${mine ? "mine" : "sold"}`}>{mine ? "Din" : "Solgt"}</span>;
+  if (item.status === "unsold" && ended && item.for_sale) return <span className="chip ok">Køb nu</span>;
   if (item.status === "unsold") return <span className="chip">Ikke solgt</span>;
   return <span className="chip">I køen</span>;
 }
@@ -191,6 +194,9 @@ export default function ShowClient(props: Props) {
   const startsIn = show.starts_at ? Date.parse(show.starts_at) - (now + offset) : null;
   const chatLines = messages.slice(-5);
   const soldCount = items.filter((i) => i.status === "sold").length;
+  const ended = show.status === "ended";
+  const forSaleCount = ended ? items.filter((i) => i.status === "unsold" && i.for_sale).length : 0;
+  const currentImg = current ? itemImage(current) : null;
 
   return (
     <div className="wrap">
@@ -217,7 +223,7 @@ export default function ShowClient(props: Props) {
               Del showet
             </button>
           </div>
-          <div className="box">
+          <div className="box" id="i-showet">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
               <h2>I dette show</h2>
               <span className="muted" style={{ fontSize: ".85rem" }}>
@@ -226,21 +232,30 @@ export default function ShowClient(props: Props) {
             </div>
             {items.length ? (
               <ul className="lots">
-                {items.map((it, n) => (
-                  <li key={it.id} className={`lot${it.id === show.current_item_id ? " is-now" : ""}`}>
-                    <span className="lot-n" style={{ background: gradFor(it.id) }} aria-hidden="true">
-                      {String(n + 1).padStart(2, "0")}
-                    </span>
-                    <div style={{ minWidth: 0 }}>
-                      <strong>{it.name}</strong>
-                      <span>{itemMeta(it) || " "}</span>
-                    </div>
-                    <div className="lot-r">
-                      <span className="price">{kr(it.price)}</span>
-                      <LotChip item={it} mine={mine.has(it.id)} />
-                    </div>
-                  </li>
-                ))}
+                {items.map((it, n) => {
+                  const img = itemImage(it);
+                  return (
+                    <li key={it.id} className={`lot${it.id === show.current_item_id ? " is-now" : ""}`}>
+                      {img ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img className="lot-img" src={img} alt="" loading="lazy" />
+                      ) : (
+                        <span className="lot-n" style={{ background: gradFor(it.id) }} aria-hidden="true">
+                          {String(n + 1).padStart(2, "0")}
+                        </span>
+                      )}
+                      <div style={{ minWidth: 0 }}>
+                        {/* Under showet bliver man på siden; før og efter kan man åbne tingens egen side. */}
+                        <strong>{live ? it.name : <Link href={itemHref(it)}>{it.name}</Link>}</strong>
+                        <span>{itemMeta(it) || " "}</span>
+                      </div>
+                      <div className="lot-r">
+                        <span className="price">{kr(it.price)}</span>
+                        <LotChip item={it} mine={mine.has(it.id)} ended={ended} />
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
               <p className="muted" style={{ fontSize: ".9rem" }}>Sælgeren har ikke lagt ting ind endnu.</p>
@@ -248,7 +263,7 @@ export default function ShowClient(props: Props) {
           </div>
           <div className="box ship-note">
             <IconBox />
-            <span>Alt, du snupper i dette show, bliver samlet under Mine snup, så det kan sendes i én pakke.</span>
+            <span>Alt, du køber hos {handle}, bliver samlet under Mine snup, så det kan sendes i én pakke.</span>
           </div>
         </aside>
 
@@ -275,12 +290,20 @@ export default function ShowClient(props: Props) {
                       <strong style={{ fontSize: "1.4rem", lineHeight: 1.2 }}>{when(show.starts_at)}</strong>
                       {startsIn !== null ? <span>{countdown(startsIn)}</span> : null}
                       <span style={{ fontSize: ".85rem", opacity: 0.8 }}>Siden skifter selv til video, når showet starter.</span>
+                      <RemindButton showId={show.id} next={`/live/${handle}`} className="btn btn-red btn-sm" />
                     </>
                   ) : (
                     <>
                       <strong style={{ fontSize: "1.4rem" }}>Showet er slut</strong>
-                      <span>{soldCount ? `${soldCount} ting blev snuppet.` : "Tak fordi du kiggede forbi."}</span>
-                      <Link className="btn btn-red btn-sm" href="/live">Find et andet show</Link>
+                      <span>
+                        {soldCount ? `${soldCount} ting blev snuppet.` : "Tak fordi du kiggede forbi."}
+                        {forSaleCount ? ` ${forSaleCount} ting kan stadig købes til fast pris.` : ""}
+                      </span>
+                      {forSaleCount ? (
+                        <a className="btn btn-red btn-sm" href="#i-showet">Se hvad der er tilbage</a>
+                      ) : (
+                        <Link className="btn btn-red btn-sm" href="/live">Find et andet show</Link>
+                      )}
                     </>
                   )}
                 </div>
@@ -314,9 +337,14 @@ export default function ShowClient(props: Props) {
                     </div>
                   ) : null}
                   <div className="v-card">
-                    <span className="v-thumb" style={{ background: current ? gradFor(current.id) : "rgba(255,255,255,.12)" }} aria-hidden="true">
-                      {current ? String(items.indexOf(current) + 1).padStart(2, "0") : "…"}
-                    </span>
+                    {currentImg ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img className="v-thumb" src={currentImg} alt="" />
+                    ) : (
+                      <span className="v-thumb" style={{ background: current ? gradFor(current.id) : "rgba(255,255,255,.12)" }} aria-hidden="true">
+                        {current ? String(items.indexOf(current) + 1).padStart(2, "0") : "…"}
+                      </span>
+                    )}
                     <div style={{ minWidth: 0 }}>
                       <div className="v-pin">{current ? "Vises nu" : "Om lidt"}</div>
                       <div className="v-name">{current ? current.name : "Sælgeren finder næste ting frem"}</div>

@@ -283,3 +283,43 @@ export function UnblockButton({ userId, handle }: { userId: string; handle: stri
     </button>
   );
 }
+
+/** Ret prisen på en ting til salg, eller tag den af. */
+export function ForSaleRow({ id, price, forSale }: { id: string; price: number; forSale: boolean }) {
+  const router = useRouter();
+  const [value, setValue] = useState(String(price));
+  const [on, setOn] = useState(forSale);
+  const [busy, setBusy] = useState(false);
+  async function save(fields: { price?: number; for_sale?: boolean }, ok: string) {
+    setBusy(true);
+    const { error } = await getSupabase().from("items").update(fields).eq("id", id);
+    setBusy(false);
+    if (error) return toast(errorText(error));
+    toast(ok);
+    router.refresh();
+  }
+  const p = Number(value.replace(/[^\d]/g, ""));
+  const changed = Number.isInteger(p) && p >= 1 && p <= 100000 && p !== price;
+  return (
+    <div className="forsale-row">
+      <label className="sr-only" htmlFor={`fs-${id}`}>Pris i kr</label>
+      <input id={`fs-${id}`} inputMode="numeric" value={value} onChange={(e) => setValue(e.target.value)} disabled={busy} />
+      <span className="muted">kr</span>
+      {changed ? (
+        <button className="btn btn-line btn-sm" type="button" disabled={busy} onClick={() => save({ price: p }, "Prisen er rettet.")}>Gem</button>
+      ) : null}
+      <label className="switch">
+        <input
+          type="checkbox"
+          checked={on}
+          disabled={busy}
+          onChange={(e) => {
+            setOn(e.target.checked);
+            void save({ for_sale: e.target.checked }, e.target.checked ? "Tingen er til salg igen." : "Tingen er taget af.");
+          }}
+        />
+        <span>{on ? "Til salg" : "Taget af"}</span>
+      </label>
+    </div>
+  );
+}

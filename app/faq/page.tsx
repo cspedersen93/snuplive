@@ -14,6 +14,8 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
     qa: [
       ["Skal jeg hente en app for at købe?", "Nej. Du ser shows, chatter og snupper direkte her på siden, både på telefonen og computeren."],
       ["Hvad betyder det at snuppe noget?", "Når sælgeren viser en ting frem, kan du trykke Snup. Den første, der trykker, får tingen, og den lander med det samme under Mine snup."],
+      ["Hvad betyder Husk mig?", "Sælgerne kan lægge deres ting på SnupLive før showet. Trykker du Husk mig på en ting eller et show, sender vi dig en mail, når showet starter. Du kan købe tingen, mens den bliver vist live."],
+      ["Hvad er Køb nu?", "Ting, der ikke bliver snuppet i et live-show, kan købes bagefter til fast pris. Tryk Køb nu på tingens side, så er den din, og du betaler under Mine snup."],
       ["Hvad er en lynrunde?", "I en lynrunde har du ti sekunder til at snuppe tingen. Sælgeren starter lynrunder, når mange vil have den samme ting."],
       ["Kan andre se, hvad jeg snupper?", "Når du snupper noget, bliver dit brugernavn vist i chatten i showet, ligesom på et loppemarked. Din liste over snup kan kun du og sælgeren se."],
     ],
@@ -22,7 +24,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
     title: "Betaling og fragt",
     qa: [
       ["Hvordan betaler jeg?", "Under Mine snup betaler du samlet for alt, du har snuppet, med MobilePay, kort, Apple Pay eller Google Pay. Du har 3 dage til at betale."],
-      ["Hvad koster fragten?", "49 kr til en DAO- eller GLS-pakkeshop, én gang pr. sælger og show, uanset hvor mange ting du snupper (op til 5 kg). Afhentning hos sælgeren er gratis."],
+      ["Hvad koster fragten?", "49 kr til en DAO- eller GLS-pakkeshop, én gang pr. sælger, uanset hvor mange ting du køber hos sælgeren (op til 5 kg). Afhentning hos sælgeren er gratis."],
       ["Hvordan vælger jeg pakkeshop?", "Under Mine snup skriver du dit postnummer, vælger DAO eller GLS og den pakkeshop, du vil hente pakken i. Fragtfirmaet giver dig besked, når pakken er klar, og du kan følge den under Mine snup."],
       ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 2 dage efter, at du har hentet pakken, eller senest 7 dage efter, at den er sendt. Har du meldt et problem, venter pengene, til sagen er afgjort."],
     ],

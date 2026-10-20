@@ -129,9 +129,11 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
   );
   const orders = (ordersQ.data ?? []) as unknown as OrderRow[];
 
+  // Én pakke pr. sælger: alt, du har købt hos samme sælger, betales og sendes samlet, også fra flere shows.
   const groupsMap = new Map<string, PayGroup>();
+  const showsOf = new Map<string, Set<string>>();
   for (const s of toPay) {
-    const key = `${s.seller_id}:${s.show_id}`;
+    const key = s.seller_id;
     const g =
       groupsMap.get(key) ??
       ({
@@ -143,7 +145,9 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
       } satisfies PayGroup);
     g.items.push({ id: s.id, name: s.item?.name ?? "Ting", meta: s.item ? itemMeta(s.item) : "", price: s.price });
     groupsMap.set(key, g);
+    showsOf.set(key, (showsOf.get(key) ?? new Set()).add(s.show_id));
   }
+  for (const [key, g] of groupsMap) if ((showsOf.get(key)?.size ?? 0) > 1) g.showTitle = "Fra flere shows";
   const groups = [...groupsMap.values()];
   const active = orders.filter((o) => o.status === "paid" || o.status === "shipped");
   const done = orders.filter((o) => o.status === "completed" || o.status === "refunded");

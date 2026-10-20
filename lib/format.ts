@@ -1,16 +1,99 @@
+/**
+ * Kategorierne: de fem største inden for brugt, der passer til live, plus "Andet".
+ * slug bruges i adressen (/kategori/<slug>), cover er reservebilledet til shows uden profilbillede.
+ */
 export const CATEGORIES = [
-  { key: "toej", label: "Tøj og vintage", cover: "/img/c-kjoler.jpg" },
-  { key: "overtoej", label: "Jakker og overtøj", cover: "/img/c-jakker.jpg" },
-  { key: "denim", label: "Denim", cover: "/img/c-denim.jpg" },
-  { key: "vinyl", label: "Vinyl og musik", cover: "/img/c-vinyl.jpg" },
-  { key: "design", label: "Retro og design", cover: "/img/c-lamper.jpg" },
-  { key: "andet", label: "Andet", cover: "/img/live3.jpg" },
+  {
+    key: "dametoej",
+    /** Ordet i en sætning, fx "brugt dametøj". */
+    word: "dametøj",
+    slug: "dametoej",
+    label: "Dametøj, sko og tasker",
+    short: "Dametøj",
+    cover: "/img/c-kjoler.jpg",
+    blurb: "Kjoler, jakker, sneakers og tasker fra danske skabe, vist frem på video.",
+    h1: "Brugt dametøj, sko og tasker – køb det live",
+    title: "Brugt dametøj, sko og tasker live | SnupLive",
+    description: "Køb brugt dametøj, sko og tasker live. Se kjolen, jakken eller tasken på video, spørg om mål og stand, og snup den med ét tryk.",
+  },
+  {
+    key: "herretoej",
+    /** Ordet i en sætning, fx "brugt herretøj". */
+    word: "herretøj",
+    slug: "herretoej",
+    label: "Herretøj og sneakers",
+    short: "Herretøj",
+    cover: "/img/c-jakker.jpg",
+    blurb: "Jakker, denim, strik og sneakers, hvor du kan se slid og mærker tæt på.",
+    h1: "Brugt herretøj og sneakers – køb det live",
+    title: "Brugt herretøj og sneakers live | SnupLive",
+    description: "Køb brugt herretøj og sneakers live. Se jakken, jeansene eller skoene tæt på, spørg om størrelse og slid, og snup dem med ét tryk.",
+  },
+  {
+    key: "boernetoej",
+    /** Ordet i en sætning, fx "brugt børnetøj". */
+    word: "børnetøj",
+    slug: "boernetoej",
+    label: "Børnetøj og legetøj",
+    short: "Børn",
+    cover: "/img/live2.jpg",
+    blurb: "Hele poser i den rigtige størrelse og legetøj, der har mere leg i sig.",
+    h1: "Brugt børnetøj og legetøj – køb det live",
+    title: "Brugt børnetøj og legetøj live | SnupLive",
+    description: "Køb brugt børnetøj og legetøj live. Se hele poser i den rigtige størrelse på video, spørg om stand, og få det hele i én pakke.",
+  },
+  {
+    key: "bolig",
+    /** Ordet i en sætning, fx "brugt design". */
+    word: "design",
+    slug: "bolig-og-design",
+    label: "Bolig og design",
+    short: "Bolig",
+    cover: "/img/c-lamper.jpg",
+    blurb: "Lamper, keramik, møbler og vintage, som du kan se fra alle vinkler, før du køber.",
+    h1: "Brugt bolig og design – lamper, keramik og vintage live",
+    title: "Brugt design, lamper og keramik live | SnupLive",
+    description: "Køb brugt bolig og design live. Se lampen, vasen eller stolen fra alle vinkler på video, spørg om mærker og stand, og snup den.",
+  },
+  {
+    key: "samlerting",
+    /** Ordet i en sætning, fx "brugt samlerting". */
+    word: "samlerting",
+    slug: "samlerting",
+    label: "Samlerting",
+    short: "Samlerting",
+    cover: "/img/c-vinyl.jpg",
+    blurb: "Vinyl, LEGO, samlerkort og retrospil til samlere, der vil se standen live.",
+    h1: "Samlerting brugt – vinyl, LEGO og samlerkort live",
+    title: "Vinyl, LEGO og samlerkort brugt live | SnupLive",
+    description: "Køb vinyl, LEGO, samlerkort og retrospil brugt live. Se standen tæt på video, spørg sælgeren, og snup det, før en anden gør.",
+  },
+  {
+    key: "andet",
+    /** Ordet i en sætning, fx "brugt ting". */
+    word: "ting",
+    slug: "andet",
+    label: "Andet",
+    short: "Andet",
+    cover: "/img/live3.jpg",
+    blurb: "Alt det, der ikke passer i de andre kategorier.",
+    h1: "Andre brugte ting – køb dem live",
+    title: "Andre brugte ting live | SnupLive",
+    description: "Køb andre brugte ting live på SnupLive. Se tingen på video, spørg sælgeren i chatten, og snup den med ét tryk.",
+  },
 ] as const;
 
 export type CategoryKey = (typeof CATEGORIES)[number]["key"];
 
-export function category(key: string) {
+/** De fem kategorier, der vises i menuen og på forsiden (uden "Andet"). */
+export const MAIN_CATEGORIES = CATEGORIES.filter((c) => c.key !== "andet");
+
+export function category(key: string | null | undefined) {
   return CATEGORIES.find((c) => c.key === key) ?? CATEGORIES[CATEGORIES.length - 1];
+}
+
+export function categoryBySlug(slug: string) {
+  return CATEGORIES.find((c) => c.slug === slug) ?? null;
 }
 
 const nf = new Intl.NumberFormat("da-DK");

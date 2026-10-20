@@ -9,10 +9,12 @@ import { StudioVideo } from "@/components/LiveVideo";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useShowRealtime, sortItems } from "@/components/useShowRealtime";
 import { gradFor, kr, when } from "@/lib/format";
-import { showImage } from "@/lib/images";
+import { itemImage, showImage } from "@/lib/images";
+import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
-import { ITEM_COLS, type Item, type Message, type Profile, type Show } from "@/lib/types";
+import type { Item, Message, Profile, Show } from "@/lib/types";
+import ItemForm from "./ItemForm";
 
 export interface StudioSale {
   id: string;
@@ -61,6 +63,9 @@ export default function StudioClient(props: Props) {
   const [busy, setBusy] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
   const [summary, setSummary] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null);
+  // Billede fra kameraet af den ting, der lige er vist frem.
+  const [capture, setCapture] = useState<{ key: number; itemId: string } | null>(null);
 
   const live = show.status === "live";
   const ended = show.status === "ended";
@@ -139,6 +144,27 @@ export default function StudioClient(props: Props) {
     [sb, me.id, show.id],
   );
 
+  const onCapture = useCallback(
+    async (jpeg: Blob) => {
+      const target = capture?.itemId;
+      if (!target) return;
+      const it = items.find((x) => x.id === target);
+      if (!it || (it.images?.length ?? 0) >= 6) return;
+      const path = `${me.id}/${target}/live-${Date.now().toString(36)}.jpg`;
+      const up = await sb.storage.from("items").upload(path, jpeg, { contentType: "image/jpeg", cacheControl: "31536000" });
+      if (up.error) return console.warn("[snuplive] billede af tingen:", up.error.message);
+      const { error } = await sb.rpc("add_item_photo", { p_item: target, p_path: path });
+      if (error) console.warn("[snuplive] billede af tingen:", error.message);
+    },
+    // items ændrer sig hele tiden; vi læser bare den aktuelle liste.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [capture?.itemId, sb, me.id],
+  );
+
+  async function present(itemId: string) {
+    if (await rpc("present_item", { p_item: itemId })) setCapture({ key: Date.now(), itemId });
+  }
+
   async function rpc(name: string, args: Record<string, unknown>, okText?: string) {
     setBusy(true);
     const { error } = await sb.rpc(name, args);
@@ -157,7 +183,10 @@ export default function StudioClient(props: Props) {
     if (count === null) return;
     if (count === 0) {
       setCount(null);
-      void rpc("set_show_status", { p_show: show.id, p_status: "live" }, "Du er live!");
+      void rpc("set_show_status", { p_show: show.id, p_status: "live" }, "Du er live!").then((ok) => {
+        // Giv besked til dem, der har trykket "Husk mig".
+        if (ok) void fetch(`/api/shows/${show.id}/notify`, { method: "POST" }).catch(() => undefined);
+      });
       return;
     }
     const t = setTimeout(() => setCount((c) => (c === null ? null : c - 1)), 800);
@@ -183,34 +212,10 @@ export default function StudioClient(props: Props) {
   }
 
   // ── Køen ──
-  const [name, setName] = useState("");
-  const [size, setSize] = useState("");
-  const [cond, setCond] = useState("");
-  const [price, setPrice] = useState("");
-  const [formErr, setFormErr] = useState<string | null>(null);
-
-  async function addItem(e: React.FormEvent) {
-    e.preventDefault();
-    const n = name.trim();
-    const p = Number(price.replace(/[^\d]/g, ""));
-    if (n.length < 2) return setFormErr("Skriv hvad tingen er, fx \"Uldfrakke, kamel\".");
-    if (!Number.isInteger(p) || p < 1 || p > 100000) return setFormErr("Skriv en pris i hele kroner mellem 1 og 100.000.");
-    setFormErr(null);
-    setBusy(true);
-    const position = items.reduce((m, i) => Math.max(m, i.position), 0) + 1;
-    const { data, error } = await sb
-      .from("items")
-      .insert({ show_id: show.id, seller_id: me.id, name: n, size: size.trim() || null, condition: cond.trim() || null, price: p, position })
-      .select(ITEM_COLS)
-      .single();
-    setBusy(false);
-    if (error || !data) return setFormErr(errorText(error));
-    setItems((xs) => (xs.some((x) => x.id === (data as Item).id) ? xs : sortItems([...xs, data as Item])));
-    setName("");
-    setSize("");
-    setCond("");
-    setPrice("");
-    document.getElementById("ni-name")?.focus();
+  const nextPosition = items.reduce((m, i) => Math.max(m, i.position), 0) + 1;
+  function saved(it: Item) {
+    setItems((xs) => sortItems(xs.some((x) => x.id === it.id) ? xs.map((x) => (x.id === it.id ? it : x)) : [...xs, it]));
+    setEditing(null);
   }
 
   async function removeItem(id: string) {
@@ -260,8 +265,18 @@ export default function StudioClient(props: Props) {
                   const canShow = live && it.status !== "sold" && it.id !== current?.id;
                   const canRemove = !ended && (it.status === "queued" || it.status === "unsold");
                   return (
+                    editing === it.id ? (
+                      <li key={it.id} className="lot-edit">
+                        <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} item={it} onSaved={saved} onCancel={() => setEditing(null)} />
+                      </li>
+                    ) : (
                     <li key={it.id} className={`lot${it.id === current?.id ? " is-now" : ""}`}>
-                      <span className="lot-n" style={{ background: gradFor(it.id) }} aria-hidden="true">{String(n + 1).padStart(2, "0")}</span>
+                      {itemImage(it) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img className="lot-img" src={itemImage(it) as string} alt="" />
+                      ) : (
+                        <span className="lot-n" style={{ background: gradFor(it.id) }} aria-hidden="true">{String(n + 1).padStart(2, "0")}</span>
+                      )}
                       <div style={{ minWidth: 0 }}>
                         <strong>{it.name}</strong>
                         <span>
@@ -276,46 +291,30 @@ export default function StudioClient(props: Props) {
                         ) : it.status === "sold" ? (
                           <span className="chip mine">Solgt</span>
                         ) : canShow ? (
-                          <button className="btn btn-ghost btn-sm" type="button" disabled={busy} onClick={() => rpc("present_item", { p_item: it.id })}>Vis</button>
+                          <button className="btn btn-ghost btn-sm" type="button" disabled={busy} onClick={() => present(it.id)}>Vis</button>
                         ) : (
                           <span className="chip">{it.status === "unsold" ? "Ikke solgt" : "I køen"}</span>
                         )}
                         {canRemove ? (
-                          <button className="linkbtn" type="button" onClick={() => removeItem(it.id)} aria-label={`Fjern ${it.name}`}>Fjern</button>
+                          <span style={{ display: "flex", gap: 10 }}>
+                            <button className="linkbtn" type="button" onClick={() => setEditing(it.id)} aria-label={`Ret ${it.name}`}>Ret</button>
+                            <button className="linkbtn" type="button" onClick={() => removeItem(it.id)} aria-label={`Fjern ${it.name}`}>Fjern</button>
+                          </span>
+                        ) : ended && it.status === "unsold" ? (
+                          <Link className="linkbtn" href={itemHref(it)}>{it.for_sale ? "Til salg" : "Ikke til salg"}</Link>
                         ) : null}
                       </div>
                     </li>
+                    )
                   );
                 })}
               </ul>
             ) : (
-              <p className="muted" style={{ fontSize: ".9rem" }}>Læg de ting ind, du vil vise frem. Du behøver ikke billeder.</p>
+              <p className="muted" style={{ fontSize: ".9rem" }}>Læg de ting ind, du vil vise frem. Med billeder og beskrivelse kan købere finde dem før showet.</p>
             )}
           </div>
           {!ended ? (
-            <form className="box" onSubmit={addItem} noValidate style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <h2>Læg en ting i køen</h2>
-              <div className="field">
-                <label htmlFor="ni-name">Hvad er det?</label>
-                <input id="ni-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Fx Uldfrakke, kamel" />
-              </div>
-              <div className="fgrid" style={{ marginTop: 0 }}>
-                <div className="field">
-                  <label htmlFor="ni-size">Str.</label>
-                  <input id="ni-size" value={size} onChange={(e) => setSize(e.target.value)} maxLength={20} placeholder="M" />
-                </div>
-                <div className="field">
-                  <label htmlFor="ni-price">Pris (kr)</label>
-                  <input id="ni-price" value={price} onChange={(e) => setPrice(e.target.value)} inputMode="numeric" placeholder="150" />
-                </div>
-                <div className="field full">
-                  <label htmlFor="ni-cond">Stand</label>
-                  <input id="ni-cond" value={cond} onChange={(e) => setCond(e.target.value)} maxLength={40} placeholder="Fx Som ny" />
-                </div>
-              </div>
-              {formErr ? <p className="err" role="alert">{formErr}</p> : null}
-              <button className="btn btn-ghost btn-block" type="submit" disabled={busy}>Læg i køen</button>
-            </form>
+            <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} onSaved={saved} />
           ) : null}
           <div className="box ship-note">
             <IconBulb />
@@ -344,7 +343,18 @@ export default function StudioClient(props: Props) {
           <div className="player">
             <div className="screen">
               {cameraOn && video ? (
-                <StudioVideo token={video.token} url={video.url} onViewers={setViewers} onError={onVideoError} onDeviceError={onDeviceError} onCamera={setCameraReady} onSnapshot={onSnapshot} snapshotEvery={live ? 60000 : null} />
+                <StudioVideo
+                  token={video.token}
+                  url={video.url}
+                  onViewers={setViewers}
+                  onError={onVideoError}
+                  onDeviceError={onDeviceError}
+                  onCamera={setCameraReady}
+                  onSnapshot={onSnapshot}
+                  snapshotEvery={live ? 60000 : null}
+                  captureKey={live ? (capture?.key ?? null) : null}
+                  onCapture={onCapture}
+                />
               ) : live ? (
                 <div className="screen-dark" />
               ) : (
@@ -409,8 +419,16 @@ export default function StudioClient(props: Props) {
                     <div className="v-rush" role="timer">{rushLeft > 0 ? <>Lynrunde <span>{rushLeft}</span></> : "Lynrunden er slut"}</div>
                   ) : null}
                   <div className="v-card">
-                    <span className="v-thumb" style={{ background: current ? gradFor(current.id) : "rgba(255,255,255,.12)" }} aria-hidden="true">
-                      {current ? String(items.indexOf(current) + 1).padStart(2, "0") : "…"}
+                    <span
+                      className="v-thumb"
+                      style={
+                        current && itemImage(current)
+                          ? { backgroundImage: `url("${itemImage(current)}")`, backgroundSize: "cover", backgroundPosition: "center" }
+                          : { background: current ? gradFor(current.id) : "rgba(255,255,255,.12)" }
+                      }
+                      aria-hidden="true"
+                    >
+                      {current && !itemImage(current) ? String(items.indexOf(current) + 1).padStart(2, "0") : current ? "" : "…"}
                     </span>
                     <div style={{ minWidth: 0 }}>
                       <div className="v-pin">{current ? "Vises nu" : "Ingen ting vises"}</div>
@@ -433,7 +451,7 @@ export default function StudioClient(props: Props) {
             </div>
             <div className="box" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <div className="ctrl">
-                <button className="btn btn-ghost" type="button" disabled={!live || busy || !next} onClick={() => next && rpc("present_item", { p_item: next.id })}>
+                <button className="btn btn-ghost" type="button" disabled={!live || busy || !next} onClick={() => next && present(next.id)}>
                   Vis næste
                 </button>
                 <button
@@ -468,7 +486,7 @@ export default function StudioClient(props: Props) {
           <div className="modal-card">
             <span className="label red">Afslut show</span>
             <h2 className="h2" id="m-end" style={{ fontSize: "2rem" }}>Vil du afslutte showet?</h2>
-            <p className="muted">Videoen stopper for alle seere. Ting, der ikke er solgt, bliver markeret som ikke solgt.</p>
+            <p className="muted">Videoen stopper for alle seere. Ting, der ikke er solgt, bliver sat til salg til fast pris, så de kan købes bagefter.</p>
             <div className="ctas">
               <button className="btn btn-red" type="button" onClick={endShow}>Ja, afslut</button>
               <button className="btn btn-line" type="button" onClick={() => setConfirmEnd(false)}>Fortsæt showet</button>
@@ -488,7 +506,7 @@ export default function StudioClient(props: Props) {
             </div>
             <p className="muted">
               {items.length - sold.length
-                ? `${items.length - sold.length} ting blev ikke solgt. Læg dem i dit næste show.`
+                ? `${items.length - sold.length} ting blev ikke solgt. De er nu til salg til fast pris under Til salg. Du kan rette prisen eller tage dem af under Mine shows.`
                 : "Alt blev solgt. Godt gået!"}
             </p>
             <div className="ctas">

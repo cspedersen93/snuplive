@@ -8,11 +8,12 @@ import { IconCart, IconMenu, IconUser } from "@/components/Icons";
 import { hasSupabase } from "@/lib/env";
 import { getSupabase } from "@/lib/supabase/client";
 
+// Menuen er til køberne. Sælgerne har deres egen, stille knap ved siden af kurven.
 const NAV = [
   { href: "/live", label: "Live nu" },
-  { href: "/saelg", label: "Sælg live" },
-  { href: "/saadan-virker-det", label: "Sådan virker det" },
-  { href: "/faq", label: "FAQ" },
+  { href: "/til-salg", label: "Til salg" },
+  { href: "/kategori", label: "Kategorier" },
+  { href: "/saadan-virker-det", label: "Sådan køber du" },
 ];
 
 export default function Header() {
@@ -20,7 +21,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [count, setCount] = useState(0);
-  const [me, setMe] = useState<{ handle: string; avatar_path: string | null } | null>(null);
+  const [me, setMe] = useState<{ handle: string; avatar_path: string | null; is_seller: boolean } | null>(null);
 
   useEffect(() => setOpen(false), [path]);
 
@@ -37,11 +38,19 @@ export default function Header() {
       }
       const [sales, prof] = await Promise.all([
         sb.from("sales").select("id", { count: "exact", head: true }).eq("buyer_id", uid).eq("status", "reserved"),
-        sb.from("profiles").select("handle,avatar_path").eq("id", uid).maybeSingle(),
+        sb.from("profiles").select("handle,avatar_path,is_seller").eq("id", uid).maybeSingle(),
       ]);
       if (!alive) return;
       setCount(sales.count ?? 0);
-      setMe(prof.data ? { handle: prof.data.handle as string, avatar_path: (prof.data.avatar_path as string | null) ?? null } : null);
+      setMe(
+        prof.data
+          ? {
+              handle: prof.data.handle as string,
+              avatar_path: (prof.data.avatar_path as string | null) ?? null,
+              is_seller: Boolean(prof.data.is_seller),
+            }
+          : null,
+      );
     };
     sb.auth.getSession().then(({ data }) => load(data.session?.user.id ?? null));
     const { data: sub } = sb.auth.onAuthStateChange((_e, session) => load(session?.user.id ?? null));
@@ -55,6 +64,8 @@ export default function Header() {
   }, []);
 
   const current = (href: string) => (path === href || path.startsWith(href + "/") ? "page" : undefined);
+  // Sælgere går direkte til studiet. Alle andre ser først, hvordan man sælger.
+  const sellHref = me?.is_seller ? "/studio" : "/saelg";
 
   return (
     <header className="head">
@@ -80,9 +91,8 @@ export default function Header() {
           <Link className={`icon-btn${me ? " has-ava" : ""}`} href={signedIn === false ? "/login" : "/konto"} aria-label={signedIn === false ? "Log ind" : "Min konto"}>
             {me ? <Avatar handle={me.handle} path={me.avatar_path} /> : <IconUser />}
           </Link>
-          <Link className="btn btn-red btn-sm btn-golive" href="/studio">
-            <span className="live-dot white" aria-hidden="true" />
-            Gå live
+          <Link className="btn btn-line btn-sm btn-sell" href={sellHref} aria-current={current(sellHref)}>
+            Sælg
           </Link>
           <button
             className="icon-btn menu-btn"
@@ -104,7 +114,7 @@ export default function Header() {
           ))}
           <Link href="/kurv">Mine snup</Link>
           <Link href={signedIn === false ? "/login" : "/konto"}>{signedIn === false ? "Log ind" : "Min konto"}</Link>
-          <Link href="/studio">Gå live</Link>
+          <Link href={sellHref}>Sælg dine ting</Link>
         </div>
       </div>
     </header>

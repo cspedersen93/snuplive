@@ -1,7 +1,7 @@
 # SnupLive
 
-Live shopping med brugte ting: sælgeren går live på video, seerne chatter med og snupper med ét tryk.
-Det hele kører i browseren på snuplive.dk.
+Køb brugt live: sælgeren viser tingene frem på video, køberne chatter med og snupper med ét tryk.
+Det, der ikke bliver snuppet, kan købes bagefter til fast pris. Det hele kører i browseren på snuplive.dk.
 
 ## Hvad virker nu?
 
@@ -17,6 +17,9 @@ Det hele kører i browseren på snuplive.dk.
 - Betaling med MobilePay og kort via Stripe. Pengene holdes tilbage, til køberen har fået sine ting, og går derefter til sælgerens bankkonto
 - Fragt til DAO- og GLS-pakkeshops med fragtlabels og sporing via Shipmondo
 - Moderation i chatten (fjern beskeder, blokér brugere) og "Meld et problem" på ordrer med en admin-side til sager
+- Backoffice på /admin med tal, ordrer, medlemmer og shows
+- En forside til købere, fem kategorier (`/kategori/...`) og en side for hver ting (`/ting/...`) med billeder, beskrivelse og pris
+- "Husk mig" på ting og shows før showet (mail, når showet starter) og "Køb nu" til fast pris for det, der ikke blev solgt
 
 MitID kommer senere (se nederst).
 
@@ -230,6 +233,28 @@ dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPM
 
 3. **Deploy**, log ind med din admin-e-mail, og gå til **Min konto**. Der står, hvor mange sager der venter.
 
+## Ting, kategorier, "Husk mig" og "Køb nu"
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0007_varer.sql`](supabase/migrations/0007_varer.sql), **før** den nye
+   version kommer på Vercel. Ellers kan show- og studiesiderne ikke hentes. Har du ikke kørt 0005 og 0006 endnu, så kør dem først.
+   Filen kan køres igen uden at gøre skade.
+2. Der er ikke nogen nye nøgler. Mails om "Husk mig" bruger den samme `RESEND_API_KEY` som sagerne. Uden den bliver der ikke
+   sendt mails, men alt andet virker.
+
+Sådan virker det:
+
+- **Kategorier:** Dametøj, sko og tasker · Herretøj og sneakers · Børnetøj og legetøj · Bolig og design · Samlerting · Andet.
+  Gamle shows bliver flyttet over automatisk (tøj og overtøj til dametøj, denim til herretøj, vinyl til samlerting, design til bolig).
+- **Før showet:** sælgeren kan give hver ting op til 4 billeder, en beskrivelse og en anden kategori end showets
+  (under "+ Billeder, beskrivelse og kategori" i studiet). Tingene kan ses på forsiden, i kategorien og på deres egen side.
+  Køberne kan trykke **Husk mig** på en ting eller et show. Når sælgeren går live, får de én mail.
+- **Under showet** tager studiet selv et billede fra kameraet, når en ting bliver vist, og lægger det på tingen.
+- **Efter showet** kommer alt, der ikke blev snuppet, til salg til den samme pris. Køberen trykker **Køb nu**, og tingen lander under
+  Mine snup. Sælgeren kan rette prisen eller tage en ting af salg under **Mine shows → Til salg**. Bliver et snup ikke betalt, eller
+  annullerer sælgeren det, kommer tingen til salg igen. Refunderede ting skal sælgeren selv sætte til salg igen.
+- **Én pakke pr. sælger:** alt, køberen har købt hos samme sælger, betales og sendes samlet, også når det er fra flere shows.
+- Databasen er forberedt til budsalg (`sale_type`), men det er ikke slået til endnu.
+
 ## Backoffice
 
 På [snuplive.dk/admin](https://snuplive.dk/admin) (kun for e-mails i `ADMIN_EMAILS`) er der:
@@ -280,16 +305,18 @@ Browser ──► Vercel (Next.js 16)
 - `app/` sider og API. `app/live/[handle]` er seersiden, `app/studio/[id]` er studiet.
 - `components/` fælles dele (chat, video, header, realtid).
 - `supabase/migrations/0001_init.sql` hele databasen: tabeller, adgangsregler og funktionerne
-  `set_show_status`, `present_item`, `start_rush` og `snup`.
+  `set_show_status`, `present_item`, `start_rush` og `snup`. De senere filer bygger videre (billeder, betaling, fragt,
+  tryghed, backoffice og `0007_varer.sql` med `buy_now`, `items_feed` og påmindelser).
 
 Al logik, der skal være til at stole på (hvem der fik tingen, om lynrunden er slut, hvem der må styre et show),
 ligger i databasen. Browseren kan ikke snyde sig udenom.
 
 ## Næste trin
 
-1. **Følg sælgere** og besked, når de går live.
-2. **MitID** for sælgere via Idura (kræver CVR).
-3. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
-4. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
+1. **Budsalg live:** en nedtælling på 30 sekunder, bud i faste trin og 10 sekunder ekstra ved sene bud, plus "Kommende budsalg" på forsiden.
+2. **Forhåndsbud, følg sælgere og lukkede shows** (kun med et hemmeligt link).
+3. **MitID** for sælgere via Idura (kræver CVR).
+4. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
+5. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
 
 Husk også at oprette mailadressen `kontakt@snuplive.dk`, som privatlivspolitikken henviser til. 

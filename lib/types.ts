@@ -43,6 +43,37 @@ export interface Item {
   rush_ends_at: string | null;
   sold_at: string | null;
   created_at: string;
+  category: string | null;
+  description: string | null;
+  images: string[];
+  for_sale: boolean;
+  listed_at: string | null;
+  sale_type: "fixed" | "auction";
+}
+
+/** En ting fra items_feed (med show og sælger). */
+export interface FeedItem {
+  id: string;
+  name: string;
+  size: string | null;
+  condition: string | null;
+  price: number;
+  images: string[];
+  category: string;
+  status: ItemStatus;
+  for_sale: boolean;
+  sale_type: "fixed" | "auction";
+  description: string | null;
+  show_id: string;
+  show_title: string;
+  show_status: "planned" | "live" | "ended";
+  starts_at: string | null;
+  listed_at: string | null;
+  seller_id: string;
+  handle: string;
+  avatar_path: string | null;
+  area: string | null;
+  total: number;
 }
 
 export type SaleStatus = "reserved" | "paid" | "shipped" | "done" | "cancelled";
@@ -72,6 +103,6 @@ export interface Message {
 export const SHOW_COLS =
   "id,seller_id,title,category,status,starts_at,started_at,ended_at,current_item_id,cover_path,cover_at,created_at";
 export const ITEM_COLS =
-  "id,show_id,seller_id,name,size,condition,price,position,status,rush_ends_at,sold_at,created_at";
+  "id,show_id,seller_id,name,size,condition,price,position,status,rush_ends_at,sold_at,created_at,category,description,images,for_sale,listed_at,sale_type";
 export const SALE_COLS = "id,item_id,show_id,seller_id,buyer_id,price,status,created_at";
 export const MESSAGE_COLS = "id,show_id,user_id,handle,body,kind,from_seller,created_at";

@@ -63,7 +63,7 @@ update profiles set is_seller = true, handle = 'majasgarderobe', display_name = 
 select t.ok((select is_seller from profiles where id = auth.uid()), 'Maja er sælger');
 select t.throws($$insert into shows (seller_id, title, status) values (auth.uid(), 'Snyd', 'live')$$, 'permission denied');
 insert into shows (id, seller_id, title, category, starts_at)
-  values ('10000000-0000-0000-0000-000000000001', auth.uid(), 'Sommerkjoler og strik', 'toej', now() + interval '1 hour');
+  values ('10000000-0000-0000-0000-000000000001', auth.uid(), 'Sommerkjoler og strik', 'dametoej', now() + interval '1 hour');
 insert into items (id, show_id, seller_id, name, size, condition, price, position) values
   ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', auth.uid(), 'Blomstret slå-om-kjole', 'S', 'Som ny', 150, 1),
   ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', auth.uid(), 'Uldcardigan, beige', 'M', 'God stand', 120, 2),
@@ -341,6 +341,55 @@ select t.throws($$select * from admin_members('maja')$$, 'permission denied');
 reset role;
 set role anon;
 select t.throws($$select * from admin_shows()$$, 'permission denied');
+reset role;
+
+-- ── Varer: kategorier, billeder, Køb nu og Husk mig ──────────────────────────
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.throws($$insert into shows (seller_id, title, category) values (auth.uid(), 'Gammel kategori', 'toej')$$, 'check constraint');
+insert into shows (id, seller_id, title, category, starts_at)
+  values ('10000000-0000-0000-0000-000000000007', auth.uid(), 'Lørdagsshow med lamper', 'bolig', now() + interval '1 day');
+insert into items (id, show_id, seller_id, name, price, position, description, images, category)
+  values ('20000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000007', auth.uid(), 'Le Klint-lampe', 450, 1,
+          'Original fra 70erne, lille hak i kanten.',
+          array['00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-000000000006/1.jpg'], 'bolig');
+select t.ok((select description is not null and cardinality(images) = 1 from items where id = '20000000-0000-0000-0000-000000000006'), 'ting med beskrivelse og billede');
+select t.throws($$update items set images = array['00000000-0000-0000-0000-00000000000b/20000000-0000-0000-0000-000000000006/x.jpg'] where id = '20000000-0000-0000-0000-000000000006'$$, 'check constraint');
+select t.throws($$update items set images = array['https://andet-sted.dk/x.jpg'] where id = '20000000-0000-0000-0000-000000000006'$$, 'check constraint');
+select t.throws($$update items set category = 'biler' where id = '20000000-0000-0000-0000-000000000006'$$, 'check constraint');
+select add_item_photo('20000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-000000000006/live-1.jpg');
+select t.ok((select cardinality(images) = 2 from items where id = '20000000-0000-0000-0000-000000000006'), 'billede fra kameraet lægges på tingen');
+select t.ok((select for_sale and status = 'unsold' from items where id = '20000000-0000-0000-0000-000000000002'), 'en usolgt ting er til salg, når showet er slut');
+select t.ok((select for_sale and status = 'unsold' from items where id = '20000000-0000-0000-0000-000000000005'), 'også ting, der aldrig blev vist');
+select t.throws($$select buy_now('20000000-0000-0000-0000-000000000002')$$, 'egne ting');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select add_item_photo('20000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-00000000000b/20000000-0000-0000-0000-000000000006/x.jpg')$$, 'kunne ikke gemmes');
+update items set description = 'Hacket' where id = '20000000-0000-0000-0000-000000000006';
+select t.throws($$select buy_now('20000000-0000-0000-0000-000000000006')$$, 'ikke til salg');
+select t.ok((select status from buy_now('20000000-0000-0000-0000-000000000002')) = 'sold', 'Liva køber cardiganen efter showet');
+select t.ok((select status from sales where item_id = '20000000-0000-0000-0000-000000000002' and buyer_id = auth.uid()) = 'reserved', 'købet ligger i Livas kurv');
+select t.ok((select count(*) from items_feed('upcoming')) = 1, 'kommende ting kan ses');
+select t.ok((select show_title from items_feed('upcoming', 'bolig')) = 'Lørdagsshow med lamper', 'kommende ting i en kategori');
+select t.ok((select count(*) from items_feed('for_sale', null, 50) where id = '20000000-0000-0000-0000-000000000002') = 0, 'en solgt ting er ikke længere til salg');
+insert into reminders (user_id, show_id) values (auth.uid(), '10000000-0000-0000-0000-000000000007');
+insert into reminders (user_id, show_id, item_id) values (auth.uid(), '10000000-0000-0000-0000-000000000007', '20000000-0000-0000-0000-000000000006');
+select t.throws($$insert into reminders (user_id, show_id) values (auth.uid(), '10000000-0000-0000-0000-000000000007')$$, 'duplicate key');
+select t.throws($$insert into reminders (user_id, show_id) values (auth.uid(), '10000000-0000-0000-0000-000000000001')$$, 'row-level security');
+select t.throws($$insert into reminders (user_id, show_id) values ('00000000-0000-0000-0000-00000000000c', '10000000-0000-0000-0000-000000000007')$$, 'row-level security');
+select t.ok((select count(*) from reminders) = 2, 'Liva kan se sine påmindelser');
+select t.throws($$select * from reminder_recipients('10000000-0000-0000-0000-000000000007')$$, 'permission denied');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select buy_now('20000000-0000-0000-0000-000000000002')$$, 'en anden nåede');
+select t.ok((select count(*) from reminders) = 0, 'andre kan ikke se Livas påmindelser');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select cancel_reservation((select id from sales where item_id = '20000000-0000-0000-0000-000000000002' and status = 'reserved'));
+select t.ok((select for_sale and status = 'unsold' from items where id = '20000000-0000-0000-0000-000000000002'), 'et annulleret køb kommer til salg igen');
+reset role;
+select t.ok((select description from items where id = '20000000-0000-0000-0000-000000000006') = 'Original fra 70erne, lille hak i kanten.', 'andre kan ikke rette tingen');
+select t.ok((select email = 'Liva.K@gmail.com' and items = array['Le Klint-lampe'] from reminder_recipients('10000000-0000-0000-0000-000000000007')), 'serveren ved, hvem der skal have besked');
+set role anon;
+select t.ok((select count(*) from items_feed('for_sale', null, 50)) >= 2, 'alle kan se ting til salg');
+select t.throws($$insert into reminders (user_id, show_id) values (null, '10000000-0000-0000-0000-000000000007')$$, 'permission denied');
 reset role;
 
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');

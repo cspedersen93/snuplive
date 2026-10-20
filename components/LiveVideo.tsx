@@ -74,9 +74,12 @@ interface StageProps {
   onCamera: (ready: boolean) => void;
   onSnapshot?: (jpeg: Blob) => void;
   snapshotEvery?: number | null;
+  /** Skifter værdien, tages et billede i 4:5 (til tingen, der lige er vist frem). */
+  captureKey?: number | null;
+  onCapture?: (jpeg: Blob) => void;
 }
 
-function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery }: StageProps) {
+function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, captureKey, onCapture }: StageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
@@ -111,6 +114,22 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery }: StagePr
       clearInterval(timer);
     };
   }, [ready, snapshotEvery, onSnapshot]);
+
+  // Billede af tingen, et øjeblik efter at sælgeren har vist den frem.
+  useEffect(() => {
+    if (!ready || !captureKey || !onCapture) return;
+    const t = setTimeout(async () => {
+      const v = videoRef.current;
+      if (!v) return;
+      try {
+        const blob = await frameFromVideo(v, 1080, 1350, 0.82);
+        if (blob) onCapture(blob);
+      } catch {
+        // Intet billede denne gang
+      }
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [ready, captureKey, onCapture]);
 
   async function flip() {
     const pub = localParticipant.getTrackPublication(Track.Source.Camera);
@@ -177,6 +196,8 @@ export function StudioVideo(props: {
   onCamera: (ready: boolean) => void;
   onSnapshot?: (jpeg: Blob) => void;
   snapshotEvery?: number | null;
+  captureKey?: number | null;
+  onCapture?: (jpeg: Blob) => void;
 }) {
   return (
     <LiveKitRoom
@@ -190,7 +211,14 @@ export function StudioVideo(props: {
       onError={props.onError}
       onMediaDeviceFailure={(f) => props.onDeviceError(deviceErrorText(f))}
     >
-      <StudioStage onViewers={props.onViewers} onCamera={props.onCamera} onSnapshot={props.onSnapshot} snapshotEvery={props.snapshotEvery} />
+      <StudioStage
+        onViewers={props.onViewers}
+        onCamera={props.onCamera}
+        onSnapshot={props.onSnapshot}
+        snapshotEvery={props.snapshotEvery}
+        captureKey={props.captureKey}
+        onCapture={props.onCapture}
+      />
     </LiveKitRoom>
   );
 }

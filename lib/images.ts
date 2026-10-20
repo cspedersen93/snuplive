@@ -2,7 +2,7 @@ import { SUPABASE_URL } from "@/lib/env";
 import { category } from "@/lib/format";
 
 /** Offentlig adresse til et billede i Supabase Storage. */
-export function storageUrl(bucket: "avatars" | "covers", path: string, version?: string | null) {
+export function storageUrl(bucket: "avatars" | "covers" | "items", path: string, version?: string | null) {
   const v = version ? `?v=${encodeURIComponent(new Date(version).getTime().toString(36))}` : "";
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path.split("/").map(encodeURIComponent).join("/")}${v}`;
 }
@@ -25,4 +25,14 @@ export function showImage(show: {
   if (show.status === "live" && show.cover_path) return storageUrl("covers", show.cover_path, show.cover_at);
   if (show.seller?.avatar_path) return storageUrl("avatars", show.seller.avatar_path);
   return category(show.category).cover;
+}
+
+/** Første billede af en ting, eller null. */
+export function itemImage(item: { images?: string[] | null }) {
+  const p = item.images?.[0];
+  return p ? storageUrl("items", p) : null;
+}
+
+export function itemImages(item: { images?: string[] | null }) {
+  return (item.images ?? []).map((p) => storageUrl("items", p));
 }

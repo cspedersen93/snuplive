@@ -9,8 +9,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/saelg" },
 };
 
-const soon = <span className="chip warn" style={{ alignSelf: "flex-start" }}>Kommer snart</span>;
-
 export default function Saelg() {
   return (
     <>
@@ -51,8 +49,8 @@ export default function Saelg() {
             </div>
             <ol className="steps">
               <li><div><h3>Opret et show</h3><p>Giv det en titel, vælg kategori og tidspunkt. Showet kommer i programmet under Live nu.</p></div></li>
-              <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris. Du behøver ikke tage billeder, for køberne ser tingen på video.</p></div></li>
-              <li><div><h3>Gå live fra studiet</h3><p>Vis tingene frem én ad gangen. Køberne snupper med ét tryk, og du kan starte lynrunder, når stemningen er god.</p></div></li>
+              <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris er nok. Lægger du billeder og en beskrivelse på, kan køberne finde tingene og trykke Husk mig før showet.</p></div></li>
+              <li><div><h3>Gå live fra studiet</h3><p>Vis tingene frem én ad gangen. Køberne snupper med ét tryk, og du kan starte lynrunder, når stemningen er god. Det, der ikke bliver solgt, kommer bagefter til salg til fast pris.</p></div></li>
               <li><div><h3>Pak, send og få pengene</h3><p>Når køberen har betalt, får du adressen. Send pakken, og når køberen har fået den, går pengene til din bankkonto.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
@@ -74,7 +72,7 @@ export default function Saelg() {
             <div><IconBolt /><h3>Lynrunder</h3><p>Ti sekunder, og den første, der trykker, får tingen. Det giver liv i showet.</p></div>
             <div><IconBox /><h3>Fragtlabels med ét tryk</h3><p>Køberen har valgt pakkeshop og betalt fragten. Du printer labelen og afleverer pakken hos DAO eller GLS.</p></div>
             <div><IconCard /><h3>Udbetaling til din konto</h3><p>Tilknyt din bankkonto via Stripe. Pengene udbetales, når køberen har fået sine ting.</p></div>
-            <div><IconDoc /><h3>Usolgt bliver til annonce</h3><p>Med et klip fra showet, så salget fortsætter, når du har slukket kameraet.</p>{soon}</div>
+            <div><IconDoc /><h3>Usolgt kommer til salg</h3><p>Det, der ikke bliver snuppet, kan købes bagefter til fast pris med et billede fra showet. Så fortsætter salget, når du har slukket kameraet.</p></div>
           </div>
         </div>
       </section>

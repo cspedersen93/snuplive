@@ -278,7 +278,12 @@ export async function dailyMaintenance(admin: AdminClient, stripe: Stripe) {
   );
   if (expired.length) {
     await admin.from("sales").update({ status: "cancelled" }).in("id", expired.map((s) => s.id));
-    await admin.from("items").update({ status: "unsold", sold_at: null }).in("id", expired.map((s) => s.item_id)).eq("status", "sold");
+    // Tingen kan købes igen. Er showet slut, kommer den til salg med Køb nu.
+    await admin
+      .from("items")
+      .update({ status: "unsold", sold_at: null, for_sale: true, listed_at: new Date().toISOString() })
+      .in("id", expired.map((s) => s.item_id))
+      .eq("status", "sold");
   }
   result.expired = expired.length;
 

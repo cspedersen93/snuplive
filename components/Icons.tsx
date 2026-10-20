@@ -116,3 +116,45 @@ export const IconFlip = (p: P) => (
     <path d="m8 11-3 3-3-3M16 13l3-3 3 3" />
   </svg>
 );
+
+/* Kategorier */
+export const IconDress = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M9 3h6l-1 4 4 13H6l4-13Z" />
+    <path d="M10 7h4" />
+  </svg>
+);
+export const IconSneaker = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M3 17v-6l4-1 3 3 6 1c3 .5 5 1.6 5 3.5V17Z" />
+    <path d="M3 17h18M9.5 12.5l1-1.5M12 13.3l1-1.5" />
+  </svg>
+);
+export const IconBear = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" {...p}>
+    <circle cx="6.5" cy="6.5" r="2.5" />
+    <circle cx="17.5" cy="6.5" r="2.5" />
+    <circle cx="12" cy="13" r="7" />
+    <circle cx="12" cy="15" r="2.2" />
+    <path d="M9.5 11h.01M14.5 11h.01" strokeWidth={2.4} />
+  </svg>
+);
+export const IconLamp = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M8 3h8l3 8H5Z" />
+    <path d="M12 11v8M8 21h8" />
+  </svg>
+);
+export const IconRecord = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 6.5a5.5 5.5 0 0 1 5.5 5.5" strokeLinecap="round" />
+  </svg>
+);
+export const IconBell = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15Z" />
+    <path d="M10 20.5a2 2 0 0 0 4 0" />
+  </svg>
+);

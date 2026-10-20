@@ -1,5 +1,8 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/env";
+import { CATEGORIES } from "@/lib/format";
+import { itemHref } from "@/lib/items";
+import { fetchFeed } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 
 export const revalidate = 3600;
@@ -9,6 +12,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${SITE_URL}/live`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
+    { url: `${SITE_URL}/til-salg`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
+    { url: `${SITE_URL}/kategori`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
+    ...CATEGORIES.map((c) => ({
+      url: `${SITE_URL}/kategori/${c.slug}`,
+      lastModified: now,
+      changeFrequency: "hourly" as const,
+      priority: c.key === "andet" ? 0.5 : 0.8,
+    })),
     { url: `${SITE_URL}/saelg`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/saadan-virker-det`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
@@ -30,6 +41,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!h || seen.has(h)) continue;
       seen.add(h);
       pages.push({ url: `${SITE_URL}/live/${h}`, lastModified: new Date(row.created_at), changeFrequency: "daily", priority: 0.6 });
+    }
+    // Ting, der kan købes nu eller bliver vist snart. Solgte ting er ikke med.
+    for (const kind of ["for_sale", "upcoming"] as const) {
+      for (let page = 0; page < 20; page++) {
+        const rows = await fetchFeed(kind, { limit: 100, offset: page * 100 });
+        for (const it of rows) {
+          pages.push({
+            url: `${SITE_URL}${itemHref(it)}`,
+            lastModified: it.listed_at ? new Date(it.listed_at) : now,
+            changeFrequency: "daily",
+            priority: 0.5,
+          });
+        }
+        if (rows.length < 100) break;
+      }
     }
   } catch {
     // Databasen svarer ikke: send de faste sider.

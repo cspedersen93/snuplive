@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
+import RemindButton from "@/components/RemindButton";
 import { clock, dayLabel } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { fetchListing, itemCount } from "@/lib/queries";
@@ -32,8 +33,8 @@ export default async function LiveNu() {
           </span>
           <h1 className="h1" id="h-live">Live shopping lige nu</h1>
           <p className="lede">
-            Hop ind i et show, kig med, og snup det, du kan lide. Alt, du snupper hos samme sælger i ét show, bliver
-            samlet ét sted.
+            Hop ind i et show, kig med, og snup det, du kan lide. Alt, du køber hos samme sælger, bliver samlet i én
+            pakke.
           </p>
         </div>
       </section>
@@ -47,7 +48,7 @@ export default async function LiveNu() {
               <p style={{ marginBottom: 14 }}>
                 Der er ingen live-shows lige nu.{upcoming.length ? " Se programmet herunder." : ""}
               </p>
-              <Link className="btn btn-red" href="/studio">Gå live med dine ting</Link>
+              <Link className="btn btn-red" href="/til-salg">Køb ting fra tidligere shows</Link>
             </div>
           )}
         </div>
@@ -59,7 +60,7 @@ export default async function LiveNu() {
             <div className="sec-head">
               <span className="label">Programmet</span>
               <h2 className="h2" id="h-sched">Hvem går live senere?</h2>
-              <p className="lede">Sælgerne planlægger deres shows på faste tidspunkter. Gem linket til sælgeren, og kig forbi, når showet starter.</p>
+              <p className="lede">Sælgerne planlægger deres shows på faste tidspunkter. Tryk Husk mig, så sender vi dig en mail, når showet starter.</p>
             </div>
             <div className="sched">
               {upcoming.map((s) => {
@@ -74,14 +75,16 @@ export default async function LiveNu() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={showImage(s)} alt="" loading="lazy" />
                     <div>
-                      <h3>{s.title}</h3>
+                      <h3>
+                        <Link href={`/live/${handle}`}>{s.title}</Link>
+                      </h3>
                       <span className="handle">
                         <Avatar handle={handle} path={s.seller?.avatar_path} />
                         {handle}
                         {n ? ` · ${n} ting` : ""}
                       </span>
                     </div>
-                    <Link className="btn btn-line btn-sm remind" href={`/live/${handle}`}>Se showet</Link>
+                    <RemindButton showId={s.id} next="/live" className="btn btn-line btn-sm remind" />
                   </div>
                 );
               })}
