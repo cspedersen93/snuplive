@@ -19,11 +19,9 @@ export default function Saelg() {
             <span aria-hidden="true">/</span>
             <span>Sælg live</span>
           </nav>
-          <span className="label red">For sælgere</span>
           <h1 className="h1" id="h-saelg">Sælg brugt tøj og ting live på video</h1>
           <p className="lede">
-            Gå live fra din telefon eller computer, vis dine ting frem, og sælg en hel bunke på én aften. Det hele
-            foregår direkte i browseren, så du ikke skal hente en app.
+            Gå live fra telefonen, vis dine ting frem, og sælg en hel bunke på én aften.
           </p>
           <div className="ctas">
             <Link className="btn btn-red" href="/opret">Opret gratis konto</Link>
@@ -44,13 +42,12 @@ export default function Saelg() {
           </figure>
           <div>
             <div className="sec-head" style={{ marginBottom: 24 }}>
-              <span className="label">Fra skab til solgt</span>
               <h2 className="h2" id="h-saelg-how">Hvordan går jeg live og sælger?</h2>
             </div>
             <ol className="steps">
               <li><div><h3>Opret et show</h3><p>Giv det en titel, vælg kategori og tidspunkt. Showet kommer i programmet under Live nu.</p></div></li>
               <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris er nok. Lægger du billeder og en beskrivelse på, kan køberne finde tingene og trykke Husk mig før showet.</p></div></li>
-              <li><div><h3>Gå live fra studiet</h3><p>Vis tingene frem én ad gangen. Køberne snupper med ét tryk, og du kan starte lynrunder, når stemningen er god. Det, der ikke bliver solgt, kommer bagefter til salg til fast pris.</p></div></li>
+              <li><div><h3>Gå live fra studiet</h3><p>Vis tingene frem én ad gangen. Køberne snupper med ét tryk, og du kan starte lynrunder eller budsalg, når stemningen er god.</p></div></li>
               <li><div><h3>Pak, send og få pengene</h3><p>Når køberen har betalt, får du adressen. Send pakken, og når køberen har fået den, går pengene til din bankkonto.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
@@ -63,7 +60,6 @@ export default function Saelg() {
       <section className="sec band" aria-labelledby="h-saelg-tools">
         <div className="wrap">
           <div className="sec-head">
-            <span className="label">Værktøjer</span>
             <h2 className="h2" id="h-saelg-tools">Hvad får jeg med som sælger?</h2>
           </div>
           <div className="feat">
@@ -80,7 +76,6 @@ export default function Saelg() {
       <section className="sec" aria-labelledby="h-saelg-faq">
         <div className="wrap faq">
           <div className="sec-head">
-            <span className="label">Godt at vide</span>
             <h2 className="h2" id="h-saelg-faq">Spørgsmål fra nye sælgere</h2>
             <p className="lede">Flere svar finder du under <Link href="/faq">spørgsmål og svar</Link>.</p>
           </div>
@@ -97,7 +92,6 @@ export default function Saelg() {
         <div className="wrap">
           <div className="cta-band">
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <span className="label red">Kom i gang</span>
               <h2 className="h2">Gå live med dit første show</h2>
             </div>
             <div className="ctas">

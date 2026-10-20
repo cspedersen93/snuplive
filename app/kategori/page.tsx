@@ -19,11 +19,7 @@ export default function Kategorier() {
             <span aria-hidden="true">/</span>
             <span>Kategorier</span>
           </nav>
-          <span className="label">Fem kategorier</span>
           <h1 className="h1" id="h-kategorier">Køb brugt tøj, design og samlerting – vælg en kategori</h1>
-          <p className="lede">
-            Vælg en kategori, og se hvem der er live, hvad der bliver vist snart, og hvad du kan købe med det samme.
-          </p>
         </div>
       </section>
       <section className="sec tight" aria-label="Alle kategorier">
@@ -33,10 +29,6 @@ export default function Kategorier() {
             Passer tingen ikke ind? Se <Link href="/kategori/andet">andre brugte ting</Link>, eller se alt, der er{" "}
             <Link href="/til-salg">til salg lige nu</Link>.
           </p>
-          <div className="ctas" style={{ marginTop: 20 }}>
-            <Link className="btn btn-red" href="/til-salg">Se alt til salg</Link>
-            <Link className="btn btn-line" href="/live">Se hvem der er live</Link>
-          </div>
         </div>
       </section>
     </>

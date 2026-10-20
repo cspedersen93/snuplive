@@ -76,10 +76,7 @@ export default async function Kategori({ params }: Params) {
         <section className="sec tight" aria-labelledby="h-kat-shows">
           <div className="wrap">
             <div className="row-head">
-              <div className="sec-head">
-                <h2 className="h3" id="h-kat-shows">{copy.who}</h2>
-                <p className="muted">Her er de shows, der er live nu, og dem, der starter snart.</p>
-              </div>
+              <h2 className="h3" id="h-kat-shows">{copy.who}</h2>
               <Link className="linkbtn" href="/live">Alle shows</Link>
             </div>
             <div className="cards-scroll">
@@ -97,10 +94,7 @@ export default async function Kategori({ params }: Params) {
         <section className="sec tight" id="snart" aria-labelledby="h-kat-snart">
           <div className="wrap">
             <div className="row-head">
-              <div className="sec-head">
-                <h2 className="h3" id="h-kat-snart">{copy.soon}</h2>
-                <p className="muted">Tryk Husk mig, så får du en mail, når showet starter. Du kan snuppe tingen, mens den bliver vist.</p>
-              </div>
+              <h2 className="h3" id="h-kat-snart">{copy.soon}</h2>
             </div>
             <div className="icards-scroll" style={{ "--n": soon.length } as React.CSSProperties}>
               <div className="icards">
@@ -116,10 +110,7 @@ export default async function Kategori({ params }: Params) {
       <section className="sec tight" id="til-salg" aria-labelledby="h-kat-salg">
         <div className="wrap">
           <div className="row-head">
-            <div className="sec-head">
-              <h2 className="h3" id="h-kat-salg">{copy.sale}</h2>
-              <p className="muted">Ting, der er vist frem live, men ikke blev snuppet. Du kan købe dem med det samme til den pris, der står på.</p>
-            </div>
+            <h2 className="h3" id="h-kat-salg">{copy.sale}</h2>
             {forSaleTotal > forSale.length ? (
               <Link className="btn btn-line btn-sm" href={allForSale}>{copy.saleAll}</Link>
             ) : null}
@@ -145,7 +136,6 @@ export default async function Kategori({ params }: Params) {
         <div className="wrap split-text">
           <div className="sec-head" style={{ marginBottom: 0 }}>
             <h2 className="h2" id="h-kat-tips">{copy.tipsH2}</h2>
-            <p className="lede">På video kan du bede sælgeren om at vise præcis det, du er i tvivl om. Her er det, der er værd at spørge om.</p>
           </div>
           <div>
             <div className="tips">
@@ -159,40 +149,7 @@ export default async function Kategori({ params }: Params) {
             {copy.note ? <p className="muted" style={{ marginTop: 18 }}>{copy.note}</p> : null}
             <div className="ctas" style={{ marginTop: 24 }}>
               <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="sec" aria-labelledby="h-kat-how">
-        <div className="wrap split-text">
-          <div className="sec-head" style={{ marginBottom: 0 }}>
-            <h2 className="h2" id="h-kat-how">{copy.howH2}</h2>
-          </div>
-          <div>
-            <ol className="steps">
-              <li>
-                <div>
-                  <h3>Find et show eller en ting</h3>
-                  <p>Se hvem der er live, eller tryk Husk mig på en ting, der bliver vist snart.</p>
-                </div>
-              </li>
-              <li>
-                <div>
-                  <h3>Se den tæt på, og spørg</h3>
-                  <p>Bed sælgeren om at vise mærket, målene eller slid. Du får svar med det samme i chatten.</p>
-                </div>
-              </li>
-              <li>
-                <div>
-                  <h3>Snup den med ét tryk</h3>
-                  <p>Den første, der trykker, får tingen. Du betaler sikkert, og alt fra samme sælger kommer i én pakke.</p>
-                </div>
-              </li>
-            </ol>
-            <div className="ctas" style={{ marginTop: 24 }}>
-              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
-              <Link className="btn btn-line" href="/saadan-virker-det">Sådan køber du</Link>
+              <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
             </div>
           </div>
         </div>
@@ -202,10 +159,7 @@ export default async function Kategori({ params }: Params) {
         <section className="sec tight" style={{ paddingTop: 0 }} aria-labelledby="h-kat-saelg">
           <div className="wrap">
             <div className="cta-band">
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560 }}>
-                <h2 className="h2" id="h-kat-saelg">{copy.sellH2}</h2>
-                <p className="muted">Gå live fra stuen, og sælg en hel bunke på én aften. Det, der ikke bliver solgt, kommer automatisk til salg bagefter.</p>
-              </div>
+              <h2 className="h2" id="h-kat-saelg" style={{ maxWidth: 560 }}>{copy.sellH2}</h2>
               <div className="ctas">
                 <Link className="btn btn-red" href="/saelg">Sælg det live</Link>
               </div>

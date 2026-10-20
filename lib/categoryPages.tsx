@@ -18,7 +18,6 @@ export interface CategoryPageCopy {
   tips: { h: string; p: string }[];
   /** Ekstra afsnit under rådene (valgfrit). */
   note?: React.ReactNode;
-  howH2: string;
   /** H2 til sælgerne. Ingen på "Andet". */
   sellH2?: string;
 }
@@ -50,7 +49,6 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
         p: "Bed om at se sålen, hælene og tasken indvendigt. Slid i hjørnerne og ved hanken ses bedst, når tasken bliver vendt.",
       },
     ],
-    howH2: "Hvordan køber man brugt dametøj live?",
     sellH2: "Har du selv dametøj, der skal videre?",
   },
   herretoej: {
@@ -73,7 +71,6 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
       },
       { h: "Strik ved albuer og manchetter", p: "Det er her, strik bliver tynd og fnuller først." },
     ],
-    howH2: "Hvordan køber man brugt herretøj live?",
     sellH2: "Har du selv herretøj, der skal videre?",
   },
   boernetoej: {
@@ -105,7 +102,6 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
         <Link href="/kategori/samlerting">Samlerting</Link>.
       </>
     ),
-    howH2: "Hvordan køber man brugt børnetøj live?",
     sellH2: "Har du selv børnetøj, der skal videre?",
   },
   bolig: {
@@ -131,7 +127,6 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
         p: "Fragt til pakkeshop gælder op til 5 kg. Møbler og andre tunge ting henter du gratis hos sælgeren.",
       },
     ],
-    howH2: "Hvordan køber man brugt design live?",
     sellH2: "Har du selv design, der skal videre?",
   },
   samlerting: {
@@ -157,7 +152,6 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
       },
       { h: "Samlerkort", p: "Bed om at se hjørner, kanter og bagside tæt på. Det er der, slid viser sig først." },
     ],
-    howH2: "Hvordan køber man brugt vinyl live?",
     sellH2: "Har du selv samlerting, der skal videre?",
   },
   andet: {
@@ -175,6 +169,5 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
         p: "Fragt til pakkeshop gælder op til 5 kg. Tungere ting henter du gratis hos sælgeren.",
       },
     ],
-    howH2: "Hvordan køber man brugte ting live?",
   },
 };

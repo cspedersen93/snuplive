@@ -67,9 +67,7 @@ export default function Faq() {
             <span aria-hidden="true">/</span>
             <span>Spørgsmål og svar</span>
           </nav>
-          <span className="label">Hjælp</span>
           <h1 className="h1" id="h-faq">Spørgsmål og svar om SnupLive</h1>
-          <p className="lede">Her finder du svar på de spørgsmål, vi oftest får om at købe og sælge live.</p>
         </div>
       </section>
       <section className="sec tight">
@@ -77,7 +75,6 @@ export default function Faq() {
           <div className="sec-head">
             <span className="label">Kan du ikke finde svaret?</span>
             <h2 className="h2">Se, hvordan det hele hænger sammen</h2>
-            <p className="lede">Guiden viser hele turen for både købere og sælgere.</p>
             <div className="ctas">
               <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
               <Link className="btn btn-red" href="/opret">Opret gratis konto</Link>

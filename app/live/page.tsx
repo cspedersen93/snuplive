@@ -32,10 +32,6 @@ export default async function LiveNu() {
             {live.length === 0 ? "Ingen er live lige nu" : live.length === 1 ? "1 sælger er live" : `${live.length} sælgere er live`}
           </span>
           <h1 className="h1" id="h-live">Live shopping lige nu</h1>
-          <p className="lede">
-            Hop ind i et show, kig med, og snup det, du kan lide. Alt, du køber hos samme sælger, bliver samlet i én
-            pakke.
-          </p>
         </div>
       </section>
 
@@ -58,9 +54,7 @@ export default async function LiveNu() {
         <section className="sec band" aria-labelledby="h-sched">
           <div className="wrap">
             <div className="sec-head">
-              <span className="label">Programmet</span>
               <h2 className="h2" id="h-sched">Hvem går live senere?</h2>
-              <p className="lede">Sælgerne planlægger deres shows på faste tidspunkter. Tryk Husk mig, så sender vi dig en mail, når showet starter.</p>
             </div>
             <div className="sched">
               {upcoming.map((s) => {
@@ -93,28 +87,6 @@ export default async function LiveNu() {
         </section>
       ) : null}
 
-      <section className="sec" aria-labelledby="h-live-seo">
-        <div className="wrap split" style={{ alignItems: "start" }}>
-          <div className="sec-head" style={{ marginBottom: 0 }}>
-            <span className="label">Om live shopping</span>
-            <h2 className="h2" id="h-live-seo">Hvad kan du købe live på SnupLive?</h2>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <p className="lede">
-              På SnupLive går private sælgere og små genbrugsbutikker live med brugt tøj, vintage, vinyl, retro design,
-              børnetøj og meget mere. Du ser tingene på video, før du køber, og kan bede sælgeren om at vise mål, mærker
-              og stand tæt på.
-            </p>
-            <p className="lede">
-              Når du snupper noget, lander det under Mine snup. Du betaler samlet med MobilePay eller kort, og pengene
-              bliver først udbetalt til sælgeren, når du har fået dine ting.
-            </p>
-            <div className="ctas">
-              <Link className="btn btn-red" href="/opret">Opret gratis konto</Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

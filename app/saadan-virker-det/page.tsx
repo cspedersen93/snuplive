@@ -19,11 +19,9 @@ export default function Saadan() {
             <span aria-hidden="true">/</span>
             <span>Sådan virker det</span>
           </nav>
-          <span className="label">Guide</span>
           <h1 className="h1" id="h-saadan">Sådan virker live shopping på SnupLive</h1>
           <p className="lede">
-            Du ser tingene på video, spørger løs i chatten og snupper med ét tryk. Her er hele turen, fra du finder et
-            show, til pakken ligger i postkassen.
+            Hele turen, fra du finder et show, til pakken ligger i postkassen.
           </p>
         </div>
       </section>
@@ -49,8 +47,8 @@ export default function Saadan() {
       </section>
 
       <section className="sec band" aria-labelledby="h-seller">
-        <div className="wrap split" style={{ alignItems: "start" }}>
-          <div className="sec-head">
+        <div className="wrap">
+          <div className="sec-head" style={{ marginBottom: 0 }}>
             <span className="label red">For sælgere</span>
             <h2 className="h2" id="h-seller">Hvordan sælger jeg på SnupLive?</h2>
             <p className="lede">Opret et show, læg dine ting i køen, og gå live fra studiet.</p>
@@ -59,21 +57,13 @@ export default function Saadan() {
               <Link className="btn btn-line" href="/studio">Gå til studiet</Link>
             </div>
           </div>
-          <ol className="steps">
-            <li><div><h3>Opret en konto</h3><p>Med din e-mail. Ved lanceringen bliver sælgere verificeret med MitID.</p></div></li>
-            <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris, og om den skal sælges til fast pris eller på budsalg. Tilføj gerne billeder og en beskrivelse, så købere kan finde tingene og trykke Husk mig før showet.</p></div></li>
-            <li><div><h3>Gå live og sælg</h3><p>Vis tingene frem én ad gangen, og svar på spørgsmål i chatten. Det, der ikke bliver solgt, kommer automatisk til salg til fast pris bagefter.</p></div></li>
-            <li><div><h3>Send og få penge</h3><p>Lav fragtlabelen under Mine shows, og aflever pakken i en pakkeshop. Når køberen har fået pakken, går pengene til din bankkonto via Stripe.</p></div></li>
-          </ol>
         </div>
       </section>
 
       <section className="sec" aria-labelledby="h-tryg" id="tryg-handel">
         <div className="wrap">
           <div className="sec-head">
-            <span className="label">Tryg handel</span>
             <h2 className="h2" id="h-tryg">Hvordan er det trygt at handle live?</h2>
-            <p className="lede">Det er nemt at købe med det samme, når du ser tingen på video. Derfor bygger vi tryghed ind i hvert trin.</p>
           </div>
           <div className="feat">
             <div><IconUser className="ico" /><h3>Sælgere med MitID</h3><p>Ved lanceringen bliver alle sælgere verificeret med MitID, før de kan sælge.</p></div>

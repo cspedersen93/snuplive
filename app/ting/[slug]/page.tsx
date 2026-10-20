@@ -198,10 +198,7 @@ export default async function ItemPage({ params }: Params) {
                 <>
                   {isAuction(it) ? <p>Ingen bød på den i showet, så nu kan du købe den til startprisen.</p> : null}
                   <BuyNow itemId={it.id} price={it.price} next={href} sellerId={it.seller_id} />
-                  <p className="fine">
-                    Tingen bliver reserveret til dig, og du betaler under Mine snup. Fragt {DELIVERY.ship.price} kr til pakkeshop, eller
-                    hent den gratis hos sælgeren.
-                  </p>
+                  <p className="fine">Tingen bliver reserveret til dig, og du betaler under Mine snup.</p>
                 </>
               ) : state === "upcoming" && bid ? (
                 <>
@@ -211,7 +208,7 @@ export default async function ItemPage({ params }: Params) {
                     <Link href={liveHref}>{show.title}</Link>. Buddene starter ved {kr(it.price)}, og det højeste bud vinder.
                   </p>
                   <RemindButton showId={show.id} itemId={it.id} next={href} className="btn btn-red btn-block" />
-                  <p className="fine">Vi sender dig en mail, når showet starter. Du forpligter dig ikke til at byde.</p>
+                  <p className="fine">Du får en mail, når showet starter.</p>
                 </>
               ) : state === "upcoming" ? (
                 <>
@@ -220,7 +217,7 @@ export default async function ItemPage({ params }: Params) {
                     <Link href={liveHref}>{show.title}</Link>. Du kan snuppe den, mens den bliver vist.
                   </p>
                   <RemindButton showId={show.id} itemId={it.id} next={href} className="btn btn-red btn-block" />
-                  <p className="fine">Vi sender dig en mail, når showet starter. Du forpligter dig ikke til at købe.</p>
+                  <p className="fine">Du får en mail, når showet starter.</p>
                 </>
               ) : state === "live" || state === "showing" ? (
                 <>
