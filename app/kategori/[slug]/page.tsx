@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import CategoryIcon from "@/components/CategoryIcon";
 import ItemCard from "@/components/ItemCard";
 import ShowCard from "@/components/ShowCard";
@@ -31,8 +31,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 const FOR_SALE = 20;
 
 export default async function Kategori({ params }: Params) {
-  const cat = categoryBySlug((await params).slug);
+  const { slug } = await params;
+  const cat = categoryBySlug(slug);
   if (!cat) notFound();
+  // En gammel adresse (fx /kategori/samlerting) sendes videre til den nye.
+  if (slug !== cat.slug) permanentRedirect(`/kategori/${cat.slug}`);
   const copy = CATEGORY_PAGES[cat.key];
 
   const [{ live, upcoming }, soon, forSale] = await Promise.all([

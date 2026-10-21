@@ -244,7 +244,7 @@ dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPM
 
 Sådan virker det:
 
-- **Kategorier:** Dametøj, sko og tasker · Herretøj og sneakers · Børnetøj og legetøj · Bolig og design · Samlerting · Andet.
+- **Kategorier:** Dametøj, sko og tasker · Herretøj og sneakers · Børnetøj og legetøj · Bolig og design · Samleobjekter · Andet. I databasen hedder Samleobjekter stadig `samlerting`, og /kategori/samlerting sendes videre til /kategori/samleobjekter.
   Gamle shows bliver flyttet over automatisk (tøj og overtøj til dametøj, denim til herretøj, vinyl til samlerting, design til bolig).
 - **Før showet:** sælgeren kan give hver ting op til 4 billeder, en beskrivelse og en anden kategori end showets
   (under "+ Billeder, beskrivelse og kategori" i studiet). Tingene kan ses på forsiden, i kategorien og på deres egen side.

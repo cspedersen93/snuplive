@@ -57,14 +57,14 @@ export const CATEGORIES = [
   },
   {
     key: "samlerting",
-    /** Ordet i en sætning, fx "brugt samlerting". */
-    word: "samlerting",
-    slug: "samlerting",
-    label: "Samlerting",
-    short: "Samlerting",
+    /** Ordet i en sætning, fx "brugte samleobjekter". Nøglen i databasen er stadig "samlerting". */
+    word: "samleobjekter",
+    slug: "samleobjekter",
+    label: "Samleobjekter",
+    short: "Samleobjekter",
     cover: "/img/c-vinyl.jpg",
     blurb: "Vinyl, LEGO, samlerkort og retrospil til samlere, der vil se standen live.",
-    h1: "Brugt vinyl, LEGO og samlerkort – køb samlerting live",
+    h1: "Brugt vinyl, LEGO og samlerkort – køb samleobjekter live",
     title: "Brugt vinyl, LEGO og samlerkort – køb det live | SnupLive",
     description: "Køb brugt vinyl, LEGO, samlerkort og retrospil live. Se standen tæt på video, spørg sælgeren, og snup det, før en anden gør.",
   },
@@ -92,8 +92,12 @@ export function category(key: string | null | undefined) {
   return CATEGORIES.find((c) => c.key === key) ?? CATEGORIES[CATEGORIES.length - 1];
 }
 
+/** Gamle adresser, der sendes videre til den nye (kategorien Samlerting hedder nu Samleobjekter). */
+const OLD_SLUGS: Record<string, string> = { samlerting: "samleobjekter" };
+
 export function categoryBySlug(slug: string) {
-  return CATEGORIES.find((c) => c.slug === slug) ?? null;
+  const s = OLD_SLUGS[slug] ?? slug;
+  return CATEGORIES.find((c) => c.slug === s) ?? null;
 }
 
 const nf = new Intl.NumberFormat("da-DK");

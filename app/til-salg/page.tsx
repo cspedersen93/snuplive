@@ -29,7 +29,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title: { absolute: cat ? `${cat.label} til salg brugt | SnupLive`.slice(0, 60) : "Brugt til salg – køb nu til fast pris | SnupLive" },
     description:
-      "Køb brugt tøj, børnetøj, design og samlerting til fast pris. Tingene er vist frem live, så du ved, hvad du får. Fragt 49 kr til pakkeshop.",
+      "Køb brugt tøj, børnetøj, design og samleobjekter til fast pris. Tingene er vist frem live, så du ved, hvad du får. Fragt 49 kr til pakkeshop.",
     alternates: { canonical: href(cat?.slug ?? null, page) },
     // Filtrerede lister findes også som kategorisider, så kun den samlede liste skal i Google.
     robots: cat ? { index: false, follow: true } : undefined,

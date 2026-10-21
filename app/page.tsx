@@ -12,9 +12,10 @@ import { fetchFeed, fetchListing } from "@/lib/queries";
 export const revalidate = 30;
 
 export const metadata: Metadata = {
-  title: { absolute: "Køb brugt live – tøj, børnetøj, design og vinyl | SnupLive" },
+  title: { absolute: "Second hand live-salg: tøj, design og samleobjekter" },
   description:
-    "Køb brugt tøj, børnetøj, design og samlerting live. Se tingen på video, spørg i chatten, og snup den med ét tryk. Betalingen er beskyttet.",
+    "Køb brugt tøj, børnetøj, design og samleobjekter live. Se tingen på video, spørg i chatten, og snup den med ét tryk. Betalingen er beskyttet.",
+  openGraph: { title: "Køb live – second hand: tøj, design og samleobjekter" },
   alternates: { canonical: "/" },
 };
 
@@ -48,7 +49,7 @@ export default async function Forside() {
               {live.length ? `${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu` : "Brugt tøj og ting på video"}
             </span>
             <h1 id="h-forside" className="hero-h1">
-              Køb brugt tøj og ting <em className="s">live</em> – snup det, mens det bliver vist
+              Køb <em className="s">live</em> – second hand: tøj, design og samleobjekter
             </h1>
             <p className="lede">Se tingen på video, spørg i chatten, og snup den med ét tryk.</p>
             <div className="ctas">

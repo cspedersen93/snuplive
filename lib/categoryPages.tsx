@@ -99,7 +99,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     note: (
       <>
         Køber du flere ting hos samme sælger, betaler du kun fragt én gang. Det gælder op til 5 kg. LEGO finder du under{" "}
-        <Link href="/kategori/samlerting">Samlerting</Link>.
+        <Link href="/kategori/samleobjekter">Samleobjekter</Link>.
       </>
     ),
     sellH2: "Har du selv børnetøj, der skal videre?",
@@ -132,11 +132,11 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
   samlerting: {
     intro:
       "Find brugte vinylplader, LEGO, samlerkort og retrospil. Samlere vil se standen, før de køber, og på video kan du se den helt tæt på.",
-    who: "Hvem sælger vinyl og samlerting live?",
-    soon: "Hvilke samlerting bliver vist snart?",
-    sale: "Brugt vinyl og samlerting til salg nu",
-    saleAll: "Se alle samlerting til salg",
-    tipsH2: "Hvad skal du kigge efter, når du køber brugt vinyl og samlerting?",
+    who: "Hvem sælger vinyl og samleobjekter live?",
+    soon: "Hvilke samleobjekter bliver vist snart?",
+    sale: "Brugt vinyl og samleobjekter til salg nu",
+    saleAll: "Se alle samleobjekter til salg",
+    tipsH2: "Hvad skal du kigge efter, når du køber brugt vinyl og samleobjekter?",
     tips: [
       {
         h: "Pladens stand",
@@ -152,7 +152,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
       },
       { h: "Samlerkort", p: "Bed om at se hjørner, kanter og bagside tæt på. Det er der, slid viser sig først." },
     ],
-    sellH2: "Har du selv samlerting, der skal videre?",
+    sellH2: "Har du selv samleobjekter, der skal videre?",
   },
   andet: {
     intro: "Bøger, sport, værktøj, hobby og meget mere. Se tingen på video, spørg sælgeren, og snup den med ét tryk.",
