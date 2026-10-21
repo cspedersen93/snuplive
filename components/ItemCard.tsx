@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
+import NoPhoto from "@/components/NoPhoto";
 import { itemMeta } from "@/components/Screen";
-import { clock, dayLabel, gradFor, kr } from "@/lib/format";
+import { clock, dayLabel, kr } from "@/lib/format";
 import { isAuction, soldPrice } from "@/lib/auction";
 import { itemImage } from "@/lib/images";
 import { itemHref, itemState } from "@/lib/items";
@@ -23,12 +24,12 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
         : kr(item.price);
   return (
     <Link className="icard" href={itemHref(item)}>
-      <div className="icard-img" style={img ? undefined : { background: gradFor(item.id) }}>
+      <div className="icard-img">
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={img} alt="" loading={priority ? "eager" : "lazy"} />
         ) : (
-          <span className="icard-name" aria-hidden="true">{item.name}</span>
+          <NoPhoto cat={item.category} text={state === "upcoming" || state === "live" || state === "showing" ? "Vises live" : "Intet billede"} />
         )}
         <span className="icard-badge">
           {bid ? <span className="b-bid">Budsalg</span> : null}

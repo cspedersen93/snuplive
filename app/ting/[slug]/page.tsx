@@ -5,13 +5,14 @@ import { cache } from "react";
 import Avatar from "@/components/Avatar";
 import { IconBell } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
+import NoPhoto from "@/components/NoPhoto";
 import RemindButton from "@/components/RemindButton";
 import ReportButton from "@/components/ReportButton";
 import { itemMeta } from "@/components/Screen";
 import SellerFacts from "@/components/SellerFacts";
 import SetupNotice from "@/components/SetupNotice";
 import { SITE_URL } from "@/lib/env";
-import { category, clock, dayLabel, gradFor, kr } from "@/lib/format";
+import { category, clock, dayLabel, kr } from "@/lib/format";
 import { itemImages } from "@/lib/images";
 import { idFromSlug, itemHref, itemSlug, itemState, type ItemState } from "@/lib/items";
 import { isAuction, soldPrice } from "@/lib/auction";
@@ -166,8 +167,8 @@ export default async function ItemPage({ params }: Params) {
             <Gallery images={images} alt={it.name} />
           ) : (
             <div className="gallery">
-              <div className="gallery-main gallery-empty" style={{ background: gradFor(it.id) }}>
-                <span>{it.name}</span>
+              <div className="gallery-main gallery-empty">
+                <NoPhoto cat={cat.key} size="large" text={state === "upcoming" || state === "live" ? "Sælgeren viser den live" : "Intet billede endnu"} />
               </div>
             </div>
           )}

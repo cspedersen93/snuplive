@@ -697,7 +697,6 @@ label.btn{cursor:pointer}
 .icard-img{position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--surface);isolation:isolate}
 .icard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
 .icard:hover .icard-img img{transform:scale(1.04)}
-.icard-name{position:absolute;inset:auto 14px 14px 14px;font-weight:700;font-size:1.05rem;line-height:1.15;color:#1b0c10;letter-spacing:-.01em}
 .icard-badge{position:absolute;top:10px;left:10px;display:flex;gap:6px;z-index:2}
 .icard-badge .b-live,.icard-badge .b-view,.b-buy{font-size:.68rem;padding:.35em .6em;border-radius:6px;gap:6px;color:#fff}
 .icard-badge .b-view{background:rgba(0,0,0,.55)}
@@ -740,8 +739,7 @@ label.btn{cursor:pointer}
 .gallery{display:flex;flex-direction:column;gap:10px;position:sticky;top:92px}
 .gallery-main{position:relative;aspect-ratio:4/5;border-radius:20px;overflow:hidden;background:var(--surface)}
 .gallery-main img{width:100%;height:100%;object-fit:cover}
-.gallery-empty{display:flex;align-items:flex-end;padding:24px}
-.gallery-empty span{font-weight:700;font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.05;letter-spacing:-.03em;color:#1b0c10}
+.gallery-empty{position:relative}
 .gallery-thumbs{display:flex;gap:8px;flex-wrap:wrap}
 .gallery-thumbs button{width:64px;height:80px;padding:0;border-radius:10px;overflow:hidden;border:2px solid transparent;background:var(--surface);cursor:pointer;opacity:.7}
 .gallery-thumbs button[aria-pressed=true]{border-color:var(--text);opacity:1}
@@ -882,3 +880,10 @@ img.v-thumb{object-fit:cover}
 .show-report{align-self:flex-start;margin-left:4px}
 .sort-note{margin:18px 0 0;font-size:.85rem;color:var(--muted)}
 .sort-note a{color:inherit}
+
+/* Ting uden billede: rolig flade med kategoriens ikon */
+.nophoto{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);background:radial-gradient(90% 70% at 50% 38%,rgba(255,236,228,.075),rgba(255,236,228,0) 70%),linear-gradient(180deg,var(--surface-2),var(--surface))}
+.nophoto i{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;border:1px solid var(--line-2);background:rgba(255,236,228,.04);color:rgba(246,240,235,.78)}
+.nophoto span{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase}
+.nophoto.lg i{width:88px;height:88px}
+.nophoto.lg span{font-size:.74rem}

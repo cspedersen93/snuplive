@@ -108,7 +108,7 @@ export default async function Forside() {
         <div className="wrap split">
           <figure className="photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/s-setup.jpg" alt="En sælger holder en kjole op foran en telefon på stativ med ringlys" loading="lazy" width={1200} height={800} />
+            <img src="/img/how-live.jpg" alt="En sælger holder en skjorte op foran ringlyset og telefonen" loading="lazy" width={1500} height={1000} />
             <figcaption>
               <span className="live-dot" aria-hidden="true" />
               Live fra soveværelset
@@ -133,7 +133,7 @@ export default async function Forside() {
         <div className="wrap">
           <article className="panel img sell-panel">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/s-phone.jpg" alt="Telefon på stativ med ringlys viser en sælger, der er live" loading="lazy" />
+            <img src="/img/sell-phone.jpg" alt="Telefon på stativ med ringlys filmer en sælger, der viser en kjole" loading="lazy" />
             <span className="label red">Til sælgere</span>
             <h2 className="h2" id="h-saelg" style={{ maxWidth: "16ch" }}>Har du selv noget, der skal videre?</h2>
             <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>Gå live fra stuen, og sælg en hel bunke på én aften.</p>

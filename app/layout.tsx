@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "da_DK",
     siteName: "SnupLive",
-    images: [{ url: "/img/c-kjoler.jpg", width: 480, height: 720, alt: "Live shopping med brugt tøj på SnupLive" }],
+    images: [{ url: "/img/og.jpg", width: 1200, height: 630, alt: "Live shopping med brugt tøj på SnupLive" }],
   },
   alternates: { canonical: "/" },
 };
