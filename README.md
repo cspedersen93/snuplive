@@ -315,6 +315,17 @@ Det er nyt:
   salg eller salg for mindst 2.000 euro er markeret. Hent listen som CSV-fil. Indberetningen skal ind senest 31. januar.
 - **Sådan sorterer vi** står på `/saadan-virker-det#sortering` og er linket fra listerne og fra bunden af siden.
 
+## Inaktive shows lukker af sig selv
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0010_inaktive_shows.sql`](supabase/migrations/0010_inaktive_shows.sql), **før**
+   den nye version kommer på Vercel. Filen lukker også de shows, der allerede hænger som live. Den kan køres igen.
+
+Studiet sender et livstegn hvert minut, mens showet er live og kameraet er tændt. Har et show ikke fået et livstegn i
+15 minutter (studiet er lukket, telefonen er gået i dvale, kameraet er slukket eller nettet er væk), slutter showet, som
+hvis sælgeren havde trykket **Afslut show**: et budsalg, der kører, går til det højeste bud, resten kommer til salg til
+fast pris, og der står i chatten, hvorfor showet sluttede. Lukningen sker, når nogen åbner forsiden, Live nu, en
+kategori eller et show, og ved det daglige job, så det kræver ikke et ekstra cron-job.
+
 ---
 
 ## Udvikling på din egen computer

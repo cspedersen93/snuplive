@@ -11,6 +11,23 @@ export interface Listing {
   upcoming: ShowWithSeller[];
 }
 
+let lastSweep = 0;
+
+/**
+ * Lukker shows, der ikke har fået et livstegn fra studiet i 15 minutter (end_stale_shows i databasen).
+ * Kaldes, før vi viser hvem der er live, højst hvert 30. sekund pr. server. Fejl ignoreres.
+ */
+export async function sweepStaleShows() {
+  if (Date.now() - lastSweep < 30_000) return;
+  lastSweep = Date.now();
+  try {
+    const sb = createPublicClient();
+    if (sb) await sb.rpc("end_stale_shows");
+  } catch {
+    // Listen virker stadig; det daglige job lukker showet bagefter.
+  }
+}
+
 /** Shows, der er live nu, og shows, der starter snart (offentlige data). */
 export async function fetchListing(limitLive = 30, limitUpcoming = 20, category?: string): Promise<Listing> {
   const sel = `${SHOW_COLS},${SELLER_EMBED},${ITEM_COUNT_EMBED}`;
@@ -18,6 +35,7 @@ export async function fetchListing(limitLive = 30, limitUpcoming = 20, category?
   try {
     const sb = createPublicClient();
     if (!sb) return { ok: false, live: [], upcoming: [] };
+    await sweepStaleShows();
     // Shows, der er fjernet efter en anmeldelse, er ikke med.
     const shows = () => {
       const q = sb.from("shows").select(sel).is("removed_at", null);

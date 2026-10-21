@@ -124,6 +124,23 @@ export default function StudioClient(props: Props) {
       .then(({ data }) => data && setSales(data as unknown as StudioSale[]));
   }, [soldKey, show.id, sb]);
 
+  // Livstegn hvert minut, mens showet er live og kameraet er tændt.
+  // Uden livstegn i 15 minutter slutter showet af sig selv (end_stale_shows i databasen).
+  useEffect(() => {
+    if (!live || !cameraOn) return;
+    const beat = () => void sb.rpc("show_heartbeat", { p_show: show.id }).then(({ error }) => error && console.warn("[snuplive] livstegn:", error.message));
+    beat();
+    const t = setInterval(beat, 60_000);
+    const wake = () => document.visibilityState === "visible" && beat();
+    document.addEventListener("visibilitychange", wake);
+    window.addEventListener("online", beat);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener("visibilitychange", wake);
+      window.removeEventListener("online", beat);
+    };
+  }, [live, cameraOn, sb, show.id]);
+
   // Advar, hvis sælgeren lukker fanen midt i et show.
   useEffect(() => {
     if (!live) return;
@@ -415,7 +432,7 @@ export default function StudioClient(props: Props) {
               {live && !cameraOn ? (
                 <div className="pre-live">
                   <strong style={{ fontSize: "1.2rem" }}>Kameraet er slukket</strong>
-                  <span>Dine seere kan ikke se dig lige nu.</span>
+                  <span>Dine seere kan ikke se dig lige nu. Tænder du ikke kameraet igen inden 15 minutter, slutter showet af sig selv.</span>
                   <button className="btn btn-red" type="button" onClick={() => setCameraOn(true)}>Tænd kameraet igen</button>
                   {videoErr ? <span className="err-msg" role="alert">{videoErr}</span> : null}
                 </div>
@@ -520,6 +537,11 @@ export default function StudioClient(props: Props) {
               </button>
             </div>
           </div>
+          {live ? (
+            <p className="fine" style={{ textAlign: "center", marginTop: 10 }}>
+              Hold studiet åbent og kameraet tændt. Er de slukket i 15 minutter, slutter showet af sig selv.
+            </p>
+          ) : null}
           {!live && !ended ? (
             <p className="fine" style={{ textAlign: "center", marginTop: 10 }}>
               Planlagte shows kan slettes.{" "}

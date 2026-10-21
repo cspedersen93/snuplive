@@ -13,5 +13,7 @@ export async function GET(req: Request) {
   const stripe = getStripe();
   const admin = createAdminClient();
   if (!stripe || !admin) return fail("Betaling er ikke sat op.", 503);
-  return json(await dailyMaintenance(admin, stripe));
+  // Shows, der hænger som live uden livstegn fra studiet, bliver lukket.
+  const stale = await admin.rpc("end_stale_shows");
+  return json({ ...(await dailyMaintenance(admin, stripe)), staleShowsEnded: stale.data ?? 0 });
 }

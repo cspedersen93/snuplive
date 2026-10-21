@@ -537,5 +537,28 @@ select t.ok(has_function_privilege('service_role', 'public.admin_moderate(uuid, 
   and not has_function_privilege('authenticated', 'public.admin_moderate(uuid, text, text)', 'execute')
   and not has_function_privilege('anon', 'public.admin_moderate(uuid, text, text)', 'execute'), 'kun serveren kan afgøre anmeldelser');
 
+-- ── Inaktive shows lukker af sig selv efter 15 minutter uden livstegn fra studiet ──
+select t.ok((select heartbeat_at is not null from shows where id = '10000000-0000-0000-0000-000000000001'), 'Gå live sætter det første livstegn');
+insert into shows (id, seller_id, title, category, status, started_at, heartbeat_at) values
+  ('10000000-0000-0000-0000-000000000041', '00000000-0000-0000-0000-00000000000c', 'Glemt show', 'andet', 'live', now() - interval '1 day', now() - interval '20 minutes'),
+  ('10000000-0000-0000-0000-000000000042', '00000000-0000-0000-0000-00000000000b', 'Aktivt show', 'andet', 'live', now() - interval '1 hour', now() - interval '20 minutes');
+insert into items (id, show_id, seller_id, name, price, position, status) values ('20000000-0000-0000-0000-000000000041', '10000000-0000-0000-0000-000000000041', '00000000-0000-0000-0000-00000000000c', 'Messinglampe', 100, 1, 'queued');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select show_heartbeat('10000000-0000-0000-0000-000000000042')), 'sælgeren sender et livstegn');
+select t.ok(not (select show_heartbeat('10000000-0000-0000-0000-000000000041')), 'man kan ikke sende livstegn for en andens show');
+reset role;
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.throws($$select show_heartbeat('10000000-0000-0000-0000-000000000042')$$, 'permission denied');
+select t.ok((select end_stale_shows()) = 1, 'et show uden livstegn i 15 minutter bliver lukket');
+reset role;
+select t.ok((select status = 'ended' and ended_at is not null and current_item_id is null from shows where id = '10000000-0000-0000-0000-000000000041'), 'det glemte show er slut');
+select t.ok((select status = 'unsold' and for_sale from items where id = '20000000-0000-0000-0000-000000000041'), 'tingene fra det glemte show kommer til salg');
+select t.ok((select count(*) from messages where show_id = '10000000-0000-0000-0000-000000000041' and body like 'Showet er slut, fordi%') = 1, 'chatten fortæller, hvorfor showet sluttede');
+select t.ok((select status from shows where id = '10000000-0000-0000-0000-000000000042') = 'live', 'et show med livstegn er stadig live');
+select t.ok((select end_stale_shows()) = 0, 'intet at lukke anden gang');
+select _end_show('10000000-0000-0000-0000-000000000042', 'Testen er slut');
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

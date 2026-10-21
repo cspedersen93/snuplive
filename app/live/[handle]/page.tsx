@@ -11,6 +11,7 @@ import { showImage } from "@/lib/images";
 import { createPublicClient } from "@/lib/supabase/public";
 import { ITEM_COLS, MESSAGE_COLS, SELLER_FACT_COLS, SHOW_COLS, type Item, type Message, type Profile, type Show } from "@/lib/types";
 import SellerRatings, { type Rating } from "./SellerRatings";
+import { sweepStaleShows } from "@/lib/queries";
 import ShowClient from "./ShowClient";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +31,7 @@ const load = cache(async (rawHandle: string) => {
     .maybeSingle();
   if (!seller) return { setup: true as const, seller: null };
 
+  await sweepStaleShows();
   const base = () => sb.from("shows").select(SHOW_COLS).eq("seller_id", seller.id).is("removed_at", null);
   const [liveQ, nextQ, lastQ] = await Promise.all([
     base().eq("status", "live").limit(1).maybeSingle(),
