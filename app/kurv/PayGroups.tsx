@@ -263,7 +263,9 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
         <button className="btn btn-red btn-block" type="button" onClick={pay} disabled={!ready || busy}>
           {!ready ? "Betaling er ikke sat op endnu" : busy ? "Åbner betaling …" : missingShop ? "Vælg pakkeshop" : `Betal ${kr(total.total)}`}
         </button>
-        <p className="fine" style={{ textAlign: "center" }}>MobilePay, kort, Apple Pay og Google Pay</p>
+        <p className="fine" style={{ textAlign: "center" }}>
+          MobilePay, kort, Apple Pay og Google Pay. Ved at betale accepterer du <a href="/handelsbetingelser">handelsbetingelserne</a>.
+        </p>
         <div className="protect">
           <IconShield />
           <span>Pengene holdes tilbage hos SnupLive, indtil du har fået dine ting. Køberbeskyttelsen er 5 % + 5 kr pr. pakke.</span>

@@ -12,6 +12,8 @@ export function sortItems(xs: Item[]) {
 }
 
 function upsert(xs: Item[], row: Item) {
+  // En ting, der er fjernet efter en anmeldelse, forsvinder hos alle.
+  if ((row as Item & { removed_at?: string | null }).removed_at) return xs.filter((x) => x.id !== row.id);
   const i = xs.findIndex((x) => x.id === row.id);
   if (i === -1) return sortItems([...xs, row]);
   const next = xs.slice();
@@ -34,7 +36,7 @@ export function useShowRealtime(initial: { show: Show; items: Item[]; messages: 
     const sb = getSupabase();
     const [s, i, m] = await Promise.all([
       sb.from("shows").select(SHOW_COLS).eq("id", id).maybeSingle(),
-      sb.from("items").select(ITEM_COLS).eq("show_id", id),
+      sb.from("items").select(ITEM_COLS).eq("show_id", id).is("removed_at", null),
       sb.from("messages").select(MESSAGE_COLS).eq("show_id", id).is("removed_at", null).order("id", { ascending: false }).limit(60),
     ]);
     if (s.data) setShow(s.data as Show);

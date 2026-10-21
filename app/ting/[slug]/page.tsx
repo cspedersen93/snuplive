@@ -6,7 +6,9 @@ import Avatar from "@/components/Avatar";
 import { IconBell } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import RemindButton from "@/components/RemindButton";
+import ReportButton from "@/components/ReportButton";
 import { itemMeta } from "@/components/Screen";
+import SellerFacts from "@/components/SellerFacts";
 import SetupNotice from "@/components/SetupNotice";
 import { SITE_URL } from "@/lib/env";
 import { category, clock, dayLabel, gradFor, kr } from "@/lib/format";
@@ -16,7 +18,7 @@ import { isAuction, soldPrice } from "@/lib/auction";
 import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
-import { ITEM_COLS, type Item } from "@/lib/types";
+import { ITEM_COLS, SELLER_FACT_COLS, type Item, type SellerFactsData } from "@/lib/types";
 import BuyNow from "./BuyNow";
 import Gallery from "./Gallery";
 
@@ -25,8 +27,8 @@ export const revalidate = 30;
 type Params = { params: Promise<{ slug: string }> };
 
 interface Loaded extends Item {
-  show: { id: string; title: string; status: "planned" | "live" | "ended"; starts_at: string | null; category: string } | null;
-  seller: { handle: string; display_name: string | null; area: string | null; avatar_path: string | null } | null;
+  show: { id: string; title: string; status: "planned" | "live" | "ended"; starts_at: string | null; category: string; removed_at: string | null } | null;
+  seller: ({ handle: string; display_name: string | null; area: string | null; avatar_path: string | null } & SellerFactsData) | null;
 }
 
 const load = cache(async (slug: string) => {
@@ -37,12 +39,14 @@ const load = cache(async (slug: string) => {
   const { data } = await sb
     .from("items")
     .select(
-      `${ITEM_COLS},show:shows!items_show_id_fkey(id,title,status,starts_at,category),seller:profiles!items_seller_id_fkey(handle,display_name,area,avatar_path)`,
+      `${ITEM_COLS},show:shows!items_show_id_fkey(id,title,status,starts_at,category,removed_at),seller:profiles!items_seller_id_fkey(handle,display_name,area,avatar_path,${SELLER_FACT_COLS})`,
     )
     .eq("id", id)
+    .is("removed_at", null)
     .maybeSingle();
   const item = data as unknown as Loaded | null;
-  if (!item?.show || !item.seller) return { setup: true as const, item: null };
+  // En ting eller et show, der er fjernet efter en anmeldelse, findes ikke længere.
+  if (!item?.show || !item.seller || item.show.removed_at) return { setup: true as const, item: null };
   return { setup: true as const, item };
 });
 
@@ -281,12 +285,14 @@ export default async function ItemPage({ params }: Params) {
                 </span>
               </span>
             </Link>
+            <SellerFacts seller={seller} />
 
             <ul className="item-trust">
               <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har tingen.</li>
               <li>Fragt {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>
               <li>Køber du flere ting fra {seller.handle}, får du dem i én pakke.</li>
             </ul>
+            <ReportButton type="item" id={it.id} className="item-report" />
           </div>
         </div>
 

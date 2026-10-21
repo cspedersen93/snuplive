@@ -104,7 +104,7 @@ export default function AuthForm({ cta = "Send login-link" }: { cta?: string }) 
       </button>
       <p className="fine">
         Vi sender et link og en kode til din mail, så du ikke skal huske en adgangskode. Har du ikke en konto, opretter vi
-        den. Ved at fortsætte accepterer du vores <a href="/privatliv">privatlivspolitik</a>.
+        den. Ved at fortsætte accepterer du vores <a href="/vilkaar">vilkår</a> og <a href="/privatliv">privatlivspolitik</a>.
       </p>
     </form>
   );

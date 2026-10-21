@@ -11,7 +11,7 @@ export async function requireProfile(next: string) {
   if (!uid) redirect(`/login?next=${encodeURIComponent(next)}`);
   const { data } = await supabase
     .from("profiles")
-    .select("id,handle,display_name,area,is_seller,avatar_path")
+    .select("id,handle,display_name,area,is_seller,avatar_path,seller_type,business_name,business_cvr,seller_terms_at,rating_avg,rating_count")
     .eq("id", uid)
     .maybeSingle();
   if (!data) redirect(`/login?next=${encodeURIComponent(next)}`);

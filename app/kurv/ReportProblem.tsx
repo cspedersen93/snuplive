@@ -6,7 +6,7 @@ import { ISSUE_REASONS, type IssueReason } from "@/lib/issues";
 import { errorText, toast } from "@/lib/toast";
 
 /** "Meld et problem": køberen fortæller, hvad der er galt, og pengene holdes tilbage. */
-export default function ReportProblem({ orderId }: { orderId: string }) {
+export default function ReportProblem({ orderId, business = false }: { orderId: string; business?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<IssueReason | null>(null);
@@ -45,7 +45,8 @@ export default function ReportProblem({ orderId }: { orderId: string }) {
     <form className="problem-form" onSubmit={send}>
       <fieldset>
         <legend>Hvad er problemet?</legend>
-        {(Object.keys(ISSUE_REASONS) as IssueReason[]).map((k) => (
+        {/* Fortrydelse gælder kun ved køb fra en virksomhed. */}
+        {(Object.keys(ISSUE_REASONS) as IssueReason[]).filter((k) => business || k !== "withdrawal").map((k) => (
           <label key={k}>
             <input type="radio" name={`issue-${orderId}`} checked={reason === k} onChange={() => setReason(k)} />
             <span>{ISSUE_REASONS[k]}</span>

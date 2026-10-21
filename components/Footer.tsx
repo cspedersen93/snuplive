@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { COMPANY, companyLine } from "@/lib/company";
 import { MAIN_CATEGORIES } from "@/lib/format";
 
 export default function Footer() {
@@ -44,12 +45,16 @@ export default function Footer() {
             <ul>
               <li><Link href="/faq">Spørgsmål og svar</Link></li>
               <li><Link href="/saadan-virker-det#tryg-handel">Tryg handel</Link></li>
+              <li><Link href="/handelsbetingelser">Handelsbetingelser</Link></li>
+              <li><Link href="/vilkaar">Vilkår</Link></li>
               <li><Link href="/privatliv">Privatlivspolitik</Link></li>
+              <li><Link href="/om-snuplive">Om SnupLive og kontakt</Link></li>
+              <li><Link href="/saadan-virker-det#sortering">Sådan sorterer vi</Link></li>
             </ul>
           </div>
         </div>
         <div className="foot-bottom">
-          <span>© {new Date().getFullYear()} snuplive.dk · Køb og sælg brugt live</span>
+          <span>© {new Date().getFullYear()} {companyLine()} · {COMPANY.email}</span>
           <span>Fotos: Pexels</span>
         </div>
       </div>

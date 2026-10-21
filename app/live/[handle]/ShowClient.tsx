@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Avatar from "@/components/Avatar";
+import ReportButton from "@/components/ReportButton";
+import SellerFacts from "@/components/SellerFacts";
 import Chat from "@/components/Chat";
 import { IconBox, IconShare } from "@/components/Icons";
 import { ViewerVideo } from "@/components/LiveVideo";
@@ -18,10 +20,10 @@ import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
-import type { Item, Message, Profile, Show } from "@/lib/types";
+import type { Item, Message, Profile, SellerFactsData, Show } from "@/lib/types";
 
 interface Props {
-  seller: Pick<Profile, "id" | "handle" | "display_name" | "area" | "avatar_path">;
+  seller: Pick<Profile, "id" | "handle" | "display_name" | "area" | "avatar_path"> & SellerFactsData;
   show: Show;
   items: Item[];
   messages: Message[];
@@ -296,6 +298,7 @@ export default function ShowClient(props: Props) {
                 </span>
               </div>
             </div>
+            <SellerFacts seller={props.seller} />
             <button className="btn btn-line btn-sm" type="button" onClick={share} style={{ alignSelf: "flex-start" }}>
               Del showet
             </button>
@@ -348,6 +351,7 @@ export default function ShowClient(props: Props) {
             <IconBox />
             <span>Alt, du køber hos {handle}, bliver samlet under Mine snup, så det kan sendes i én pakke.</span>
           </div>
+          <ReportButton type="show" id={show.id} className="show-report" />
         </aside>
 
         <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>

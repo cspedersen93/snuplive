@@ -3,11 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import Avatar from "@/components/Avatar";
+import ReportButton from "@/components/ReportButton";
+import SellerFacts from "@/components/SellerFacts";
 import SetupNotice from "@/components/SetupNotice";
 import { when } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { createPublicClient } from "@/lib/supabase/public";
-import { ITEM_COLS, MESSAGE_COLS, SHOW_COLS, type Item, type Message, type Profile, type Show } from "@/lib/types";
+import { ITEM_COLS, MESSAGE_COLS, SELLER_FACT_COLS, SHOW_COLS, type Item, type Message, type Profile, type Show } from "@/lib/types";
+import SellerRatings, { type Rating } from "./SellerRatings";
 import ShowClient from "./ShowClient";
 
 export const dynamic = "force-dynamic";
@@ -22,12 +25,12 @@ const load = cache(async (rawHandle: string) => {
 
   const { data: seller } = await sb
     .from("profiles")
-    .select("id,handle,display_name,area,is_seller,avatar_path")
+    .select(`id,handle,display_name,area,is_seller,avatar_path,${SELLER_FACT_COLS}`)
     .eq("handle", handle)
     .maybeSingle();
   if (!seller) return { setup: true as const, seller: null };
 
-  const base = () => sb.from("shows").select(SHOW_COLS).eq("seller_id", seller.id);
+  const base = () => sb.from("shows").select(SHOW_COLS).eq("seller_id", seller.id).is("removed_at", null);
   const [liveQ, nextQ, lastQ] = await Promise.all([
     base().eq("status", "live").limit(1).maybeSingle(),
     base().eq("status", "planned").order("starts_at", { ascending: true, nullsFirst: false }).limit(1).maybeSingle(),
@@ -39,13 +42,20 @@ const load = cache(async (rawHandle: string) => {
   let messages: Message[] = [];
   if (show) {
     const [i, m] = await Promise.all([
-      sb.from("items").select(ITEM_COLS).eq("show_id", show.id).order("position").order("created_at"),
+      sb.from("items").select(ITEM_COLS).eq("show_id", show.id).is("removed_at", null).order("position").order("created_at"),
       sb.from("messages").select(MESSAGE_COLS).eq("show_id", show.id).is("removed_at", null).order("id", { ascending: false }).limit(60),
     ]);
     items = (i.data ?? []) as Item[];
     messages = ((m.data ?? []) as Message[]).reverse();
   }
-  return { setup: true as const, seller: seller as Profile, show, items, messages };
+  const r = await sb
+    .from("ratings")
+    .select("stars,comment,created_at,buyer:profiles!ratings_buyer_id_fkey(handle)")
+    .eq("seller_id", seller.id)
+    .order("created_at", { ascending: false })
+    .limit(10);
+  const ratings = (r.data ?? []) as unknown as Rating[];
+  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings };
 });
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -94,22 +104,43 @@ export default async function SellerPage({ params }: Params) {
             <span className="muted">{[d.seller.display_name, d.seller.area].filter(Boolean).join(" · ")}</span>
           </div>
         </div>
-        <div className="empty">
+        {d.seller.is_seller ? <SellerFacts seller={d.seller} /> : null}
+        <div className="empty" style={{ marginTop: 18 }}>
           <p style={{ marginBottom: 14 }}>{d.seller.handle} har ikke planlagt et show endnu.</p>
           <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
         </div>
+        <SellerRatings handle={d.seller.handle} ratings={d.ratings} avg={d.seller.rating_avg} count={d.seller.rating_count} />
+        <ReportButton type="profile" id={d.seller.id} className="page-report" />
       </div>
     );
   }
 
   return (
-    <ShowClient
-      key={d.show.id}
-      seller={{ id: d.seller.id, handle: d.seller.handle, display_name: d.seller.display_name, area: d.seller.area, avatar_path: d.seller.avatar_path }}
-      show={d.show}
-      items={d.items}
-      messages={d.messages}
-      serverNow={Date.now()}
-    />
+    <>
+      <ShowClient
+        key={d.show.id}
+        seller={{
+          id: d.seller.id,
+          handle: d.seller.handle,
+          display_name: d.seller.display_name,
+          area: d.seller.area,
+          avatar_path: d.seller.avatar_path,
+          seller_type: d.seller.seller_type,
+          business_name: d.seller.business_name,
+          business_cvr: d.seller.business_cvr,
+          rating_avg: d.seller.rating_avg,
+          rating_count: d.seller.rating_count,
+        }}
+        show={d.show}
+        items={d.items}
+        messages={d.messages}
+        serverNow={Date.now()}
+      />
+      {d.ratings.length ? (
+        <div className="wrap" style={{ paddingBottom: 64 }}>
+          <SellerRatings handle={d.seller.handle} ratings={d.ratings} avg={d.seller.rating_avg} count={d.seller.rating_count} />
+        </div>
+      ) : null}
+    </>
   );
 }

@@ -828,3 +828,57 @@ img.v-thumb{object-fit:cover}
 .v-rush.bid span{color:var(--red)}
 .v-lead{font-size:.82em;opacity:.9}
 .item-price-k{font-size:.9rem;font-weight:500;letter-spacing:0;margin-right:4px}
+/* Vilkår og firmaoplysninger */
+.company-info{list-style:none;margin:0;padding:16px 18px;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;gap:6px;background:var(--bg-2)}
+.company-info li{color:var(--muted)}
+.prose a{color:var(--text)}
+.prose h3{font-size:1.05rem;letter-spacing:-.01em;margin-top:6px}
+.prose ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px}
+.prose ol li{color:var(--muted)}
+/* Bedømmelser */
+.rate-form{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.stars{border:0;margin:0;padding:0;display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.stars legend{font-weight:600;font-size:.92rem;margin-bottom:6px;width:100%}
+.stars label{position:relative;cursor:pointer;font-size:1.7rem;line-height:1;color:var(--line-2);padding:2px}
+.stars label.on{color:var(--amber)}
+.stars input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.stars input:focus-visible+span{outline:2px solid var(--red-text);outline-offset:2px;border-radius:4px}
+.stars-word{margin-left:8px;font-size:.9rem;color:var(--muted)}
+.rate-form textarea{font:inherit;font-size:.95rem;color:var(--text);background:var(--bg);border:1px solid var(--line-2);border-radius:12px;padding:.6em .8em;resize:vertical}
+.stars-sum{display:inline-flex;align-items:center;gap:4px;font-size:.88rem;font-variant-numeric:tabular-nums}
+.stars-sum>span:first-child{color:var(--amber)}
+.sort-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;color:var(--muted)}
+.sort-list b{color:var(--text)}
+
+/* Bliv sælger: privat eller erhverv */
+.become-box{display:flex;flex-direction:column;gap:16px}
+.seller-form{display:flex;flex-direction:column;gap:14px;max-width:620px}
+.seller-form fieldset{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.seller-form legend{font-weight:600;font-size:.95rem;margin-bottom:10px;padding:0}
+.seller-opt{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line-2);border-radius:14px;cursor:pointer;background:var(--bg)}
+.seller-opt.on{border-color:var(--red);box-shadow:0 0 0 1px var(--red) inset}
+.seller-opt input{accent-color:var(--red);margin:.25em 0 0}
+.seller-opt > span{display:flex;flex-direction:column;gap:2px;font-size:.92rem}
+.seller-biz{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px 12px}
+.seller-biz .fine{grid-column:1/-1;margin:0}
+@media (max-width:560px){.seller-biz{grid-template-columns:1fr}}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.92rem;cursor:pointer}
+.check input{accent-color:var(--red);margin:.25em 0 0;width:16px;height:16px;flex:none}
+
+/* Sælgeroplysninger ved ting og shows (§ 8 a) */
+.seller-facts{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
+.seller-type{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.seller-facts .muted a{color:inherit}
+.item-report{align-self:flex-start}
+.report-form{margin-top:4px}
+.report-done{margin:0}
+.ratings{margin-top:32px}
+.ratings ul{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.ratings li{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:.92rem}
+.ratings li p{margin:0}
+.ratings li .muted{font-size:.82rem}
+.stars .dim{color:var(--line-2)}
+.page-report{margin-top:28px;display:inline-block}
+.show-report{align-self:flex-start;margin-left:4px}
+.sort-note{margin:18px 0 0;font-size:.85rem;color:var(--muted)}
+.sort-note a{color:inherit}

@@ -59,7 +59,9 @@ select t.throws($$update profiles set id = gen_random_uuid() where id = auth.uid
 
 -- ── Maja bliver sælger og opretter et show ───────────────────────────────────
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
-update profiles set is_seller = true, handle = 'majasgarderobe', display_name = 'Maja', area = 'Nørrebro' where id = auth.uid();
+select t.throws($$update profiles set is_seller = true where id = auth.uid()$$, 'permission denied');
+select become_seller('private');
+update profiles set handle = 'majasgarderobe', display_name = 'Maja', area = 'Nørrebro' where id = auth.uid();
 select t.ok((select is_seller from profiles where id = auth.uid()), 'Maja er sælger');
 select t.throws($$insert into shows (seller_id, title, status) values (auth.uid(), 'Snyd', 'live')$$, 'permission denied');
 insert into shows (id, seller_id, title, category, starts_at)
@@ -464,6 +466,76 @@ set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
 select t.ok((select status from buy_now('20000000-0000-0000-0000-000000000018')) = 'sold', 'og kan købes med Køb nu');
 reset role;
+
+-- ── Lancering: sælgertype, bedømmelser, anmeldelser, fjernede ting og DAC7 ───
+select t.ok((select seller_type = 'private' and seller_terms_at is not null from profiles where handle = 'majasgarderobe'), 'Maja er privat sælger og har accepteret vilkårene');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000e"}', false);
+select t.throws($$select become_seller('business')$$, 'firmanavn');
+select t.throws($$select become_seller('business', 'Genbrug ApS', '1234')$$, '8 cifre');
+select t.throws($$select become_seller('firma')$$, 'privatperson eller virksomhed');
+select t.ok((select is_seller and business_cvr = '12345678' from become_seller('business', 'Genbrug ApS', '12 34 56 78')), 'en butik bliver erhvervssælger med CVR');
+select t.throws($$update profiles set seller_type = 'private' where id = auth.uid() returning 1$$, 'permission denied');
+reset role;
+-- Livas første ordre bliver afsluttet. Så kan hun bedømme Maja.
+update orders set status = 'completed', completed_at = now() where id = '30000000-0000-0000-0000-000000000001';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select rate_seller('30000000-0000-0000-0000-000000000002', 5)$$, 'når du har fået');
+select t.throws($$select rate_seller('30000000-0000-0000-0000-000000000001', 6)$$, 'mellem 1 og 5');
+select t.throws($$insert into ratings (order_id, seller_id, buyer_id, stars) values ('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', auth.uid(), 5)$$, 'permission denied');
+select t.ok((select stars from rate_seller('30000000-0000-0000-0000-000000000001', 4, '  Fin kjole, hurtig levering  ')) = 4, 'Liva bedømmer Maja');
+select t.throws($$select rate_seller('30000000-0000-0000-0000-000000000001', 5)$$, 'allerede bedømt');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select rate_seller('30000000-0000-0000-0000-000000000001', 1)$$, 'findes ikke');
+select t.throws($$select * from reports$$, 'permission denied');
+select t.throws($$insert into reports (target_type, target_id, reason) values ('item', gen_random_uuid(), 'andet')$$, 'permission denied');
+reset role;
+select t.ok((select rating_avg = 4.0 and rating_count = 1 from profiles where handle = 'majasgarderobe'), 'gennemsnittet står på Majas profil');
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.ok((select comment = 'Fin kjole, hurtig levering' from ratings), 'alle kan læse bedømmelser');
+select t.throws($$select * from admin_dac7(2026)$$, 'permission denied');
+reset role;
+update items set removed_at = now() where id = '20000000-0000-0000-0000-000000000002';
+select t.ok((select count(*) from items_feed('for_sale', null, 100) where id = '20000000-0000-0000-0000-000000000002') = 0, 'en fjernet ting er ikke med i listerne');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select buy_now('20000000-0000-0000-0000-000000000002')$$, 'ikke til salg');
+reset role;
+select t.ok((select sales = 1 and amount = 250 and seller_type = 'private' from admin_dac7(extract(year from now())::int) where handle = 'majasgarderobe'), 'listen til Skattestyrelsen har Majas salg');
+select t.ok((select count(*) from admin_dac7(extract(year from now())::int - 1)) = 0, 'sidste år er tomt');
+select t.ok(has_function_privilege('service_role', 'public.admin_dac7(int)', 'execute') and not has_function_privilege('authenticated', 'public.admin_dac7(int)', 'execute'), 'kun serveren kan hente listen');
+
+-- Anmeldelser bliver afgjort på /admin/anmeldelser.
+insert into shows (id, seller_id, title, category, starts_at) values ('10000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-00000000000e', 'Butikkens show', 'bolig', now() + interval '1 day');
+insert into items (id, show_id, seller_id, name, price, position) values
+  ('20000000-0000-0000-0000-000000000031', '10000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-00000000000e', 'Taske med falsk logo', 300, 1),
+  ('20000000-0000-0000-0000-000000000032', '10000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-00000000000e', 'Bordlampe', 200, 2);
+insert into reports (id, target_type, target_id, reason, reporter_email) values
+  ('40000000-0000-0000-0000-000000000001', 'item', '20000000-0000-0000-0000-000000000031', 'falsk', 'liva@example.dk'),
+  ('40000000-0000-0000-0000-000000000002', 'item', '20000000-0000-0000-0000-000000000031', 'falsk', null),
+  ('40000000-0000-0000-0000-000000000003', 'show', '10000000-0000-0000-0000-000000000031', 'kraenkende', null),
+  ('40000000-0000-0000-0000-000000000004', 'profile', '00000000-0000-0000-0000-00000000000e', 'andet', null),
+  ('40000000-0000-0000-0000-000000000005', 'profile', '00000000-0000-0000-0000-00000000000e', 'ulovlig', null);
+select t.throws($$select * from admin_moderate('40000000-0000-0000-0000-000000000001', 'remove')$$, 'hvorfor');
+select t.throws($$select * from admin_moderate('40000000-0000-0000-0000-000000000001', 'slet', 'x')$$, 'Ukendt handling');
+select t.ok((select owner_id = '00000000-0000-0000-0000-00000000000e' and reporter_email = 'liva@example.dk' from admin_moderate('40000000-0000-0000-0000-000000000001', 'remove', 'Kopivarer må ikke sælges')), 'en anmeldt ting bliver fjernet, og vi ved, hvem der skal have besked');
+select t.ok((select removed_at is not null and not for_sale from items where id = '20000000-0000-0000-0000-000000000031'), 'tingen er fjernet');
+select t.ok((select status = 'removed' and decision = 'Kopivarer må ikke sælges' from reports where id = '40000000-0000-0000-0000-000000000002'), 'en anden anmeldelse af samme ting bliver afgjort samtidig');
+select t.throws($$select * from admin_moderate('40000000-0000-0000-0000-000000000001', 'reject')$$, 'allerede afgjort');
+select t.ok((select count(*) from items_feed('upcoming') where show_id = '10000000-0000-0000-0000-000000000031') = 1, 'resten af showet er stadig med');
+select t.ok((select count(*) from admin_moderate('40000000-0000-0000-0000-000000000003', 'remove', 'Titlen er krænkende')) = 1, 'et show kan fjernes');
+select t.ok((select removed_at is not null and status = 'ended' from shows where id = '10000000-0000-0000-0000-000000000031'), 'det fjernede show er stoppet');
+select t.ok((select count(*) from items_feed('upcoming') where show_id = '10000000-0000-0000-0000-000000000031') = 0, 'tingene i et fjernet show er ikke med i listerne');
+select t.ok((select owner_id from admin_moderate('40000000-0000-0000-0000-000000000004', 'reject')) = '00000000-0000-0000-0000-00000000000e', 'en anmeldelse kan afvises');
+select t.ok((select is_seller from profiles where id = '00000000-0000-0000-0000-00000000000e') and (select status from reports where id = '40000000-0000-0000-0000-000000000005') = 'rejected', 'en afvist anmeldelse ændrer intet og lukker de andre af samme profil');
+insert into reports (id, target_type, target_id, reason) values ('40000000-0000-0000-0000-000000000006', 'profile', '00000000-0000-0000-0000-00000000000e', 'ulovlig');
+select * from admin_moderate('40000000-0000-0000-0000-000000000006', 'remove', 'Sælger ulovlige ting');
+select t.ok((select not is_seller from profiles where id = '00000000-0000-0000-0000-00000000000e'), 'en sælgerkonto kan lukkes');
+select t.ok(has_function_privilege('service_role', 'public.admin_moderate(uuid, text, text)', 'execute')
+  and not has_function_privilege('authenticated', 'public.admin_moderate(uuid, text, text)', 'execute')
+  and not has_function_privilege('anon', 'public.admin_moderate(uuid, text, text)', 'execute'), 'kun serveren kan afgøre anmeldelser');
 
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

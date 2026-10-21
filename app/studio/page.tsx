@@ -33,13 +33,13 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
       <div className="wrap dash">
         <AccountNav profile={profile} active="studio" />
         <div className="dpanel">
-          <div className="next-show" style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
+          <div className="box become-box">
             <div>
               <span className="label red">Sælg live</span>
               <h1 className="h3" style={{ fontSize: "1.5rem", margin: "6px 0" }}>Bliv sælger på SnupLive</h1>
               <p className="muted">Opret et show, læg dine ting i køen, og gå live direkte fra browseren. Det er gratis i beta-perioden.</p>
             </div>
-            <BecomeSeller userId={uid} />
+            <BecomeSeller />
           </div>
           <p className="muted">Vil du vide mere først? Læs <Link href="/saelg">sådan sælger du live</Link>.</p>
         </div>
@@ -68,6 +68,15 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           </div>
           <Link className="btn btn-line" href={`/live/${profile.handle}`}>Se min side</Link>
         </div>
+
+        {!profile.seller_terms_at ? (
+          <div className="notice" role="status">
+            <span>
+              <b>Én ting mangler:</b> Bekræft, om du sælger som privatperson eller virksomhed, og sig ja til vilkårene for sælgere.{" "}
+              <Link href="/konto#saelger">Gør det her</Link>
+            </span>
+          </div>
+        ) : null}
 
         <NewShowForm sellerId={uid} />
 

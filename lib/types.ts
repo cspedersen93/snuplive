@@ -8,7 +8,20 @@ export interface Profile {
   area: string | null;
   is_seller: boolean;
   avatar_path?: string | null;
+  /** Privat eller erhverv (forbrugeraftaleloven § 8 a). Sættes, når man bliver sælger. */
+  seller_type?: SellerType | null;
+  business_name?: string | null;
+  business_cvr?: string | null;
+  seller_terms_at?: string | null;
+  rating_avg?: number | string | null;
+  rating_count?: number | null;
 }
+
+export type SellerType = "private" | "business";
+
+/** Det, køberen skal kunne se om sælgeren: privat eller erhverv, firma og bedømmelser. */
+export const SELLER_FACT_COLS = "seller_type,business_name,business_cvr,rating_avg,rating_count";
+export type SellerFactsData = Pick<Profile, "seller_type" | "business_name" | "business_cvr" | "rating_avg" | "rating_count">;
 
 export interface Show {
   id: string;

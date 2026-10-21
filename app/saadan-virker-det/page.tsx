@@ -69,14 +69,27 @@ export default function Saadan() {
             <div><IconUser className="ico" /><h3>Sælgere med MitID</h3><p>Ved lanceringen bliver alle sælgere verificeret med MitID, før de kan sælge.</p></div>
             <div><IconShield /><h3>Pengene holdes tilbage</h3><p>Sælgeren får først pengene, når du har modtaget dine ting.</p></div>
             <div><IconCamera /><h3>Du ser tingen live</h3><p>Bed om at se mærket, målene og standen tæt på, før du snupper.</p></div>
-            <div><IconStar /><h3>Bedømmelser</h3><p>Efter hver handel kan køberen bedømme sælgeren, så du kan se, hvem du handler med.</p></div>
+            <div><IconStar /><h3>Bedømmelser</h3><p>Efter hver handel kan køberen give sælgeren stjerner, så du kan se, hvem du handler med.</p></div>
             <div><IconBox /><h3>Sporing på pakken</h3><p>Du kan følge pakken fra sælgeren sender den, til den ligger i pakkeshoppen.</p></div>
             <div><IconChat /><h3>Hjælp, hvis noget går galt</h3><p>Tryk Meld et problem på ordren, inden pengene bliver udbetalt. Så holder vi pengene tilbage og hjælper jer med at finde en løsning.</p></div>
           </div>
           <p className="fine" style={{ marginTop: 18 }}>
-            SnupLive er i beta. MitID og bedømmelser bliver slået til inden lanceringen.
+            SnupLive er i beta. MitID for sælgere bliver slået til inden lanceringen.
           </p>
           <div className="ctas" style={{ marginTop: 24 }}><Link className="btn btn-line" href="/faq">Læs spørgsmål og svar</Link></div>
+        </div>
+      </section>
+
+      <section className="sec band" aria-labelledby="h-sortering" id="sortering">
+        <div className="wrap" style={{ maxWidth: 860 }}>
+          <h2 className="h2" id="h-sortering" style={{ marginBottom: 18 }}>Sådan sorterer vi</h2>
+          <ul className="sort-list">
+            <li><b>Live nu:</b> de shows, der er startet senest, står først.</li>
+            <li><b>Snart live og budsalg:</b> efter hvornår showet starter. Budsalg, der kører lige nu, står først.</li>
+            <li><b>Til salg:</b> de ting, der senest er kommet til salg, står først.</li>
+            <li><b>Kategorier og sælgere:</b> samme rækkefølge, kun med de ting, der passer.</li>
+          </ul>
+          <p className="muted" style={{ marginTop: 14 }}>Ingen sælger kan betale sig til en bedre plads, og vi sorterer ikke efter, hvad vi tjener.</p>
         </div>
       </section>
     </>

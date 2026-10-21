@@ -17,6 +17,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const message = typeof body.message === "string" ? body.message.trim().slice(0, 1000) : "";
   if (!isIssueReason(body.reason)) return fail("Vælg, hvad problemet er.", 400);
   if (message.length < 10) return fail("Skriv lidt mere om, hvad der er galt (mindst 10 tegn).", 400);
+  if (body.reason === "withdrawal") {
+    const { data: o } = await admin.from("orders").select("seller:profiles!orders_seller_id_fkey(seller_type)").eq("id", id).maybeSingle();
+    const type = (o as unknown as { seller: { seller_type: string | null } | null } | null)?.seller?.seller_type;
+    if (type !== "business") return fail("Fortrydelsesret gælder kun, når du køber af en virksomhed.", 400);
+  }
   try {
     await reportIssue(admin, id, uid, body.reason, message);
     return json({ ok: true });

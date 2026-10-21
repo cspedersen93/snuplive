@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import CategoryIcon from "@/components/CategoryIcon";
 import ItemCard from "@/components/ItemCard";
 import ShowCard from "@/components/ShowCard";
+import SortNote from "@/components/SortNote";
 import { CATEGORY_PAGES } from "@/lib/categoryPages";
 import { CATEGORIES, categoryBySlug } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
@@ -124,6 +125,9 @@ export default async function Kategori({ params }: Params) {
                 <ItemCard key={it.id} item={it} priority={i < 5 && !shows.length} />
               ))}
             </div>
+          ) : null}
+          {forSale.length ? (
+            <SortNote />
           ) : (
             <div className="empty">
               <p style={{ marginBottom: 14 }}>

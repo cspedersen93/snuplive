@@ -285,6 +285,36 @@ På [snuplive.dk/admin](https://snuplive.dk/admin) (kun for e-mails i `ADMIN_EMA
 Kør [`supabase/migrations/0006_backoffice.sql`](supabase/migrations/0006_backoffice.sql) i Supabase først. Filen retter også en
 fejl, så en ting, der er blevet annulleret eller refunderet, kan snuppes igen.
 
+## Klar til lancering: vilkår, sælgertype, anmeldelser, bedømmelser og Skat
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0009_lancering.sql`](supabase/migrations/0009_lancering.sql), **før** den
+   nye version kommer på Vercel (0008 skal være kørt først). Ellers virker Mine snup og Bliv sælger ikke. Filen kan køres igen.
+2. **Når selskabet har et CVR-nummer**, så opret tre variabler i Vercel med typen **Config**, og tryk **Redeploy**:
+
+   | Navn | Værdi |
+   | --- | --- |
+   | `NEXT_PUBLIC_COMPANY_NAME` | `SnupLive ApS` |
+   | `NEXT_PUBLIC_COMPANY_CVR` | CVR-nummeret (8 cifre) |
+   | `NEXT_PUBLIC_COMPANY_ADDRESS` | Selskabets adresse |
+
+   Indtil da står der *SnupLive ApS (under stiftelse)* på siden og i vilkårene.
+
+Det er nyt:
+
+- **Handelsbetingelser, vilkår og Om SnupLive** på `/handelsbetingelser`, `/vilkaar` og `/om-snuplive`, linket fra bunden af
+  alle sider, fra login og fra betalingen.
+- **Privat eller erhverv:** man vælger, når man bliver sælger, og kan skifte under Min konto. En erhvervssælger skriver
+  firmanavn og CVR. Køberne ser det ved hver ting og hvert show sammen med, om fortrydelsesretten gælder. Køb fra en
+  erhvervssælger kan fortrydes med *Meld et problem*. Sælgere fra før skal bekræfte under Min konto.
+- **Anmeld** på ting, shows og profiler, også uden login. Du får en mail, og afgør dem under **Backoffice → Anmeldelser**:
+  fjern tingen, fjern showet, luk sælgerkontoen eller afvis. Sælgeren får begrundelsen på mail, og den, der anmeldte, får
+  besked om afgørelsen.
+- **Bedømmelser:** når en ordre er afsluttet, kan køberen give sælgeren 1–5 stjerner under Mine snup. Gennemsnittet står ved
+  sælgeren, og de nyeste bedømmelser står på sælgerens side.
+- **Backoffice → Skat:** salg pr. sælger og kvartal til indberetningen til Skattestyrelsen (DAC7). Sælgere med mindst 30
+  salg eller salg for mindst 2.000 euro er markeret. Hent listen som CSV-fil. Indberetningen skal ind senest 31. januar.
+- **Sådan sorterer vi** står på `/saadan-virker-det#sortering` og er linket fra listerne og fra bunden af siden.
+
 ---
 
 ## Udvikling på din egen computer
@@ -333,7 +363,7 @@ ligger i databasen. Browseren kan ikke snyde sig udenom.
 ## Næste trin
 
 1. **Forhåndsbud og maks-bud, følg sælgere og lukkede shows** (kun med et hemmeligt link).
-2. **MitID** for sælgere via Idura (kræver CVR).
+2. **MitID** for sælgere via Idura (kræver CVR). Siden lover, at det er slået til inden lanceringen.
 3. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
 4. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
 

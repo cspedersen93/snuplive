@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import SortNote from "@/components/SortNote";
 import Avatar from "@/components/Avatar";
 import RemindButton from "@/components/RemindButton";
 import { clock, dayLabel } from "@/lib/format";
@@ -38,7 +39,10 @@ export default async function LiveNu() {
       <section className="sec tight" aria-label="Shows, der er live">
         <div className="wrap">
           {live.length ? (
-            <LiveGrid shows={live} />
+            <>
+              <LiveGrid shows={live} />
+              <SortNote />
+            </>
           ) : (
             <div className="empty">
               <p style={{ marginBottom: 14 }}>

@@ -16,12 +16,13 @@ import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import ConfirmReceived from "./ConfirmReceived";
 import PayGroups, { type PayGroup } from "./PayGroups";
+import RateSeller from "./RateSeller";
 import ReportProblem from "./ReportProblem";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Mine snup", robots: { index: false } };
 
-type Seller = { handle: string; display_name: string | null; avatar_path: string | null };
+type Seller = { handle: string; display_name: string | null; avatar_path: string | null; seller_type?: string | null };
 type ItemInfo = { name: string; size: string | null; condition: string | null };
 
 interface SaleRow {
@@ -61,6 +62,8 @@ interface OrderRow {
   seller: Seller | null;
   show: { title: string } | null;
   sales: { id: string; price: number; item: ItemInfo | null }[];
+  /** Én bedømmelse pr. ordre. PostgREST giver et objekt (én-til-én), men vi tager også imod en liste. */
+  ratings: { stars: number } | { stars: number }[] | null;
 }
 
 const STATUS: Record<OrderRow["status"], [string, string]> = {
@@ -116,7 +119,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
     supabase
       .from("orders")
       .select(
-        "id,status,delivery,items_amount,shipping_amount,fee_amount,total_amount,carrier,tracking,paid_at,shipped_at,completed_at,sp_carrier,sp_name,sp_address,sp_zipcode,sp_city,tracking_status,delivered_at,issue_open,issues:order_issues!order_issues_order_id_fkey(reason,message,status,resolution,created_at),seller:profiles!orders_seller_id_fkey(handle,display_name,avatar_path),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
+        "id,status,delivery,items_amount,shipping_amount,fee_amount,total_amount,carrier,tracking,paid_at,shipped_at,completed_at,sp_carrier,sp_name,sp_address,sp_zipcode,sp_city,tracking_status,delivered_at,issue_open,issues:order_issues!order_issues_order_id_fkey(reason,message,status,resolution,created_at),seller:profiles!orders_seller_id_fkey(handle,display_name,avatar_path,seller_type),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition)),ratings:ratings!ratings_order_id_fkey(stars)",
       )
       .eq("buyer_id", uid)
       .in("status", ["paid", "shipped", "completed", "refunded"])
@@ -234,6 +237,7 @@ function OrderCard({ o }: { o: OrderRow }) {
   const [cls, label] = STATUS[o.status];
   const issue = [...(o.issues ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
   const seller = o.seller;
+  const rated = Array.isArray(o.ratings) ? o.ratings[0] : o.ratings;
   return (
     <section className="group" aria-label={`Ordre fra ${seller?.handle ?? "sælger"}`}>
       <div className="group-head">
@@ -297,6 +301,11 @@ function OrderCard({ o }: { o: OrderRow }) {
             </span>
           ) : null}
           {o.status === "completed" ? <span className="muted">Modtaget {when(o.completed_at)}. Tak for handlen!</span> : null}
+          {o.status === "completed" && rated ? (
+            <span className="fine">Du gav {seller?.handle ?? "sælgeren"} {rated.stars} {rated.stars === 1 ? "stjerne" : "stjerner"}.</span>
+          ) : o.status === "completed" ? (
+            <RateSeller orderId={o.id} handle={seller?.handle ?? "sælgeren"} />
+          ) : null}
           {o.status === "refunded" && issue?.resolution !== "refunded" ? (
             <span className="muted">Sælgeren har annulleret ordren, og du har fået pengene tilbage.</span>
           ) : null}
@@ -315,7 +324,7 @@ function OrderCard({ o }: { o: OrderRow }) {
           {o.status === "shipped" || (o.status === "paid" && o.delivery === "pickup") ? (
             <ConfirmReceived orderId={o.id} pickup={o.delivery === "pickup"} />
           ) : null}
-          {(o.status === "paid" || o.status === "shipped") && !o.issue_open ? <ReportProblem orderId={o.id} /> : null}
+          {(o.status === "paid" || o.status === "shipped") && !o.issue_open ? <ReportProblem orderId={o.id} business={seller?.seller_type === "business"} /> : null}
         </div>
       </div>
     </section>

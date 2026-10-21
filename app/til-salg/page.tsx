@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ItemCard from "@/components/ItemCard";
 import Pager from "@/components/Pager";
+import SortNote from "@/components/SortNote";
 import { CATEGORIES, categoryBySlug } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
 import { fetchFeed } from "@/lib/queries";
@@ -84,6 +85,7 @@ export default async function TilSalg({ searchParams }: Props) {
                 ))}
               </div>
               <Pager page={page} pages={pages} href={(n) => href(cat?.slug ?? null, n)} />
+              <SortNote />
             </>
           ) : (
             <div className="empty">

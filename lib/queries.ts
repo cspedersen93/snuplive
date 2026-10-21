@@ -18,7 +18,11 @@ export async function fetchListing(limitLive = 30, limitUpcoming = 20, category?
   try {
     const sb = createPublicClient();
     if (!sb) return { ok: false, live: [], upcoming: [] };
-    const shows = () => (category ? sb.from("shows").select(sel).eq("category", category) : sb.from("shows").select(sel));
+    // Shows, der er fjernet efter en anmeldelse, er ikke med.
+    const shows = () => {
+      const q = sb.from("shows").select(sel).is("removed_at", null);
+      return category ? q.eq("category", category) : q;
+    };
     const [live, upcoming] = await Promise.all([
       shows().eq("status", "live").order("started_at", { ascending: false }).limit(limitLive),
       shows()

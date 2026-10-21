@@ -89,15 +89,25 @@ export default async function Konto() {
             <Link className="btn btn-line" href={`/live/${profile.handle}`}>snuplive.dk/live/{profile.handle}</Link>
           </div>
         ) : (
-          <div className="next-show" style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
+          <div className="box become-box">
             <div>
               <span className="label red">Sælg live</span>
-              <h3>Har du et skab, der skal ryddes?</h3>
+              <h2 className="h3" style={{ marginTop: 6 }}>Har du et skab, der skal ryddes?</h2>
               <p className="muted" style={{ fontSize: ".95rem" }}>Bliv sælger, læg dine ting i køen, og gå live fra telefonen eller computeren.</p>
             </div>
-            <BecomeSeller userId={uid} />
+            <BecomeSeller />
           </div>
         )}
+
+        {profile.is_seller ? (
+          <div className="box become-box" id="saelger">
+            <div>
+              <h2 className="h3">Sælgeroplysninger</h2>
+              <p className="muted" style={{ fontSize: ".95rem" }}>Køberne kan se, om du sælger som privatperson eller virksomhed.</p>
+            </div>
+            <BecomeSeller profile={profile} />
+          </div>
+        ) : null}
       </div>
     </div>
   );

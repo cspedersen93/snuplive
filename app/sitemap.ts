@@ -25,6 +25,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/opret`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
     { url: `${SITE_URL}/privatliv`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/handelsbetingelser`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/vilkaar`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/om-snuplive`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
   const sb = createPublicClient();
   if (!sb) return pages;
@@ -33,6 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data } = await sb
       .from("shows")
       .select("created_at,seller:profiles!shows_seller_id_fkey(handle)")
+      .is("removed_at", null)
       .order("created_at", { ascending: false })
       .limit(2000);
     const seen = new Set<string>();
