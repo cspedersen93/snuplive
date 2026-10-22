@@ -132,6 +132,7 @@ export default async function SellerPage({ params }: Params) {
           business_cvr: d.seller.business_cvr,
           rating_avg: d.seller.rating_avg,
           rating_count: d.seller.rating_count,
+          mitid_verified_at: d.seller.mitid_verified_at,
         }}
         show={d.show}
         items={d.items}

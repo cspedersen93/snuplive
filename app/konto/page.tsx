@@ -7,6 +7,10 @@ import { kr } from "@/lib/format";
 import { isAdminEmail } from "@/lib/mail";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getUserInfo } from "@/lib/supabase/server";
+import { Suspense } from "react";
+import MitIdButton from "@/components/MitIdButton";
+import MitIdResult from "@/components/MitIdResult";
+import { mitidState } from "@/lib/mitid";
 import BecomeSeller from "./BecomeSeller";
 import ProfileForm from "./ProfileForm";
 
@@ -23,6 +27,7 @@ export default async function Konto() {
     profile.is_seller ? supabase.from("sales").select("price").eq("seller_id", uid).neq("status", "cancelled") : Promise.resolve({ data: [] as { price: number }[] }),
     profile.is_seller ? supabase.from("shows").select("id,status").eq("seller_id", uid) : Promise.resolve({ data: [] as { id: string; status: string }[] }),
   ]);
+  const mitid = profile.is_seller ? await mitidState(supabase, profile) : null;
   const snup = mine.data ?? [];
   const sold = sales.data ?? [];
   const myShows = shows.data ?? [];
@@ -106,8 +111,27 @@ export default async function Konto() {
               <p className="muted" style={{ fontSize: ".95rem" }}>Køberne kan se, om du sælger som privatperson eller virksomhed.</p>
             </div>
             <BecomeSeller profile={profile} />
+            {mitid?.verified ? (
+              <div className="mitid-status">
+                <span className="mitid-ok">MitID-bekræftet</span>
+                <p className="muted">
+                  Du bekræftede dig {new Date(profile.mitid_verified_at as string).toLocaleDateString("da-DK", { day: "numeric", month: "long", year: "numeric" })}. Køberne kan se mærket ved dine ting og shows.
+                </p>
+              </div>
+            ) : mitid?.enabled ? (
+              <div className="mitid-status">
+                <p>
+                  Bekræft, hvem du er, med MitID. Så ser køberne mærket <b>MitID-bekræftet</b> ved dine ting og shows.
+                  {mitid.required ? " Du skal gøre det, før du kan gå live." : ""}
+                </p>
+                <MitIdButton next="/konto#saelger" />
+              </div>
+            ) : null}
           </div>
         ) : null}
+        <Suspense fallback={null}>
+          <MitIdResult />
+        </Suspense>
       </div>
     </div>
   );

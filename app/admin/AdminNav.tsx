@@ -11,6 +11,7 @@ const TABS = [
   { href: "/admin/medlemmer", label: "Medlemmer" },
   { href: "/admin/shows", label: "Shows" },
   { href: "/admin/indberetning", label: "Skat" },
+  { href: "/admin/indstillinger", label: "Indstillinger" },
 ];
 
 export default function AdminNav({ openIssues, openReports = 0 }: { openIssues: number; openReports?: number }) {

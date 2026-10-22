@@ -29,6 +29,7 @@ export default function Privatliv() {
         <li><b>Betaling og levering:</b> når du betaler, får vi dit navn, din adresse og dit telefonnummer fra Stripe, og vi gemmer den pakkeshop, du vælger. Sælgeren ser dem kun for at kunne sende eller aflevere dine ting. Når sælgeren laver fragtlabelen, sender vi dit navn, din adresse, din e-mail og dit telefonnummer til Shipmondo og fragtfirmaet (DAO eller GLS). Kortoplysninger og MobilePay håndteres af Stripe, og vi ser dem aldrig.</li>
         <li><b>Bedømmelser:</b> giver du en sælger stjerner og en kommentar, kan alle se den sammen med dit brugernavn.</li>
         <li><b>Problemer og anmeldelser:</b> melder du et problem med en ordre, kan sælgeren læse det, du skriver. Anmelder du noget, gemmer vi anmeldelsen og eventuelt din e-mail, så vi kan svare dig. Vi siger ikke til den anmeldte, hvem der har anmeldt.</li>
+        <li><b>MitID:</b> når du som sælger bekræfter dig med MitID, får vi dit navn, din fødselsdato og et id fra MitID gennem Idura. Vi gemmer navn, fødselsdato, tidspunktet og et fingeraftryk af id&apos;et (ikke selve id&apos;et), så det samme MitID ikke kan bruges på flere konti. Vi får ikke dit CPR-nummer. Køberne kan kun se, at du er MitID-bekræftet.</li>
         <li><b>Sælgere og udbetaling:</b> for at få udbetalt penge opretter du en konto hos Stripe, som tjekker din identitet og bankkonto. Din afsenderadresse står på fragtlabelen og deles med Shipmondo og fragtfirmaet.</li>
         <li><b>Video:</b> videoen fra et live-show bliver sendt direkte til seerne og bliver ikke gemt. Når sælgeren viser en ting frem, gemmer vi et stillbillede af den på tingens side.</li>
       </ul>
@@ -50,7 +51,7 @@ export default function Privatliv() {
       <h2>Hvem hjælper os?</h2>
       <p>
         Vi bruger databehandlere til drift: Supabase (database og login), LiveKit (video), Vercel (hosting), Stripe (betaling og
-        udbetaling), Shipmondo (fragtlabels og sporing) og Resend (mails). De må kun bruge oplysningerne til at hjælpe os.
+        udbetaling), Shipmondo (fragtlabels og sporing), Resend (mails) og Idura (MitID). De må kun bruge oplysningerne til at hjælpe os.
       </p>
 
       <h2>Cookies</h2>

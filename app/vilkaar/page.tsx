@@ -69,6 +69,10 @@ export default function Vilkaar() {
         skal vælge erhverv med firmanavn og CVR-nummer. Som erhvervssælger skal du overholde reglerne om fortrydelsesret og
         reklamation, og dine priser skal være med moms, hvis du er momsregistreret.
       </p>
+      <p>
+        Vi kan bede dig bekræfte, hvem du er, med MitID, før du går live. Du skal være fyldt 18 år, og det samme MitID må kun bruges
+        på én sælgerkonto. Køberne ser mærket MitID-bekræftet ved dine ting og shows.
+      </p>
 
       <h3>7. Dine ting</h3>
       <ul>

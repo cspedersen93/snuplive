@@ -326,6 +326,32 @@ hvis sælgeren havde trykket **Afslut show**: et budsalg, der kører, går til d
 fast pris, og der står i chatten, hvorfor showet sluttede. Lukningen sker, når nogen åbner forsiden, Live nu, en
 kategori eller et show, og ved det daglige job, så det kræver ikke et ekstra cron-job.
 
+## MitID for sælgere (Idura)
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0011_mitid.sql`](supabase/migrations/0011_mitid.sql) (efter 0010). Filen kan køres igen.
+2. **Idura:** opret en konto på idura.eu. Under **Applications** opretter du en app med
+   - *Callback URL / redirect URI:* `https://snuplive.dk/api/mitid/callback`
+   - *eID:* Danish MitID
+   - *OAuth2 code flow* slået til, så appen får en client secret.
+3. **Vercel → Environment Variables** (alle tre som Secret), og tryk **Redeploy**:
+
+   | Navn | Værdi |
+   | --- | --- |
+   | `IDURA_DOMAIN` | Domænet fra Idura, fx `snuplive-test.idura.broker` |
+   | `IDURA_CLIENT_ID` | Client ID fra appen |
+   | `IDURA_CLIENT_SECRET` | Client secret fra appen |
+
+4. **Test:** opret en testbruger i MitID's testværktøj (pp.mitid.dk/test-tool), og bekræft dig under Min konto →
+   Sælgeroplysninger. I test virker kun MitID-testbrugere.
+5. **Produktion** (kræver CVR og momsnummer): skift Idura til Production, lad en med MitID Erhverv indsende firmaets
+   oplysninger under eID providers → DK MitID, opret produktionsappen, og skift de tre variabler i Vercel.
+6. **Backoffice → Indstillinger:** slå *Sælgere skal bekræfte sig med MitID, før de kan gå live* til, når rigtigt MitID virker.
+
+Sådan virker det: sælgeren trykker **Bekræft med MitID** (under Min konto eller i studiet), logger ind med MitID hos Idura og
+kommer tilbage. Vi gemmer navn, fødselsdato og et fingeraftryk af MitID-id'et (ikke CPR), så det samme MitID ikke kan bruges på
+flere konti, og sælgeren skal være fyldt 18. Køberne ser mærket **MitID-bekræftet** ved sælgerens ting og shows. Når kravet er
+slået til, kan man ikke gå live uden MitID; det tjekkes også i databasen.
+
 ---
 
 ## Udvikling på din egen computer
@@ -374,7 +400,7 @@ ligger i databasen. Browseren kan ikke snyde sig udenom.
 ## Næste trin
 
 1. **Forhåndsbud og maks-bud, følg sælgere og lukkede shows** (kun med et hemmeligt link).
-2. **MitID** for sælgere via Idura (kræver CVR). Siden lover, at det er slået til inden lanceringen.
+2. **MitID i produktion** via Idura, når CVR-nummeret er på plads (koden er klar, se *MitID for sælgere*).
 3. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
 4. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
 

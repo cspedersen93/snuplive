@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
+import { Suspense } from "react";
+import MitIdResult from "@/components/MitIdResult";
+import { mitidState } from "@/lib/mitid";
 import { ITEM_COLS, MESSAGE_COLS, SHOW_COLS, type Item, type Message, type Show } from "@/lib/types";
 import StudioClient, { type StudioSale } from "./StudioClient";
 
@@ -20,7 +23,8 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
   const { data: show } = await supabase.from("shows").select(SHOW_COLS).eq("id", id).eq("seller_id", uid).maybeSingle();
   if (!show) notFound();
 
-  const [items, messages, sales] = await Promise.all([
+  const [mitid, items, messages, sales] = await Promise.all([
+    mitidState(supabase, profile),
     supabase.from("items").select(ITEM_COLS).eq("show_id", id).order("position").order("created_at"),
     supabase.from("messages").select(MESSAGE_COLS).eq("show_id", id).is("removed_at", null).order("id", { ascending: false }).limit(60),
     supabase
@@ -32,6 +36,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
   ]);
 
   return (
+    <>
     <StudioClient
       profile={profile}
       show={show as Show}
@@ -39,6 +44,11 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
       messages={((messages.data ?? []) as Message[]).reverse()}
       sales={(sales.data ?? []) as unknown as StudioSale[]}
       serverNow={Date.now()}
+      needsMitid={mitid.needed}
     />
+    <Suspense fallback={null}>
+      <MitIdResult />
+    </Suspense>
+    </>
   );
 }

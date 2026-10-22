@@ -7,6 +7,10 @@ import { clock, dayLabel, when } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { ITEM_COUNT_EMBED } from "@/lib/queries";
 import { SHOW_COLS, type Show } from "@/lib/types";
+import { Suspense } from "react";
+import MitIdButton from "@/components/MitIdButton";
+import MitIdResult from "@/components/MitIdResult";
+import { mitidState } from "@/lib/mitid";
 import BecomeSeller from "../konto/BecomeSeller";
 import NewShowForm from "./NewShowForm";
 import BlockedUsers from "./BlockedUsers";
@@ -47,6 +51,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
     );
   }
 
+  const mitid = await mitidState(supabase, profile);
   const showsQ = await supabase
     .from("shows")
     .select(`${SHOW_COLS},${ITEM_COUNT_EMBED}`)
@@ -68,6 +73,18 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           </div>
           <Link className="btn btn-line" href={`/live/${profile.handle}`}>Se min side</Link>
         </div>
+
+        {mitid.needed ? (
+          <div className="notice" role="status">
+            <span>
+              <b>Bekræft, hvem du er, med MitID, før du går live.</b> Det tager et minut, og køberne ser mærket MitID-bekræftet ved dine ting.
+            </span>
+            <MitIdButton next="/studio" className="btn btn-red btn-sm" />
+          </div>
+        ) : null}
+        <Suspense fallback={null}>
+          <MitIdResult />
+        </Suspense>
 
         {!profile.seller_terms_at ? (
           <div className="notice" role="status">

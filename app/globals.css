@@ -887,3 +887,7 @@ img.v-thumb{object-fit:cover}
 .nophoto span{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase}
 .nophoto.lg i{width:88px;height:88px}
 .nophoto.lg span{font-size:.74rem}
+.mitid-ok{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:.66rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:.3em .6em;border-radius:6px;background:rgba(150,220,180,.12);color:var(--mint);white-space:nowrap}
+.mitid-status{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:.92rem}
+.mitid-status p{margin:0;flex:1 1 260px}
+.setting-toggle{padding:14px 16px;border:1px solid var(--line);border-radius:14px}

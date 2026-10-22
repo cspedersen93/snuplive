@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Chat from "@/components/Chat";
 import { IconBulb } from "@/components/Icons";
 import { StudioVideo } from "@/components/LiveVideo";
+import MitIdButton from "@/components/MitIdButton";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useShowRealtime, sortItems } from "@/components/useShowRealtime";
 import { AUCTION_SECONDS, auctionLeft, isAuction, soldPrice } from "@/lib/auction";
@@ -31,6 +32,8 @@ interface Props {
   messages: Message[];
   sales: StudioSale[];
   serverNow: number;
+  /** MitID er et krav for at gå live, og sælgeren har ikke bekræftet sig endnu. */
+  needsMitid?: boolean;
 }
 
 const SALE_SELECT = "id,item_id,price,buyer:profiles!sales_buyer_id_fkey(handle)";
@@ -406,6 +409,12 @@ export default function StudioClient(props: Props) {
                 <div className="pre-live">
                   {count !== null ? (
                     <div className="count" aria-live="assertive">{count}</div>
+                  ) : props.needsMitid ? (
+                    <>
+                      <strong style={{ fontSize: "1.3rem" }}>Bekræft, hvem du er</strong>
+                      <span style={{ maxWidth: "30ch" }}>Før du går live første gang, skal du bekræfte dig med MitID. Det tager et minut.</span>
+                      <MitIdButton next={`/studio/${show.id}`} />
+                    </>
                   ) : !cameraOn ? (
                     <>
                       <strong style={{ fontSize: "1.3rem" }}>Klar til at gå live?</strong>

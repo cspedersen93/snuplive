@@ -19,6 +19,12 @@ export default function SellerFacts({ seller, stars = true }: { seller: SellerFa
         ) : (
           <b>Privat sælger</b>
         )}
+        {seller.mitid_verified_at ? (
+          <span className="mitid-ok" title="Sælgeren har bekræftet, hvem hun eller han er, med MitID">
+            <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            MitID-bekræftet
+          </span>
+        ) : null}
         {stars ? <Stars avg={seller.rating_avg} count={seller.rating_count} /> : null}
       </span>
       <span className="muted">

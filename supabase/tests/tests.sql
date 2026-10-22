@@ -560,5 +560,33 @@ select t.ok((select status from shows where id = '10000000-0000-0000-0000-000000
 select t.ok((select end_stale_shows()) = 0, 'intet at lukke anden gang');
 select _end_show('10000000-0000-0000-0000-000000000042', 'Testen er slut');
 
+-- ── MitID: bekræftelse af sælgere og krav om MitID for at gå live ──
+select t.ok(not mitid_required(), 'MitID-kravet er slået fra fra start');
+select t.ok((select admin_set_mitid('00000000-0000-0000-0000-00000000000a', 'hash-maja', 'Maja Hansen', '1990-04-01')) = 'ok', 'Maja bekræfter sig med MitID');
+select t.ok((select admin_set_mitid('00000000-0000-0000-0000-00000000000b', 'hash-maja', 'Maja Hansen', '1990-04-01')) = 'taken', 'det samme MitID kan ikke bruges på en anden konto');
+select t.ok((select admin_set_mitid('00000000-0000-0000-0000-00000000000a', 'hash-maja', 'Maja Hansen', '1990-04-01')) = 'ok', 'Maja kan bekræfte sig igen');
+select t.ok((select mitid_verified_at is not null from profiles where id = '00000000-0000-0000-0000-00000000000a'), 'mærket står på Majas profil');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$update profiles set mitid_verified_at = now() where id = auth.uid() returning 1$$, 'permission denied');
+select t.throws($$select admin_set_mitid(auth.uid(), 'x', 'Snyd', null)$$, 'permission denied');
+select t.throws($$update settings set value = 'false' where key = 'mitid_required' returning 1$$, 'permission denied');
+select t.ok((select count(*) from identity_verifications) = 0, 'andre kan ikke se Majas MitID-oplysninger');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select name from identity_verifications) = 'Maja Hansen', 'Maja kan se sine egne oplysninger');
+reset role;
+insert into shows (id, seller_id, title, category, starts_at) values
+  ('10000000-0000-0000-0000-000000000051', '00000000-0000-0000-0000-00000000000c', 'Uden MitID', 'andet', now() + interval '1 hour'),
+  ('10000000-0000-0000-0000-000000000052', '00000000-0000-0000-0000-00000000000a', 'Med MitID', 'andet', now() + interval '1 hour');
+update settings set value = 'true' where key = 'mitid_required';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select set_show_status('10000000-0000-0000-0000-000000000051', 'live')$$, 'MitID');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select status from set_show_status('10000000-0000-0000-0000-000000000052', 'live')) = 'live', 'en sælger med MitID kan gå live, når kravet er slået til');
+reset role;
+select _end_show('10000000-0000-0000-0000-000000000052', 'Testen er slut');
+update settings set value = 'false' where key = 'mitid_required';
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'
