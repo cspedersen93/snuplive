@@ -1,7 +1,14 @@
 import Link from "next/link";
+import BetaBar from "@/components/BetaBar";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function NotFound() {
   return (
+    <>
+    <BetaBar />
+    <Header />
+    <main id="indhold">
     <section className="sec">
       <div className="wrap" style={{ display: "flex", flexDirection: "column", gap: 18, alignItems: "flex-start" }}>
         <span className="label red">404</span>
@@ -13,5 +20,8 @@ export default function NotFound() {
         </div>
       </div>
     </section>
+    </main>
+    <Footer />
+    </>
   );
 }

@@ -891,3 +891,46 @@ img.v-thumb{object-fit:cover}
 .mitid-status{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:.92rem}
 .mitid-status p{margin:0;flex:1 1 260px}
 .setting-toggle{padding:14px 16px;border:1px solid var(--line);border-radius:14px}
+
+/* Kommer snart */
+.soon{min-height:100vh;display:flex;flex-direction:column}
+.soon main{flex:1}
+.soon-top{border-bottom:1px solid var(--line)}
+.soon-top .wrap{display:flex;align-items:center;min-height:76px}
+.soon-top .logo img{height:42px;width:auto}
+.soon-hero .hero-copy{gap:22px}
+.soon-form{display:flex;flex-direction:column;gap:14px;max-width:560px}
+.soon-row{display:flex;gap:10px}
+.soon-row input{flex:1;min-width:0;font:inherit;font-size:1.05rem;color:var(--text);background:var(--surface);border:1px solid var(--line-2);border-radius:999px;padding:.95em 1.2em}
+.soon-row input::placeholder{color:var(--dim)}
+.soon-row input:focus{outline:2px solid var(--red);outline-offset:2px}
+.soon-row .btn{flex:none}
+.soon-roles{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.soon-roles legend{float:left;margin-right:6px;font-size:.92rem;color:var(--muted)}
+.soon-roles label{display:inline-flex;align-items:center;gap:8px;padding:.5em .95em;border:1px solid var(--line-2);border-radius:999px;font-size:.92rem;cursor:pointer}
+.soon-roles label.on{border-color:var(--red);box-shadow:0 0 0 1px var(--red) inset}
+.soon-roles input{accent-color:var(--red);margin:0}
+.soon-form .check{font-size:.86rem;color:var(--muted);max-width:520px}
+.soon-form .check a{color:inherit}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.soon-done{max-width:560px;padding:18px 20px;border:1px solid var(--line-2);border-radius:18px;background:var(--surface)}
+.soon-done strong{display:block;font-size:1.15rem;margin-bottom:6px}
+.soon-done p{margin:0;color:var(--muted)}
+.soon-points{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.soon-points>div{padding:22px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
+.soon-points h3{font-size:1.15rem;margin:10px 0 6px}
+.soon-points p{margin:0;font-size:.95rem}
+.soon-n{font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;color:var(--red)}
+.soon-msg{display:flex;flex-direction:column;align-items:flex-start;gap:16px;max-width:720px;padding-block:clamp(40px,8vw,96px)}
+.soon-foot{border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.soon-foot .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;padding-block:22px}
+.soon-foot nav{display:flex;flex-wrap:wrap;gap:8px 20px}
+.soon-foot a{color:inherit}
+@media (max-width:820px){.soon-points{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .soon-hero .stage{display:grid;min-height:540px}
+  .soon-row{flex-direction:column}
+  .soon-row .btn{width:100%}
+}
+.tester-form{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:10px;align-items:end}
+@media (max-width:640px){.tester-form{grid-template-columns:1fr}}

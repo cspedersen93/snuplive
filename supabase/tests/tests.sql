@@ -588,5 +588,24 @@ reset role;
 select _end_show('10000000-0000-0000-0000-000000000052', 'Testen er slut');
 update settings set value = 'false' where key = 'mitid_required';
 
+-- ── Kommer snart: lukket side, venteliste og testere ──
+select t.ok((select value = 'false'::jsonb from settings where key = 'site_open'), 'siden er lukket, når 0012 er kørt');
+insert into waitlist (email, role) values ('liva@example.dk', 'buyer');
+select t.throws($$insert into waitlist (email, role) values ('liva@example.dk', 'seller')$$, 'duplicate key');
+select t.throws($$insert into waitlist (email, role) values ('Liva@Example.dk', 'buyer')$$, 'check constraint');
+select t.throws($$insert into waitlist (email, role) values ('ole@example.dk', 'snyder')$$, 'check constraint');
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.throws($$select * from waitlist$$, 'permission denied');
+select t.throws($$insert into waitlist (email, role) values ('x@example.dk', 'buyer')$$, 'permission denied');
+select t.throws($$select * from beta_access$$, 'permission denied');
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select * from waitlist$$, 'permission denied');
+select t.throws($$insert into beta_access (email) values ('liva@example.dk')$$, 'permission denied');
+select t.ok((select value = 'false'::jsonb from settings where key = 'site_open'), 'alle kan læse, om siden er åben');
+reset role;
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

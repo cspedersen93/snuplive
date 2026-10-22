@@ -352,6 +352,25 @@ kommer tilbage. Vi gemmer navn, fødselsdato og et fingeraftryk af MitID-id'et (
 flere konti, og sælgeren skal være fyldt 18. Køberne ser mærket **MitID-bekræftet** ved sælgerens ting og shows. Når kravet er
 slået til, kan man ikke gå live uden MitID; det tjekkes også i databasen.
 
+## Kommer snart og lukket side
+
+1. **Supabase → SQL Editor:** kør [`supabase/migrations/0012_kommer_snart.sql`](supabase/migrations/0012_kommer_snart.sql) (efter 0011).
+   **Når filen er kørt, er siden lukket** for alle andre end admins og testere.
+2. Der er ingen nye nøgler. Bekræftelsesmails og mails til ventelisten bruger `RESEND_API_KEY`, så den skal være sat, og
+   domænet snuplive.dk skal være bekræftet hos Resend.
+
+Sådan virker det:
+
+- **Besøgende** ser kun *Kommer snart* på snuplive.dk og kan skrive sig op med e-mail, om de vil købe, sælge eller begge dele,
+  og et flueben for samtykke. De får en mail og er først med, når de har trykket på linket (dobbelt tilmelding). Alle andre
+  sider sender videre til forsiden. Privatlivspolitik, vilkår, handelsbetingelser og Om SnupLive kan stadig ses.
+- **Admins** (`ADMIN_EMAILS`) og **testere** ser hele siden, når de er logget ind på snuplive.dk/login.
+  Testere tilføjes under **Backoffice → Indstillinger**.
+- **Backoffice → Venteliste:** tal, listen, CSV-fil og *Send en mail til ventelisten* (send en test til dig selv først).
+  Hver mail får et afmeldingslink. Resends gratisplan sender højst 100 mails om dagen.
+- **Ved lanceringen:** Backoffice → Indstillinger → *Siden er åben for alle*. Det virker inden for et minut, uden redeploy.
+- Google ser kun forsiden og de faste sider, mens siden er lukket (robots.txt og sitemap.xml følger med).
+
 ---
 
 ## Udvikling på din egen computer

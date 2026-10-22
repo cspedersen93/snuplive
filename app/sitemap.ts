@@ -3,12 +3,25 @@ import { SITE_URL } from "@/lib/env";
 import { CATEGORIES } from "@/lib/format";
 import { itemHref } from "@/lib/items";
 import { fetchFeed } from "@/lib/queries";
+import { siteOpen } from "@/lib/siteAccess";
 import { createPublicClient } from "@/lib/supabase/public";
 
-export const revalidate = 3600;
+export const revalidate = 600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  // Før lanceringen kan Google kun se "Kommer snart" og de faste sider om SnupLive.
+  if (!(await siteOpen())) {
+    return [
+      { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
+      ...["/om-snuplive", "/privatliv", "/handelsbetingelser", "/vilkaar"].map((p) => ({
+        url: `${SITE_URL}${p}`,
+        lastModified: now,
+        changeFrequency: "yearly" as const,
+        priority: 0.2,
+      })),
+    ];
+  }
   const pages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${SITE_URL}/live`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },

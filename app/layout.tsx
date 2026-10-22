@@ -2,9 +2,6 @@ import "@fontsource-variable/familjen-grotesk";
 import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import BetaBar from "@/components/BetaBar";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import Toaster from "@/components/Toaster";
 import { SITE_URL } from "@/lib/env";
 
@@ -38,10 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="da">
       <body>
-        <BetaBar />
-        <Header />
-        <main id="indhold">{children}</main>
-        <Footer />
+        {children}
         <Toaster />
       </body>
     </html>
