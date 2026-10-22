@@ -3,7 +3,7 @@ import { COMPANY } from "@/lib/company";
 import { isAdminEmail, sendMail, sendMailBatch } from "@/lib/mail";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserInfo } from "@/lib/supabase/server";
-import { unsubFooter } from "@/lib/waitlist";
+import { unsubFooter, unsubHeaders } from "@/lib/waitlist";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   if (!subject || !text) return fail("Skriv både emne og tekst.", 400);
 
   if (body.test === true) {
-    const ok = await sendMail({ to: [user.email], subject: `[Test] ${subject}`, text: text + unsubFooter("00000000-0000-0000-0000-000000000000"), replyTo: [COMPANY.email] });
+    const ok = await sendMail({ to: [user.email], subject: `[Test] ${subject}`, text: text + unsubFooter("00000000-0000-0000-0000-000000000000"), replyTo: [COMPANY.email], headers: unsubHeaders("00000000-0000-0000-0000-000000000000") });
     return ok ? json({ ok: true, sent: 1 }) : fail("Mailen blev ikke sendt. Tjek RESEND_API_KEY i Vercel.", 502);
   }
 
@@ -27,7 +27,13 @@ export async function POST(req: Request) {
   if (body.to === "sellers") q = q.in("role", ["seller", "both"]);
   const { data, error } = await q.limit(50_000);
   if (error) return fail(error.message, 500);
-  const msgs = (data ?? []).map((r) => ({ to: r.email as string, subject, text: text + unsubFooter(r.unsub_token as string) }));
+  const msgs = (data ?? []).map((r) => ({
+    to: r.email as string,
+    subject,
+    text: text + unsubFooter(r.unsub_token as string),
+    replyTo: [COMPANY.email],
+    headers: unsubHeaders(r.unsub_token as string),
+  }));
   if (!msgs.length) return fail("Der er ingen at sende til.", 400);
   const sent = await sendMailBatch(msgs);
   console.info("[snuplive] admin", user.email, "mail til ventelisten", { to: body.to, sent, total: msgs.length });

@@ -29,6 +29,17 @@ export function sendConfirmMail(email: string, token: string) {
   });
 }
 
+/**
+ * Afmelding med ét klik i mailprogrammet (Gmail og Yahoo kræver det af nyhedsmails).
+ * Mailprogrammet sender en POST til linket med "List-Unsubscribe=One-Click".
+ */
+export function unsubHeaders(token: string) {
+  return {
+    "List-Unsubscribe": `<${SITE_URL}/api/venteliste/afmeld?t=${token}>, <mailto:kontakt@snuplive.dk?subject=Afmeld>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  };
+}
+
 /** Nederst i alle mails til ventelisten: link til afmelding. */
 export function unsubFooter(token: string) {
   return `\n\n—\nDu får mailen, fordi du har skrevet dig op til SnupLive.\nAfmeld: ${unsubscribeUrl(token)}`;
