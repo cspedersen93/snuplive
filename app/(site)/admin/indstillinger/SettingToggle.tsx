@@ -45,7 +45,7 @@ export default function SettingToggle({
   }
   if (ask) {
     return (
-      <div className="confirm-ask setting-toggle">
+      <div className="confirm-ask setting-toggle" data-setting={settingKey}>
         <span>{confirmOn}</span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button className="btn btn-red btn-sm" type="button" disabled={busy} onClick={() => change(true).then(() => setAsk(false))}>
@@ -57,7 +57,7 @@ export default function SettingToggle({
     );
   }
   return (
-    <label className="check setting-toggle">
+    <label className="check setting-toggle" data-setting={settingKey}>
       <input
         type="checkbox"
         checked={on}
