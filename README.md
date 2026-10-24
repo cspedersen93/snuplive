@@ -432,6 +432,20 @@ Kør `supabase/migrations/0015_klip.sql` i Supabase → SQL Editor (efter 0014).
 
 ---
 
+## Kamerafiltre i studiet
+
+Ved kameraet i studiet er der to knapper under *Skift kamera*. Der skal ikke køres noget i Supabase eller sættes nøgler i Vercel.
+
+- **Solen (Lys op)** gør billedet lysere i dårligt lys uden at ændre farverne, så tingene ser ud, som de er.
+- **Personen (Slør baggrund)** slører alt bag sælgeren. Første gang henter browseren en model på ca. 10 MB fra
+  `relived.dk/mediapipe`. Den kopieres fra `node_modules` ved hver build (`scripts/mediapipe.mjs`), så intet hentes fra
+  fremmede servere.
+- Filtrene kører på sælgerens egen enhed. Seerne ser billedet med filter, og det kommer med på billedet og klippet af tingen.
+- Valget huskes i browseren til næste show. Kan enheden ikke sløre baggrunden, får sælgeren besked, og knappen slår fra igen.
+  Knapperne vises ikke i browsere, der slet ikke kan bruge filtre.
+
+---
+
 ## Udvikling på din egen computer
 
 ```bash

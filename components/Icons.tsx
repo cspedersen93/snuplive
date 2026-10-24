@@ -175,3 +175,16 @@ export const IconMute = (p: P) => (
     <path d="m16 9.5 5 5M21 9.5l-5 5" />
   </svg>
 );
+export const IconSun = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" {...p}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+  </svg>
+);
+export const IconBlurBg = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <circle cx="12" cy="9" r="3.2" />
+    <path d="M6.5 20c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" />
+    <path d="M3 5h.01M3 9h.01M3 13h.01M21 5h.01M21 9h.01M21 13h.01M3 17h.01M21 17h.01" strokeWidth={2.6} />
+  </svg>
+);

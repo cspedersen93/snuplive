@@ -536,6 +536,9 @@ main{display:block;min-height:60vh}
 .cam-btn svg{width:20px;height:20px}
 .cam-btn.off{background:var(--red);border-color:var(--red)}
 .cam-btn:disabled{opacity:.5}
+.cam-btn.on{background:#fff;border-color:#fff;color:#0b0b0c}
+.cam-btn.busy svg{animation:blink 1s ease-in-out infinite}
+.cam-btn.busy:disabled{opacity:1}
 .pre-live .label{color:rgba(255,255,255,.8)}
 .checks li.wait::before{content:"…";color:var(--amber)}
 a.dtab{text-decoration:none}

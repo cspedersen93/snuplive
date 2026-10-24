@@ -9,3 +9,6 @@ next-env.d.ts
 .vercel
 .DS_Store
 npm-debug.log*
+
+# MediaPipe (kopieres fra node_modules ved build)
+public/mediapipe/vision_wasm_*
