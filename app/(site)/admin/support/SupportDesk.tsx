@@ -186,7 +186,7 @@ function Thread({ id, back, onChange }: { id: string; back: string; onChange: ()
       toast(
         j.mailed && thread?.email
           ? `Sendt. ${thread.email} får også svaret på mail.`
-          : thread?.email && !(thread.user_seen_at && Date.now() - Date.parse(thread.user_seen_at) < 12_000)
+          : thread?.email && !(thread.user_seen_at && Date.now() - Date.parse(thread.user_seen_at) < 20_000)
             ? "Sendt. Ser brugeren det ikke i chatten om 2 minutter, kommer det på mail."
             : "Sendt.",
       );
