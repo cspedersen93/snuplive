@@ -49,7 +49,7 @@ export async function mailAdminsAboutSupport(t: { id: string; email: string | nu
   });
 }
 
-/** Mail til brugeren med svarene fra SnupLive, de ikke har set. */
+/** Mail til brugeren med svarene fra Relived, de ikke har set. */
 async function mailUser(admin: AdminClient, n: { id: string; token: string; email: string; since: string }) {
   const { data } = await admin
     .from("support_messages")
@@ -64,19 +64,19 @@ async function mailUser(admin: AdminClient, n: { id: string; token: string; emai
   return sendMail({
     to: [n.email],
     replyTo: [COMPANY.email],
-    subject: "Du har fået svar fra SnupLive",
+    subject: "Du har fået svar fra Relived",
     text: [
       "Hej,",
       "",
-      "Du har fået svar på din besked til SnupLive:",
+      "Du har fået svar på din besked til Relived:",
       "",
-      ...msgs.flatMap((m) => [`${m.author_name || "SnupLive"} skriver:`, quote(m.body), ""]),
+      ...msgs.flatMap((m) => [`${m.author_name || "Relived"} skriver:`, quote(m.body), ""]),
       `Fortsæt samtalen her: ${SITE_URL}/?hjaelp=${n.token}`,
       "",
       "Du kan også bare svare på denne mail.",
       "",
       "Venlig hilsen",
-      "SnupLive",
+      "Relived",
       COMPANY.email,
     ].join("\n"),
   });
@@ -105,7 +105,7 @@ export async function sweepSupportNotices(admin: AdminClient, force = false) {
   return n;
 }
 
-/** Navnet, brugeren ser ved svar fra os: fornavnet fra profilen (Min konto → Navn), ellers bare "SnupLive". */
+/** Navnet, brugeren ser ved svar fra os: fornavnet fra profilen (Min konto → Navn), ellers bare "Relived". */
 export function staffName(p: { display_name: string | null; handle: string } | null) {
   const first = p?.display_name?.trim().split(/\s+/)[0];
   return first ? first.slice(0, 60) : null;

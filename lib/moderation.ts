@@ -32,7 +32,7 @@ export async function targetInfo(admin: SupabaseClient, type: ReportTarget, id: 
 
 /** Hvad sker der, når admin trykker "Fjern"? */
 export const REMOVE_TEXT: Record<ReportTarget, { button: string; ask: string }> = {
-  item: { button: "Fjern tingen", ask: "Tingen forsvinder fra SnupLive og kan ikke købes." },
+  item: { button: "Fjern tingen", ask: "Tingen forsvinder fra Relived og kan ikke købes." },
   show: { button: "Fjern showet", ask: "Showet stopper og forsvinder sammen med tingene i det." },
   profile: { button: "Luk sælgerkontoen", ask: "Sælgeren kan ikke længere sælge, og kommende shows og ting forsvinder." },
 };

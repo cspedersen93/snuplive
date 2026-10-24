@@ -181,7 +181,7 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, captureKe
 
 export function deviceErrorText(failure?: MediaDeviceFailure) {
   if (failure === MediaDeviceFailure.PermissionDenied)
-    return "Giv SnupLive adgang til kamera og mikrofon i browseren (ikonet ved adresselinjen), og prøv igen.";
+    return "Giv Relived adgang til kamera og mikrofon i browseren (ikonet ved adresselinjen), og prøv igen.";
   if (failure === MediaDeviceFailure.NotFound) return "Vi kan ikke finde et kamera eller en mikrofon på enheden.";
   if (failure === MediaDeviceFailure.DeviceInUse) return "Kameraet bruges af et andet program. Luk det, og prøv igen.";
   return "Kameraet kunne ikke starte. Prøv at genindlæse siden.";

@@ -63,7 +63,7 @@ export default function ReportProblem({ orderId, business = false }: { orderId: 
           placeholder="Fx: Kjolen har en plet på ryggen, som ikke blev vist i showet."
         />
       </div>
-      <p className="fine">Pengene holdes tilbage hos SnupLive, indtil sagen er afgjort. Sælgeren kan se, hvad du skriver.</p>
+      <p className="fine">Pengene holdes tilbage hos Relived, indtil sagen er afgjort. Sælgeren kan se, hvad du skriver.</p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button className="btn btn-red btn-sm" type="submit" disabled={busy}>{busy ? "Sender …" : "Meld problemet"}</button>
         <button className="btn btn-line btn-sm" type="button" onClick={() => setOpen(false)} disabled={busy}>Fortryd</button>

@@ -268,7 +268,7 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
         </p>
         <div className="protect">
           <IconShield />
-          <span>Pengene holdes tilbage hos SnupLive, indtil du har fået dine ting. Køberbeskyttelsen er 5 % + 5 kr pr. pakke.</span>
+          <span>Pengene holdes tilbage hos Relived, indtil du har fået dine ting. Køberbeskyttelsen er 5 % + 5 kr pr. pakke.</span>
         </div>
       </aside>
     </div>

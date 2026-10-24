@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import AuthPage from "@/components/AuthPage";
 
 export const metadata: Metadata = {
-  title: { absolute: "Opret konto – køb og sælg live | SnupLive" },
-  description: "Opret en gratis konto på SnupLive med din e-mail, og begynd at købe eller sælge brugte ting live på video.",
+  title: { absolute: "Opret konto – køb og sælg live | Relived" },
+  description: "Opret en gratis konto på Relived med din e-mail, og begynd at købe eller sælge brugte ting live på video.",
   alternates: { canonical: "/opret" },
 };
 

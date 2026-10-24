@@ -28,6 +28,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   } catch (e) {
     if (e instanceof IssueError) return fail(e.message, 409);
     console.error("[snuplive] problem kunne ikke meldes", id, e);
-    return fail("Noget gik galt. Prøv igen, eller skriv til kontakt@snuplive.dk.", 500);
+    return fail("Noget gik galt. Prøv igen, eller skriv til kontakt@relived.dk.", 500);
   }
 }

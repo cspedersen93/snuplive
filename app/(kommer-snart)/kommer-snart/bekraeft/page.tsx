@@ -28,7 +28,7 @@ export default async function Bekraeft({ searchParams }: { searchParams: Promise
             <span className="label red">Du er med</span>
             <h1 className="h2">Tak! Du står nu på listen.</h1>
             <p className="lede">
-              Vi sender dig en mail, når SnupLive åbner.
+              Vi sender dig en mail, når Relived åbner.
               {role !== "buyer" ? " Du har skrevet dig op som sælger, så vi kontakter dig før åbningen og hjælper dig med dit første show." : ""}
             </p>
           </>

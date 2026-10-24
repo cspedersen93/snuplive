@@ -86,7 +86,7 @@ export async function markCheckoutPaid(admin: AdminClient, stripe: Stripe, sessi
   return ids.length;
 }
 
-/** En betaling blev ikke gennemført: ordrerne annulleres, og snuppene kan betales igen. */
+/** En betaling blev ikke gennemført: ordrerne annulleres, og købene kan betales igen. */
 export async function cancelCheckout(admin: AdminClient, checkoutId: string) {
   await admin
     .from("orders")
@@ -97,7 +97,7 @@ export async function cancelCheckout(admin: AdminClient, checkoutId: string) {
 
 /**
  * Send pengene videre til sælgeren (hvis sælgeren har tilknyttet udbetaling): tingene, og fragten
- * hvis sælgeren selv har sendt pakken. Er pakken sendt med SnupLives label, har fragten betalt labelen.
+ * hvis sælgeren selv har sendt pakken. Er pakken sendt med Reliveds label, har fragten betalt labelen.
  */
 export async function releaseOrder(admin: AdminClient, stripe: Stripe, orderId: string) {
   const { data: order } = await admin.from("orders").select(ORDER_COLS).eq("id", orderId).maybeSingle<OrderRow>();
@@ -121,7 +121,7 @@ export async function releaseOrder(admin: AdminClient, stripe: Stripe, orderId: 
         destination: acct.stripe_account_id as string,
         ...(order.stripe_charge ? { source_transaction: order.stripe_charge } : {}),
         transfer_group: order.checkout_id,
-        description: `SnupLive ordre ${order.id.slice(0, 8)}`,
+        description: `Relived ordre ${order.id.slice(0, 8)}`,
         metadata: { order_id: order.id },
       },
       { idempotencyKey: `transfer-${order.id}` },
@@ -219,7 +219,7 @@ export async function syncPayoutAccount(admin: AdminClient, stripe: Stripe, acco
   return acct;
 }
 
-/** Dagligt oprydningsjob: afslut gamle ordrer, send ventende udbetalinger og annullér gamle snup. */
+/** Dagligt oprydningsjob: afslut gamle ordrer, send ventende udbetalinger og annullér gamle ubetalte køb. */
 export async function dailyMaintenance(admin: AdminClient, stripe: Stripe) {
   const days = (n: number) => new Date(Date.now() - n * 864e5).toISOString();
   const result = { completed: 0, transfers: 0, expired: 0, cancelledCheckouts: 0 };
@@ -347,7 +347,7 @@ export async function createLabelForOrder(admin: AdminClient, orderId: string, s
       carrier: order.sp_carrier,
       pakkeshopId: order.sp_id as string,
       weight,
-      reference: `SnupLive ${String(order.id).slice(0, 8)}`,
+      reference: `Relived ${String(order.id).slice(0, 8)}`,
       sender: {
         name: address.name,
         address1: address.address1,
@@ -357,7 +357,7 @@ export async function createLabelForOrder(admin: AdminClient, orderId: string, s
         phone: address.phone,
       },
       receiver: {
-        name: order.ship_name || "SnupLive-køber",
+        name: order.ship_name || "Relived-køber",
         // Har køberen ikke skrevet en adresse, bruger vi pakkeshoppens (pakken går alligevel dertil).
         address1: order.ship_line1 || order.sp_address || order.sp_name || "",
         address2: order.ship_line1 ? order.ship_line2 : null,
@@ -383,7 +383,7 @@ export async function createLabelForOrder(admin: AdminClient, orderId: string, s
       .eq("id", orderId);
     if (error) {
       console.error("[snuplive] LABEL LAVET MEN IKKE GEMT", orderId, label.shipmentId, error);
-      throw new LabelError("Labelen blev lavet, men kunne ikke gemmes. Skriv til kontakt@snuplive.dk.");
+      throw new LabelError("Labelen blev lavet, men kunne ikke gemmes. Skriv til kontakt@relived.dk.");
     }
     await admin.from("shipping_labels").upsert({
       order_id: orderId,
@@ -467,7 +467,7 @@ export async function reportIssue(admin: AdminClient, orderId: string, buyerId: 
     .maybeSingle();
   if (!order) throw new IssueError("Ordren findes ikke.");
   if (!["paid", "shipped"].includes(order.status as string)) {
-    throw new IssueError("Du kan kun melde et problem, før ordren er afsluttet. Skriv til kontakt@snuplive.dk.");
+    throw new IssueError("Du kan kun melde et problem, før ordren er afsluttet. Skriv til kontakt@relived.dk.");
   }
   if (order.issue_open) throw new IssueError("Du har allerede meldt et problem med den her ordre.");
 
@@ -489,7 +489,7 @@ export async function reportIssue(admin: AdminClient, orderId: string, buyerId: 
   const admins = adminEmails();
   await sendMail({
     to: admins,
-    subject: `Ny sag på SnupLive: ${what}`,
+    subject: `Ny sag på Relived: ${what}`,
     text: [
       `@${o.buyer?.handle ?? "køber"} har meldt et problem med en ordre fra @${o.seller?.handle ?? "sælger"} (${o.show?.title ?? ""}).`,
       "",
@@ -516,10 +516,10 @@ export async function reportIssue(admin: AdminClient, orderId: string, buyerId: 
         `Grund: ${what}`,
         `Køberen skriver: ${message}`,
         "",
-        "Pengene for ordren holdes tilbage, mens SnupLive kigger på sagen. Du kan svare på den her mail, hvis du vil fortælle din side.",
+        "Pengene for ordren holdes tilbage, mens Relived kigger på sagen. Du kan svare på den her mail, hvis du vil fortælle din side.",
         "",
         "Venlig hilsen",
-        "SnupLive",
+        "Relived",
       ].join("\n"),
     });
   }

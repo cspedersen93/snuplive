@@ -3,9 +3,9 @@ import Link from "next/link";
 import CategoryCards from "@/components/CategoryCards";
 
 export const metadata: Metadata = {
-  title: { absolute: "Kategorier – brugt tøj, design og samleobjekter | SnupLive" },
+  title: { absolute: "Kategorier – brugt tøj, design og samleobjekter | Relived" },
   description:
-    "Køb brugt dametøj, herretøj, børnetøj, design og samleobjekter live. Vælg en kategori, se tingene på video, og snup dem med ét tryk.",
+    "Køb brugt dametøj, herretøj, børnetøj, design og samleobjekter live. Vælg en kategori, se tingene på video, og køb dem med ét tryk.",
   alternates: { canonical: "/kategori" },
 };
 

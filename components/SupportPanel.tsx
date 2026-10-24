@@ -204,7 +204,7 @@ export default function SupportPanel({
 
       <div className="sup-body" ref={body} aria-live="polite" aria-relevant="additions">
         <div className="sup-msg them">
-          <span className="sup-who">SnupLive</span>
+          <span className="sup-who">Relived</span>
           <p>Hej! Driller siden, eller har du et spørgsmål til en handel? Skriv her, så hjælper vi dig.</p>
         </div>
         {state?.needLogin && !state.thread ? (
@@ -214,7 +214,7 @@ export default function SupportPanel({
         ) : null}
         {msgs.map((m) => (
           <div key={m.id} className={`sup-msg ${m.sender === "user" ? "me" : "them"}`}>
-            {m.sender === "admin" ? <span className="sup-who">{m.author_name ? `${m.author_name} · SnupLive` : "SnupLive"}</span> : null}
+            {m.sender === "admin" ? <span className="sup-who">{m.author_name ? `${m.author_name} · Relived` : "Relived"}</span> : null}
             <p><Linked text={m.body} /></p>
             <time dateTime={m.created_at}>{stamp(m.created_at)}</time>
           </div>
@@ -226,8 +226,8 @@ export default function SupportPanel({
           </p>
         ) : null}
         {closed ? <p className="sup-note">Samtalen er afsluttet. Skriv igen, hvis du har brug for mere hjælp.</p> : null}
-        {failed ? <p className="sup-note warn" role="alert">Vi kan ikke få forbindelse lige nu. Tjek dit internet, eller skriv til kontakt@snuplive.dk.</p> : null}
-        {off ? <p className="sup-note warn">Chatten er ikke sat op endnu. Skriv til kontakt@snuplive.dk.</p> : null}
+        {failed ? <p className="sup-note warn" role="alert">Vi kan ikke få forbindelse lige nu. Tjek dit internet, eller skriv til kontakt@relived.dk.</p> : null}
+        {off ? <p className="sup-note warn">Chatten er ikke sat op endnu. Skriv til kontakt@relived.dk.</p> : null}
       </div>
 
       <form className="sup-form" onSubmit={send} noValidate>

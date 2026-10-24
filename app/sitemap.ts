@@ -10,11 +10,11 @@ export const revalidate = 600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  // Før lanceringen kan Google kun se "Kommer snart" og de faste sider om SnupLive.
+  // Før lanceringen kan Google kun se "Kommer snart" og de faste sider om Relived.
   if (!(await siteOpen())) {
     return [
       { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
-      ...["/om-snuplive", "/privatliv", "/handelsbetingelser", "/vilkaar"].map((p) => ({
+      ...["/om-relived", "/privatliv", "/handelsbetingelser", "/vilkaar"].map((p) => ({
         url: `${SITE_URL}${p}`,
         lastModified: now,
         changeFrequency: "yearly" as const,
@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/privatliv`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/handelsbetingelser`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/vilkaar`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${SITE_URL}/om-snuplive`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITE_URL}/om-relived`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
   const sb = createPublicClient();
   if (!sb) return pages;

@@ -8,7 +8,7 @@ import { RESERVATION_DAYS } from "@/lib/pricing";
 export const metadata: Metadata = {
   title: "Vilkår for brugere og sælgere",
   description:
-    "Vilkår for at bruge og sælge på SnupLive: konto, regler for ting og shows, anmeldelser, gebyrer, udbetaling og indberetning til Skattestyrelsen.",
+    "Vilkår for at bruge og sælge på Relived: konto, regler for ting og shows, anmeldelser, gebyrer, udbetaling og indberetning til Skattestyrelsen.",
   alternates: { canonical: "/vilkaar" },
 };
 
@@ -16,7 +16,7 @@ export default function Vilkaar() {
   return (
     <LegalPage title="Vilkår for brugere og sælgere" crumb="Vilkår" updated="oktober 2026">
       <p className="lede">
-        Vilkårene gælder for alle, der bruger SnupLive. Del B gælder også for sælgere. Når du køber, gælder også{" "}
+        Vilkårene gælder for alle, der bruger Relived. Del B gælder også for sælgere. Når du køber, gælder også{" "}
         <Link href="/handelsbetingelser">handelsbetingelserne</Link>.
       </p>
       <CompanyInfo />
@@ -37,7 +37,7 @@ export default function Vilkaar() {
         <li>ting, der er farlige eller kaldt tilbage</li>
         <li>nøgenhed, vold, chikane, trusler eller hadefulde udtalelser i shows og chat</li>
       </ul>
-      <p>Køb og salg skal ske gennem SnupLive. Du må ikke bede andre om at betale uden om siden.</p>
+      <p>Køb og salg skal ske gennem Relived. Du må ikke bede andre om at betale uden om siden.</p>
 
       <h3>3. Anmeld noget, der ikke er i orden</h3>
       <p>
@@ -84,7 +84,7 @@ export default function Vilkaar() {
 
       <h3>8. Gebyrer</h3>
       <p>
-        Det er gratis at sælge, mens SnupLive er i beta. Køberen betaler køberbeskyttelsen. Indfører vi et salgsgebyr, får du besked,
+        Det er gratis at sælge, mens Relived er i beta. Køberen betaler køberbeskyttelsen. Indfører vi et salgsgebyr, får du besked,
         før det gælder.
       </p>
 
@@ -98,7 +98,7 @@ export default function Vilkaar() {
 
       <h3>10. Skat og indberetning til Skattestyrelsen</h3>
       <p>
-        SnupLive skal efter reglerne om digitale platforme (DAC7) hvert år indberette sælgere, der har mindst 30 salg eller har solgt
+        Relived skal efter reglerne om digitale platforme (DAC7) hvert år indberette sælgere, der har mindst 30 salg eller har solgt
         for mere end 2.000 euro i løbet af året. Vi indberetter navn, adresse, CPR- eller CVR-nummer, fødselsdato, bankkonto og dine
         salg pr. kvartal. Nærmer du dig grænsen, beder vi dig om de oplysninger, vi mangler. Du er selv ansvarlig for at betale den
         skat, der skal betales af dine salg.

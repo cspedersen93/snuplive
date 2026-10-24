@@ -12,7 +12,7 @@ export default function AuthPage({ mode }: { mode: "login" | "opret" }) {
           <span aria-hidden="true">/</span>
           <span>{opret ? "Opret konto" : "Log ind"}</span>
         </nav>
-        <h1 className="h1">{opret ? "Opret en gratis konto på SnupLive" : "Log ind på SnupLive"}</h1>
+        <h1 className="h1">{opret ? "Opret en gratis konto på Relived" : "Log ind på Relived"}</h1>
         <p className="lede">
           {opret
             ? "Med én konto kan du både købe og sælge. Skriv din e-mail, så sender vi dig et login med det samme."
@@ -20,7 +20,7 @@ export default function AuthPage({ mode }: { mode: "login" | "opret" }) {
         </p>
         <ul className="ticks">
           <li>Gratis at oprette</li>
-          <li>Snup ting i live-shows med ét tryk</li>
+          <li>Køb ting i live-shows med ét tryk</li>
           <li>Gå live fra telefonen eller computeren, direkte i browseren</li>
         </ul>
       </div>

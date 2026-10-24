@@ -72,7 +72,7 @@ export default function Header() {
       <div className="wrap">
         <Link className="logo" href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/img/logo.png" alt="SnupLive – forside" width={169} height={50} />
+          <img src="/img/logo.svg" alt="Relived – forside" width={129} height={38} />
         </Link>
         <nav className="nav" aria-label="Hovedmenu">
           {NAV.map((n) => (
@@ -82,7 +82,7 @@ export default function Header() {
           ))}
         </nav>
         <div className="actions">
-          <Link className="icon-btn" href="/kurv" aria-label={count ? `Mine snup (${count})` : "Mine snup"}>
+          <Link className="icon-btn" href="/kurv" aria-label={count ? `Mine køb (${count})` : "Mine køb"}>
             <IconCart />
             <span className="badge" hidden={!count}>
               {count}
@@ -112,7 +112,7 @@ export default function Header() {
               {n.label}
             </Link>
           ))}
-          <Link href="/kurv">Mine snup</Link>
+          <Link href="/kurv">Mine køb</Link>
           <Link href={signedIn === false ? "/login" : "/konto"}>{signedIn === false ? "Log ind" : "Min konto"}</Link>
           <Link href={sellHref}>Sælg dine ting</Link>
         </div>

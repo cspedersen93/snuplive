@@ -20,7 +20,7 @@ export default function AccountNav({ profile, active, snupCount }: { profile: Pr
       </Link>
       <Link className="dtab" href="/kurv" aria-current={tab("kurv")}>
         <IconCart className="ico" />
-        Mine snup
+        Mine køb
         {snupCount ? <span className="count">{snupCount}</span> : null}
       </Link>
       <Link className="dtab" href="/studio" aria-current={tab("studio")}>

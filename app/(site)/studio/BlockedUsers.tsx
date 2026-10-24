@@ -23,7 +23,7 @@ export default async function BlockedUsers({ uid }: { uid: string }) {
     <div className="box">
       <h2 className="h3" style={{ marginBottom: 4 }}>Blokerede brugere</h2>
       <p className="muted" style={{ fontSize: ".9rem", marginBottom: 6 }}>
-        De kan ikke skrive i chatten eller snuppe i dine shows. Du blokerer fra beskedens menu i chatten.
+        De kan ikke skrive i chatten eller købe i dine shows. Du blokerer fra beskedens menu i chatten.
       </p>
       <ul className="list">
         {rows.map((r) => (

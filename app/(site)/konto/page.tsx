@@ -13,6 +13,7 @@ import MitIdResult from "@/components/MitIdResult";
 import { mitidState } from "@/lib/mitid";
 import BecomeSeller from "./BecomeSeller";
 import ProfileForm from "./ProfileForm";
+import { SITE_HOST } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Min konto", robots: { index: false } };
@@ -70,9 +71,9 @@ export default async function Konto() {
 
         <div className="stats">
           <Link className="stat" href="/kurv" style={{ textDecoration: "none" }}>
-            <span className="k">Mine snup</span>
+            <span className="k">Mine køb</span>
             <span className="v">{snup.length}</span>
-            <span className="d">{snup.length ? kr(snup.reduce((a, b) => a + b.price, 0)) : "Snup noget i et show"}</span>
+            <span className="d">{snup.length ? kr(snup.reduce((a, b) => a + b.price, 0)) : "Køb noget i et show"}</span>
           </Link>
           {profile.is_seller ? (
             <>
@@ -91,7 +92,7 @@ export default async function Konto() {
               <h2 className="h3">Din side</h2>
               <p className="muted" style={{ fontSize: ".95rem" }}>Del linket med dine følgere. Det viser altid dit næste eller igangværende show.</p>
             </div>
-            <Link className="btn btn-line" href={`/live/${profile.handle}`}>snuplive.dk/live/{profile.handle}</Link>
+            <Link className="btn btn-line" href={`/live/${profile.handle}`}>{SITE_HOST}/live/{profile.handle}</Link>
           </div>
         ) : (
           <div className="box become-box">

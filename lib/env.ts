@@ -26,7 +26,10 @@ export function cleanOrigin(raw: string | undefined, scheme = "https") {
   }
 }
 
-export const SITE_URL = cleanOrigin(process.env.NEXT_PUBLIC_SITE_URL) || "https://snuplive.dk";
+export const SITE_URL = cleanOrigin(process.env.NEXT_PUBLIC_SITE_URL) || "https://relived.dk";
+
+/** Domænet som tekst, fx "relived.dk" (uden https:// og www.). */
+export const SITE_HOST = new URL(SITE_URL).host.replace(/^www\./, "");
 
 export const SUPABASE_URL = cleanOrigin(process.env.NEXT_PUBLIC_SUPABASE_URL);
 export const SUPABASE_KEY = unquote(

@@ -143,7 +143,7 @@ begin
     raise exception 'For mange nye samtaler på kort tid. Prøv igen om lidt.';
   end if;
   if (select count(*) from public.support_threads t where t.created_at > now() - interval '1 hour') >= 100 then
-    raise exception 'Supporten har travlt lige nu. Skriv til kontakt@snuplive.dk.';
+    raise exception 'Supporten har travlt lige nu. Skriv til kontakt@relived.dk.';
   end if;
   if btrim(coalesce(p_body, '')) = '' then
     raise exception 'Skriv en besked';

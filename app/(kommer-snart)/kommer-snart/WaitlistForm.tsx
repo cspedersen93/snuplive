@@ -89,7 +89,7 @@ export default function WaitlistForm() {
       <label className="check">
         <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
         <span>
-          Ja tak, send mig en mail, når SnupLive åbner, og nyheder om SnupLive. Du kan altid afmelde dig.{" "}
+          Ja tak, send mig en mail, når Relived åbner, og nyheder om Relived. Du kan altid afmelde dig.{" "}
           <Link href="/privatliv">Sådan passer vi på dine oplysninger</Link>
         </span>
       </label>

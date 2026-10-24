@@ -3,7 +3,7 @@ import Link from "next/link";
 import { IconBolt, IconBox, IconCamera, IconCard, IconDoc, IconList } from "@/components/Icons";
 
 export const metadata: Metadata = {
-  title: { absolute: "Sælg brugt tøj live på video | SnupLive" },
+  title: { absolute: "Sælg brugt tøj live på video | Relived" },
   description:
     "Gå live fra telefonen eller computeren, vis dine ting frem og sælg en hel bunke på én aften. Gratis at oprette sælgerkonto.",
   alternates: { canonical: "/saelg" },
@@ -47,7 +47,7 @@ export default function Saelg() {
             <ol className="steps">
               <li><div><h3>Opret et show</h3><p>Giv det en titel, vælg kategori og tidspunkt. Showet kommer i programmet under Live nu.</p></div></li>
               <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris er nok. Lægger du billeder og en beskrivelse på, kan køberne finde tingene og trykke Husk mig før showet.</p></div></li>
-              <li><div><h3>Gå live fra studiet</h3><p>Vis tingene frem én ad gangen. Køberne snupper med ét tryk, og du kan starte lynrunder eller budsalg, når stemningen er god.</p></div></li>
+              <li><div><h3>Gå live fra studiet</h3><p>Vis tingene frem én ad gangen. Køberne køber med ét tryk, og du kan starte lynrunder eller budsalg, når stemningen er god.</p></div></li>
               <li><div><h3>Pak, send og få pengene</h3><p>Når køberen har betalt, får du adressen. Send pakken, og når køberen har fået den, går pengene til din bankkonto.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
@@ -68,7 +68,7 @@ export default function Saelg() {
             <div><IconBolt /><h3>Lynrunder og budsalg</h3><p>Lynrunder på ti sekunder til fast pris, eller budsalg på 30 sekunder, hvor det højeste bud vinder. Det giver liv i showet.</p></div>
             <div><IconBox /><h3>Fragtlabels med ét tryk</h3><p>Køberen har valgt pakkeshop og betalt fragten. Du printer labelen og afleverer pakken hos DAO eller GLS.</p></div>
             <div><IconCard /><h3>Udbetaling til din konto</h3><p>Tilknyt din bankkonto via Stripe. Pengene udbetales, når køberen har fået sine ting.</p></div>
-            <div><IconDoc /><h3>Usolgt kommer til salg</h3><p>Det, der ikke bliver snuppet, kan købes bagefter til fast pris med et billede fra showet. Så fortsætter salget, når du har slukket kameraet.</p></div>
+            <div><IconDoc /><h3>Usolgt kommer til salg</h3><p>Det, der ikke bliver solgt, kan købes bagefter til fast pris med et billede fra showet. Så fortsætter salget, når du har slukket kameraet.</p></div>
           </div>
         </div>
       </section>

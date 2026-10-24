@@ -200,7 +200,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
                 </label>
               ) : null}
             </div>
-            <span className="fine">Tingene kan ses på SnupLive før showet. Et billede fra kameraet kommer også på, når du viser tingen live.</span>
+            <span className="fine">Tingene kan ses på Relived før showet. Et billede fra kameraet kommer også på, når du viser tingen live.</span>
           </div>
         </>
       ) : (

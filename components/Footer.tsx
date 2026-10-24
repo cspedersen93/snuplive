@@ -11,9 +11,9 @@ export default function Footer() {
           <div>
             <Link className="logo" href="/">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/img/logo.png" alt="SnupLive" width={169} height={50} loading="lazy" />
+              <img src="/img/logo.svg" alt="Relived" width={129} height={38} loading="lazy" />
             </Link>
-            <p>Køb brugt tøj og ting live. Se tingen på video, spørg i chatten, og snup den med ét tryk.</p>
+            <p>Køb brugt tøj og ting live. Se tingen på video, spørg i chatten, og køb den med ét tryk.</p>
           </div>
           <div>
             <h2>Køb</h2>
@@ -22,7 +22,7 @@ export default function Footer() {
               <li><Link href="/til-salg">Til salg</Link></li>
               <li><Link href="/kategori">Kategorier</Link></li>
               <li><Link href="/saadan-virker-det">Sådan virker det</Link></li>
-              <li><Link href="/kurv">Mine snup</Link></li>
+              <li><Link href="/kurv">Mine køb</Link></li>
             </ul>
           </div>
           <div>
@@ -50,7 +50,7 @@ export default function Footer() {
               <li><Link href="/handelsbetingelser">Handelsbetingelser</Link></li>
               <li><Link href="/vilkaar">Vilkår</Link></li>
               <li><Link href="/privatliv">Privatlivspolitik</Link></li>
-              <li><Link href="/om-snuplive">Om SnupLive og kontakt</Link></li>
+              <li><Link href="/om-relived">Om Relived og kontakt</Link></li>
               <li><Link href="/saadan-virker-det#sortering">Sådan sorterer vi</Link></li>
             </ul>
           </div>

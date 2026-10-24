@@ -3,7 +3,7 @@ import { CARRIERS, type CarrierCode, type Pakkeshop } from "@/lib/carriers";
 import { SITE_URL, unquoteEnv } from "@/lib/env";
 
 // Shipmondo finder pakkeshops, køber fragtlabels på Shipmondos egne aftaler med DAO og GLS
-// og sender sporingen tilbage til SnupLive. Kun på serveren.
+// og sender sporingen tilbage til Relived. Kun på serveren.
 
 const PROD = "https://app.shipmondo.com/api/public/v3";
 const SANDBOX = "https://sandbox.shipmondo.com/api/public/v3";
@@ -198,7 +198,7 @@ const party = (type: "sender" | "receiver", p: Party) => ({
   phone: p.phone || undefined,
 });
 
-/** Køb en label til en pakkeshop. Shipmondo trækker prisen på SnupLives konto. */
+/** Køb en label til en pakkeshop. Shipmondo trækker prisen på Reliveds konto. */
 export async function createLabel(input: {
   carrier: CarrierCode;
   pakkeshopId: string;
@@ -288,7 +288,7 @@ export function readWebhook(raw: string): Record<string, unknown> | null {
 
 let webhookReady = false;
 
-/** Sørg for, at Shipmondo sender sporing til SnupLive. Opretter webhooken første gang. */
+/** Sørg for, at Shipmondo sender sporing til Relived. Opretter webhooken første gang. */
 export async function ensureTrackingWebhook() {
   if (webhookReady || !hasShipmondo()) return;
   const endpoint = webhookEndpoint();
@@ -300,7 +300,7 @@ export async function ensureTrackingWebhook() {
   );
   if (!exists) {
     await call("POST", "/webhooks", {
-      body: { name: "SnupLive sporing", endpoint, key: webhookKey(), action: "latest", resource_name: "Shipment Monitor" },
+      body: { name: "Relived sporing", endpoint, key: webhookKey(), action: "latest", resource_name: "Shipment Monitor" },
     });
   }
   webhookReady = true;

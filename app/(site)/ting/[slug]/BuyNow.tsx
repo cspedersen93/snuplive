@@ -8,7 +8,7 @@ import { hasSupabase } from "@/lib/env";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 
-/** Køb nu: tingen reserveres til dig og lander i Mine snup, hvor du betaler. */
+/** Køb nu: tingen reserveres til dig og lander i Mine køb, hvor du betaler. */
 export default function BuyNow({ itemId, price, next, sellerId }: { itemId: string; price: number; next: string; sellerId: string }) {
   const router = useRouter();
   const [uid, setUid] = useState<string | null | undefined>(undefined);
@@ -41,7 +41,7 @@ export default function BuyNow({ itemId, price, next, sellerId }: { itemId: stri
       return;
     }
     window.dispatchEvent(new Event("snup:changed"));
-    toast("Den er din! Betal under Mine snup.");
+    toast("Den er din! Betal under Mine køb.");
     router.push("/kurv");
   }
 

@@ -18,7 +18,7 @@ const getFlag = () => {
 };
 
 /**
- * "Hjælp"-knappen nederst til højre på alle sider. Åbner chatten med SnupLive.
+ * "Hjælp"-knappen nederst til højre på alle sider. Åbner chatten med Relived.
  * Skjult i Backoffice og i et show eller studiet (de har deres egen chat), men kan stadig åbnes
  * fra linket "Skriv til os" i bunden af siden.
  */

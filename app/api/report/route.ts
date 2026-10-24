@@ -17,7 +17,7 @@ const PER_HOUR = 10;
  */
 export async function POST(req: Request) {
   const admin = createAdminClient();
-  if (!admin) return fail("Anmeldelser er ikke sat op endnu. Skriv til kontakt@snuplive.dk.", 503);
+  if (!admin) return fail("Anmeldelser er ikke sat op endnu. Skriv til kontakt@relived.dk.", 503);
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   if (!isReportTarget(body.target_type) || typeof body.target_id !== "string" || !UUID.test(body.target_id)) {
     return fail("Vi kunne ikke finde det, du vil anmelde.", 400);
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
   });
   if (error) {
     console.error("[snuplive] anmeldelse kunne ikke gemmes", error);
-    return fail("Noget gik galt. Prøv igen, eller skriv til kontakt@snuplive.dk.", 500);
+    return fail("Noget gik galt. Prøv igen, eller skriv til kontakt@relived.dk.", 500);
   }
 
   // Admins får besked første gang, noget bliver anmeldt.

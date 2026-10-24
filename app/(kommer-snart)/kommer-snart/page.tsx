@@ -5,26 +5,26 @@ import { SITE_URL } from "@/lib/env";
 import WaitlistForm from "./WaitlistForm";
 
 export const metadata: Metadata = {
-  title: { absolute: "SnupLive – live shopping med second hand åbner snart" },
+  title: { absolute: "Relived – live shopping med second hand åbner snart" },
   description:
-    "Køb og sælg brugt tøj, design og samleobjekter live på video. Skriv dig op til SnupLive, og få besked, så snart vi åbner.",
+    "Køb og sælg brugt tøj, design og samleobjekter live på video. Skriv dig op til Relived, og få besked, så snart vi åbner.",
   alternates: { canonical: "/" },
-  openGraph: { title: "Køb og sælg second hand live – SnupLive åbner snart", url: "/" },
+  openGraph: { title: "Køb og sælg second hand live – Relived åbner snart", url: "/" },
 };
 
 const POINTS = [
   { h: "Se det live", p: "Sælgeren viser mærke, mål og slid på video, og du kan spørge løs i chatten." },
-  { h: "Snup med ét tryk", p: "Den første, der trykker, får tingen. Eller byd med, når der er budsalg." },
+  { h: "Køb med ét tryk", p: "Den første, der trykker, får tingen. Eller byd med, når der er budsalg." },
   { h: "Tryg betaling", p: "Sælgeren får først pengene, når du har fået dine ting." },
 ];
 
-/** Forsiden, mens SnupLive er lukket: hvad det er, og tilmelding til ventelisten. */
+/** Forsiden, mens Relived er lukket: hvad det er, og tilmelding til ventelisten. */
 export default function KommerSnart() {
   const ld = {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "Organization", name: "SnupLive", url: `${SITE_URL}/`, logo: `${SITE_URL}/img/logo.png` },
-      { "@type": "WebSite", name: "SnupLive", url: `${SITE_URL}/`, inLanguage: "da-DK" },
+      { "@type": "Organization", name: "Relived", url: `${SITE_URL}/`, logo: `${SITE_URL}/img/logo.png` },
+      { "@type": "WebSite", name: "Relived", url: `${SITE_URL}/`, inLanguage: "da-DK" },
     ],
   };
   return (
@@ -41,7 +41,7 @@ export default function KommerSnart() {
               Køb og sælg second hand <em className="s">live</em>
             </h1>
             <p className="lede">
-              Se tingen på video, spørg sælgeren i chatten, og snup den med ét tryk. Skriv dig op, så får du besked, når SnupLive åbner.
+              Se tingen på video, spørg sælgeren i chatten, og køb den med ét tryk. Skriv dig op, så får du besked, når Relived åbner.
             </p>
             <Suspense fallback={null}>
               <WaitlistForm />
@@ -53,7 +53,7 @@ export default function KommerSnart() {
 
       <section className="sec" aria-labelledby="h-soon-how">
         <div className="wrap">
-          <h2 className="h2" id="h-soon-how" style={{ marginBottom: 28 }}>Hvordan virker SnupLive?</h2>
+          <h2 className="h2" id="h-soon-how" style={{ marginBottom: 28 }}>Hvordan virker Relived?</h2>
           <div className="soon-points">
             {POINTS.map((x, i) => (
               <div key={x.h}>

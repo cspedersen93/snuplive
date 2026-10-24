@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (d.show?.status === "live") {
     return {
       title: { absolute: `${d.seller.handle} er live: ${d.show.title}`.slice(0, 60) },
-      description: `${name} er live på SnupLive lige nu med ${d.show.title.toLowerCase()}. Se med, stil spørgsmål i chatten, og snup det, du kan lide.`.slice(0, 155),
+      description: `${name} er live på Relived lige nu med ${d.show.title.toLowerCase()}. Se med, stil spørgsmål i chatten, og køb det, du kan lide.`.slice(0, 155),
       alternates: { canonical },
       openGraph: { images: [showImage({ ...d.show, seller: d.seller })] },
     };
@@ -77,8 +77,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: `${d.seller.handle} – live shopping med brugte ting`.slice(0, 48),
     description: d.show
-      ? `Følg ${name} på SnupLive. ${d.show.status === "planned" ? `Næste show: ${d.show.title}, ${when(d.show.starts_at).toLowerCase()}.` : "Se, hvornår næste show starter."}`.slice(0, 155)
-      : `${name} sælger brugte ting live på SnupLive. Kig forbi, når næste show starter.`.slice(0, 155),
+      ? `Følg ${name} på Relived. ${d.show.status === "planned" ? `Næste show: ${d.show.title}, ${when(d.show.starts_at).toLowerCase()}.` : "Se, hvornår næste show starter."}`.slice(0, 155)
+      : `${name} sælger brugte ting live på Relived. Kig forbi, når næste show starter.`.slice(0, 155),
     alternates: { canonical },
   };
 }

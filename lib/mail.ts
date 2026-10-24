@@ -17,7 +17,7 @@ export async function sendMail(msg: { to: string[]; subject: string; text: strin
   const to = msg.to.filter(Boolean);
   if (!key || !to.length) return false;
   const base = (unquoteEnv(process.env.RESEND_API_BASE) || "https://api.resend.com").replace(/\/+$/, "");
-  const from = unquoteEnv(process.env.MAIL_FROM) || "SnupLive <noreply@snuplive.dk>";
+  const from = unquoteEnv(process.env.MAIL_FROM) || "Relived <noreply@relived.dk>";
   try {
     const r = await fetch(`${base}/emails`, {
       method: "POST",
@@ -45,7 +45,7 @@ export async function sendMailBatch(msgs: { to: string; subject: string; text: s
   const key = unquoteEnv(process.env.RESEND_API_KEY);
   if (!key || !msgs.length) return 0;
   const base = (unquoteEnv(process.env.RESEND_API_BASE) || "https://api.resend.com").replace(/\/+$/, "");
-  const from = unquoteEnv(process.env.MAIL_FROM) || "SnupLive <noreply@snuplive.dk>";
+  const from = unquoteEnv(process.env.MAIL_FROM) || "Relived <noreply@relived.dk>";
   let sent = 0;
   for (let i = 0; i < msgs.length; i += 100) {
     const chunk = msgs.slice(i, i + 100).map((m) => ({

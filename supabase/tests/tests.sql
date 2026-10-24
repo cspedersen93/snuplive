@@ -36,7 +36,7 @@ select t.ok((select handle from profiles where id = '00000000-0000-0000-0000-000
 select t.ok((select handle from profiles where id = '00000000-0000-0000-0000-00000000000b') = 'liva.k', 'brugernavn med små bogstaver');
 select t.ok((select handle from profiles where id = '00000000-0000-0000-0000-00000000000c') = 'olesnup', 'ugyldige tegn fjernes');
 select t.ok((select handle ~ '^maja[0-9]{4}$' from profiles where id = '00000000-0000-0000-0000-00000000000d'), 'optaget brugernavn får tal bagpå');
-select t.ok((select handle from profiles where id = '00000000-0000-0000-0000-00000000000e') = 'snupper', 'for kort brugernavn bliver "snupper"');
+select t.ok((select handle from profiles where id = '00000000-0000-0000-0000-00000000000e') = 'bruger', 'for kort brugernavn bliver "bruger"');
 
 -- ── Anonym besøgende ─────────────────────────────────────────────────────────
 set role anon;
@@ -112,14 +112,14 @@ select t.throws($$insert into messages (show_id, user_id, body, kind) values ('1
 select t.throws($$insert into messages (show_id, user_id, body) values ('10000000-0000-0000-0000-000000000001', auth.uid(), '')$$, '');
 select t.ok((select status from snup('20000000-0000-0000-0000-000000000001')) = 'sold', 'Liva snupper kjolen');
 select t.ok((select count(*) from sales where buyer_id = auth.uid()) = 1, 'Liva kan se sit snup');
-select t.ok((select body from messages where kind = 'event' order by id desc limit 1) = 'liva.k snuppede Blomstret slå-om-kjole for 150 kr', 'snuppet bliver annonceret i chatten');
+select t.ok((select body from messages where kind = 'event' order by id desc limit 1) = 'liva.k købte Blomstret slå-om-kjole for 150 kr', 'købet bliver annonceret i chatten');
 select t.ok((select user_id is null from messages where kind = 'event' order by id desc limit 1), 'hændelsen er ikke knyttet til Livas id');
 
 -- Ole kommer for sent
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
 select t.throws($$select snup('20000000-0000-0000-0000-000000000001')$$, 'en anden nåede');
 select t.ok((select count(*) from sales) = 0, 'Ole kan ikke se andres snup');
-select t.throws($$select snup('20000000-0000-0000-0000-000000000002')$$, 'ikke snuppes lige nu');
+select t.throws($$select snup('20000000-0000-0000-0000-000000000002')$$, 'ikke købes lige nu');
 
 -- ── Lynrunde ─────────────────────────────────────────────────────────────────
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
@@ -667,7 +667,7 @@ select t.ok((select (support_start(null, 'b@example.dk', null, '/', null, 'ip-2'
 select t.throws($$select support_start(null, 'b@example.dk', null, '/', null, 'ip-3', '')$$, 'Skriv en besked');
 
 -- Logget ind: samtalen hører til kontoen og slettes med den.
-select support_start('00000000-0000-0000-0000-00000000000e', 'å@x.dk', 'snupper', '/konto', null, null, 'Hjælp');
+select support_start('00000000-0000-0000-0000-00000000000e', 'å@x.dk', 'bruger', '/konto', null, null, 'Hjælp');
 select t.ok((select count(*) from support_threads where user_id = '00000000-0000-0000-0000-00000000000e') = 1, 'samtalen hører til kontoen');
 
 -- Oprydning.
@@ -677,6 +677,10 @@ select t.ok((select support_cleanup()) = 1, 'samtaler slettes 12 måneder efter 
 select t.ok((select count(*) from support_threads where ip_hash = 'ip-2') = 0, 'spam-stemplet slettes efter to døgn');
 delete from support_threads where id = (select (r->>'thread_id')::uuid from st);
 select t.ok((select count(*) from support_messages where thread_id = (select (r->>'thread_id')::uuid from st)) = 0, 'beskederne slettes med samtalen');
+
+-- ── Nyt navn: beskeder fra siden selv står som Relived ──
+select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
+select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');
 
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

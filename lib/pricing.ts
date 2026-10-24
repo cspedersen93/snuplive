@@ -32,14 +32,14 @@ export function orderAmounts(items: number, delivery: Delivery) {
 }
 
 /**
- * Det, sælgeren får for en ordre. Går pakken til en pakkeshop med SnupLives label (sp_id er sat),
+ * Det, sælgeren får for en ordre. Går pakken til en pakkeshop med Reliveds label (sp_id er sat),
  * betaler fragten labelen, og sælgeren får beløbet for tingene. Ellers får sælgeren også fragten.
  */
 export function sellerPayout(o: { items_amount: number; shipping_amount: number; sp_id?: string | null }) {
   return o.items_amount + (o.sp_id ? 0 : o.shipping_amount);
 }
 
-/** Et snup, der ikke er betalt efter så mange dage, bliver annulleret. */
+/** Et køb, der ikke er betalt efter så mange dage, bliver annulleret. */
 export const RESERVATION_DAYS = 3;
 /** Så mange dage efter afsendelse bliver ordren afsluttet, hvis køberen ikke selv bekræfter. */
 export const AUTO_COMPLETE_DAYS = 7;

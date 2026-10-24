@@ -5,27 +5,27 @@ import { COMPANY } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Privatlivspolitik",
-  description: "Sådan behandler SnupLive dine oplysninger: hvad vi gemmer, hvorfor, hvem der hjælper os, og hvordan du får dem slettet.",
+  description: "Sådan behandler Relived dine oplysninger: hvad vi gemmer, hvorfor, hvem der hjælper os, og hvordan du får dem slettet.",
   alternates: { canonical: "/privatliv" },
 };
 
 export default function Privatliv() {
   return (
     <LegalPage title="Privatlivspolitik" crumb="Privatlivspolitik" updated="oktober 2026">
-      <p className="lede">Her kan du læse, hvilke oplysninger SnupLive gemmer om dig, og hvad vi bruger dem til.</p>
+      <p className="lede">Her kan du læse, hvilke oplysninger Relived gemmer om dig, og hvad vi bruger dem til.</p>
 
       <h2>Hvem er ansvarlig?</h2>
-      <p>SnupLive er dataansvarlig for de oplysninger, der bliver behandlet på snuplive.dk.</p>
+      <p>Relived er dataansvarlig for de oplysninger, der bliver behandlet på relived.dk.</p>
       <CompanyInfo />
 
       <h2>Hvad gemmer vi?</h2>
       <ul>
-        <li><b>Venteliste:</b> skriver du dig op, før SnupLive åbner, gemmer vi din e-mail, om du vil købe eller sælge, og hvornår du sagde ja til mails og bekræftede. Vi bruger den kun til at give dig besked, når vi åbner, og til nyheder om SnupLive. Hver mail har et link til afmelding. Afmelder du dig, sender vi ikke flere mails, og vi gemmer kun, at du er afmeldt.</li>
+        <li><b>Venteliste:</b> skriver du dig op, før Relived åbner, gemmer vi din e-mail, om du vil købe eller sælge, og hvornår du sagde ja til mails og bekræftede. Vi bruger den kun til at give dig besked, når vi åbner, og til nyheder om Relived. Hver mail har et link til afmelding. Afmelder du dig, sender vi ikke flere mails, og vi gemmer kun, at du er afmeldt.</li>
         <li><b>Konto:</b> din e-mailadresse, dit brugernavn og eventuelt navn, område og profilbillede, hvis du selv lægger dem ind.</li>
         <li><b>Shows og ting:</b> de shows og ting, du lægger op som sælger, med billeder og beskrivelser. De kan ses af alle.</li>
         <li><b>Sælgeroplysninger:</b> om du sælger som privatperson eller virksomhed. Sælger du som virksomhed, vises firmanavn og CVR-nummer ved dine ting.</li>
-        <li><b>Chat:</b> de beskeder, du skriver i et show. De kan ses af alle, der ser showet. Fjerner du eller sælgeren en besked, bliver teksten slettet. Blokerer en sælger dig, gemmer vi det, så du ikke kan skrive, snuppe eller byde i sælgerens shows.</li>
-        <li><b>Snup, bud og ordrer:</b> hvad du har snuppet og budt på, hos hvem og til hvilken pris. Når du snupper eller vinder et budsalg, bliver dit brugernavn vist i chatten, og under et budsalg kan alle se brugernavnet på den, der har det højeste bud.</li>
+        <li><b>Chat:</b> de beskeder, du skriver i et show. De kan ses af alle, der ser showet. Fjerner du eller sælgeren en besked, bliver teksten slettet. Blokerer en sælger dig, gemmer vi det, så du ikke kan skrive, købe eller byde i sælgerens shows.</li>
+        <li><b>Køb, bud og ordrer:</b> hvad du har købt og budt på, hos hvem og til hvilken pris. Når du køber eller vinder et budsalg, bliver dit brugernavn vist i chatten, og under et budsalg kan alle se brugernavnet på den, der har det højeste bud.</li>
         <li><b>Husk mig:</b> hvilke ting og shows du har bedt om en mail om.</li>
         <li><b>Betaling og levering:</b> når du betaler, får vi dit navn, din adresse og dit telefonnummer fra Stripe, og vi gemmer den pakkeshop, du vælger. Sælgeren ser dem kun for at kunne sende eller aflevere dine ting. Når sælgeren laver fragtlabelen, sender vi dit navn, din adresse, din e-mail og dit telefonnummer til Shipmondo og fragtfirmaet (DAO eller GLS). Kortoplysninger og MobilePay håndteres af Stripe, og vi ser dem aldrig.</li>
         <li><b>Bedømmelser:</b> giver du en sælger stjerner og en kommentar, kan alle se den sammen med dit brugernavn.</li>

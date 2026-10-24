@@ -100,7 +100,7 @@ export async function GET(req: Request) {
 /** Skriv en besked: { body, email?, page?, website? }. Uden login skal der en e-mail med første gang. */
 export async function POST(req: Request) {
   const { admin, user, thread, cookie } = await context();
-  if (!admin) return fail("Chatten er ikke sat op endnu. Skriv til kontakt@snuplive.dk.", 503);
+  if (!admin) return fail("Chatten er ikke sat op endnu. Skriv til kontakt@relived.dk.", 503);
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   // Feltet "website" er skjult, så kun robotter udfylder det.
   if (typeof body.website === "string" && body.website.trim()) return json({ ok: true, message: null });
@@ -157,5 +157,5 @@ export async function POST(req: Request) {
 function failFrom(msg: string) {
   if (known.test(msg)) return fail(msg, /mange|travlt/.test(msg) ? 429 : 400);
   console.error("[snuplive] support", msg);
-  return fail("Beskeden blev ikke sendt. Prøv igen, eller skriv til kontakt@snuplive.dk.", 500);
+  return fail("Beskeden blev ikke sendt. Prøv igen, eller skriv til kontakt@relived.dk.", 500);
 }

@@ -1,4 +1,4 @@
-/* SnupLive — dark, cinematic, in the logo's white and signal red on black.
+/* Relived — dark, cinematic, in the logo's white and signal red on black.
    Layout: a sticky header over full-bleed dark bands; video is always the hero of any page it appears on. */
 :root{
   --bg:#0B0A0C;
@@ -87,7 +87,7 @@ em.s{font-style:normal;color:var(--red-text)}
 .head{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(11,10,12,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .head .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:10px}
 .logo{display:flex;align-items:center;text-decoration:none;line-height:0;flex:none}
-.logo img{height:50px;width:auto}
+.logo img{height:38px;width:auto}
 .nav{display:flex;align-items:center;gap:26px}
 .nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.95rem}
 .nav a:hover,.nav a[aria-current="page"]{color:var(--text)}
@@ -111,7 +111,7 @@ em.s{font-style:normal;color:var(--red-text)}
   .mnav a{padding:12px 0;text-decoration:none;font-weight:600;font-size:1.05rem;border-bottom:1px solid var(--line)}
   .head .btn-sell{display:none}
 }
-@media (max-width:480px){.logo img{height:42px}.icon-btn{width:40px;height:40px}}
+@media (max-width:480px){.logo img{height:32px}.icon-btn{width:40px;height:40px}}
 
 /* Page hero for subpages */
 .phero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
@@ -897,7 +897,7 @@ img.v-thumb{object-fit:cover}
 .soon main{flex:1}
 .soon-top{border-bottom:1px solid var(--line)}
 .soon-top .wrap{display:flex;align-items:center;min-height:76px}
-.soon-top .logo img{height:42px;width:auto}
+.soon-top .logo img{height:36px;width:auto}
 .soon-hero .hero-copy{gap:22px}
 .soon-form{display:flex;flex-direction:column;gap:14px;max-width:560px}
 .soon-row{display:flex;gap:10px}

@@ -55,7 +55,7 @@ function LineActions({ m, me, canModerate }: { m: Message; me: Me; canModerate: 
   if (ask) {
     return (
       <div className="cmsg-menu" ref={menu}>
-        <span>Blokér @{m.handle}? Personen kan ikke skrive eller snuppe i dine shows, og beskederne her forsvinder.</span>
+        <span>Blokér @{m.handle}? Personen kan ikke skrive eller købe i dine shows, og beskederne her forsvinder.</span>
         <div className="row">
           <button className="btn btn-red btn-sm" type="button" onClick={() => run("block_user")} disabled={busy}>
             {busy ? "Blokerer …" : "Ja, blokér"}
@@ -171,7 +171,7 @@ export default function Chat({ showId, messages, me, live, loginHref, title = "C
         </form>
       ) : me === null ? (
         <div className="chat-form" style={{ justifyContent: "space-between", alignItems: "center" }}>
-          <span className="muted" style={{ fontSize: ".9rem" }}>Log ind for at skrive og snuppe</span>
+          <span className="muted" style={{ fontSize: ".9rem" }}>Log ind for at skrive og købe</span>
           <Link className="btn btn-red btn-sm" href={loginHref}>Log ind</Link>
         </div>
       ) : null}

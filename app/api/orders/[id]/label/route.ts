@@ -47,7 +47,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="snuplive-label-${id.slice(0, 8)}.pdf"`,
+        "Content-Disposition": `inline; filename="relived-label-${id.slice(0, 8)}.pdf"`,
         "Cache-Control": "private, no-store",
       },
     });

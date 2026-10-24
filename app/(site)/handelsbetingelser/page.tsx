@@ -8,7 +8,7 @@ import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS
 export const metadata: Metadata = {
   title: "Handelsbetingelser for købere",
   description:
-    "Handelsbetingelser for køb på SnupLive: hvem du køber af, priser, fragt, betaling, køberbeskyttelse, fortrydelsesret og klager.",
+    "Handelsbetingelser for køb på Relived: hvem du køber af, priser, fragt, betaling, køberbeskyttelse, fortrydelsesret og klager.",
   alternates: { canonical: "/handelsbetingelser" },
 };
 
@@ -16,25 +16,25 @@ export default function Handelsbetingelser() {
   return (
     <LegalPage title="Handelsbetingelser for købere" crumb="Handelsbetingelser" updated="oktober 2026">
       <p className="lede">
-        Her står, hvad der gælder, når du køber på SnupLive. Sælgerne har deres egne <Link href="/vilkaar">vilkår</Link>.
+        Her står, hvad der gælder, når du køber på Relived. Sælgerne har deres egne <Link href="/vilkaar">vilkår</Link>.
       </p>
 
       <h2>1. Hvem køber du af?</h2>
       <p>
-        SnupLive er en markedsplads. Du køber tingen af sælgeren og ikke af SnupLive. Ved hver ting og hvert show står der, hvem
-        sælgeren er, og om sælgeren er en privatperson eller en virksomhed. SnupLive står for betalingen, køberbeskyttelsen og
+        Relived er en markedsplads. Du køber tingen af sælgeren og ikke af Relived. Ved hver ting og hvert show står der, hvem
+        sælgeren er, og om sælgeren er en privatperson eller en virksomhed. Relived står for betalingen, køberbeskyttelsen og
         fragtlabels til pakkeshops.
       </p>
       <CompanyInfo />
 
       <h2>2. Hvornår er købet bindende?</h2>
       <ul>
-        <li><b>Snup:</b> Den første, der trykker Snup, mens tingen bliver vist live, har købt tingen.</li>
+        <li><b>Køb i et live-show:</b> Den første, der trykker Køb, mens tingen bliver vist live, har købt tingen.</li>
         <li><b>Budsalg:</b> Det højeste bud, når nedtællingen står på 0, har købt tingen til sit bud. Et bud kan ikke trækkes tilbage.</li>
         <li><b>Køb nu:</b> Trykker du Køb nu på en ting, der er til salg efter et show, har du købt den.</li>
       </ul>
       <p>
-        Tingen lander under Mine snup, og du skal betale inden {RESERVATION_DAYS} dage. Betaler du ikke, bliver købet annulleret, og
+        Tingen lander under Mine køb, og du skal betale inden {RESERVATION_DAYS} dage. Betaler du ikke, bliver købet annulleret, og
         sælgeren kan sælge tingen igen.
       </p>
 
@@ -48,7 +48,7 @@ export default function Handelsbetingelser() {
 
       <h2>4. Betaling</h2>
       <p>
-        Du betaler under Mine snup med kort, MobilePay, Apple Pay eller Google Pay. Betalingen sker gennem Stripe, og SnupLive ser
+        Du betaler under Mine køb med kort, MobilePay, Apple Pay eller Google Pay. Betalingen sker gennem Stripe, og Relived ser
         aldrig dine kortoplysninger. Pengene bliver holdt tilbage og først sendt til sælgeren, når du bekræfter, at du har fået
         tingene. Bekræfter du ikke selv, sker det automatisk {DELIVERED_COMPLETE_DAYS} dage efter, at du har hentet pakken, eller senest{" "}
         {AUTO_COMPLETE_DAYS} dage efter, at den er sendt, medmindre du har meldt et problem.
@@ -57,14 +57,14 @@ export default function Handelsbetingelser() {
       <h2>5. Levering</h2>
       <p>
         Vælger du pakkeshop, sender sælgeren pakken med DAO eller GLS til den pakkeshop, du har valgt. Du kan følge pakken under Mine
-        snup, og fragtfirmaet giver dig besked, når den er klar. Vælger du afhentning, aftaler du tid og sted med sælgeren, som får
+        køb, og fragtfirmaet giver dig besked, når den er klar. Vælger du afhentning, aftaler du tid og sted med sælgeren, som får
         dit telefonnummer.
       </p>
 
       <h2>6. Køberbeskyttelse: når noget går galt</h2>
       <p>
         Kommer pakken ikke frem, eller er tingen væsentligt anderledes end vist og beskrevet, så tryk <b>Meld et problem</b> på ordren
-        under Mine snup, før ordren er afsluttet. Så holder vi pengene tilbage, sælgeren får besked, og vi hjælper jer med at finde en
+        under Mine køb, før ordren er afsluttet. Så holder vi pengene tilbage, sælgeren får besked, og vi hjælper jer med at finde en
         løsning. Kan I ikke blive enige, afgør vi sagen og kan give dig pengene tilbage.
       </p>
       <p>
@@ -107,7 +107,7 @@ export default function Handelsbetingelser() {
 
       <h2>11. Ansvar</h2>
       <p>
-        Sælgeren er ansvarlig for tingen og for at beskrive den rigtigt. SnupLive er ansvarlig for betalingen, køberbeskyttelsen og
+        Sælgeren er ansvarlig for tingen og for at beskrive den rigtigt. Relived er ansvarlig for betalingen, køberbeskyttelsen og
         de andre dele af tjenesten, som vi selv står for.
       </p>
 

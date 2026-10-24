@@ -9,17 +9,17 @@ import { SITE_URL } from "@/lib/env";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "SnupLive – live shopping med brugt tøj og ting",
-    template: "%s | SnupLive",
+    default: "Relived – live shopping med brugt tøj og ting",
+    template: "%s | Relived",
   },
   description:
-    "Sælg og køb brugt tøj og ting live på video. Chat med sælgeren, snup med ét tryk og få det hele i én pakke. Prøv SnupLive.",
-  applicationName: "SnupLive",
+    "Sælg og køb brugt tøj og ting live på video. Chat med sælgeren, køb med ét tryk og få det hele i én pakke. Prøv Relived.",
+  applicationName: "Relived",
   openGraph: {
     type: "website",
     locale: "da_DK",
-    siteName: "SnupLive",
-    images: [{ url: "/img/og.jpg", width: 1200, height: 630, alt: "Live shopping med brugt tøj på SnupLive" }],
+    siteName: "Relived",
+    images: [{ url: "/img/og.jpg", width: 1200, height: 630, alt: "Live shopping med brugt tøj på Relived" }],
   },
   alternates: { canonical: "/" },
 };

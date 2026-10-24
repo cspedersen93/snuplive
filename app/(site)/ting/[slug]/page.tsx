@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const images = itemImages(it);
   return {
     title: title.length <= 48 ? title : it.name.slice(0, 48),
-    description: `${it.name}${meta ? ` (${meta})` : ""} ${bid ? "fra" : "til"} ${kr(it.price)} hos ${it.seller?.handle}. ${where}. Beskyttet betaling på SnupLive.`.slice(0, 155),
+    description: `${it.name}${meta ? ` (${meta})` : ""} ${bid ? "fra" : "til"} ${kr(it.price)} hos ${it.seller?.handle}. ${where}. Beskyttet betaling på Relived.`.slice(0, 155),
     alternates: { canonical: itemHref(it) },
     // Solgte og fjernede ting skal ikke ligge i Google.
     robots: state === "sold" || state === "off" ? { index: false, follow: true } : undefined,
@@ -125,7 +125,7 @@ export default async function ItemPage({ params }: Params) {
       {
         "@type": "Product",
         name: it.name,
-        description: it.description || `${it.name}${meta ? `, ${meta}` : ""}. Brugt ${cat.word} fra ${seller.handle} på SnupLive.`,
+        description: it.description || `${it.name}${meta ? `, ${meta}` : ""}. Brugt ${cat.word} fra ${seller.handle} på Relived.`,
         ...(images.length ? { image: images } : {}),
         category: cat.label,
         itemCondition: "https://schema.org/UsedCondition",
@@ -203,7 +203,7 @@ export default async function ItemPage({ params }: Params) {
                 <>
                   {isAuction(it) ? <p>Ingen bød på den i showet, så nu kan du købe den til startprisen.</p> : null}
                   <BuyNow itemId={it.id} price={it.price} next={href} sellerId={it.seller_id} />
-                  <p className="fine">Tingen bliver reserveret til dig, og du betaler under Mine snup.</p>
+                  <p className="fine">Tingen bliver reserveret til dig, og du betaler under Mine køb.</p>
                 </>
               ) : state === "upcoming" && bid ? (
                 <>
@@ -219,7 +219,7 @@ export default async function ItemPage({ params }: Params) {
                 <>
                   <p>
                     Den bliver vist live {show.starts_at ? `${dayLabel(show.starts_at).toLowerCase()} kl. ${clock(show.starts_at)}` : "snart"} i{" "}
-                    <Link href={liveHref}>{show.title}</Link>. Du kan snuppe den, mens den bliver vist.
+                    <Link href={liveHref}>{show.title}</Link>. Du kan købe den, mens den bliver vist.
                   </p>
                   <RemindButton showId={show.id} itemId={it.id} next={href} className="btn btn-red btn-block" />
                   <p className="fine">Du får en mail, når showet starter.</p>
@@ -233,7 +233,7 @@ export default async function ItemPage({ params }: Params) {
                       </>
                     ) : state === "showing" ? (
                       <>
-                        <b>Den bliver vist lige nu.</b> Gå ind i showet og snup den.
+                        <b>Den bliver vist lige nu.</b> Gå ind i showet og køb den.
                       </>
                     ) : bid ? (
                       <>
@@ -241,13 +241,13 @@ export default async function ItemPage({ params }: Params) {
                       </>
                     ) : (
                       <>
-                        <b>{seller.handle} er live nu.</b> Tingen er i køen. Gå ind i showet og snup den, når den bliver vist.
+                        <b>{seller.handle} er live nu.</b> Tingen er i køen. Gå ind i showet og køb den, når den bliver vist.
                       </>
                     )}
                   </p>
                   <Link className="btn btn-red btn-block" href={liveHref}>
                     <span className="live-dot white" aria-hidden="true" />
-                    {bid ? "Se med og byd" : "Se med og snup"}
+                    {bid ? "Se med og byd" : "Se med og køb"}
                   </Link>
                 </>
               ) : state === "sold" ? (

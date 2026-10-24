@@ -51,7 +51,7 @@ export default async function Medlem({ params }: { params: Promise<{ id: string 
           <div><dt>E-mail</dt><dd><a href={`mailto:${m.email}`}>{m.email}</a></dd></div>
           <div><dt>Medlem siden</dt><dd>{when(m.created_at)}</dd></div>
           <div><dt>Har købt</dt><dd>{num(m.purchases)} {Number(m.purchases) === 1 ? "ordre" : "ordrer"} · {kr(Number(m.spent))}</dd></div>
-          <div><dt>Ubetalte snup</dt><dd>{unpaid.length ? `${unpaid.length} for ${kr(unpaid.reduce((a, b) => a + b.price, 0))}` : "Ingen"}</dd></div>
+          <div><dt>Ubetalte køb</dt><dd>{unpaid.length ? `${unpaid.length} for ${kr(unpaid.reduce((a, b) => a + b.price, 0))}` : "Ingen"}</dd></div>
           {m.is_seller ? (
             <>
               <div><dt>Har solgt</dt><dd>{num(m.items_sold)} ting · {kr(Number(m.earned))}</dd></div>

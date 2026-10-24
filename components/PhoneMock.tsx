@@ -8,7 +8,7 @@ export default function PhoneMock() {
       <div
         className="phone"
         role="img"
-        aria-label="Eksempel på et live-show: sælgeren holder en trenchcoat op til kameraet, seerne skriver i chatten, og frakken kan snuppes med ét tryk"
+        aria-label="Eksempel på et live-show: sælgeren holder en trenchcoat op til kameraet, seerne skriver i chatten, og frakken kan købes med ét tryk"
       >
         <div className="island" />
         <div className="screen" aria-hidden="true">
@@ -34,7 +34,7 @@ export default function PhoneMock() {
             <div className="msg" style={{ ["--c" as string]: "#9DB4E0" }}><i /><div><b>liva.k</b>Hvor lang er frakken?</div></div>
             <div className="msg seller" style={{ ["--c" as string]: "linear-gradient(135deg,#F4AC94,#C46E8A)" }}><i /><div><b>majasgarderobe</b>98 cm fra skulderen 🙌</div></div>
             <div className="msg" style={{ ["--c" as string]: "#B9D9C6" }}><i /><div><b>ole_k</b>Kan du vende den?</div></div>
-            <div className="msg event">liva.k snuppede Strikvest for 80 kr</div>
+            <div className="msg event">liva.k købte Strikvest for 80 kr</div>
           </div>
           <div className="v-card">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -44,7 +44,7 @@ export default function PhoneMock() {
               <div className="v-name">Trenchcoat, beige</div>
               <div className="v-meta">Str. M · Som ny</div>
             </div>
-            <span className="v-buy">Snup 350 kr</span>
+            <span className="v-buy">Køb 350 kr</span>
           </div>
         </div>
       </div>

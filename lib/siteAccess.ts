@@ -70,7 +70,7 @@ export function alwaysOpen(path: string) {
     path === "/privatliv" ||
     path === "/handelsbetingelser" ||
     path === "/vilkaar" ||
-    path === "/om-snuplive" ||
+    path === "/om-relived" ||
     path === "/robots.txt" ||
     path === "/sitemap.xml"
   );

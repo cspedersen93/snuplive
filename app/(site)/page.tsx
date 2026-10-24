@@ -14,7 +14,7 @@ export const revalidate = 30;
 export const metadata: Metadata = {
   title: { absolute: "Second hand live-salg: tøj, design og samleobjekter" },
   description:
-    "Køb brugt tøj, børnetøj, design og samleobjekter live. Se tingen på video, spørg i chatten, og snup den med ét tryk. Betalingen er beskyttet.",
+    "Køb brugt tøj, børnetøj, design og samleobjekter live. Se tingen på video, spørg i chatten, og køb den med ét tryk. Betalingen er beskyttet.",
   openGraph: { title: "Køb live – second hand: tøj, design og samleobjekter" },
   alternates: { canonical: "/" },
 };
@@ -33,8 +33,8 @@ export default async function Forside() {
   const ld = {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "Organization", name: "SnupLive", url: `${SITE_URL}/`, logo: `${SITE_URL}/img/logo.png` },
-      { "@type": "WebSite", name: "SnupLive", url: `${SITE_URL}/`, inLanguage: "da-DK" },
+      { "@type": "Organization", name: "Relived", url: `${SITE_URL}/`, logo: `${SITE_URL}/img/logo.png` },
+      { "@type": "WebSite", name: "Relived", url: `${SITE_URL}/`, inLanguage: "da-DK" },
     ],
   };
 
@@ -51,7 +51,7 @@ export default async function Forside() {
             <h1 id="h-forside" className="hero-h1">
               Køb <em className="s">live</em> – second hand: tøj, design og samleobjekter
             </h1>
-            <p className="lede">Se tingen på video, spørg i chatten, og snup den med ét tryk.</p>
+            <p className="lede">Se tingen på video, spørg i chatten, og køb den med ét tryk.</p>
             <div className="ctas">
               <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
               <Link className="btn btn-line" href="/til-salg">Køb nu til fast pris</Link>
@@ -68,7 +68,7 @@ export default async function Forside() {
       <section className="sec tight" aria-labelledby="h-kategorier">
         <div className="wrap">
           <div className="row-head">
-            <h2 className="h2" id="h-kategorier">Hvad kan du købe brugt på SnupLive?</h2>
+            <h2 className="h2" id="h-kategorier">Hvad kan du købe brugt på Relived?</h2>
             <Link className="btn btn-line" href="/kategori">Alle kategorier</Link>
           </div>
           <CategoryCards />
@@ -119,7 +119,7 @@ export default async function Forside() {
             <ol className="steps">
               <li><div><h3>Find et show eller en ting</h3><p>Se hvem der er live, eller tryk Husk mig.</p></div></li>
               <li><div><h3>Se den tæt på, og spørg</h3><p>Sælgeren viser mærke, mål og slid på video.</p></div></li>
-              <li><div><h3>Snup eller byd</h3><p>Du betaler samlet, og alt fra samme sælger kommer i én pakke.</p></div></li>
+              <li><div><h3>Køb eller byd</h3><p>Du betaler samlet, og alt fra samme sælger kommer i én pakke.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
               <Link className="btn btn-red" href="/live">Find et show</Link>

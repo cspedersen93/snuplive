@@ -14,17 +14,17 @@ export const unsubscribeUrl = (token: string) => `${SITE_URL}/kommer-snart/afmel
 export function sendConfirmMail(email: string, token: string) {
   return sendMail({
     to: [email],
-    subject: "Bekræft din tilmelding til SnupLive",
+    subject: "Bekræft din tilmelding til Relived",
     text: [
       "Hej",
       "",
-      "Tak, fordi du vil være med, når SnupLive åbner.",
+      "Tak, fordi du vil være med, når Relived åbner.",
       "Tryk på linket for at bekræfte din tilmelding:",
       `${SITE_URL}/kommer-snart/bekraeft?t=${token}`,
       "",
       "Har du ikke skrevet dig op, kan du bare slette mailen.",
       "",
-      "Hilsen SnupLive",
+      "Hilsen Relived",
     ].join("\n"),
   });
 }
@@ -35,12 +35,12 @@ export function sendConfirmMail(email: string, token: string) {
  */
 export function unsubHeaders(token: string) {
   return {
-    "List-Unsubscribe": `<${SITE_URL}/api/venteliste/afmeld?t=${token}>, <mailto:kontakt@snuplive.dk?subject=Afmeld>`,
+    "List-Unsubscribe": `<${SITE_URL}/api/venteliste/afmeld?t=${token}>, <mailto:kontakt@relived.dk?subject=Afmeld>`,
     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
   };
 }
 
 /** Nederst i alle mails til ventelisten: link til afmelding. */
 export function unsubFooter(token: string) {
-  return `\n\n—\nDu får mailen, fordi du har skrevet dig op til SnupLive.\nAfmeld: ${unsubscribeUrl(token)}`;
+  return `\n\n—\nDu får mailen, fordi du har skrevet dig op til Relived.\nAfmeld: ${unsubscribeUrl(token)}`;
 }

@@ -14,7 +14,7 @@ const RESEND_AFTER_MS = 10 * 60_000;
  */
 export async function POST(req: Request) {
   const admin = createAdminClient();
-  if (!admin) return fail("Tilmeldingen er ikke sat op endnu. Skriv til kontakt@snuplive.dk.", 503);
+  if (!admin) return fail("Tilmeldingen er ikke sat op endnu. Skriv til kontakt@relived.dk.", 503);
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   // Feltet "website" er skjult, så kun robotter udfylder det.
   if (typeof body.website === "string" && body.website.trim()) return json({ ok: true });

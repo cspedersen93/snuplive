@@ -26,7 +26,7 @@ interface SaleRow {
 }
 
 /**
- * Start en betaling for alle køberens ubetalte snup.
+ * Start en betaling for alle køberens ubetalte køb.
  * Body: { deliveries: { "<sælger-id>": "ship" | "pickup" }, pakkeshop?: { carrier, id, zipcode } }
  * Beløbene regnes ud her på serveren, ikke i browseren.
  */
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     )
     .eq("buyer_id", user.id)
     .eq("status", "reserved");
-  if (error) return fail("Dine snup kunne ikke hentes. Prøv igen.", 500);
+  if (error) return fail("Dine køb kunne ikke hentes. Prøv igen.", 500);
   const payable = ((data ?? []) as unknown as SaleRow[]).filter((s) => !s.order || ["pending", "cancelled"].includes(s.order.status));
   if (!payable.length) return fail("Der er ikke noget at betale.", 400);
 
@@ -205,12 +205,12 @@ export async function POST(req: Request) {
         ...(anyShip ? { shipping_address_collection: { allowed_countries: ["DK"] } } : {}),
         payment_intent_data: {
           transfer_group: checkoutId,
-          description: "Køb på SnupLive",
+          description: "Køb på Relived",
           metadata: { checkout_id: checkoutId, buyer_id: user.id },
         },
         metadata: { checkout_id: checkoutId, buyer_id: user.id },
         custom_text: {
-          submit: { message: "SnupLive holder pengene tilbage, indtil du har fået dine ting." },
+          submit: { message: "Relived holder pengene tilbage, indtil du har fået dine ting." },
         },
         expires_at: Math.floor(Date.now() / 1000) + 35 * 60,
         success_url: `${origin}/kurv?betaling={CHECKOUT_SESSION_ID}`,

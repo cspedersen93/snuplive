@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CategoryKey } from "@/lib/format";
 
-// Tekster til kategorisiderne (/kategori/<slug>). Godkendt i dokumentet "SnupLive – tekster til forside, kategorier og varesider".
+// Tekster til kategorisiderne (/kategori/<slug>). Godkendt i dokumentet "Relived – tekster til forside, kategorier og varesider".
 
 export interface CategoryPageCopy {
   /** Teksten under H1. */
@@ -25,7 +25,7 @@ export interface CategoryPageCopy {
 export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
   dametoej: {
     intro:
-      "Find brugte kjoler, jakker, sko og tasker fra danske skabe. Sælgeren viser tøjet frem på video, så du kan se pasform, stof og slid, før du snupper.",
+      "Find brugte kjoler, jakker, sko og tasker fra danske skabe. Sælgeren viser tøjet frem på video, så du kan se pasform, stof og slid, før du køber.",
     who: "Hvem sælger brugt dametøj live?",
     soon: "Hvilket dametøj bliver vist snart?",
     sale: "Brugt dametøj til salg nu",
@@ -155,7 +155,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     sellH2: "Har du selv samleobjekter, der skal videre?",
   },
   andet: {
-    intro: "Bøger, sport, værktøj, hobby og meget mere. Se tingen på video, spørg sælgeren, og snup den med ét tryk.",
+    intro: "Bøger, sport, værktøj, hobby og meget mere. Se tingen på video, spørg sælgeren, og køb den med ét tryk.",
     who: "Hvem sælger brugte ting live?",
     soon: "Hvad bliver vist snart?",
     sale: "Andre brugte ting til salg nu",

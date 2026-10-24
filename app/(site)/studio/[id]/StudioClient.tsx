@@ -17,6 +17,7 @@ import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { Item, Message, Profile, Show } from "@/lib/types";
 import ItemForm from "./ItemForm";
+import { SITE_HOST } from "@/lib/env";
 
 export interface StudioSale {
   id: string;
@@ -115,7 +116,7 @@ export default function StudioClient(props: Props) {
     };
   }, [cameraOn, ended, show.id]);
 
-  // Hent salg igen, når der bliver snuppet noget.
+  // Hent salg igen, når der bliver købt noget.
   const soldKey = sold.map((i) => i.id).join(",");
   useEffect(() => {
     if (!soldKey) return;
@@ -251,7 +252,7 @@ export default function StudioClient(props: Props) {
       await navigator.clipboard.writeText(window.location.origin + shareUrl);
       toast("Linket til dit show er kopieret");
     } catch {
-      toast(`Dit link: snuplive.dk${shareUrl}`);
+      toast(`Dit link: ${SITE_HOST}${shareUrl}`);
     }
   }
 
@@ -359,7 +360,7 @@ export default function StudioClient(props: Props) {
           ) : null}
           <div className="box ship-note">
             <IconBulb />
-            <span>Vis mærket og målene tæt på kameraet, og svar på spørgsmålene højt. Det giver flere snup.</span>
+            <span>Vis mærket og målene tæt på kameraet, og svar på spørgsmålene højt. Det giver flere salg.</span>
           </div>
         </aside>
 

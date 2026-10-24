@@ -20,7 +20,7 @@ import RateSeller from "./RateSeller";
 import ReportProblem from "./ReportProblem";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Mine snup", robots: { index: false } };
+export const metadata: Metadata = { title: "Mine køb", robots: { index: false } };
 
 type Seller = { handle: string; display_name: string | null; avatar_path: string | null; seller_type?: string | null };
 type ItemInfo = { name: string; size: string | null; condition: string | null };
@@ -162,7 +162,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
         <div className="dpanel-head">
           <div>
             <span className="label">Kurv</span>
-            <h1 style={{ fontSize: "clamp(1.6rem,3vw,2.2rem)", letterSpacing: "-.035em", lineHeight: 1.05, marginTop: 6 }}>Mine snup</h1>
+            <h1 style={{ fontSize: "clamp(1.6rem,3vw,2.2rem)", letterSpacing: "-.035em", lineHeight: 1.05, marginTop: 6 }}>Mine køb</h1>
           </div>
         </div>
 
@@ -179,7 +179,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
         ) : banner === "afbrudt" ? (
           <div className="notice" role="status">
             <IconInfo />
-            <span>Betalingen blev afbrudt. Dine snup er stadig reserveret, så du kan prøve igen.</span>
+            <span>Betalingen blev afbrudt. Dine køb er stadig reserveret, så du kan prøve igen.</span>
           </div>
         ) : null}
 
@@ -188,7 +188,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
             <div className="sec-mini">
               <h2 className="h3">Til betaling</h2>
               <p className="muted" style={{ fontSize: ".92rem" }}>
-                Betal inden {RESERVATION_DAYS} dage, ellers bliver snuppet annulleret, og sælgeren kan sælge tingen igen.
+                Betal inden {RESERVATION_DAYS} dage, ellers bliver købet annulleret, og sælgeren kan sælge tingen igen.
               </p>
             </div>
             {ready && stripeTestMode() ? (
@@ -224,7 +224,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
 
         {!groups.length && !orders.length ? (
           <div className="empty">
-            <p style={{ marginBottom: 14 }}>Du har ikke snuppet noget endnu.</p>
+            <p style={{ marginBottom: 14 }}>Du har ikke købt noget endnu.</p>
             <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
           </div>
         ) : null}

@@ -94,7 +94,7 @@ export default function SupportDesk({ initial, filter: start, selected }: { init
                       <b>{t.admin_unread ? <span className="sr-only">Ulæst: </span> : null}{who(t)}</b>
                       <time dateTime={t.last_message_at}>{stamp(t.last_message_at)}</time>
                     </span>
-                    <span className="sd-prev">{t.last_sender === "admin" ? "SnupLive: " : ""}{t.preview}</span>
+                    <span className="sd-prev">{t.last_sender === "admin" ? "Relived: " : ""}{t.preview}</span>
                     <span className="sd-meta">{[t.status === "closed" ? "Lukket" : null, t.page, deviceLabel(t.user_agent)].filter(Boolean).join(" · ")}</span>
                   </Link>
                 </li>
@@ -275,7 +275,7 @@ function Thread({ id, back, onChange }: { id: string; back: string; onChange: ()
       <div className="sd-msgs" ref={box} aria-live="polite" aria-relevant="additions">
         {msgs.map((m) => (
           <div key={m.id} className={`sup-msg ${m.sender === "admin" ? "me" : "them"}`}>
-            {m.sender === "admin" ? <span className="sup-who">{m.author_name || "SnupLive"}</span> : null}
+            {m.sender === "admin" ? <span className="sup-who">{m.author_name || "Relived"}</span> : null}
             <p><Linked text={m.body} /></p>
             <time dateTime={m.created_at}>{stamp(m.created_at)}</time>
           </div>

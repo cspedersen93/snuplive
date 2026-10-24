@@ -11,9 +11,9 @@ import LiveGrid from "./LiveGrid";
 export const revalidate = 15;
 
 export const metadata: Metadata = {
-  title: { absolute: "Live shopping lige nu – brugt tøj og ting | SnupLive" },
+  title: { absolute: "Live shopping lige nu – brugt tøj og ting | Relived" },
   description:
-    "Se hvem der er live lige nu. Find live-shows med vintagetøj, vinyl og retro design, og snup det, du kan lide, med ét tryk.",
+    "Se hvem der er live lige nu. Find live-shows med vintagetøj, vinyl og retro design, og køb det, du kan lide, med ét tryk.",
   alternates: { canonical: "/live" },
 };
 

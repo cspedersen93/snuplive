@@ -2,7 +2,7 @@ import { createHash } from "crypto";
 import { unquoteEnv } from "@/lib/env";
 
 // MitID via Idura (OpenID Connect). Sæt IDURA_DOMAIN, IDURA_CLIENT_ID og IDURA_CLIENT_SECRET i Vercel.
-// IDURA_DOMAIN er domænet fra Idura, fx "snuplive-test.idura.broker" (test) eller jeres eget produktionsdomæne.
+// IDURA_DOMAIN er domænet fra Idura, fx "relived-test.idura.broker" (test) eller jeres eget produktionsdomæne.
 
 /** Middel sikkerhed (MitID "substantial"), som Idura anbefaler. */
 export const MITID_ACR = "urn:grn:authn:dk:mitid:substantial";

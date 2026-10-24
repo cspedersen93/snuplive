@@ -40,7 +40,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           <div className="box become-box">
             <div>
               <span className="label red">Sælg live</span>
-              <h1 className="h3" style={{ fontSize: "1.5rem", margin: "6px 0" }}>Bliv sælger på SnupLive</h1>
+              <h1 className="h3" style={{ fontSize: "1.5rem", margin: "6px 0" }}>Bliv sælger på Relived</h1>
               <p className="muted">Opret et show, læg dine ting i køen, og gå live direkte fra browseren. Det er gratis i beta-perioden.</p>
             </div>
             <BecomeSeller />

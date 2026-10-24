@@ -4,11 +4,12 @@ import { num, requireAdmin } from "@/lib/admin";
 import { mitidEnabled } from "@/lib/mitid";
 import SettingToggle from "./SettingToggle";
 import Testers, { type Tester } from "./Testers";
+import { SITE_HOST } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Indstillinger" };
 
-/** Indstillinger for hele SnupLive. Lige nu: om sælgere skal bekræfte sig med MitID for at gå live. */
+/** Indstillinger for hele Relived. Lige nu: om sælgere skal bekræfte sig med MitID for at gå live. */
 export default async function Indstillinger() {
   const { admin } = await requireAdmin("/admin/indstillinger");
   if (!admin) return <SetupNotice />;
@@ -43,7 +44,7 @@ export default async function Indstillinger() {
           help="Slå til, når I lancerer. Så forsvinder Kommer snart, og alle kan se shows, ting og sælgere. Det virker inden for et minut."
         />
         <h3 style={{ fontSize: "1rem", marginTop: 8 }}>Testere, der må se hele siden før åbningen</h3>
-        <p className="muted" style={{ fontSize: ".9rem" }}>Testeren logger ind på snuplive.dk/login med den e-mail, du skriver her.</p>
+        <p className="muted" style={{ fontSize: ".9rem" }}>Testeren logger ind på {SITE_HOST}/login med den e-mail, du skriver her.</p>
         <Testers testers={(testers.data ?? []) as Tester[]} />
       </section>
 

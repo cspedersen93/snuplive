@@ -9,7 +9,7 @@ export function getStripe(): Stripe | null {
   const key = unquoteEnv(process.env.STRIPE_SECRET_KEY);
   if (!key) return (cached = null);
   const config: ConstructorParameters<typeof Stripe>[1] = {
-    appInfo: { name: "SnupLive", url: "https://snuplive.dk" },
+    appInfo: { name: "Relived", url: "https://relived.dk" },
     maxNetworkRetries: 2,
   };
   // Kun til lokale tests mod en falsk Stripe.

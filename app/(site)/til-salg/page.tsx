@@ -28,7 +28,7 @@ function href(cat: string | null, page: number) {
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { cat, page } = parse(await searchParams);
   return {
-    title: { absolute: cat ? `${cat.label} til salg brugt | SnupLive`.slice(0, 60) : "Brugt til salg – køb nu til fast pris | SnupLive" },
+    title: { absolute: cat ? `${cat.label} til salg brugt | Relived`.slice(0, 60) : "Brugt til salg – køb nu til fast pris | Relived" },
     description:
       "Køb brugt tøj, børnetøj, design og samleobjekter til fast pris. Tingene er vist frem live, så du ved, hvad du får. Fragt 49 kr til pakkeshop.",
     alternates: { canonical: href(cat?.slug ?? null, page) },
@@ -62,7 +62,7 @@ export default async function TilSalg({ searchParams }: Props) {
           </nav>
           {total ? <span className="label mint">{total} ting til salg</span> : null}
           <h1 className="h1" id="h-til-salg">{cat ? `${cat.label} til salg` : "Brugt til salg – køb nu til fast pris"}</h1>
-          <p className="lede">Ting fra tidligere live-shows, som ikke blev snuppet. Køb dem til fast pris lige nu.</p>
+          <p className="lede">Ting fra tidligere live-shows, som ikke blev solgt. Køb dem til fast pris lige nu.</p>
         </div>
       </section>
 

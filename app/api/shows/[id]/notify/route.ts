@@ -42,9 +42,9 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
           `@${handle} er gået live med showet "${show.title}".`,
           r.items?.length ? `Du bad os huske dig på: ${r.items.join(", ")}.` : "",
           "",
-          `Se med og snup: ${link}`,
+          `Se med og køb: ${link}`,
           "",
-          "Du får denne mail, fordi du trykkede Husk mig på SnupLive.",
+          "Du får denne mail, fordi du trykkede Husk mig på Relived.",
         ]
           .filter((l, i, a) => l !== "" || a[i - 1] !== "")
           .join("\n"),

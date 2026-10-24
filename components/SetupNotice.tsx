@@ -5,7 +5,7 @@ export default function SetupNotice() {
   return (
     <div className="wrap" style={{ paddingBlock: "64px 96px" }}>
       <div className="notice" role="alert" style={{ flexDirection: "column", gap: 8 }}>
-        <b>SnupLive er ikke koblet til databasen endnu.</b>
+        <b>Relived er ikke koblet til databasen endnu.</b>
         {problems.length ? (
           <ul style={{ margin: 0, paddingLeft: "1.2em" }}>
             {problems.map((p) => (

@@ -44,7 +44,7 @@ export default function ReportActions({ reportId, type }: { reportId: string; ty
             value={decision}
             onChange={(e) => setDecision(e.target.value)}
             maxLength={1000}
-            placeholder="Fx: Tasken er en kopivare, og kopivarer må ikke sælges på SnupLive."
+            placeholder="Fx: Tasken er en kopivare, og kopivarer må ikke sælges på Relived."
           />
         </div>
       ) : (

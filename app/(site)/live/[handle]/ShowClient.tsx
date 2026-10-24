@@ -118,7 +118,7 @@ export default function ShowClient(props: Props) {
     };
   }, [live, show.id, meKey]);
 
-  // Hvilke ting i showet har jeg snuppet?
+  // Hvilke ting i showet har jeg købt?
   useEffect(() => {
     if (!me) return;
     getSupabase()
@@ -196,7 +196,7 @@ export default function ShowClient(props: Props) {
     won.current = auction.id;
     setMine((s) => new Set(s).add(auction.id));
     window.dispatchEvent(new Event("snup:changed"));
-    toast(`Du vandt ${auction.name} for ${kr(soldPrice(auction))}!`, "/kurv", "Mine snup");
+    toast(`Du vandt ${auction.name} for ${kr(soldPrice(auction))}!`, "/kurv", "Mine køb");
   }, [me, auction]);
 
   async function bid() {
@@ -226,7 +226,7 @@ export default function ShowClient(props: Props) {
     }
     setMine((s) => new Set(s).add(current.id));
     window.dispatchEvent(new Event("snup:changed"));
-    toast(`Du snuppede ${current.name}!`, "/kurv", "Mine snup");
+    toast(`Du købte ${current.name}!`, "/kurv", "Mine køb");
   }
 
   async function share() {
@@ -244,7 +244,7 @@ export default function ShowClient(props: Props) {
 
   const sold = current?.status === "sold";
   const isMine = current ? mine.has(current.id) : false;
-  let buyLabel = me === null ? `Log ind og snup` : `Snup ${current ? kr(current.price) : ""}`;
+  let buyLabel = me === null ? `Log ind og køb` : `Køb ${current ? kr(current.price) : ""}`;
   let buyDisabled = busy || !current || !live;
   if (current && sold) {
     buyLabel = isMine || leading ? "Din!" : "Solgt";
@@ -294,7 +294,7 @@ export default function ShowClient(props: Props) {
               <div>
                 <strong>{handle}</strong>
                 <span className="muted" style={{ fontSize: ".88rem" }}>
-                  {[props.seller.display_name, props.seller.area].filter(Boolean).join(" · ") || "Sælger på SnupLive"}
+                  {[props.seller.display_name, props.seller.area].filter(Boolean).join(" · ") || "Sælger på Relived"}
                 </span>
               </div>
             </div>
@@ -349,7 +349,7 @@ export default function ShowClient(props: Props) {
           </div>
           <div className="box ship-note">
             <IconBox />
-            <span>Alt, du køber hos {handle}, bliver samlet under Mine snup, så det kan sendes i én pakke.</span>
+            <span>Alt, du køber hos {handle}, bliver samlet under Mine køb, så det kan sendes i én pakke.</span>
           </div>
           <ReportButton type="show" id={show.id} className="show-report" />
         </aside>
@@ -383,7 +383,7 @@ export default function ShowClient(props: Props) {
                     <>
                       <strong style={{ fontSize: "1.4rem" }}>Showet er slut</strong>
                       <span>
-                        {soldCount ? `${soldCount} ting blev snuppet.` : "Tak fordi du kiggede forbi."}
+                        {soldCount ? `${soldCount} ting blev solgt.` : "Tak fordi du kiggede forbi."}
                         {forSaleCount ? ` ${forSaleCount} ting kan stadig købes til fast pris.` : ""}
                       </span>
                       {forSaleCount ? (
@@ -418,7 +418,7 @@ export default function ShowClient(props: Props) {
                     )}
                   </div>
                   {current && sold && (isMine || leading) ? (
-                    <div className="v-flag">{auction ? "Du vandt budsalget!" : "Du snuppede den!"}</div>
+                    <div className="v-flag">{auction ? "Du vandt budsalget!" : "Du købte den!"}</div>
                   ) : current && sold && auction?.high_handle ? (
                     <div className="v-flag">Solgt til {auction.high_handle}</div>
                   ) : bidRunning && leading ? (
@@ -469,8 +469,8 @@ export default function ShowClient(props: Props) {
           {live ? (
             <p className="fine" style={{ textAlign: "center" }}>
               {auction
-                ? "Dit bud er bindende. Vinder du, lander tingen under Mine snup, og du betaler inden 3 dage."
-                : "Når du snupper, vises dit brugernavn i chatten. Du betaler samlet under Mine snup inden 3 dage."}
+                ? "Dit bud er bindende. Vinder du, lander tingen under Mine køb, og du betaler inden 3 dage."
+                : "Når du køber, vises dit brugernavn i chatten. Du betaler samlet under Mine køb inden 3 dage."}
             </p>
           ) : null}
         </div>
@@ -478,7 +478,7 @@ export default function ShowClient(props: Props) {
         <aside className="show-side" aria-label="Chat">
           <Chat showId={show.id} messages={messages} me={me} live={live} loginHref={loginHref} canModerate={Boolean(me && me.id === show.seller_id)} />
           <div style={{ display: "flex", gap: 8 }}>
-            <Link className="btn btn-line btn-block" href="/kurv">Mine snup</Link>
+            <Link className="btn btn-line btn-block" href="/kurv">Mine køb</Link>
             <button className="icon-btn" type="button" onClick={share} aria-label="Del showet">
               <IconShare stroke="currentColor" />
             </button>

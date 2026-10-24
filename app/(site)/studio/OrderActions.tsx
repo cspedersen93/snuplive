@@ -79,7 +79,7 @@ export function CancelReservation({ saleId }: { saleId: string }) {
     const { error } = await getSupabase().rpc("cancel_reservation", { p_sale: saleId });
     setBusy(false);
     if (error) return toast(errorText(error));
-    toast("Snuppet er annulleret, og tingen kan sælges igen.");
+    toast("Købet er annulleret, og tingen kan sælges igen.");
     router.refresh();
   }
   return (
@@ -186,7 +186,7 @@ export function SenderAddressForm({
   );
 }
 
-/** Lav fragtlabelen: sælgeren vælger vægt, og SnupLive køber labelen hos Shipmondo. */
+/** Lav fragtlabelen: sælgeren vælger vægt, og Relived køber labelen hos Shipmondo. */
 export function LabelMaker({
   orderId,
   weights,
@@ -274,7 +274,7 @@ export function UnblockButton({ userId, handle }: { userId: string; handle: stri
     const { error } = await getSupabase().rpc("unblock_user", { p_user: userId });
     setBusy(false);
     if (error) return toast(errorText(error));
-    toast(`@${handle} kan igen skrive og snuppe i dine shows.`);
+    toast(`@${handle} kan igen skrive og købe i dine shows.`);
     router.refresh();
   }
   return (

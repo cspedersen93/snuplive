@@ -29,7 +29,7 @@ export async function GET(req: Request) {
   return new Response("﻿" + [head.join(";"), ...lines].join("\r\n") + "\r\n", {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="snuplive-venteliste${all ? "-alle" : ""}.csv"`,
+      "Content-Disposition": `attachment; filename="relived-venteliste${all ? "-alle" : ""}.csv"`,
       "Cache-Control": "no-store",
     },
   });

@@ -68,7 +68,7 @@ function IssueNote({ o }: { o: SellerOrder }) {
       <span>
         {isIssueReason(issue.reason) ? ISSUE_REASONS[issue.reason] : "Problem"}: <q>{issue.message}</q>
       </span>
-      <span>Pengene holdes tilbage, mens SnupLive kigger på sagen. Du har fået en mail, du kan svare på.</span>
+      <span>Pengene holdes tilbage, mens Relived kigger på sagen. Du har fået en mail, du kan svare på.</span>
     </div>
   );
 }
@@ -77,7 +77,7 @@ const NOTICE: Record<string, [string, string]> = {
   klar: ["ok", "Din udbetaling er klar. Pengene fra dine salg går nu til din bankkonto via Stripe."],
   mangler: ["", "Stripe mangler stadig nogle oplysninger. Tryk “Fortsæt hos Stripe” for at gøre det færdigt."],
   fejl: ["", "Vi kunne ikke åbne Stripe. Prøv igen om lidt."],
-  "ikke-sat-op": ["", "Betaling er ikke sat op på SnupLive endnu."],
+  "ikke-sat-op": ["", "Betaling er ikke sat op på Relived endnu."],
 };
 
 type SenderAddress = { name: string; address1: string; address2: string | null; zipcode: string; city: string; phone: string | null };
@@ -141,7 +141,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                 {acct?.payouts_enabled
                   ? "Klar. Når køberen har fået sine ting, går pengene for tingene til din bankkonto."
                   : acct?.details_submitted
-                    ? "Stripe er ved at tjekke dine oplysninger, eller der mangler noget. Dine penge venter sikkert hos SnupLive imens."
+                    ? "Stripe er ved at tjekke dine oplysninger, eller der mangler noget. Dine penge venter sikkert hos Relived imens."
                     : "Tilknyt din bankkonto via Stripe, så du kan få pengene fra dine salg. Det tager et par minutter og kræver MitID eller ID."}
                 {stripeTestMode() ? " (Testmiljø: brug Stripes testoplysninger.)" : ""}
               </p>
@@ -306,16 +306,16 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
 
       {reservations.length ? (
         <div className="box">
-          <h2 className="h3" style={{ marginBottom: 4 }}>Snuppet, men ikke betalt endnu</h2>
+          <h2 className="h3" style={{ marginBottom: 4 }}>Købt, men ikke betalt endnu</h2>
           <p className="muted" style={{ fontSize: ".9rem", marginBottom: 6 }}>
-            Køberen har {RESERVATION_DAYS} dage til at betale. Derefter bliver snuppet annulleret af sig selv.
+            Køberen har {RESERVATION_DAYS} dage til at betale. Derefter bliver købet annulleret af sig selv.
           </p>
           <ul className="list">
             {reservations.map((r) => (
               <li key={r.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto auto", gap: 14 }}>
                 <div>
                   <strong>{r.item?.name}</strong>
-                  <span>@{r.buyer?.handle ?? "køber"} · snuppet {at(r.created_at)}</span>
+                  <span>@{r.buyer?.handle ?? "køber"} · købt {at(r.created_at)}</span>
                 </div>
                 <span className="num">{kr(r.price)}</span>
                 <CancelReservation saleId={r.id} />
@@ -327,7 +327,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
 
       {!ready ? (
         <p className="fine">
-          Betaling er ikke slået til endnu. <Link href="/kurv">Mine snup</Link> viser køberne, at betaling kommer snart.
+          Betaling er ikke slået til endnu. <Link href="/kurv">Mine køb</Link> viser køberne, at betaling kommer snart.
         </p>
       ) : null}
     </>

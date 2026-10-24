@@ -214,7 +214,7 @@ export default async function Overblik({ searchParams }: { searchParams: Promise
           <span className="k">Solgte ting</span>
           <span className="v">{num(o.items_sold)}</span>
           <span className="d muted">
-            {o.unpaid_snups ? `${num(o.unpaid_snups)} snup for ${kr(o.unpaid_value)} venter på betaling` : "Ingen snup venter på betaling"}
+            {o.unpaid_snups ? `${num(o.unpaid_snups)} køb for ${kr(o.unpaid_value)} venter på betaling` : "Ingen køb venter på betaling"}
           </span>
         </div>
       </div>

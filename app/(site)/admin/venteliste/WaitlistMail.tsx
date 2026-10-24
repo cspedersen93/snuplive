@@ -5,11 +5,11 @@ import { errorText, toast } from "@/lib/toast";
 
 type To = "all" | "sellers";
 
-/** Mail til ventelisten, fx når SnupLive åbner. Send altid en test til dig selv først. */
+/** Mail til ventelisten, fx når Relived åbner. Send altid en test til dig selv først. */
 export default function WaitlistMail({ recipients, sellers, me }: { recipients: number; sellers: number; me: string }) {
-  const [subject, setSubject] = useState("SnupLive er åben!");
+  const [subject, setSubject] = useState("Relived er åben!");
   const [text, setText] = useState(
-    "Hej\n\nNu er SnupLive åben. Se hvem der er live, og snup brugt tøj, design og samleobjekter på video:\nhttps://snuplive.dk\n\nHilsen SnupLive",
+    "Hej\n\nNu er Relived åben. Se hvem der er live, og køb brugt tøj, design og samleobjekter på video:\nhttps://relived.dk\n\nHilsen Relived",
   );
   const [to, setTo] = useState<To>("all");
   const [tested, setTested] = useState(false);

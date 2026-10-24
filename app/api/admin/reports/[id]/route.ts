@@ -52,20 +52,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       await sendMail({
         to: [to],
         replyTo: [COMPANY.email],
-        subject: report.target_type === "profile" ? "Din sælgerkonto på SnupLive er lukket" : `Vi har fjernet ${info.label} fra SnupLive`,
+        subject: report.target_type === "profile" ? "Din sælgerkonto på Relived er lukket" : `Vi har fjernet ${info.label} fra Relived`,
         text: [
           "Hej",
           "",
           report.target_type === "profile"
-            ? "Vi har lukket din sælgerkonto på SnupLive efter en anmeldelse. Dine kommende shows og ting er fjernet."
-            : `Vi har fjernet ${info.label} fra SnupLive efter en anmeldelse.`,
+            ? "Vi har lukket din sælgerkonto på Relived efter en anmeldelse. Dine kommende shows og ting er fjernet."
+            : `Vi har fjernet ${info.label} fra Relived efter en anmeldelse.`,
           "",
           `Begrundelse: ${decision}`,
           "",
           "Ordrer, der allerede er betalt, bliver gjort færdige eller refunderet.",
           `Er du uenig, så svar på denne mail eller skriv til ${COMPANY.email}, så ser vi på det igen.`,
           "",
-          "Hilsen SnupLive",
+          "Hilsen Relived",
         ].join("\n"),
       });
     }
@@ -80,11 +80,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         "",
         `Tak, fordi du anmeldte ${info.label}.`,
         action === "remove"
-          ? "Vi har kigget på det og fjernet det fra SnupLive."
+          ? "Vi har kigget på det og fjernet det fra Relived."
           : "Vi har kigget på det og vurderet, at det ikke strider mod vores vilkår, så det bliver på siden.",
         `Er du uenig, kan du svare på denne mail eller skrive til ${COMPANY.email}.`,
         "",
-        "Hilsen SnupLive",
+        "Hilsen Relived",
       ].join("\n"),
     });
   }

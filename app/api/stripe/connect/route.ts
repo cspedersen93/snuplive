@@ -36,7 +36,7 @@ export async function GET(req: Request) {
           capabilities: { transfers: { requested: true } },
           business_profile: {
             mcc: "5931",
-            product_description: "Salg af brugte ting i live-shows på SnupLive",
+            product_description: "Salg af brugte ting i live-shows på Relived",
           },
           metadata: { snuplive_user: user.id },
         },

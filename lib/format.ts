@@ -13,8 +13,8 @@ export const CATEGORIES = [
     cover: "/img/cover-dametoej.jpg",
     blurb: "Kjoler, jakker, sneakers og tasker fra danske skabe, vist frem på video.",
     h1: "Brugt dametøj, sko og tasker – køb det live",
-    title: "Brugt dametøj, sko og tasker – køb det live | SnupLive",
-    description: "Køb brugt dametøj, sko og tasker live. Se kjolen, jakken eller tasken på video, spørg om mål og stand, og snup den med ét tryk.",
+    title: "Brugt dametøj, sko og tasker – køb det live | Relived",
+    description: "Køb brugt dametøj, sko og tasker live. Se kjolen, jakken eller tasken på video, spørg om mål og stand, og køb den med ét tryk.",
   },
   {
     key: "herretoej",
@@ -26,8 +26,8 @@ export const CATEGORIES = [
     cover: "/img/cover-herretoej.jpg",
     blurb: "Jakker, denim, strik og sneakers, hvor du kan se slid og mærker tæt på.",
     h1: "Brugt herretøj og sneakers – køb det live",
-    title: "Brugt herretøj og sneakers – køb det live | SnupLive",
-    description: "Køb brugt herretøj og sneakers live. Se jakken, jeansene eller skoene tæt på, spørg om størrelse og slid, og snup dem med ét tryk.",
+    title: "Brugt herretøj og sneakers – køb det live | Relived",
+    description: "Køb brugt herretøj og sneakers live. Se jakken, jeansene eller skoene tæt på, spørg om størrelse og slid, og køb dem med ét tryk.",
   },
   {
     key: "boernetoej",
@@ -39,7 +39,7 @@ export const CATEGORIES = [
     cover: "/img/cover-boernetoej.jpg",
     blurb: "Hele poser i den rigtige størrelse og legetøj, der har mere leg i sig.",
     h1: "Brugt børnetøj og legetøj – køb det live",
-    title: "Brugt børnetøj og legetøj – køb det live | SnupLive",
+    title: "Brugt børnetøj og legetøj – køb det live | Relived",
     description: "Køb brugt børnetøj og legetøj live. Se hele poser i den rigtige størrelse på video, spørg om stand, og få det hele i én pakke.",
   },
   {
@@ -52,8 +52,8 @@ export const CATEGORIES = [
     cover: "/img/cover-bolig.jpg",
     blurb: "Lamper, keramik og vintage, som du kan se fra alle vinkler, før du køber.",
     h1: "Brugt design til hjemmet – lamper, keramik og vintage live",
-    title: "Brugt design, lamper og keramik – køb det live | SnupLive",
-    description: "Køb brugt design live: lamper, keramik, glas og vintage. Se tingen fra alle vinkler på video, spørg om mærke og stand, og snup den.",
+    title: "Brugt design, lamper og keramik – køb det live | Relived",
+    description: "Køb brugt design live: lamper, keramik, glas og vintage. Se tingen fra alle vinkler på video, spørg om mærke og stand, og køb den.",
   },
   {
     key: "samlerting",
@@ -65,8 +65,8 @@ export const CATEGORIES = [
     cover: "/img/cover-samleobjekter.jpg",
     blurb: "Vinyl, LEGO, samlerkort og retrospil til samlere, der vil se standen live.",
     h1: "Brugt vinyl, LEGO og samlerkort – køb samleobjekter live",
-    title: "Brugt vinyl, LEGO og samlerkort – køb det live | SnupLive",
-    description: "Køb brugt vinyl, LEGO, samlerkort og retrospil live. Se standen tæt på video, spørg sælgeren, og snup det, før en anden gør.",
+    title: "Brugt vinyl, LEGO og samlerkort – køb det live | Relived",
+    description: "Køb brugt vinyl, LEGO, samlerkort og retrospil live. Se standen tæt på video, spørg sælgeren, og køb det, før en anden gør.",
   },
   {
     key: "andet",
@@ -78,8 +78,8 @@ export const CATEGORIES = [
     cover: "/img/cover-andet.jpg",
     blurb: "Bøger, sport, værktøj og alt det, der ikke passer i de andre kategorier.",
     h1: "Andre brugte ting – køb dem live",
-    title: "Andre brugte ting – køb dem live | SnupLive",
-    description: "Køb brugte ting live: bøger, sport, værktøj og alt det, der ikke passer i de andre kategorier. Se tingen på video, og snup den.",
+    title: "Andre brugte ting – køb dem live | Relived",
+    description: "Køb brugte ting live: bøger, sport, værktøj og alt det, der ikke passer i de andre kategorier. Se tingen på video, og køb den.",
   },
 ] as const;
 

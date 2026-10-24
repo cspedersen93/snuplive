@@ -8,6 +8,7 @@ import { resizeImage } from "@/lib/resizeImage";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { Profile } from "@/lib/types";
+import { SITE_HOST } from "@/lib/env";
 
 export default function ProfileForm({ profile }: { profile: Profile }) {
   const router = useRouter();
@@ -111,7 +112,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
           <input id="pf-area" value={area} onChange={(e) => setArea(e.target.value)} maxLength={40} placeholder="Fx Nørrebro" />
         </div>
       </div>
-      <p className="fine">Dit brugernavn bliver vist i chatten og i adressen til dine shows: snuplive.dk/live/{handle.trim().toLowerCase() || "brugernavn"}</p>
+      <p className="fine">Dit brugernavn bliver vist i chatten og i adressen til dine shows: {SITE_HOST}/live/{handle.trim().toLowerCase() || "brugernavn"}</p>
       {err ? <p className="err" role="alert">{err}</p> : null}
       <div>
         <button className="btn btn-red" type="submit" disabled={busy}>{busy ? "Gemmer …" : "Gem profil"}</button>
