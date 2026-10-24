@@ -373,6 +373,23 @@ Sådan virker det:
 
 ---
 
+## Supportchat ("Hjælp")
+
+Kør `supabase/migrations/0013_support.sql` i Supabase → SQL Editor (efter 0012). Der skal ikke nye nøgler i Vercel.
+
+- **Besøgende** trykker **Hjælp** nederst til højre (eller *Skriv til os* i bunden af siden) og skriver til jer. Gæster skriver
+  deres e-mail første gang. Er de logget ind, hører samtalen til deres konto. Knappen er skjult i et show og i studiet,
+  så den ikke dækker for knapperne, men *Skriv til os* i bunden virker stadig. Den virker også på *Kommer snart*.
+- **I svarer** under **Backoffice → Support**. Alle i `ADMIN_EMAILS` får en mail ved en ny samtale, og igen hvis brugeren
+  skriver, efter I har kigget. Fanen viser, hvor mange samtaler der er ulæste.
+- **Har brugeren chatten åben**, ser de svaret med det samme. Ellers får de svaret på mail fra `MAIL_FROM` med et link, der
+  åbner samtalen igen (også på en anden telefon). Svarer de på mailen, lander den i kontakt@snuplive.dk.
+- Brugeren ser jeres fornavn ved svaret, hvis I har skrevet jeres navn under **Min konto**. Ellers står der bare *SnupLive*.
+- Spam: højst 5 nye samtaler i timen fra samme sted og 15 beskeder på 5 minutter pr. samtale. Samtaler slettes 12 måneder
+  efter sidste besked (det daglige job).
+
+---
+
 ## Udvikling på din egen computer
 
 ```bash

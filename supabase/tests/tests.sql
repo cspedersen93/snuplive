@@ -607,5 +607,76 @@ select t.throws($$insert into beta_access (email) values ('liva@example.dk')$$, 
 select t.ok((select value = 'false'::jsonb from settings where key = 'site_open'), 'alle kan læse, om siden er åben');
 reset role;
 
+-- ── Supportchat: kun serveren, mails til admins og brugere, spamgrænser ──
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.throws($$select * from support_threads$$, 'permission denied');
+select t.throws($$select * from support_messages$$, 'permission denied');
+select t.throws($$select support_start(null, 'x@example.dk', null, '/', null, null, 'hej')$$, 'permission denied');
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select * from support_threads$$, 'permission denied');
+select t.throws($$insert into support_messages (thread_id, sender, body) values (gen_random_uuid(), 'admin', 'snyd')$$, 'permission denied');
+select t.throws($$select support_add(gen_random_uuid(), 'admin', null, 'Snyd', 'hej')$$, 'permission denied');
+select t.throws($$select * from support_user_notices()$$, 'permission denied');
+reset role;
+
+create temp table st as
+  select support_start(null, 'Gaest@Example.dk', null, '/kurv', 'Mozilla/5.0 (iPhone)', 'ip-1', '  Siden driller  ') as r;
+select t.ok((select (r->>'notify')::boolean from st), 'første besked giver admins en mail');
+select t.ok((select email = 'gaest@example.dk' and page = '/kurv' and admin_unread and status = 'open' from support_threads where id = (select (r->>'thread_id')::uuid from st)), 'samtalen er gemt med e-mail og side');
+select t.ok((select body from support_messages where thread_id = (select (r->>'thread_id')::uuid from st)) = 'Siden driller', 'beskeden er gemt uden mellemrum');
+select t.ok(not (select (support_add((select (r->>'thread_id')::uuid from st), 'user', null, null, 'Hallo?')->>'notify')::boolean), 'ingen ny mail, før admins har kigget');
+update support_threads set admin_unread = false, admin_seen_at = now() where id = (select (r->>'thread_id')::uuid from st);
+select t.ok((select (support_add((select (r->>'thread_id')::uuid from st), 'user', null, null, 'Er I der?')->>'notify')::boolean), 'ny mail, når admins har kigget og der kommer en ny besked');
+select t.throws($$select support_add((select (r->>'thread_id')::uuid from st), 'user', null, null, '   ')$$, 'Skriv en besked');
+select t.throws($$select support_add((select (r->>'thread_id')::uuid from st), 'user', null, null, repeat('x', 2001))$$, 'for lang');
+select t.throws($$select support_add((select (r->>'thread_id')::uuid from st), 'robot', null, null, 'hej')$$, 'Ukendt afsender');
+
+-- Svar fra SnupLive. Brugeren har lige skrevet, så der kommer ingen mail med det samme.
+select support_add((select (r->>'thread_id')::uuid from st), 'admin', '00000000-0000-0000-0000-00000000000a', 'Maja', 'Vi kigger på det');
+select t.ok((select not admin_unread and last_admin_at is not null from support_threads where id = (select (r->>'thread_id')::uuid from st)), 'svar fra admin: samtalen er læst');
+select t.ok((select count(*) from support_user_notices((select (r->>'thread_id')::uuid from st))) = 0, 'ingen mail, mens brugeren har chatten åben');
+-- Brugeren er gået: mail med det samme.
+update support_threads set user_seen_at = now() - interval '10 minutes' where id = (select (r->>'thread_id')::uuid from st);
+select t.ok((select count(*) from support_user_notices((select (r->>'thread_id')::uuid from st)) where email = 'gaest@example.dk') = 1, 'mail til brugeren, når de er gået');
+select support_add((select (r->>'thread_id')::uuid from st), 'admin', null, 'Maja', 'Nu virker det');
+select t.ok((select count(*) from support_user_notices((select (r->>'thread_id')::uuid from st))) = 0, 'højst én mail hvert 5. minut');
+select t.ok((select count(*) from support_user_notices()) = 0, 'det sidste svar sendes ikke, før det er 2 minutter gammelt');
+update support_threads set user_notified_at = now() - interval '6 minutes', last_admin_at = now() - interval '3 minutes' where id = (select (r->>'thread_id')::uuid from st);
+select t.ok((select count(*) from support_user_notices() where since between now() - interval '7 minutes' and now() - interval '5 minutes') = 1, 'det daglige tjek sender det næste svar med de nye beskeder');
+select t.ok((select count(*) from support_user_notices()) = 0, 'det samme svar sendes kun én gang');
+
+-- Lukket samtale åbner igen, når brugeren skriver.
+update support_threads set status = 'closed', closed_at = now() where id = (select (r->>'thread_id')::uuid from st);
+select support_add((select (r->>'thread_id')::uuid from st), 'user', null, null, 'Én ting mere');
+select t.ok((select status = 'open' and closed_at is null from support_threads where id = (select (r->>'thread_id')::uuid from st)), 'en lukket samtale åbner igen');
+
+-- Spamgrænser.
+do $$
+declare v uuid := (select (r->>'thread_id')::uuid from st);
+begin
+  for i in 1..11 loop perform public.support_add(v, 'user', null, null, 'spam ' || i); end loop;
+end $$;
+select t.throws($$select support_add((select (r->>'thread_id')::uuid from st), 'user', null, null, 'nummer 16')$$, 'mange beskeder');
+select support_add((select (r->>'thread_id')::uuid from st), 'admin', null, 'Maja', 'Admins kan altid svare');
+select support_start(null, 'a@example.dk', null, '/', null, 'ip-1', 'hej') from generate_series(1, 4);
+select t.throws($$select support_start(null, 'b@example.dk', null, '/', null, 'ip-1', 'hej')$$, 'For mange nye samtaler');
+select t.ok((select (support_start(null, 'b@example.dk', null, '/', null, 'ip-2', 'hej')->>'notify')::boolean), 'en anden kan stadig skrive');
+select t.throws($$select support_start(null, 'b@example.dk', null, '/', null, 'ip-3', '')$$, 'Skriv en besked');
+
+-- Logget ind: samtalen hører til kontoen og slettes med den.
+select support_start('00000000-0000-0000-0000-00000000000e', 'å@x.dk', 'snupper', '/konto', null, null, 'Hjælp');
+select t.ok((select count(*) from support_threads where user_id = '00000000-0000-0000-0000-00000000000e') = 1, 'samtalen hører til kontoen');
+
+-- Oprydning.
+update support_threads set created_at = now() - interval '3 days' where ip_hash = 'ip-2';
+insert into support_threads (email, last_message_at) values ('gammel@example.dk', now() - interval '13 months');
+select t.ok((select support_cleanup()) = 1, 'samtaler slettes 12 måneder efter sidste besked');
+select t.ok((select count(*) from support_threads where ip_hash = 'ip-2') = 0, 'spam-stemplet slettes efter to døgn');
+delete from support_threads where id = (select (r->>'thread_id')::uuid from st);
+select t.ok((select count(*) from support_messages where thread_id = (select (r->>'thread_id')::uuid from st)) = 0, 'beskederne slettes med samtalen');
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

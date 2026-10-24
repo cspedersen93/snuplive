@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { COMPANY, companyLine } from "@/lib/company";
 import { MAIN_CATEGORIES } from "@/lib/format";
+import SupportLink from "./SupportLink";
 
 export default function Footer() {
   return (
@@ -43,6 +44,7 @@ export default function Footer() {
           <div>
             <h2>Hjælp</h2>
             <ul>
+              <li><SupportLink>Skriv til os</SupportLink></li>
               <li><Link href="/faq">Spørgsmål og svar</Link></li>
               <li><Link href="/saadan-virker-det#tryg-handel">Tryg handel</Link></li>
               <li><Link href="/handelsbetingelser">Handelsbetingelser</Link></li>

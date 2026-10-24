@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import CompanyInfo from "@/components/CompanyInfo";
 import LegalPage from "@/components/LegalPage";
+import SupportLink from "@/components/SupportLink";
 import { COMPANY } from "@/lib/company";
 
 export const metadata: Metadata = {
@@ -20,7 +21,8 @@ export default function OmSnupLive() {
 
       <h2>Kontakt</h2>
       <p>
-        Skriv til <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. Gælder det en ordre, så brug <b>Meld et problem</b> på
+        Skriv til os i chatten (<SupportLink className="sup-link inline">åbn chatten</SupportLink>, eller tryk <b>Hjælp</b> nederst på
+        siden), eller send en mail til <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. Gælder det en ordre, så brug <b>Meld et problem</b> på
         ordren under Mine snup. Vil du anmelde en ting, et show eller en profil, så tryk <b>Anmeld</b> ved den.
       </p>
 

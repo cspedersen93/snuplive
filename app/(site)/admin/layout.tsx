@@ -7,15 +7,16 @@ export const metadata: Metadata = { title: { default: "Backoffice", template: "%
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { admin } = await requireAdmin();
-  const [issues, reports] = admin
+  const [issues, reports, support] = admin
     ? await Promise.all([
         admin.from("order_issues").select("id", { count: "exact", head: true }).eq("status", "open"),
         admin.from("reports").select("id", { count: "exact", head: true }).eq("status", "open"),
+        admin.from("support_threads").select("id", { count: "exact", head: true }).eq("admin_unread", true),
       ])
-    : [null, null];
+    : [null, null, null];
   return (
     <div className="wrap adm">
-      <AdminNav openIssues={issues?.count ?? 0} openReports={reports?.count ?? 0} />
+      <AdminNav openIssues={issues?.count ?? 0} openReports={reports?.count ?? 0} unreadSupport={support?.count ?? 0} />
       {children}
     </div>
   );

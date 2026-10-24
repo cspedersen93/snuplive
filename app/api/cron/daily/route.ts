@@ -2,6 +2,7 @@ import { fail, json } from "@/lib/api";
 import { unquoteEnv } from "@/lib/env";
 import { dailyMaintenance } from "@/lib/orders";
 import { getStripe } from "@/lib/stripe";
+import { sweepSupportNotices } from "@/lib/support";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -15,5 +16,13 @@ export async function GET(req: Request) {
   if (!stripe || !admin) return fail("Betaling er ikke sat op.", 503);
   // Shows, der hænger som live uden livstegn fra studiet, bliver lukket.
   const stale = await admin.rpc("end_stale_shows");
-  return json({ ...(await dailyMaintenance(admin, stripe)), staleShowsEnded: stale.data ?? 0 });
+  // Supportchatten: svar, der ikke er sendt på mail endnu, og gamle samtaler, der skal slettes.
+  const supportMailed = await sweepSupportNotices(admin, true);
+  const supportDeleted = await admin.rpc("support_cleanup");
+  return json({
+    ...(await dailyMaintenance(admin, stripe)),
+    staleShowsEnded: stale.data ?? 0,
+    supportMailed,
+    supportDeleted: supportDeleted.data ?? 0,
+  });
 }
