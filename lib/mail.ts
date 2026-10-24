@@ -14,6 +14,23 @@ export const isAdminEmail = (email: string | null | undefined) => Boolean(email 
 
 let lastError = "";
 
+const FROM_DEFAULT = "Relived <noreply@relived.dk>";
+
+/**
+ * Afsenderen fra MAIL_FROM, renset for små tastefejl i Vercel: anførselstegn og `backticks` omkring,
+ * eller kun en e-mail uden navn. Resend kræver formen "Navn <mail@domæne.dk>".
+ */
+export function mailFrom() {
+  const raw = unquoteEnv(process.env.MAIL_FROM)
+    .replace(/^MAIL_FROM\s*=\s*/i, "")
+    .replace(/^[`'"\s]+|[`'"\s]+$/g, "");
+  if (!raw) return FROM_DEFAULT;
+  const email = /[^\s<>"'`]+@[^\s<>"'`]+\.[a-z]{2,}/i.exec(raw)?.[0];
+  if (!email) return FROM_DEFAULT;
+  const name = raw.replace(email, "").replace(/[<>"'`]/g, "").trim();
+  return `${name || "Relived"} <${email}>`;
+}
+
 /**
  * Hvorfor den sidste mail ikke blev sendt, forklaret, så admins kan rette det selv
  * (fx at domænet ikke er bekræftet hos Resend endnu, eller at nøglen ikke må sende fra det).
@@ -28,9 +45,12 @@ function resendMessage() {
 }
 
 export function mailProblem() {
-  const from = unquoteEnv(process.env.MAIL_FROM) || "Relived <noreply@relived.dk>";
+  const from = mailFrom();
   const domain = /@([^>\s]+)/.exec(from)?.[1] ?? "domænet";
   if (!unquoteEnv(process.env.RESEND_API_KEY)) return "RESEND_API_KEY mangler i Vercel.";
+  if (/`from` field|from field/i.test(lastError)) {
+    return `MAIL_FROM i Vercel har en forkert form. Skriv den sådan: Relived <kontakt@${domain}> (uden anførselstegn), og lav en Redeploy.`;
+  }
   if (/not verified|verify/i.test(lastError)) {
     return `${domain} er ikke bekræftet hos Resend endnu. Vent, til der står Verified under Domains hos Resend, eller sæt MAIL_FROM i Vercel tilbage til et bekræftet domæne så længe.`;
   }
@@ -48,7 +68,7 @@ export async function sendMail(msg: { to: string[]; subject: string; text: strin
   const to = msg.to.filter(Boolean);
   if (!key || !to.length) return false;
   const base = (unquoteEnv(process.env.RESEND_API_BASE) || "https://api.resend.com").replace(/\/+$/, "");
-  const from = unquoteEnv(process.env.MAIL_FROM) || "Relived <noreply@relived.dk>";
+  const from = mailFrom();
   try {
     const r = await fetch(`${base}/emails`, {
       method: "POST",
@@ -81,7 +101,7 @@ export async function sendMailBatch(msgs: { to: string; subject: string; text: s
   const key = unquoteEnv(process.env.RESEND_API_KEY);
   if (!key || !msgs.length) return 0;
   const base = (unquoteEnv(process.env.RESEND_API_BASE) || "https://api.resend.com").replace(/\/+$/, "");
-  const from = unquoteEnv(process.env.MAIL_FROM) || "Relived <noreply@relived.dk>";
+  const from = mailFrom();
   let sent = 0;
   for (let i = 0; i < msgs.length; i += 100) {
     const chunk = msgs.slice(i, i + 100).map((m) => ({
