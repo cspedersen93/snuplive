@@ -12,6 +12,26 @@ export function adminEmails() {
 
 export const isAdminEmail = (email: string | null | undefined) => Boolean(email && adminEmails().includes(email.toLowerCase()));
 
+let lastError = "";
+
+/**
+ * Hvorfor den sidste mail ikke blev sendt, forklaret, så admins kan rette det selv
+ * (fx at domænet ikke er bekræftet hos Resend endnu, eller at nøglen ikke må sende fra det).
+ */
+export function mailProblem() {
+  const from = unquoteEnv(process.env.MAIL_FROM) || "Relived <noreply@relived.dk>";
+  const domain = /@([^>\s]+)/.exec(from)?.[1] ?? "domænet";
+  if (!unquoteEnv(process.env.RESEND_API_KEY)) return "RESEND_API_KEY mangler i Vercel.";
+  if (/not verified|verify/i.test(lastError)) {
+    return `${domain} er ikke bekræftet hos Resend endnu. Vent, til der står Verified under Domains hos Resend, eller sæt MAIL_FROM i Vercel tilbage til et bekræftet domæne så længe.`;
+  }
+  if (/restricted|not allowed|permission|access/i.test(lastError)) {
+    return `Resend-nøglen må ikke sende fra ${domain}. Lav en nøgle med adgang til ${domain} (eller alle domæner) hos Resend, og læg den i RESEND_API_KEY i Vercel.`;
+  }
+  if (/api key|unauthori[sz]ed|invalid/i.test(lastError)) return "Resend afviser nøglen. Tjek RESEND_API_KEY i Vercel.";
+  return lastError ? `Resend svarede: ${lastError}` : "Mailen blev ikke sendt. Tjek RESEND_API_KEY og MAIL_FROM i Vercel.";
+}
+
 export async function sendMail(msg: { to: string[]; subject: string; text: string; replyTo?: string[]; headers?: Record<string, string> }) {
   const key = unquoteEnv(process.env.RESEND_API_KEY);
   const to = msg.to.filter(Boolean);
@@ -32,9 +52,14 @@ export async function sendMail(msg: { to: string[]; subject: string; text: strin
       }),
       signal: AbortSignal.timeout(10_000),
     });
-    if (!r.ok) console.error("[snuplive] mail fejlede", r.status, (await r.text()).slice(0, 300));
+    if (!r.ok) {
+      const body = (await r.text()).slice(0, 300);
+      lastError = body;
+      console.error("[snuplive] mail fejlede", r.status, body);
+    }
     return r.ok;
   } catch (e) {
+    lastError = e instanceof Error ? e.message : String(e);
     console.error("[snuplive] mail fejlede", e);
     return false;
   }
@@ -64,8 +89,12 @@ export async function sendMailBatch(msgs: { to: string; subject: string; text: s
         signal: AbortSignal.timeout(15_000),
       });
       if (r.ok) sent += chunk.length;
-      else console.error("[snuplive] mails fejlede", r.status, (await r.text()).slice(0, 300));
+      else {
+        lastError = (await r.text()).slice(0, 300);
+        console.error("[snuplive] mails fejlede", r.status, lastError);
+      }
     } catch (e) {
+      lastError = e instanceof Error ? e.message : String(e);
       console.error("[snuplive] mails fejlede", e);
     }
   }

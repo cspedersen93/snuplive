@@ -1,6 +1,6 @@
 import { fail, json } from "@/lib/api";
 import { COMPANY } from "@/lib/company";
-import { isAdminEmail, sendMail, sendMailBatch } from "@/lib/mail";
+import { isAdminEmail, mailProblem, sendMail, sendMailBatch } from "@/lib/mail";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserInfo } from "@/lib/supabase/server";
 import { unsubFooter, unsubHeaders } from "@/lib/waitlist";
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
   if (body.test === true) {
     const ok = await sendMail({ to: [user.email], subject: `[Test] ${subject}`, text: text + unsubFooter("00000000-0000-0000-0000-000000000000"), replyTo: [COMPANY.email], headers: unsubHeaders("00000000-0000-0000-0000-000000000000") });
-    return ok ? json({ ok: true, sent: 1 }) : fail("Mailen blev ikke sendt. Tjek RESEND_API_KEY i Vercel.", 502);
+    return ok ? json({ ok: true, sent: 1 }) : fail(mailProblem(), 502);
   }
 
   let q = admin.from("waitlist").select("email,unsub_token").not("confirmed_at", "is", null).is("unsubscribed_at", null);
@@ -37,6 +37,6 @@ export async function POST(req: Request) {
   if (!msgs.length) return fail("Der er ingen at sende til.", 400);
   const sent = await sendMailBatch(msgs);
   console.info("[snuplive] admin", user.email, "mail til ventelisten", { to: body.to, sent, total: msgs.length });
-  if (!sent) return fail("Mailen blev ikke sendt. Tjek RESEND_API_KEY i Vercel.", 502);
+  if (!sent) return fail(mailProblem(), 502);
   return json({ ok: true, sent });
 }
