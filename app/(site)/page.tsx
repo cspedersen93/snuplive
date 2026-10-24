@@ -65,6 +65,16 @@ export default async function Forside() {
         </div>
       </section>
 
+      <section className="sec tight" aria-labelledby="h-kategorier">
+        <div className="wrap">
+          <div className="row-head">
+            <h2 className="h2" id="h-kategorier">Hvad kan du købe brugt på SnupLive?</h2>
+            <Link className="btn btn-line" href="/kategori">Alle kategorier</Link>
+          </div>
+          <CategoryCards />
+        </div>
+      </section>
+
       <section className="sec tight" aria-labelledby="h-live-now">
         <div className="wrap">
           <div className="row-head">
@@ -87,16 +97,6 @@ export default async function Forside() {
               <Link className="btn btn-red" href="/til-salg">Se ting til salg</Link>
             </div>
           )}
-        </div>
-      </section>
-
-      <section className="sec tight" aria-labelledby="h-kategorier">
-        <div className="wrap">
-          <div className="row-head">
-            <h2 className="h2" id="h-kategorier">Hvad kan du købe brugt på SnupLive?</h2>
-            <Link className="btn btn-line" href="/kategori">Alle kategorier</Link>
-          </div>
-          <CategoryCards />
         </div>
       </section>
 
