@@ -32,13 +32,16 @@ export async function POST(req: Request) {
 
   try {
     switch (event.type) {
+      // Betalingen hentes igen med kodens egen API-version, så det er ligegyldigt, hvilken version
+      // webhooken står på i Stripe (Stripe tilbyder kun den nyeste, når man opretter en ny).
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded":
-        await markCheckoutPaid(admin, stripe, event.data.object);
+        await markCheckoutPaid(admin, stripe, await stripe.checkout.sessions.retrieve(event.data.object.id));
         break;
       case "checkout.session.expired":
       case "checkout.session.async_payment_failed": {
-        const id = event.data.object.metadata?.checkout_id;
+        const session = await stripe.checkout.sessions.retrieve(event.data.object.id);
+        const id = session.metadata?.checkout_id;
         if (id) await cancelCheckout(admin, id);
         break;
       }
