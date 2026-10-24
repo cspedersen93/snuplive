@@ -13,7 +13,7 @@ import SellerFacts from "@/components/SellerFacts";
 import SetupNotice from "@/components/SetupNotice";
 import { SITE_URL } from "@/lib/env";
 import { category, clock, dayLabel, kr } from "@/lib/format";
-import { itemImages } from "@/lib/images";
+import { clipUrl, itemImages } from "@/lib/images";
 import { idFromSlug, itemHref, itemSlug, itemState, type ItemState } from "@/lib/items";
 import { isAuction, soldPrice } from "@/lib/auction";
 import { DELIVERY } from "@/lib/pricing";
@@ -37,18 +37,23 @@ const load = cache(async (slug: string) => {
   if (!sb) return { setup: false as const };
   const id = idFromSlug(decodeURIComponent(slug));
   if (!id) return { setup: true as const, item: null };
-  const { data } = await sb
-    .from("items")
-    .select(
-      `${ITEM_COLS},show:shows!items_show_id_fkey(id,title,status,starts_at,category,removed_at),seller:profiles!items_seller_id_fkey(handle,display_name,area,avatar_path,${SELLER_FACT_COLS})`,
-    )
-    .eq("id", id)
-    .is("removed_at", null)
-    .maybeSingle();
+  const [{ data }, clipRes] = await Promise.all([
+    sb
+      .from("items")
+      .select(
+        `${ITEM_COLS},show:shows!items_show_id_fkey(id,title,status,starts_at,category,removed_at),seller:profiles!items_seller_id_fkey(handle,display_name,area,avatar_path,${SELLER_FACT_COLS})`,
+      )
+      .eq("id", id)
+      .is("removed_at", null)
+      .maybeSingle(),
+    // Klippet hentes for sig, så siden virker, også før 0015_klip.sql er kørt.
+    sb.from("items").select("clip_path,clip_at").eq("id", id).maybeSingle(),
+  ]);
   const item = data as unknown as Loaded | null;
   // En ting eller et show, der er fjernet efter en anmeldelse, findes ikke længere.
   if (!item?.show || !item.seller || item.show.removed_at) return { setup: true as const, item: null };
-  return { setup: true as const, item };
+  const clip = clipRes.error ? null : (clipRes.data as { clip_path: string | null; clip_at: string | null } | null);
+  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null };
 });
 
 function stateOf(it: Loaded): ItemState {
@@ -99,6 +104,9 @@ export default async function ItemPage({ params }: Params) {
   const cat = category(it.category ?? show.category);
   const state = stateOf(it);
   const images = itemImages(it);
+  // Klippet fra live-showet vises, når tingen er til salg bagefter (eller solgt, til klippet bliver slettet).
+  const clip = state === "for_sale" || state === "sold" ? d.clip : null;
+  const video = clip?.url ?? null;
   const meta = itemMeta(it);
   const href = itemHref(it);
   const liveHref = `/live/${seller.handle}`;
@@ -147,6 +155,19 @@ export default async function ItemPage({ params }: Params) {
           { "@type": "ListItem", position: 3, name: it.name, item: `${SITE_URL}${href}` },
         ],
       },
+      // Klippet fra live-showet, så Google kan vise tingen med video.
+      ...(clip && images.length
+        ? [
+            {
+              "@type": "VideoObject",
+              name: `${it.name} vist live`,
+              description: `${it.name}${meta ? `, ${meta}` : ""}, vist live af ${seller.handle} på Relived.`,
+              thumbnailUrl: images[0],
+              contentUrl: clip.url,
+              uploadDate: clip.at ?? undefined,
+            },
+          ]
+        : []),
     ],
   };
 
@@ -163,8 +184,8 @@ export default async function ItemPage({ params }: Params) {
         </nav>
 
         <div className="item-grid">
-          {images.length ? (
-            <Gallery images={images} alt={it.name} />
+          {images.length || video ? (
+            <Gallery images={images} alt={it.name} video={video} />
           ) : (
             <div className="gallery">
               <div className="gallery-main gallery-empty">

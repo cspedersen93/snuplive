@@ -415,6 +415,23 @@ og snuplive.dk sender videre. Gør det her i rækkefølge:
 
 ---
 
+## Videoklip af tingene fra showet
+
+Kør `supabase/migrations/0015_klip.sql` i Supabase → SQL Editor (efter 0014). Der skal ikke nye nøgler i Vercel.
+
+- **Når sælgeren viser en ting frem**, optager studiet de første 15 sekunder (med lyd) i sælgerens browser og lægger klippet
+  i mappen `clips` i Supabase Storage. Viser sælgeren den næste ting før tid, gemmes det, der er nået (mindst 4 sekunder).
+  Viser sælgeren samme ting igen, erstatter det nye klip det gamle.
+- **Bliver tingen ikke solgt**, vises klippet først på tingens side (uden lyd, i loop, med knap til lyd), og kortet under
+  *Til salg* får mærket *Video*. Har man slået *reducer bevægelse* til på sin enhed, starter klippet ikke af sig selv.
+- **Sælgeren kan slette klippet** under **Studie → Til salg** (*Slet video*).
+- **Oprydning:** det daglige job sletter klip 14 dage efter, at tingen er solgt, og klip af ting, der er fjernet.
+- Klip fylder ca. 2-3 MB stykket (højst 15 MB). Supabase Free har 1 GB lagerplads, så hold øje med *Storage* i Supabase, når
+  der kommer mange sælgere.
+- Er 0015 ikke kørt, sker der ingenting: studiet springer klippet over, og siderne virker som før.
+
+---
+
 ## Udvikling på din egen computer
 
 ```bash

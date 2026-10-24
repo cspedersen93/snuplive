@@ -700,6 +700,7 @@ label.btn{cursor:pointer}
 .icard-badge{position:absolute;top:10px;left:10px;display:flex;gap:6px;z-index:2}
 .icard-badge .b-live,.icard-badge .b-view,.b-buy{font-size:.68rem;padding:.35em .6em;border-radius:6px;gap:6px;color:#fff}
 .icard-badge .b-view{background:rgba(0,0,0,.55)}
+.icard-badge .b-view svg{width:11px;height:11px}
 .b-buy{display:flex;align-items:center;background:var(--mint);color:#0e1a14 !important;font-family:var(--mono);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
 .icard-info{display:flex;flex-direction:column;gap:3px;min-width:0}
 .icard-info strong{font-size:1.02rem}
@@ -730,6 +731,9 @@ label.btn{cursor:pointer}
 .pthumb.add:hover{color:var(--text);border-color:var(--muted)}
 .pthumb.add:focus-within{outline:2px solid var(--red-text);outline-offset:2px}
 .forsale-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.list .clip-row{display:block;margin-top:2px}
+.clip-row a{color:inherit}
+.clip-row .linkbtn{font-size:inherit}
 .forsale-row input[inputmode]{width:84px;font:inherit;font-size:.92rem;color:var(--text);background:var(--bg);border:1px solid var(--line-2);border-radius:10px;padding:.45em .6em;text-align:right}
 .switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:.86rem}
 .switch input{accent-color:var(--mint);width:18px;height:18px;margin:0}
@@ -745,6 +749,17 @@ label.btn{cursor:pointer}
 .gallery-thumbs button[aria-pressed=true]{border-color:var(--text);opacity:1}
 .gallery-thumbs button:hover{opacity:1}
 .gallery-thumbs img{width:100%;height:100%;object-fit:cover}
+.gallery-main video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+.gallery-tag{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;padding:.4em .65em;border-radius:6px;background:rgba(0,0,0,.55);color:#fff;font:500 .68rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+.gallery-tag svg{width:11px;height:11px}
+.gallery-ctl{position:absolute;right:12px;bottom:12px;display:flex;gap:8px}
+.gallery-ctl button{display:grid;place-items:center;width:42px;height:42px;border-radius:99px;border:0;background:rgba(0,0,0,.55);color:#fff;cursor:pointer}
+.gallery-ctl button:hover{background:rgba(0,0,0,.75)}
+.gallery-ctl button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.gallery-ctl svg{width:20px;height:20px}
+.gallery-thumbs .thumb-video{position:relative;display:grid;place-items:center;color:#fff;background:#111}
+.gallery-thumbs .thumb-video img{position:absolute;inset:0}
+.gallery-thumbs .thumb-video svg{position:relative;width:22px;height:22px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
 .item-info{display:flex;flex-direction:column;gap:22px;min-width:0}
 .item-head{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
 .item-h1{font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.02;letter-spacing:-.035em}

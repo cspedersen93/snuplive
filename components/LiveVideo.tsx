@@ -12,6 +12,7 @@ import {
 } from "@livekit/components-react";
 import { ConnectionState, MediaDeviceFailure, Track, VideoPresets, type LocalVideoTrack } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
+import { CLIP_MIN_MS, CLIP_SECONDS, recordClip } from "@/lib/clipRecorder";
 import { frameFromVideo } from "@/lib/resizeImage";
 import { IconFlip, IconMic } from "@/components/Icons";
 
@@ -77,9 +78,12 @@ interface StageProps {
   /** Skifter værdien, tages et billede i 4:5 (til tingen, der lige er vist frem). */
   captureKey?: number | null;
   onCapture?: (jpeg: Blob) => void;
+  /** Skifter den, optages et klip på op til 15 sekunder af tingen, der lige er vist frem. */
+  clip?: { key: number; itemId: string } | null;
+  onClip?: (itemId: string, video: Blob, ext: "mp4" | "webm") => void;
 }
 
-function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, captureKey, onCapture }: StageProps) {
+function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, captureKey, onCapture, clip, onClip }: StageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
@@ -130,6 +134,28 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, captureKe
     }, 1500);
     return () => clearTimeout(t);
   }, [ready, captureKey, onCapture]);
+
+  // Klip af tingen: optager fra kameraet og mikrofonen, til 15 sekunder er gået, eller sælgeren viser den næste.
+  const clipKey = clip?.key ?? null;
+  const clipItem = clip?.itemId ?? null;
+  const onClipRef = useRef(onClip);
+  onClipRef.current = onClip;
+  useEffect(() => {
+    if (!ready || !clipKey || !clipItem || !onClipRef.current) return;
+    // Kommer kameraet først igen længe efter (fx efter et udfald), optager vi ikke en tilfældig bid.
+    if (Date.now() - clipKey > 10_000) return;
+    const video = cam?.publication?.track?.mediaStreamTrack;
+    if (!video || video.readyState !== "live") return;
+    const mic = localParticipant.getTrackPublication(Track.Source.Microphone)?.track?.mediaStreamTrack;
+    const stream = new MediaStream(mic && mic.readyState === "live" ? [video, mic] : [video]);
+    const ctrl = new AbortController();
+    recordClip(stream, CLIP_SECONDS, ctrl.signal).then((c) => {
+      if (c && c.ms >= CLIP_MIN_MS) onClipRef.current?.(clipItem, c.blob, c.ext);
+    });
+    return () => ctrl.abort();
+    // Kun når en ny ting bliver vist (eller kameraet bliver klar).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, clipKey, clipItem]);
 
   async function flip() {
     const pub = localParticipant.getTrackPublication(Track.Source.Camera);
@@ -198,6 +224,8 @@ export function StudioVideo(props: {
   snapshotEvery?: number | null;
   captureKey?: number | null;
   onCapture?: (jpeg: Blob) => void;
+  clip?: { key: number; itemId: string } | null;
+  onClip?: (itemId: string, video: Blob, ext: "mp4" | "webm") => void;
 }) {
   return (
     <LiveKitRoom
@@ -218,6 +246,8 @@ export function StudioVideo(props: {
         snapshotEvery={props.snapshotEvery}
         captureKey={props.captureKey}
         onCapture={props.onCapture}
+        clip={props.clip}
+        onClip={props.onClip}
       />
     </LiveKitRoom>
   );

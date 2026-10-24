@@ -323,3 +323,35 @@ export function ForSaleRow({ id, price, forSale }: { id: string; price: number; 
     </div>
   );
 }
+
+/** Klippet fra live-showet på en ting: se det, eller slet det. */
+export function ClipRow({ id, href }: { id: string; href: string }) {
+  const router = useRouter();
+  const [ask, setAsk] = useState(false);
+  const [busy, setBusy] = useState(false);
+  async function remove() {
+    setBusy(true);
+    const sb = getSupabase();
+    const { data, error } = await sb.rpc("clear_item_clip", { p_item: id });
+    if (!error && typeof data === "string" && data) await sb.storage.from("clips").remove([data]);
+    setBusy(false);
+    if (error) return toast(errorText(error));
+    toast("Videoen er slettet.");
+    router.refresh();
+  }
+  return (
+    <span className="clip-row">
+      <a href={href}>Video fra showet</a>
+      {" · "}
+      {ask ? (
+        <>
+          Slet videoen?{" "}
+          <button className="linkbtn" type="button" disabled={busy} onClick={remove}>Ja, slet</button>{" "}
+          <button className="linkbtn" type="button" disabled={busy} onClick={() => setAsk(false)}>Nej</button>
+        </>
+      ) : (
+        <button className="linkbtn" type="button" onClick={() => setAsk(true)}>Slet video</button>
+      )}
+    </span>
+  );
+}

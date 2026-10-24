@@ -2,7 +2,7 @@ import { SUPABASE_URL } from "@/lib/env";
 import { category } from "@/lib/format";
 
 /** Offentlig adresse til et billede i Supabase Storage. */
-export function storageUrl(bucket: "avatars" | "covers" | "items", path: string, version?: string | null) {
+export function storageUrl(bucket: "avatars" | "covers" | "items" | "clips", path: string, version?: string | null) {
   const v = version ? `?v=${encodeURIComponent(new Date(version).getTime().toString(36))}` : "";
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path.split("/").map(encodeURIComponent).join("/")}${v}`;
 }
@@ -35,4 +35,9 @@ export function itemImage(item: { images?: string[] | null }) {
 
 export function itemImages(item: { images?: string[] | null }) {
   return (item.images ?? []).map((p) => storageUrl("items", p));
+}
+
+/** Klippet af tingen fra live-showet, eller null. */
+export function clipUrl(item: { clip_path?: string | null; clip_at?: string | null }) {
+  return item.clip_path ? storageUrl("clips", item.clip_path, item.clip_at) : null;
 }

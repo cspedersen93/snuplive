@@ -184,6 +184,22 @@ export default function StudioClient(props: Props) {
     [capture?.itemId, sb, me.id],
   );
 
+  // Klip af tingen (op til 15 sekunder). Bliver den ikke solgt, vises klippet på annoncen.
+  const onClip = useCallback(
+    async (itemId: string, video: Blob, ext: "mp4" | "webm") => {
+      const path = `${me.id}/${itemId}/clip-${Date.now().toString(36)}.${ext}`;
+      const up = await sb.storage.from("clips").upload(path, video, { contentType: video.type, cacheControl: "31536000" });
+      if (up.error) return console.warn("[snuplive] klip af tingen:", up.error.message);
+      const { data: old, error } = await sb.rpc("set_item_clip", { p_item: itemId, p_path: path });
+      if (error) {
+        await sb.storage.from("clips").remove([path]);
+        return console.warn("[snuplive] klip af tingen:", error.message);
+      }
+      if (typeof old === "string" && old) await sb.storage.from("clips").remove([old]);
+    },
+    [sb, me.id],
+  );
+
   async function present(itemId: string) {
     if (await rpc("present_item", { p_item: itemId })) setCapture({ key: Date.now(), itemId });
   }
@@ -396,6 +412,8 @@ export default function StudioClient(props: Props) {
                   snapshotEvery={live ? 60000 : null}
                   captureKey={live ? (capture?.key ?? null) : null}
                   onCapture={onCapture}
+                  clip={live ? capture : null}
+                  onClip={onClip}
                 />
               ) : live ? (
                 <div className="screen-dark" />
@@ -549,7 +567,8 @@ export default function StudioClient(props: Props) {
           </div>
           {live ? (
             <p className="fine" style={{ textAlign: "center", marginTop: 10 }}>
-              Hold studiet åbent og kameraet tændt. Er de slukket i 15 minutter, slutter showet af sig selv.
+              Hold studiet åbent og kameraet tændt. Er de slukket i 15 minutter, slutter showet af sig selv. Når du viser en ting frem,
+              gemmer vi de første 15 sekunder som video på tingens side, hvis den ikke bliver solgt.
             </p>
           ) : null}
           {!live && !ended ? (

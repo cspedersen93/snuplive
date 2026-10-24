@@ -96,6 +96,8 @@ export interface FeedItem {
   area: string | null;
   high_bid: number | null;
   bid_count: number;
+  /** Klip fra live-showet (findes først, når 0015_klip.sql er kørt). */
+  clip_path?: string | null;
   total: number;
 }
 

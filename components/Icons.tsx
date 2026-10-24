@@ -158,3 +158,20 @@ export const IconBell = (p: P) => (
     <path d="M10 20.5a2 2 0 0 0 4 0" />
   </svg>
 );
+export const IconPlay = (p: P) => (
+  <svg {...base} fill="currentColor" {...p}>
+    <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" />
+  </svg>
+);
+export const IconSound = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z" />
+    <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
+  </svg>
+);
+export const IconMute = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z" />
+    <path d="m16 9.5 5 5M21 9.5l-5 5" />
+  </svg>
+);

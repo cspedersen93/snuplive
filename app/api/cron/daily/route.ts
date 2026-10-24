@@ -19,10 +19,24 @@ export async function GET(req: Request) {
   // Supportchatten: svar, der ikke er sendt på mail endnu, og gamle samtaler, der skal slettes.
   const supportMailed = await sweepSupportNotices(admin, true);
   const supportDeleted = await admin.rpc("support_cleanup");
+  // Klip fra live-showene: slettes 14 dage efter salget, og når en ting er fjernet.
+  const clipsDeleted = await cleanClips(admin);
   return json({
     ...(await dailyMaintenance(admin, stripe)),
     staleShowsEnded: stale.data ?? 0,
     supportMailed,
     supportDeleted: supportDeleted.data ?? 0,
+    clipsDeleted,
   });
+}
+
+async function cleanClips(admin: NonNullable<ReturnType<typeof createAdminClient>>) {
+  const { data, error } = await admin.rpc("clips_to_clean");
+  if (error) return 0; // 0015_klip.sql er ikke kørt endnu
+  const paths = ((data ?? []) as unknown[]).filter((p): p is string => typeof p === "string" && !!p);
+  for (let i = 0; i < paths.length; i += 100) {
+    const { error: rmErr } = await admin.storage.from("clips").remove(paths.slice(i, i + 100));
+    if (rmErr) console.error("[snuplive] klip blev ikke slettet", rmErr.message);
+  }
+  return paths.length;
 }

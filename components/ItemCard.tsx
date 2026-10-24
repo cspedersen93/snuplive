@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
+import { IconPlay } from "@/components/Icons";
 import NoPhoto from "@/components/NoPhoto";
 import { itemMeta } from "@/components/Screen";
 import { clock, dayLabel, kr } from "@/lib/format";
@@ -46,6 +47,12 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
             <span className="b-buy">Køb nu</span>
           ) : state === "sold" ? (
             <span className="b-view">Solgt</span>
+          ) : null}
+          {state === "for_sale" && item.clip_path ? (
+            <span className="b-view" title="Se tingen i et klip fra live-showet">
+              <IconPlay />
+              Video
+            </span>
           ) : null}
         </span>
       </div>

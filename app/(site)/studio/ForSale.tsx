@@ -4,7 +4,7 @@ import { itemImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { createClient } from "@/lib/supabase/server";
 import { ITEM_COLS, type Item } from "@/lib/types";
-import { ForSaleRow } from "./OrderActions";
+import { ClipRow, ForSaleRow } from "./OrderActions";
 
 /** Sælgerens usolgte ting fra afsluttede shows: til salg til fast pris, eller taget af. */
 export default async function ForSale({ uid }: { uid: string }) {
@@ -16,6 +16,15 @@ export default async function ForSale({ uid }: { uid: string }) {
     .eq("status", "unsold")
     .order("listed_at", { ascending: false })
     .limit(200);
+  // Klip hentes for sig, så listen virker, også før 0015_klip.sql er kørt.
+  const { data: clipData, error: clipErr } = await supabase
+    .from("items")
+    .select("id")
+    .eq("seller_id", uid)
+    .eq("status", "unsold")
+    .not("clip_path", "is", null)
+    .limit(200);
+  const withClip = new Set(clipErr ? [] : (clipData ?? []).map((c: { id: string }) => c.id));
   const rows = ((data ?? []) as unknown as (Item & { show: { status: string; title: string } | null })[]).filter(
     (r) => r.show?.status === "ended",
   );
@@ -42,6 +51,7 @@ export default async function ForSale({ uid }: { uid: string }) {
                 <a href={itemHref(r)}>{r.name}</a>
               </strong>
               <span>{[itemMeta(r), r.show?.title].filter(Boolean).join(" · ")}</span>
+              {withClip.has(r.id) ? <ClipRow id={r.id} href={itemHref(r)} /> : null}
             </div>
             <ForSaleRow id={r.id} price={r.price} forSale={r.for_sale} />
           </li>

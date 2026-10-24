@@ -678,6 +678,42 @@ select t.ok((select count(*) from support_threads where ip_hash = 'ip-2') = 0, '
 delete from support_threads where id = (select (r->>'thread_id')::uuid from st);
 select t.ok((select count(*) from support_messages where thread_id = (select (r->>'thread_id')::uuid from st)) = 0, 'beskederne slettes med samtalen');
 
+-- ── Klip af tingene fra live-showet ──
+insert into items (id, show_id, seller_id, name, price) values
+  ('20000000-0000-0000-0000-000000000091', '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', 'Klip-test', 100),
+  ('20000000-0000-0000-0000-000000000092', '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', 'Klip-solgt', 100),
+  ('20000000-0000-0000-0000-000000000093', '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', 'Klip-nyligt-solgt', 100);
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.throws($$select set_item_clip('20000000-0000-0000-0000-000000000091', 'x')$$, 'permission denied');
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select set_item_clip('20000000-0000-0000-0000-000000000091', '00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-000000000091/clip-abc.mp4')) is null, 'sælgeren gemmer et klip på sin ting');
+select t.ok((select set_item_clip('20000000-0000-0000-0000-000000000091', '00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-000000000091/clip-def.webm')) like '%clip-abc.mp4', 'et nyt klip giver det gamle tilbage, så filen kan slettes');
+select t.throws($$select set_item_clip('20000000-0000-0000-0000-000000000091', '00000000-0000-0000-0000-00000000000b/20000000-0000-0000-0000-000000000091/clip-x.mp4')$$, 'check constraint');
+select t.throws($$select set_item_clip('20000000-0000-0000-0000-000000000091', '00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-000000000091/clip-x.mov')$$, 'check constraint');
+select t.throws($$select * from clips_to_clean()$$, 'permission denied');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select set_item_clip('20000000-0000-0000-0000-000000000091', '00000000-0000-0000-0000-00000000000b/20000000-0000-0000-0000-000000000091/clip-x.mp4')$$, 'findes ikke');
+select t.throws($$select clear_item_clip('20000000-0000-0000-0000-000000000091')$$, 'findes ikke');
+reset role;
+select t.ok((select clip_path from items_feed('upcoming', null, 100, 0, '00000000-0000-0000-0000-00000000000a', null) where id = '20000000-0000-0000-0000-000000000091') like '%clip-def.webm'
+            or not exists (select 1 from items_feed('upcoming', null, 100, 0, '00000000-0000-0000-0000-00000000000a', null) where id = '20000000-0000-0000-0000-000000000091'),
+            'listerne har klippet med');
+update items set clip_path = '00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-000000000092/clip-old.mp4', status = 'sold', sold_at = now() - interval '20 days' where id = '20000000-0000-0000-0000-000000000092';
+update items set clip_path = '00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-000000000093/clip-new.mp4', status = 'sold', sold_at = now() - interval '2 days' where id = '20000000-0000-0000-0000-000000000093';
+select t.ok((select array_agg(p) from clips_to_clean() p) = array['00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-000000000092/clip-old.mp4'], 'klip af ting solgt for mere end 14 dage siden ryddes op');
+select t.ok((select clip_path is null from items where id = '20000000-0000-0000-0000-000000000092') and (select clip_path is not null from items where id = '20000000-0000-0000-0000-000000000093'), 'et nyligt solgt klip bliver');
+update items set removed_at = now() where id = '20000000-0000-0000-0000-000000000091';
+select t.ok((select count(*) from clips_to_clean()) = 1, 'klip af en fjernet ting ryddes op');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select clear_item_clip('20000000-0000-0000-0000-000000000093')) like '%clip-new.mp4', 'sælgeren kan fjerne sit klip');
+reset role;
+select t.ok((select clip_path is null from items where id = '20000000-0000-0000-0000-000000000093'), 'klippet er væk fra tingen');
+delete from items where id in ('20000000-0000-0000-0000-000000000091', '20000000-0000-0000-0000-000000000092', '20000000-0000-0000-0000-000000000093');
+
 -- ── Nyt navn: beskeder fra siden selv står som Relived ──
 select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
 select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');
