@@ -18,6 +18,15 @@ let lastError = "";
  * Hvorfor den sidste mail ikke blev sendt, forklaret, så admins kan rette det selv
  * (fx at domænet ikke er bekræftet hos Resend endnu, eller at nøglen ikke må sende fra det).
  */
+function resendMessage() {
+  try {
+    const j = JSON.parse(lastError) as { message?: string; name?: string };
+    return [j.message, j.name ? `(${j.name})` : ""].filter(Boolean).join(" ") || lastError;
+  } catch {
+    return lastError;
+  }
+}
+
 export function mailProblem() {
   const from = unquoteEnv(process.env.MAIL_FROM) || "Relived <noreply@relived.dk>";
   const domain = /@([^>\s]+)/.exec(from)?.[1] ?? "domænet";
@@ -25,11 +34,13 @@ export function mailProblem() {
   if (/not verified|verify/i.test(lastError)) {
     return `${domain} er ikke bekræftet hos Resend endnu. Vent, til der står Verified under Domains hos Resend, eller sæt MAIL_FROM i Vercel tilbage til et bekræftet domæne så længe.`;
   }
-  if (/restricted|not allowed|permission|access/i.test(lastError)) {
-    return `Resend-nøglen må ikke sende fra ${domain}. Lav en nøgle med adgang til ${domain} (eller alle domæner) hos Resend, og læg den i RESEND_API_KEY i Vercel.`;
+  if (/restricted|not allowed|not authori[sz]ed|permission|access/i.test(lastError)) {
+    return `Resend-nøglen må ikke sende fra ${domain}. Lav en nøgle med adgang til ${domain} (eller alle domæner) hos Resend, og læg den i RESEND_API_KEY i Vercel. (Resend: ${resendMessage()})`;
   }
-  if (/api key|unauthori[sz]ed|invalid/i.test(lastError)) return "Resend afviser nøglen. Tjek RESEND_API_KEY i Vercel.";
-  return lastError ? `Resend svarede: ${lastError}` : "Mailen blev ikke sendt. Tjek RESEND_API_KEY og MAIL_FROM i Vercel.";
+  if (/api key|unauthori[sz]ed|invalid/i.test(lastError)) {
+    return `Resend afviser nøglen. Tjek RESEND_API_KEY i Vercel, og lav en Redeploy, når du har ændret den. (Resend: ${resendMessage()})`;
+  }
+  return lastError ? `Resend svarede: ${resendMessage()}` : "Mailen blev ikke sendt. Tjek RESEND_API_KEY og MAIL_FROM i Vercel.";
 }
 
 export async function sendMail(msg: { to: string[]; subject: string; text: string; replyTo?: string[]; headers?: Record<string, string> }) {
