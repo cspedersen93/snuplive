@@ -13,7 +13,7 @@ function fail(error: string, status: number) {
 
 /**
  * Giver adgang til videoen i et show.
- * Sælgeren må sende video (også før showet starter, så kameraet kan testes).
+ * Sælgeren og gæsterne i showet må sende video (også før showet starter, så kameraet kan testes).
  * Alle andre må kun se med, og kun mens showet er live.
  */
 export async function POST(req: Request) {
@@ -45,7 +45,14 @@ export async function POST(req: Request) {
   if (!show) return fail("Showet findes ikke.", 404);
 
   const isSeller = Boolean(uid) && uid === show.seller_id;
-  if (isSeller ? show.status === "ended" : show.status !== "live") {
+  // Gæster i showet (0020_gaester.sql) sender også video, ligesom værten.
+  let isGuest = false;
+  if (uid && !isSeller) {
+    const { data: g, error: gErr } = await supabase.rpc("is_show_guest", { p_show: show.id, p_user: uid });
+    isGuest = !gErr && g === true;
+  }
+  const canPublish = isSeller || isGuest;
+  if (canPublish ? show.status === "ended" : show.status !== "live") {
     return fail(show.status === "ended" ? "Showet er slut." : "Showet er ikke startet endnu.", 409);
   }
 
@@ -55,16 +62,19 @@ export async function POST(req: Request) {
     if (p?.handle) name = p.handle as string;
   }
   // Seere får et unikt id pr. fane, så to faner ikke smider hinanden ud.
+  // Værten er "seller:<id>", gæsterne er "cohost:<id>". Seerne kan se, hvis kamera der er hvis.
   const identity = isSeller
     ? `seller:${uid}`
-    : `${uid ? `user:${uid}` : "guest"}:${crypto.randomUUID().slice(0, 8)}`;
+    : isGuest
+      ? `cohost:${uid}`
+      : `${uid ? `user:${uid}` : "guest"}:${crypto.randomUUID().slice(0, 8)}`;
 
   const at = new AccessToken(key, secret, { identity, name, ttl: "4h" });
   at.addGrant({
     room: show.id,
     roomJoin: true,
     canSubscribe: true,
-    canPublish: isSeller,
+    canPublish,
     canPublishData: false,
     canUpdateOwnMetadata: false,
   });

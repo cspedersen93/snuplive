@@ -22,6 +22,7 @@ import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { Item, Message, Profile, SellerFactsData, Show } from "@/lib/types";
+import type { Guest } from "@/lib/guests";
 
 interface Props {
   seller: Pick<Profile, "id" | "handle" | "display_name" | "area" | "avatar_path"> & SellerFactsData;
@@ -31,6 +32,8 @@ interface Props {
   serverNow: number;
   /** Ting, Relived har ægthedstjekket. */
   authOk?: string[];
+  /** Gæster i showet (andre sælgere, der sælger med). */
+  guests?: Guest[];
 }
 
 function useNow(ms: number) {
@@ -91,6 +94,44 @@ export default function ShowClient(props: Props) {
   const handle = props.seller.handle;
   const loginHref = `/login?next=${encodeURIComponent(`/live/${handle}`)}`;
   const meKey = me === undefined ? "wait" : (me?.id ?? "guest");
+  // Gæster i showet: hentes igen hvert 30. sekund, mens showet er live (en gæst kan komme med undervejs).
+  const [guests, setGuests] = useState<Guest[]>(props.guests ?? []);
+  useEffect(() => {
+    if (!live || !hasSupabase) return;
+    const sb = getSupabase();
+    const t = setInterval(() => {
+      void sb
+        .from("show_guests")
+        .select("joined_at,guest:profiles!show_guests_guest_id_fkey(id,handle,display_name,avatar_path)")
+        .eq("show_id", show.id)
+        .is("left_at", null)
+        .order("joined_at")
+        .then(({ data, error }) => {
+          if (error || !data) return;
+          setGuests((data as unknown as { guest: Guest | null }[]).map((r) => r.guest).filter((g): g is Guest => Boolean(g)));
+        });
+    }, 30_000);
+    return () => clearInterval(t);
+  }, [live, show.id]);
+  // Hvem sælger tingen? Værten, eller en gæst (også en gæst, der er gået).
+  const [names, setNames] = useState<Record<string, string>>({});
+  const ownerOf = (it: Item) =>
+    it.seller_id === props.seller.id ? null : (guests.find((g) => g.id === it.seller_id)?.handle ?? names[it.seller_id] ?? "sælger");
+  const unknownKey = [...new Set(items.map((i) => i.seller_id))]
+    .filter((id) => id !== props.seller.id && !guests.some((g) => g.id === id) && !(id in names))
+    .join(",");
+  useEffect(() => {
+    if (!unknownKey || !hasSupabase) return;
+    void getSupabase()
+      .from("profiles")
+      .select("id,handle")
+      .in("id", unknownKey.split(","))
+      .then(({ data }) => {
+        const got = Object.fromEntries(((data ?? []) as { id: string; handle: string }[]).map((p) => [p.id, p.handle]));
+        setNames((n) => ({ ...n, ...Object.fromEntries(unknownKey.split(",").map((id) => [id, got[id] ?? "sælger"])) }));
+      });
+  }, [unknownKey]);
+  const multi = guests.length > 0 || items.some((i) => i.seller_id !== props.seller.id);
 
   // Hent en videoadgang, når showet er live.
   useEffect(() => {
@@ -303,6 +344,20 @@ export default function ShowClient(props: Props) {
             </div>
             <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} className="btn btn-red btn-sm" />
             <SellerFacts seller={props.seller} />
+            {guests.length ? (
+              <div className="show-guests">
+                <span className="label">Sælger sammen med</span>
+                {guests.map((g) => (
+                  <Link key={g.id} className="show-guest" href={`/live/${g.handle}`}>
+                    <Avatar handle={g.handle} path={g.avatar_path} size={30} />
+                    <span>
+                      <b>@{g.handle}</b>
+                      {g.display_name ? <span className="muted"> · {g.display_name}</span> : null}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
             <button className="btn btn-line btn-sm" type="button" onClick={share} style={{ alignSelf: "flex-start" }}>
               Del showet
             </button>
@@ -332,6 +387,7 @@ export default function ShowClient(props: Props) {
                         {/* Under showet bliver man på siden; før og efter kan man åbne tingens egen side. */}
                         <strong>{live ? it.name : <Link href={itemHref(it)}>{it.name}</Link>}</strong>
                         <span>{itemMeta(it) || " "}</span>
+                        {ownerOf(it) ? <span className="lot-owner">fra @{ownerOf(it)}</span> : null}
                       </div>
                       <div className="lot-r">
                         <span className="price">
@@ -353,7 +409,11 @@ export default function ShowClient(props: Props) {
           </div>
           <div className="box ship-note">
             <IconBox />
-            <span>Alt, du køber hos {handle}, bliver samlet under Mine køb, så det kan sendes i én pakke.</span>
+            <span>
+              {multi
+                ? "Alt, du køber, bliver samlet under Mine køb. Du får én pakke fra hver sælger i showet."
+                : `Alt, du køber hos ${handle}, bliver samlet under Mine køb, så det kan sendes i én pakke.`}
+            </span>
           </div>
           <ReportButton type="show" id={show.id} className="show-report" />
         </aside>
@@ -363,7 +423,13 @@ export default function ShowClient(props: Props) {
           <div className="player">
             <div className="screen">
               {live && video ? (
-                <ViewerVideo token={video.token} url={video.url} onViewers={setViewers} onError={onVideoError} />
+                <ViewerVideo
+                  token={video.token}
+                  url={video.url}
+                  onViewers={setViewers}
+                  onError={onVideoError}
+                  spotlight={current?.seller_id ?? null}
+                />
               ) : live ? (
                 <div className="screen-dark" />
               ) : (
@@ -371,7 +437,7 @@ export default function ShowClient(props: Props) {
                 <img className="feed" src={cover} alt="" />
               )}
               <div className="shade" />
-              <ScreenTop handle={handle} avatarPath={props.seller.avatar_path} area={props.seller.area} live={live} viewers={viewers} />
+              <ScreenTop handle={handle} avatarPath={props.seller.avatar_path} area={props.seller.area} live={live} viewers={viewers} guests={guests} />
 
               {!live ? (
                 <div className="pre-live">
@@ -459,6 +525,7 @@ export default function ShowClient(props: Props) {
                         ) : null}
                       </div>
                       <div className="v-name">{current ? current.name : "Sælgeren finder næste ting frem"}</div>
+                      {current && ownerOf(current) ? <div className="v-owner">Sælges af @{ownerOf(current)}</div> : null}
                       <div className="v-meta" aria-live="polite">
                         {auction
                           ? auction.high_bid

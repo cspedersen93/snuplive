@@ -30,6 +30,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
     title: "Betaling og fragt",
     qa: [
       ["Hvordan betaler jeg?", "Under Mine køb betaler du samlet for alt, du har købt, med MobilePay, kort, Apple Pay eller Google Pay. Du har 3 dage til at betale."],
+      ["Hvad hvis jeg køber hos flere sælgere i samme show?", "Nogle shows har gæster, så flere sælgere sælger sammen. Ved hver ting står, hvem der sælger den. Køber du hos flere af dem, får du en pakke fra hver sælger, og fragten betales pr. pakke."],
       ["Hvad koster fragten?", "49 kr til en DAO- eller GLS-pakkeshop, én gang pr. sælger, uanset hvor mange ting du køber hos sælgeren (op til 5 kg). Afhentning hos sælgeren er gratis."],
       ["Hvordan vælger jeg pakkeshop?", "Under Mine køb skriver du dit postnummer, vælger DAO eller GLS og den pakkeshop, du vil hente pakken i. Fragtfirmaet giver dig besked, når pakken er klar, og du kan følge den under Mine køb."],
       ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 2 dage efter, at du har hentet pakken, eller senest 7 dage efter, at den er sendt. Har du meldt et problem, venter pengene, til sagen er afgjort."],
@@ -41,6 +42,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
       ["Hvad koster det at sælge?", "Det er gratis at oprette en konto, gå live og sælge i beta-perioden. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke."],
       ["Hvad skal jeg bruge for at gå live?", "En telefon eller computer med kamera og en stabil internetforbindelse. Du går live direkte i browseren."],
       ["Skal jeg være god til at stå foran et kamera?", "Nej. De bedste shows minder om en snak ved et bord på loppemarkedet. Start med et kort show og få ting."],
+      ["Kan vi være flere sælgere i samme show?", "Ja. I studiet trykker du Inviter en sælger og sender linket til en anden sælger. Op til 2 gæster kan være med. I er på kameraet sammen, og gæsterne lægger deres egne ting i køen. Pengene for en gæsts ting går til gæsten, og gæsten sender selv sine ting. Du styrer showet: hvad der vises, budsalg, lynrunder og chatten. Følgerne af gæsterne får også besked, når showet går live."],
       ["Kan jeg sælge uden at gå live?", "Ja. Under Mine shows trykker du Sælg med video og filmer tingen i op til 45 sekunder med telefonens kamera. Du skal ikke selv være med. Vi finder billederne i videoen, du skriver pris og stand, og så kan tingen købes med det samme med Køb nu. Videoen vises på annoncen og under Klip."],
     ],
   },

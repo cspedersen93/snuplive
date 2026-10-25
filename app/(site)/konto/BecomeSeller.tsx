@@ -11,13 +11,15 @@ type Props = {
   /** Når man allerede er sælger, kan man skifte mellem privat og erhverv. */
   profile?: Pick<Profile, "is_seller" | "seller_type" | "business_name" | "business_cvr" | "seller_terms_at">;
   label?: string;
+  /** Hvor man kommer hen bagefter (ellers Mine shows). */
+  next?: string;
 };
 
 /**
  * Bliv sælger: privat eller erhverv (forbrugeraftaleloven § 8 a) og accept af vilkårene.
  * Kalder become_seller i databasen. Bruges også til at skifte sælgertype under Min konto.
  */
-export default function BecomeSeller({ profile, label = "Bliv sælger" }: Props) {
+export default function BecomeSeller({ profile, label = "Bliv sælger", next }: Props) {
   const router = useRouter();
   const id = useId();
   const change = Boolean(profile?.is_seller);
@@ -49,8 +51,8 @@ export default function BecomeSeller({ profile, label = "Bliv sælger" }: Props)
       router.refresh();
       return;
     }
-    toast("Du er nu sælger. Opret dit første show!");
-    router.push("/studio");
+    toast(next ? "Du er nu sælger." : "Du er nu sælger. Opret dit første show!");
+    router.push(next ?? "/studio");
     router.refresh();
   }
 

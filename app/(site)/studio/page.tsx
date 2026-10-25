@@ -18,6 +18,7 @@ import BlockedUsers from "./BlockedUsers";
 import ForSale from "./ForSale";
 import SellerPayments from "./SellerPayments";
 import ShowMenu from "./ShowMenu";
+import { myGuestShows } from "@/lib/guests";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Mine shows", robots: { index: false } };
@@ -72,6 +73,8 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
   const canHide = !hiddenQ.error;
   const hiddenIds = new Set((hiddenQ.data ?? []).map((r) => r.id as string));
   const shows = all.filter((s) => !hiddenIds.has(s.id));
+  // Shows, sælgeren er gæst i (0020_gaester.sql).
+  const guestShows = await myGuestShows(supabase, uid);
   const hiddenShows = all.filter((s) => hiddenIds.has(s.id));
 
   return (
@@ -104,6 +107,27 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
               <b>Én ting mangler:</b> Bekræft, om du sælger som privatperson eller virksomhed, og sig ja til vilkårene for sælgere.{" "}
               <Link href="/konto#saelger">Gør det her</Link>
             </span>
+          </div>
+        ) : null}
+
+        {guestShows.length ? (
+          <div className="box guest-shows">
+            <h2 className="h3" style={{ marginBottom: 8 }}>Du er gæst i</h2>
+            <ul className="list">
+              {guestShows.map((g) => (
+                <li key={g.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
+                  <div style={{ minWidth: 0 }}>
+                    <strong>{g.title}</strong>
+                    <span>
+                      hos @{g.host?.handle} · {g.status === "live" ? "Live nu" : when(g.starts_at)}
+                    </span>
+                  </div>
+                  <Link className={`btn btn-sm ${g.status === "live" ? "btn-red" : "btn-ghost"}`} href={`/studio/${g.id}`}>
+                    {g.status === "live" ? "Til studiet" : "Åbn studiet"}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         ) : null}
 

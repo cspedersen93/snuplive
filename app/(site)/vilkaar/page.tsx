@@ -94,6 +94,11 @@ export default function Vilkaar() {
           billeder, du vælger, vises på tingens side og under Klip, så længe tingen ligger her. Videoen må kun vise tingen, ikke
           andre personer, der ikke har sagt ja til det.
         </li>
+        <li>
+          Sælger I flere sammen i ét show (Gæst i showet), er hver sælger selv ansvarlig for sine egne ting: beskrivelsen,
+          ægtheden, at sende dem og at svare på klager. Værten er ikke ansvarlig for gæsternes ting, og gæsterne er ikke ansvarlige
+          for værtens. Værten styrer showet og kan tage en gæst ud af det.
+        </li>
         <li>Prisen, du sætter, og et vindende bud er bindende for dig.</li>
         <li>Send pakken inden 3 hverdage efter, at køberen har betalt, eller aftal afhentning med køberen.</li>
       </ul>

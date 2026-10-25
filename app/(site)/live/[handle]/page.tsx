@@ -15,6 +15,7 @@ import { sweepStaleShows } from "@/lib/queries";
 import ShowClient from "./ShowClient";
 import FollowButton from "@/components/FollowButton";
 import { videoShowId } from "@/lib/videoShow";
+import { showGuests, type Guest } from "@/lib/guests";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,24 @@ const load = cache(async (rawHandle: string) => {
   let items: Item[] = [];
   let messages: Message[] = [];
   let authOk: string[] = [];
+  let guests: Guest[] = [];
+  // Er sælgeren med som gæst i en andens show lige nu (0020_gaester.sql)?
+  let guestAt: { host: string; title: string } | null = null;
+  if (!liveQ.data) {
+    const g = await sb
+      .from("show_guests")
+      .select("show:shows!show_guests_show_id_fkey(title,status,removed_at,host:profiles!shows_seller_id_fkey(handle))")
+      .eq("guest_id", seller.id)
+      .is("left_at", null);
+    const liveShow = ((g.error ? [] : (g.data ?? [])) as unknown as {
+      show: { title: string; status: string; removed_at: string | null; host: { handle: string } | null } | null;
+    }[])
+      .map((r) => r.show)
+      .find((x) => x?.status === "live" && !x.removed_at && x.host);
+    if (liveShow?.host) guestAt = { host: liveShow.host.handle, title: liveShow.title };
+  }
   if (show) {
+    guests = await showGuests(sb, show.id);
     const [i, m] = await Promise.all([
       sb.from("items").select(ITEM_COLS).eq("show_id", show.id).is("removed_at", null).order("position").order("created_at"),
       sb.from("messages").select(MESSAGE_COLS).eq("show_id", show.id).is("removed_at", null).order("id", { ascending: false }).limit(60),
@@ -69,7 +87,7 @@ const load = cache(async (rawHandle: string) => {
     .order("created_at", { ascending: false })
     .limit(10);
   const ratings = (r.data ?? []) as unknown as Rating[];
-  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk };
+  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt };
 });
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -118,6 +136,7 @@ export default async function SellerPage({ params }: Params) {
             <span className="muted">{[d.seller.display_name, d.seller.area].filter(Boolean).join(" · ")}</span>
           </div>
         </div>
+        {d.guestAt ? <GuestAtBanner handle={d.seller.handle} at={d.guestAt} /> : null}
         {d.seller.is_seller ? <FollowButton sellerId={d.seller.id} handle={d.seller.handle} next={`/live/${d.seller.handle}`} className="btn btn-red btn-sm" /> : null}
         {d.seller.is_seller ? <SellerFacts seller={d.seller} /> : null}
         <div className="empty" style={{ marginTop: 18 }}>
@@ -134,6 +153,11 @@ export default async function SellerPage({ params }: Params) {
 
   return (
     <>
+      {d.guestAt ? (
+        <div className="wrap" style={{ paddingTop: 18 }}>
+          <GuestAtBanner handle={d.seller.handle} at={d.guestAt} />
+        </div>
+      ) : null}
       <ShowClient
         key={d.show.id}
         seller={{
@@ -154,6 +178,7 @@ export default async function SellerPage({ params }: Params) {
         messages={d.messages}
         serverNow={Date.now()}
         authOk={d.authOk}
+        guests={d.guests}
       />
       {d.ratings.length ? (
         <div className="wrap" style={{ paddingBottom: 64 }}>
@@ -161,5 +186,18 @@ export default async function SellerPage({ params }: Params) {
         </div>
       ) : null}
     </>
+  );
+}
+
+/** Sælgeren er live som gæst i en andens show lige nu. */
+function GuestAtBanner({ handle, at }: { handle: string; at: { host: string; title: string } }) {
+  return (
+    <Link className="guest-at" href={`/live/${at.host}`}>
+      <span className="live-dot" aria-hidden="true" />
+      <span>
+        <b>{handle} er live nu</b> som gæst hos @{at.host}: {at.title}
+      </span>
+      <span className="guest-at-go">Se med</span>
+    </Link>
   );
 }

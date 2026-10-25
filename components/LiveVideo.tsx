@@ -7,8 +7,10 @@ import {
   VideoTrack,
   useConnectionState,
   useLocalParticipant,
+  isTrackReference,
   useParticipants,
   useTracks,
+  type TrackReference,
 } from "@livekit/components-react";
 import { ConnectionState, MediaDeviceFailure, Track, VideoPresets, type LocalVideoTrack } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
@@ -112,19 +114,74 @@ function useCameraFilters(track: LocalVideoTrack | undefined) {
   return { supported: !!fx, filters, blurBusy, toggle };
 }
 
+// Værten er "seller:<id>", gæsterne i showet er "cohost:<id>" (se /api/livekit-token). Resten er seere.
 const isSeller = (identity: string) => identity.startsWith("seller:");
+const isCrew = (identity: string) => identity.startsWith("seller:") || identity.startsWith("cohost:");
+const crewId = (identity: string) => identity.slice(identity.indexOf(":") + 1);
 
-function useViewerCount(onViewers: (n: number) => void) {
+/**
+ * Seerne: alle undtagen værten og gæsterne. I studiet tælles kun de andre (ens egen forbindelse har ikke noget navn,
+ * før den er forbundet). På seersiden tælles man selv med, som før.
+ */
+function useViewerCount(onViewers: (n: number) => void, studio = false) {
   const participants = useParticipants();
-  const n = participants.filter((p) => !isSeller(p.identity)).length;
+  const n = participants.filter((p) => !isCrew(p.identity) && !(studio && p.isLocal)).length;
   useEffect(() => onViewers(n), [n, onViewers]);
+}
+
+type CamRef = TrackReference;
+
+/** De andre kameraer i showet, små i hjørnet. Et tryk gør kameraet stort (kun for den, der trykker). */
+function PipRow({ cams, onPick, mirrorLocal }: { cams: CamRef[]; onPick?: (id: string) => void; mirrorLocal?: boolean }) {
+  if (!cams.length) return null;
+  return (
+    <div className="pip-row">
+      {cams.map((c) => {
+        const id = crewId(c.participant.identity);
+        const name = c.participant.name || "Gæst";
+        const tile = (
+          <>
+            <VideoTrack
+              trackRef={c}
+              className="pip-video"
+              playsInline
+              muted
+              style={mirrorLocal && c.participant.isLocal ? { transform: "scaleX(-1)" } : undefined}
+            />
+            <span className="pip-name">{c.participant.isLocal ? "Dig" : name}</span>
+          </>
+        );
+        return onPick ? (
+          <button key={c.participant.identity} type="button" className="pip" onClick={() => onPick(id)} aria-label={`Vis ${name} stort`}>
+            {tile}
+          </button>
+        ) : (
+          <div key={c.participant.identity} className="pip">
+            {tile}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 /* ── Seer ──────────────────────────────────────────────────────────────── */
 
-function ViewerStage({ onViewers }: { onViewers: (n: number) => void }) {
+/**
+ * Det store billede er kameraet hos den, der ejer tingen, der vises nu (værten eller en gæst).
+ * Ellers værtens. De andre kameraer står små i hjørnet.
+ */
+function ViewerStage({ onViewers, spotlight }: { onViewers: (n: number) => void; spotlight?: string | null }) {
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: true });
-  const cam = tracks.find((t) => isSeller(t.participant.identity));
+  const cams = tracks.filter((t): t is TrackReference => isTrackReference(t) && isCrew(t.participant.identity));
+  const [picked, setPicked] = useState<string | null>(null);
+  // Skifter tingen, følger billedet med igen.
+  useEffect(() => setPicked(null), [spotlight]);
+  const want = picked ?? spotlight ?? null;
+  const cam =
+    cams.find((t) => want && crewId(t.participant.identity) === want) ??
+    cams.find((t) => isSeller(t.participant.identity)) ??
+    cams[0];
   const state = useConnectionState();
   useViewerCount(onViewers);
   return (
@@ -136,6 +193,7 @@ function ViewerStage({ onViewers }: { onViewers: (n: number) => void }) {
           {state === ConnectionState.Connected ? "Sælgeren gør kameraet klar …" : "Forbinder til showet …"}
         </div>
       )}
+      <PipRow cams={cams.filter((c) => c !== cam)} onPick={setPicked} />
       <StartAudio label="Tryk for lyd" className="btn btn-red btn-sm start-audio" />
     </>
   );
@@ -146,6 +204,8 @@ export function ViewerVideo(props: {
   url: string;
   onViewers: (n: number) => void;
   onError: (e: Error) => void;
+  /** Sælgeren, hvis ting vises nu. Hendes kamera bliver stort. */
+  spotlight?: string | null;
 }) {
   return (
     <LiveKitRoom
@@ -158,7 +218,7 @@ export function ViewerVideo(props: {
       options={{ adaptiveStream: true, dynacast: true }}
       onError={props.onError}
     >
-      <ViewerStage onViewers={props.onViewers} />
+      <ViewerStage onViewers={props.onViewers} spotlight={props.spotlight} />
       <RoomAudioRenderer />
     </LiveKitRoom>
   );
@@ -185,10 +245,14 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, shown, on
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
   const cam = tracks.find((t) => t.participant.isLocal && t.publication?.track);
+  // Værten og gæsterne ser hinanden små i hjørnet.
+  const others = tracks.filter(
+    (t): t is TrackReference => isTrackReference(t) && !t.participant.isLocal && isCrew(t.participant.identity) && t.publication.isSubscribed,
+  );
   const state = useConnectionState();
   const [facing, setFacing] = useState<"user" | "environment">("user");
   const [flipping, setFlipping] = useState(false);
-  useViewerCount(onViewers);
+  useViewerCount(onViewers, true);
   const ready = Boolean(cam);
   const fx = useCameraFilters(cam?.publication?.track as LocalVideoTrack | undefined);
   useEffect(() => onCamera(ready), [ready, onCamera]);
@@ -312,6 +376,7 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, shown, on
       ) : (
         <div className="stage-msg">{state === ConnectionState.Connected ? "Tænder kameraet …" : "Forbinder …"}</div>
       )}
+      <PipRow cams={others} />
       <div className="cam-ctrl">
         <button
           type="button"
@@ -398,6 +463,8 @@ export function StudioVideo(props: {
         onClip={props.onClip}
         onPhotos={props.onPhotos}
       />
+      {/* Værten og gæsterne kan høre hinanden. */}
+      <RoomAudioRenderer />
     </LiveKitRoom>
   );
 }

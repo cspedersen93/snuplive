@@ -8,7 +8,7 @@ import { createClient, getUserId } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 /**
- * Sælgeren er gået live: besked til alle, der har trykket "Husk mig", og til sælgerens følgere.
+ * Sælgeren er gået live: besked til alle, der har trykket "Husk mig", til sælgerens følgere og til følgerne af gæsterne i showet.
  * Har man slået besked på telefonen til, får man den der. Ellers en mail. Sker kun én gang pr. show.
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -33,7 +33,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const path = `/live/${handle}`;
   const link = `${SITE_URL}${path}`;
 
-  type Person = { email: string; items: string[]; reminded: boolean; follower: boolean };
+  type Person = { email: string; items: string[]; reminded: boolean; follower: boolean; viaGuest?: string };
   const people = new Map<string, Person>();
   const { data: rem } = await admin.rpc("reminder_recipients", { p_show: id });
   for (const r of (rem ?? []) as { user_id: string; email: string; items: string[] }[]) {
@@ -53,32 +53,65 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       }
     }
   }
+  // Gæsterne i showet (0020_gaester.sql): deres følgere får også besked ("@lise er med i @maja's show").
+  const { data: guestRows } = await admin.rpc("show_guest_ids", { p_show: show.id });
+  const guestIds = ((guestRows ?? []) as unknown[]).map((g) => (typeof g === "string" ? g : (g as { show_guest_ids?: string }).show_guest_ids)).filter(
+    (g): g is string => typeof g === "string",
+  );
+  if (guestIds.length) {
+    const { data: gp } = await admin.from("profiles").select("id,handle").in("id", guestIds);
+    for (const g of (gp ?? []) as { id: string; handle: string }[]) {
+      const { data: fol, error } = await admin.rpc("follower_recipients", { p_seller: g.id });
+      if (error) continue;
+      for (const f of (fol ?? []) as { user_id: string; email: string }[]) {
+        if (!people.has(f.user_id)) people.set(f.user_id, { email: f.email, items: [], reminded: false, follower: true, viaGuest: g.handle });
+      }
+    }
+    for (const g of guestIds) people.delete(g);
+  }
   people.delete(show.seller_id);
   if (!people.size) return json({ sent: 0, pushed: 0 });
 
-  const pushed = await sendPush(admin, [...people.keys()], {
+  const direct = [...people.entries()].filter(([, p]) => !p.viaGuest).map(([u]) => u);
+  const pushed = await sendPush(admin, direct, {
     title: `@${handle} er live nu`,
     body: show.title,
     url: path,
     tag: `live-${show.id}`,
   });
+  // Følgere af en gæst: én besked pr. gæst.
+  const byGuest = new Map<string, string[]>();
+  for (const [u, p] of people) if (p.viaGuest) byGuest.set(p.viaGuest, [...(byGuest.get(p.viaGuest) ?? []), u]);
+  for (const [g, users] of byGuest) {
+    const got = await sendPush(admin, users, {
+      title: `@${g} er live hos @${handle}`,
+      body: show.title,
+      url: path,
+      tag: `live-${show.id}`,
+    });
+    got.forEach((u) => pushed.add(u));
+  }
 
   const mails = [...people.entries()]
     .filter(([userId, p]) => !pushed.has(userId) && p.email)
     .map(([, p]) => ({
       to: p.email,
-      subject: `@${handle} er live nu: ${show.title}`,
+      subject: p.viaGuest ? `@${p.viaGuest} er live hos @${handle}: ${show.title}` : `@${handle} er live nu: ${show.title}`,
       text: [
         "Hej",
         "",
-        `@${handle} er gået live med showet "${show.title}".`,
+        p.viaGuest
+          ? `@${p.viaGuest} er med som gæst i @${handle}s show "${show.title}", som er live nu.`
+          : `@${handle} er gået live med showet "${show.title}".`,
         p.items.length ? `Du bad os huske dig på: ${p.items.join(", ")}.` : "",
         "",
         `Se med og køb: ${link}`,
         "",
-        p.follower
-          ? `Du får denne mail, fordi du følger @${handle} på Relived. Vil du ikke have flere, så tryk Følger på ${link}.`
-          : "Du får denne mail, fordi du trykkede Husk mig på Relived.",
+        p.viaGuest
+          ? `Du får denne mail, fordi du følger @${p.viaGuest} på Relived. Vil du ikke have flere, så tryk Følger på ${SITE_URL}/live/${p.viaGuest}.`
+          : p.follower
+            ? `Du får denne mail, fordi du følger @${handle} på Relived. Vil du ikke have flere, så tryk Følger på ${link}.`
+            : "Du får denne mail, fordi du trykkede Husk mig på Relived.",
       ]
         .filter((l, i, a) => l !== "" || a[i - 1] !== "")
         .join("\n"),

@@ -872,6 +872,88 @@ select t.ok((select count(*) from items where seller_id = '00000000-0000-0000-00
             'en lukket sælger har ikke noget til salg');
 update profiles set is_seller = true where id = '00000000-0000-0000-0000-00000000000a';
 
+-- ── Gæst i showet: værten inviterer op til 2 sælgere med ──
+insert into shows (id, seller_id, title, category, status, starts_at) values
+  ('10000000-0000-0000-0000-0000000000f9', '00000000-0000-0000-0000-00000000000a', 'Fælles loppemarked', 'dametoej', 'planned', now() + interval '1 day');
+-- Ole og den anden Maja er sælgere i denne del (gæsterne).
+update profiles set is_seller = true where id in ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+create temp table if not exists t_code (code text);
+grant all on t_code to authenticated;
+insert into t_code select guest_invite('10000000-0000-0000-0000-0000000000f9');
+select t.ok((select length(code) = 32 from t_code), 'værten får et invitationslink');
+select t.ok((select guest_invite('10000000-0000-0000-0000-0000000000f9')) = (select code from t_code), 'det samme link, til værten laver et nyt');
+select t.throws($$select guest_join((select code from t_code))$$, 'Det er dit eget show');
+select t.throws($$select guest_invite('10000000-0000-0000-0000-000000000001')$$, 'Showet');
+-- En køber (ikke sælger) kan ikke være gæst.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select guest_join((select code from t_code))$$, 'Bliv sælger først');
+select t.throws($$select * from show_invites$$, 'permission denied');
+-- Ole siger ja og lægger sine ting i værtens kø.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.ok((select title = 'Fælles loppemarked' and host_handle = 'majasgarderobe' and guests = 0 and not joined from guest_invite_info((select code from t_code))), 'invitationen viser show og vært');
+select t.ok(guest_join((select code from t_code)) = '10000000-0000-0000-0000-0000000000f9', 'en sælger kan sige ja');
+select t.ok(is_show_guest('10000000-0000-0000-0000-0000000000f9', auth.uid()), 'og er gæst');
+insert into items (id, show_id, seller_id, name, price) values
+  ('30000000-0000-0000-0000-0000000000b1', '10000000-0000-0000-0000-0000000000f9', auth.uid(), 'Vinylplade, Kim Larsen', 150),
+  ('30000000-0000-0000-0000-0000000000b2', '10000000-0000-0000-0000-0000000000f9', auth.uid(), 'Pladespiller', 600);
+select t.ok((select count(*) from items where show_id = '10000000-0000-0000-0000-0000000000f9' and seller_id = auth.uid()) = 2, 'gæsten lægger ting i køen');
+select t.throws($$insert into items (show_id, seller_id, name, price) values ('10000000-0000-0000-0000-000000000001', auth.uid(), 'Snyd', 10)$$, 'row-level security');
+select t.throws($$insert into show_guests (show_id, guest_id) values ('10000000-0000-0000-0000-000000000001', auth.uid())$$, 'permission denied');
+-- Den anden Maja er gæst nummer 2. Flere kan ikke komme med.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000d"}', false);
+select guest_join((select code from t_code));
+reset role;
+update profiles set is_seller = true where id = '00000000-0000-0000-0000-00000000000e';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000e"}', false);
+select t.throws($$select guest_join((select code from t_code))$$, 'allerede 2 gæster');
+reset role;
+update shows set status = 'live', started_at = now() where id = '10000000-0000-0000-0000-0000000000f9';
+set role authenticated;
+-- Kun værten viser ting frem og starter lynrunder, også gæsternes ting.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select present_item('30000000-0000-0000-0000-0000000000b1')$$, 'Tingen findes ikke');
+select pg_sleep(1.05); -- Ole har skrevet i chatten lige før (bremse mod spam).
+insert into messages (show_id, user_id, body) values ('10000000-0000-0000-0000-0000000000f9', auth.uid(), 'Hej fra Ole');
+select t.ok((select from_seller from messages where show_id = '10000000-0000-0000-0000-0000000000f9' and body = 'Hej fra Ole'), 'gæstens beskeder er fremhævet som sælgerens');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select present_item('30000000-0000-0000-0000-0000000000b1');
+select t.ok((select current_item_id = '30000000-0000-0000-0000-0000000000b1' from shows where id = '10000000-0000-0000-0000-0000000000f9'), 'værten viser gæstens ting frem');
+select start_rush('30000000-0000-0000-0000-0000000000b1', 10);
+select t.ok((select rush_ends_at is not null from items where id = '30000000-0000-0000-0000-0000000000b1'), 'værten starter en lynrunde på gæstens ting');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select start_rush('30000000-0000-0000-0000-0000000000b1', 10)$$, 'Vis tingen frem');
+-- Liva køber gæstens ting: salget (og pengene) går til gæsten.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select snup('30000000-0000-0000-0000-0000000000b1');
+select t.ok((select seller_id = '00000000-0000-0000-0000-00000000000c' from sales where item_id = '30000000-0000-0000-0000-0000000000b1'), 'salget af gæstens ting går til gæsten');
+-- Værten tager Ole ud. Hans ting kan ikke vises, og han kan ikke komme med igen.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select guest_remove('10000000-0000-0000-0000-0000000000f9', '00000000-0000-0000-0000-00000000000c');
+select t.throws($$select present_item('30000000-0000-0000-0000-0000000000b2')$$, 'ikke med i showet længere');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.ok(not is_show_guest('10000000-0000-0000-0000-0000000000f9', auth.uid()), 'en gæst, der er taget ud, er ikke gæst');
+select t.throws($$select guest_join((select code from t_code))$$, 'taget dig ud');
+select t.throws($$select guest_remove('10000000-0000-0000-0000-0000000000f9', '00000000-0000-0000-0000-00000000000d')$$, 'Showet findes ikke');
+-- Den anden Maja forlader showet og kan komme med igen. Et nyt link gør det gamle ugyldigt.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000d"}', false);
+select guest_leave('10000000-0000-0000-0000-0000000000f9');
+select t.ok(not is_show_guest('10000000-0000-0000-0000-0000000000f9', auth.uid()), 'gæsten har forladt showet');
+select t.ok(exists (select 1 from messages where show_id = '10000000-0000-0000-0000-0000000000f9' and kind = 'event' and body like '%har forladt showet'), 'chatten siger, at gæsten er gået');
+select guest_join((select code from t_code));
+select t.ok(is_show_guest('10000000-0000-0000-0000-0000000000f9', auth.uid()), 'og kan komme med igen');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select guest_invite('10000000-0000-0000-0000-0000000000f9', true);
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000d"}', false);
+select guest_leave('10000000-0000-0000-0000-0000000000f9');
+select t.throws($$select guest_join((select code from t_code))$$, 'gælder ikke længere');
+reset role;
+delete from shows where id = '10000000-0000-0000-0000-0000000000f9';
+update profiles set is_seller = false
+ where id in ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000d', '00000000-0000-0000-0000-00000000000e');
+
 -- ── Nyt navn: beskeder fra siden selv står som Relived ──
 select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
 select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');
