@@ -17,6 +17,7 @@ import { mitidState } from "@/lib/mitid";
 import BecomeSeller from "./BecomeSeller";
 import ProfileForm from "./ProfileForm";
 import { SITE_HOST } from "@/lib/env";
+import { videoShowId } from "@/lib/videoShow";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Min konto", robots: { index: false } };
@@ -47,7 +48,9 @@ export default async function Konto() {
   const followers = fc.error ? null : ((fc.data as { follower_count?: number } | null)?.follower_count ?? 0);
   const snup = mine.data ?? [];
   const sold = sales.data ?? [];
-  const myShows = shows.data ?? [];
+  // Videoannoncerne ligger i et skjult "show" (0019_videoannoncer.sql). Det tæller ikke med som et show.
+  const videoShow = profile.is_seller ? await videoShowId(supabase, uid) : null;
+  const myShows = (shows.data ?? []).filter((s) => s.id !== videoShow);
   const liveNow = myShows.some((s) => s.status === "live");
 
   // Admins ser, hvor mange sager der venter.

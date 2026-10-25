@@ -39,7 +39,7 @@ const load = cache(async (slug: string) => {
   if (!sb) return { setup: false as const };
   const id = idFromSlug(decodeURIComponent(slug));
   if (!id) return { setup: true as const, item: null };
-  const [{ data }, clipRes, authRes] = await Promise.all([
+  const [{ data }, clipRes, authRes, kindRes] = await Promise.all([
     sb
       .from("items")
       .select(
@@ -52,6 +52,8 @@ const load = cache(async (slug: string) => {
     sb.from("items").select("clip_path,clip_at").eq("id", id).maybeSingle(),
     // Ægthedstjek (0017_aegthed.sql).
     sb.from("items").select("auth_required,auth_status").eq("id", id).maybeSingle(),
+    // Videoannonce (0019_videoannoncer.sql)?
+    sb.from("items").select("show:shows!items_show_id_fkey(kind)").eq("id", id).maybeSingle(),
   ]);
   const item = data as unknown as Loaded | null;
   // En ting eller et show, der er fjernet efter en anmeldelse, findes ikke længere.
@@ -59,7 +61,8 @@ const load = cache(async (slug: string) => {
   const clip = clipRes.error ? null : (clipRes.data as { clip_path: string | null; clip_at: string | null } | null);
   const a = authRes.error ? null : (authRes.data as { auth_required: boolean; auth_status: string | null } | null);
   const auth = a?.auth_required ? (a.auth_status === "approved" ? ("approved" as const) : ("waiting" as const)) : null;
-  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth };
+  const video = !kindRes.error && (kindRes.data as unknown as { show: { kind: string } | null } | null)?.show?.kind === "video";
+  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video };
 });
 
 function stateOf(it: Loaded): ItemState {
@@ -166,8 +169,8 @@ export default async function ItemPage({ params }: Params) {
         ? [
             {
               "@type": "VideoObject",
-              name: `${it.name} vist live`,
-              description: `${it.name}${meta ? `, ${meta}` : ""}, vist live af ${seller.handle} på Relived.`,
+              name: d.video ? `${it.name} på video` : `${it.name} vist live`,
+              description: `${it.name}${meta ? `, ${meta}` : ""}, ${d.video ? "filmet" : "vist live"} af ${seller.handle} på Relived.`,
               thumbnailUrl: images[0],
               contentUrl: clip.url,
               uploadDate: clip.at ?? undefined,
@@ -191,7 +194,7 @@ export default async function ItemPage({ params }: Params) {
 
         <div className="item-grid">
           {images.length || video ? (
-            <Gallery images={images} alt={it.name} video={video} />
+            <Gallery images={images} alt={it.name} video={video} filmed={d.video} />
           ) : (
             <div className="gallery">
               <div className="gallery-main gallery-empty">
@@ -327,7 +330,7 @@ export default async function ItemPage({ params }: Params) {
               <span>
                 <strong>{seller.handle}</strong>
                 <span className="muted" style={{ fontSize: ".88rem" }}>
-                  {[seller.area, show.status === "ended" ? `Fra showet ${show.title}` : show.title].filter(Boolean).join(" · ")}
+                  {[seller.area, d.video ? "Videoannonce" : show.status === "ended" ? `Fra showet ${show.title}` : show.title].filter(Boolean).join(" · ")}
                 </span>
               </span>
             </Link>

@@ -469,6 +469,29 @@ Indtil 0018 er kørt, kan man kun slette planlagte shows (afsluttede shows har i
 
 ---
 
+## Sælg med video (videoannoncer)
+
+Kør `supabase/migrations/0019_videoannoncer.sql` i Supabase → SQL Editor (efter 0018). Der skal ikke nye nøgler i Vercel.
+
+For sælgere, der ikke har lyst til at gå live:
+
+- **Mine shows → Sælg med video → Film nu:** telefonens bagkamera åbner, og sælgeren filmer tingen i 5-45 sekunder (uden selv
+  at være med). Har sælgeren allerede filmet, kan hun trykke **Vælg en video**. Så bliver videoen lavet om på telefonen, så den
+  kan ses på alle telefoner (det tager lige så lang tid som videoen).
+- **Billederne:** mens der filmes, tages der billeder. Claude vælger op til 4 (det bedste bliver forsidebilledet), og sælgeren
+  kan vælge til og fra eller lægge sine egne billeder på. Uden `ANTHROPIC_API_KEY` vælger telefonen de skarpeste.
+- **Annoncen:** navn, kategori, str., pris, stand og beskrivelse. Tryk **Sæt til salg**, så kan tingen købes med det samme med
+  Køb nu. Videoen vises først på tingens side og i Klip. Betaling, fragt og ordrer virker som for ting fra et show.
+- **Mærkevarer** skal stadig ægthedstjekkes, før de kan købes. Sælgeren sender billederne lige efter, eller under
+  **Mine shows → Til salg → Send billeder**.
+- **Bag kulissen:** tingene ligger i et skjult "show" pr. sælger (`kind = 'video'`). Det vises aldrig som et show (ikke under
+  Mine shows, ikke på sælgerens side og uden studie). I Backoffice → Shows står det som *Videoannoncer*.
+- **Lukker I en sælger** (Backoffice → Anmeldelser → fjern profilen), bliver alt, sælgeren har til salg, nu også taget af salg.
+- Højst 40 videoannoncer pr. sælger pr. døgn. Videoerne fylder ca. 5-9 MB stykket i Supabase Storage (mappen `clips`).
+- Er 0019 ikke kørt, er der ingen knap til videoannoncer, og resten af siden virker som før.
+
+---
+
 ## Studiet: swipe for at skifte ting
 
 Kortet nederst på kameraet i studiet ("Vises nu") kan swipes: **til venstre** viser den næste ting i køen, **til højre**

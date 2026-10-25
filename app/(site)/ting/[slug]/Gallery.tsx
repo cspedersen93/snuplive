@@ -7,7 +7,18 @@ import { IconMute, IconPlay, IconSound } from "@/components/Icons";
  * Billeder af tingen: ét stort og små under, man kan vælge imellem.
  * Har tingen et klip fra live-showet, vises det først (uden lyd, i loop; lyden kan slås til).
  */
-export default function Gallery({ images, alt, video }: { images: string[]; alt: string; video?: string | null }) {
+export default function Gallery({
+  images,
+  alt,
+  video,
+  filmed = false,
+}: {
+  images: string[];
+  alt: string;
+  video?: string | null;
+  /** Videoen er filmet til en videoannonce (ikke fra et live-show). */
+  filmed?: boolean;
+}) {
   const media = [...(video ? [{ kind: "video" as const, src: video }] : []), ...images.map((src) => ({ kind: "img" as const, src }))];
   const [i, setI] = useState(0);
   const cur = media[Math.min(i, media.length - 1)];
@@ -15,7 +26,7 @@ export default function Gallery({ images, alt, video }: { images: string[]; alt:
     <div className="gallery">
       <div className="gallery-main">
         {cur?.kind === "video" ? (
-          <Clip src={cur.src} poster={images[0]} alt={alt} />
+          <Clip src={cur.src} poster={images[0]} alt={alt} filmed={filmed} />
         ) : cur ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={cur.src} alt={alt} />
@@ -31,7 +42,7 @@ export default function Gallery({ images, alt, video }: { images: string[]; alt:
                 className="thumb-video"
                 onClick={() => setI(n)}
                 aria-pressed={n === i}
-                aria-label="Video fra live-showet"
+                aria-label={filmed ? "Video af tingen" : "Video fra live-showet"}
               >
                 {images[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -52,7 +63,7 @@ export default function Gallery({ images, alt, video }: { images: string[]; alt:
   );
 }
 
-function Clip({ src, poster, alt }: { src: string; poster?: string; alt: string }) {
+function Clip({ src, poster, alt, filmed }: { src: string; poster?: string; alt: string; filmed: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
@@ -90,14 +101,14 @@ function Clip({ src, poster, alt }: { src: string; poster?: string; alt: string 
         loop
         playsInline
         preload="metadata"
-        aria-label={`${alt}, video fra live-showet`}
+        aria-label={`${alt}, ${filmed ? "video af tingen" : "video fra live-showet"}`}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onClick={togglePlay}
       />
       <span className="gallery-tag">
         <IconPlay />
-        Fra live-showet
+        {filmed ? "Video" : "Fra live-showet"}
       </span>
       <div className="gallery-ctl">
         <button type="button" onClick={togglePlay} aria-label={playing ? "Sæt videoen på pause" : "Afspil videoen"}>

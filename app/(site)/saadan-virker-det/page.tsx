@@ -39,7 +39,7 @@ export default function Saadan() {
             <li><div><h3>Spørg i chatten</h3><p>Bed sælgeren vise mærket, målene eller stoffet tæt på. Svaret kommer, mens du ser med.</p></div></li>
             <li><div><h3>Køb med ét tryk</h3><p>Den første, der trykker Køb, får tingen. Den lander med det samme under Mine køb.</p></div></li>
             <li><div><h3>Eller byd på budsalg</h3><p>Står der Budsalg på tingen, byder du i stedet for at købe med det samme. Du har 30 sekunder, og det højeste bud vinder.</p></div></li>
-            <li><div><h3>Eller køb bagefter</h3><p>Ting, der ikke blev solgt i showet, kommer <Link href="/til-salg">til salg</Link> til fast pris. Tryk Køb nu, så er tingen din.</p></div></li>
+            <li><div><h3>Eller køb til fast pris</h3><p>Ting, der ikke blev solgt i showet, og ting, sælgerne har filmet i en videoannonce, er <Link href="/til-salg">til salg</Link> til fast pris. Tryk Køb nu, så er tingen din.</p></div></li>
             <li><div><h3>Betal samlet</h3><p>Betal med MobilePay eller kort under Mine køb. Alt fra samme sælger sendes i én pakke.</p></div></li>
             <li><div><h3>Modtag din pakke</h3><p>Du bekræfter, at alt er i orden, og først derefter bliver pengene udbetalt til sælgeren.</p></div></li>
           </ol>
@@ -51,7 +51,7 @@ export default function Saadan() {
           <div className="sec-head" style={{ marginBottom: 0 }}>
             <span className="label red">For sælgere</span>
             <h2 className="h2" id="h-seller">Hvordan sælger jeg på Relived?</h2>
-            <p className="lede">Opret et show, læg dine ting i køen, og gå live fra studiet.</p>
+            <p className="lede">Opret et show, læg dine ting i køen, og gå live fra studiet. Har du ikke lyst til at gå live, kan du filme tingen og sætte den til salg med Sælg med video.</p>
             <div className="ctas">
               <Link className="btn btn-red" href="/saelg">Læs om at sælge live</Link>
               <Link className="btn btn-line" href="/studio">Gå til studiet</Link>

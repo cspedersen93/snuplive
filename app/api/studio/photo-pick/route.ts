@@ -32,13 +32,14 @@ export async function POST(req: Request) {
   const uid = await getUserId(supabase);
   if (!uid) return fail("Log ind først.", 401);
 
-  const body = (await req.json().catch(() => null)) as { itemId?: unknown; images?: unknown } | null;
+  const body = (await req.json().catch(() => null)) as { itemId?: unknown; images?: unknown; mode?: unknown } | null;
   const itemId = typeof body?.itemId === "string" ? body.itemId : "";
   const images = Array.isArray(body?.images) ? body.images : [];
-  if (!UUID.test(itemId)) return fail("Ukendt ting.", 400);
   if (!images.length || images.length > MAX_IMAGES) return fail("Forkert antal billeder.", 400);
   if (!images.every((b) => typeof b === "string" && b.length > 100 && b.length <= MAX_B64 && /^[A-Za-z0-9+/=]+$/.test(b)))
     return fail("Billederne kunne ikke læses.", 400);
+  if (body?.mode === "video") return videoPick(supabase, uid, images as string[]);
+  if (!UUID.test(itemId)) return fail("Ukendt ting.", 400);
 
   const { data: item } = await supabase
     .from("items")
@@ -59,24 +60,62 @@ export async function POST(req: Request) {
   if (it.show.status !== "live" && !justEnded) return fail("Showet kører ikke.", 409);
   if (tooMany(uid)) return fail("For mange billeder på kort tid.", 429);
 
-  const key = unquoteEnv(process.env.ANTHROPIC_API_KEY);
-  if (!key) return json({ pick: null, why: "off" });
-
   const cat = category(it.category ?? it.show.category);
   const what = [it.name, it.size ? `str. ${it.size}` : "", it.condition ?? "", cat.word].filter(Boolean).join(", ");
+  const r = await askClaude(
+    images,
+    `Billederne er taget fra et live-videoshow, hvor en sælger viser en brugt ting frem: "${what}". ` +
+      "Vælg det billede, der er bedst som produktbillede i en annonce for tingen: tingen skal kunne ses tydeligt, " +
+      "være i fokus og gerne fylde meget. Sælgeren må godt være med, men billedet skal vise tingen. " +
+      "Svar kun med billedets nummer. Svar 0, hvis tingen ikke kan ses på nogen af billederne.",
+  );
+  if ("why" in r) return json({ pick: null, why: r.why });
+  const m = /\d+/.exec(r.text);
+  const n = m ? Number(m[0]) : NaN;
+  if (!Number.isInteger(n) || n < 0 || n > images.length) {
+    console.error("[relived] uventet svar fra Claude på billedvalget:", r.text.slice(0, 80));
+    return json({ pick: null, why: "unclear" });
+  }
+  return json({ pick: n });
+}
+
+/**
+ * Videoannoncer: sælgeren har filmet tingen (uden at gå live). Claude vælger op til 4 billeder til annoncen, det bedste først.
+ * Svarer { picks: [3, 1, 6] } (numrene på billederne), { picks: [] } (tingen ses ikke) eller { picks: null } (Claude er ikke
+ * sat op eller svarede ikke; siden vælger så selv de skarpeste).
+ */
+async function videoPick(supabase: Awaited<ReturnType<typeof createClient>>, uid: string, images: string[]) {
+  const { data: me } = await supabase.from("profiles").select("is_seller").eq("id", uid).maybeSingle();
+  if (!me?.is_seller) return fail("Bliv sælger først.", 403);
+  if (tooMany(uid)) return fail("For mange billeder på kort tid.", 429);
+  const r = await askClaude(
+    images,
+    "Billederne er taget fra en kort video, hvor en sælger filmer en brugt ting, som skal sælges i en annonce. " +
+      "Vælg op til 4 billeder til annoncen, det bedste først. Det første bliver forsidebilledet: tingen skal ses tydeligt, " +
+      "være i fokus og gerne fylde meget. Vælg gerne de andre, så de viser tingen fra forskellige sider eller tæt på " +
+      "(fx mærke eller detaljer). Spring uskarpe billeder og billeder uden tingen over. " +
+      "Svar kun med numrene adskilt af komma, fx 3, 1, 6. Svar 0, hvis tingen ikke kan ses på nogen af billederne.",
+  );
+  if ("why" in r) return json({ picks: null, why: r.why });
+  const nums = (r.text.match(/\d+/g) ?? []).map(Number);
+  if (!nums.length || nums.some((n) => !Number.isInteger(n) || n < 0 || n > images.length)) {
+    console.error("[relived] uventet svar fra Claude på billedvalget (video):", r.text.slice(0, 80));
+    return json({ picks: null, why: "unclear" });
+  }
+  const picks = [...new Set(nums.filter((n) => n > 0))].slice(0, 4);
+  return json({ picks });
+}
+
+/** Spørg Claude om billederne. Giver svarteksten, eller hvorfor der ikke kom et svar. */
+async function askClaude(images: string[], question: string): Promise<{ text: string } | { why: "off" | "error" }> {
+  const key = unquoteEnv(process.env.ANTHROPIC_API_KEY);
+  if (!key) return { why: "off" };
   const content: unknown[] = [];
   images.forEach((b, i) => {
     content.push({ type: "text", text: `Billede ${i + 1}:` });
     content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: b } });
   });
-  content.push({
-    type: "text",
-    text:
-      `Billederne er taget fra et live-videoshow, hvor en sælger viser en brugt ting frem: "${what}". ` +
-      "Vælg det billede, der er bedst som produktbillede i en annonce for tingen: tingen skal kunne ses tydeligt, " +
-      "være i fokus og gerne fylde meget. Sælgeren må godt være med, men billedet skal vise tingen. " +
-      "Svar kun med billedets nummer. Svar 0, hvis tingen ikke kan ses på nogen af billederne.",
-  });
+  content.push({ type: "text", text: question });
 
   const base = (unquoteEnv(process.env.ANTHROPIC_API_BASE) || "https://api.anthropic.com").replace(/\/+$/, "");
   const model = unquoteEnv(process.env.ANTHROPIC_MODEL) || MODEL_DEFAULT;
@@ -86,26 +125,19 @@ export async function POST(req: Request) {
     const r = await fetch(`${base}/v1/messages`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
-      // Svaret er ét tal. max_tokens giver plads, hvis modellen tænker lidt først (kun tekstdelen bruges).
+      // Svaret er et par tal. max_tokens giver plads, hvis modellen tænker lidt først (kun tekstdelen bruges).
       body: JSON.stringify({ model, max_tokens: 400, messages: [{ role: "user", content }] }),
       signal: ctrl.signal,
     });
     const j = (await r.json().catch(() => null)) as { content?: { type: string; text?: string }[]; error?: { message?: string } } | null;
     if (!r.ok) {
       console.error("[relived] Claude svarede ikke på billedvalget:", r.status, j?.error?.message ?? "");
-      return json({ pick: null, why: "error" });
+      return { why: "error" };
     }
-    const text = (j?.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join(" ");
-    const m = /\d+/.exec(text);
-    const n = m ? Number(m[0]) : NaN;
-    if (!Number.isInteger(n) || n < 0 || n > images.length) {
-      console.error("[relived] uventet svar fra Claude på billedvalget:", text.slice(0, 80));
-      return json({ pick: null, why: "unclear" });
-    }
-    return json({ pick: n });
+    return { text: (j?.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join(" ") };
   } catch (e) {
     console.error("[relived] Claude svarede ikke på billedvalget:", e instanceof Error ? e.message : e);
-    return json({ pick: null, why: "error" });
+    return { why: "error" };
   } finally {
     clearTimeout(timer);
   }

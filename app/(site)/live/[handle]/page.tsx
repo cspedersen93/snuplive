@@ -14,6 +14,7 @@ import SellerRatings, { type Rating } from "./SellerRatings";
 import { sweepStaleShows } from "@/lib/queries";
 import ShowClient from "./ShowClient";
 import FollowButton from "@/components/FollowButton";
+import { videoShowId } from "@/lib/videoShow";
 
 export const dynamic = "force-dynamic";
 
@@ -34,10 +35,16 @@ const load = cache(async (rawHandle: string) => {
 
   await sweepStaleShows();
   const base = () => sb.from("shows").select(SHOW_COLS).eq("seller_id", seller.id).is("removed_at", null);
+  // Videoannoncerne ligger i et skjult "show" (0019_videoannoncer.sql). Det skal ikke vises som sælgerens seneste show.
+  const videoShow = await videoShowId(sb, seller.id);
+  const ended = () => {
+    const q = base().eq("status", "ended");
+    return videoShow ? q.neq("id", videoShow) : q;
+  };
   const [liveQ, nextQ, lastQ] = await Promise.all([
     base().eq("status", "live").limit(1).maybeSingle(),
     base().eq("status", "planned").order("starts_at", { ascending: true, nullsFirst: false }).limit(1).maybeSingle(),
-    base().eq("status", "ended").order("ended_at", { ascending: false }).limit(1).maybeSingle(),
+    ended().order("ended_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
   const show = (liveQ.data ?? nextQ.data ?? lastQ.data ?? null) as Show | null;
 

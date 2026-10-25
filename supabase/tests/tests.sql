@@ -830,6 +830,48 @@ select t.throws($$select set_show_hidden('10000000-0000-0000-0000-0000000000f7',
 reset role;
 delete from shows where id = '10000000-0000-0000-0000-0000000000f7';
 
+-- ── Videoannoncer: sælgeren filmer tingen og sætter den til salg uden at gå live ──
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select create_video_listing('30000000-0000-0000-0000-0000000000a1', 'Strikkjole, grøn', 'M', 'Som ny', 220, 'dametoej', 'Lidt fnuller',
+  array['00000000-0000-0000-0000-00000000000a/30000000-0000-0000-0000-0000000000a1/f1.jpg', '00000000-0000-0000-0000-00000000000a/30000000-0000-0000-0000-0000000000a1/f2.jpg'],
+  '00000000-0000-0000-0000-00000000000a/30000000-0000-0000-0000-0000000000a1/clip-abc123.mp4');
+select t.ok((select status = 'unsold' and for_sale and listed_at is not null and sale_type = 'fixed' and clip_path is not null and cardinality(images) = 2
+               from items where id = '30000000-0000-0000-0000-0000000000a1'), 'videoannoncen er til salg med det samme');
+select t.ok((select s.kind = 'video' and s.status = 'ended' and s.title = 'Videoannoncer' from items i join shows s on s.id = i.show_id
+               where i.id = '30000000-0000-0000-0000-0000000000a1'), 'den ligger i sælgerens skjulte videoannonce-show');
+select create_video_listing('30000000-0000-0000-0000-0000000000a2', 'Louis Vuitton Speedy 30', null, 'Brugt', 4500, 'luksus', null,
+  array['00000000-0000-0000-0000-00000000000a/30000000-0000-0000-0000-0000000000a2/f1.jpg'],
+  '00000000-0000-0000-0000-00000000000a/30000000-0000-0000-0000-0000000000a2/clip-x1.webm');
+select t.ok((select count(*) from shows where seller_id = '00000000-0000-0000-0000-00000000000a' and kind = 'video') = 1, 'kun ét videoannonce-show pr. sælger');
+select t.ok((select auth_required and auth_status is null from items where id = '30000000-0000-0000-0000-0000000000a2'), 'en mærketaske skal ægthedstjekkes');
+select t.throws($$select create_video_listing('30000000-0000-0000-0000-0000000000a3', 'Taske', null, null, 100, 'andet', null,
+  array['00000000-0000-0000-0000-00000000000a/30000000-0000-0000-0000-0000000000a3/f1.jpg'],
+  '00000000-0000-0000-0000-00000000000b/30000000-0000-0000-0000-0000000000a3/clip-x1.mp4')$$, 'Videoen kunne ikke gemmes');
+select t.throws($$select create_video_listing('30000000-0000-0000-0000-0000000000a3', 'Taske', null, null, 100, 'andet', null, '{}',
+  '00000000-0000-0000-0000-00000000000a/30000000-0000-0000-0000-0000000000a3/clip-x1.mp4')$$, 'Vælg 1-4 billeder');
+select t.throws($$select create_video_listing('30000000-0000-0000-0000-0000000000a3', 'Taske', null, null, 100, 'andet', null,
+  array['andensaelger/30000000-0000-0000-0000-0000000000a3/f1.jpg'],
+  '00000000-0000-0000-0000-00000000000a/30000000-0000-0000-0000-0000000000a3/clip-x1.mp4')$$, 'items_images_check');
+select t.throws($$select set_show_status((select id from shows where seller_id = auth.uid() and kind = 'video'), 'live')$$, 'allerede startet eller slut');
+select t.throws($$update shows set kind = 'show' where seller_id = auth.uid() and kind = 'video'$$, 'permission denied');
+select t.throws($$insert into shows (seller_id, title, category, starts_at, kind) values (auth.uid(), 'Snyd', 'andet', now(), 'video')$$, 'permission denied');
+-- En køber kan købe videoannoncen med Køb nu, men ikke mærketasken før den er tjekket.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select create_video_listing('30000000-0000-0000-0000-0000000000a4', 'Bluse', null, null, 100, 'andet', null,
+  array['00000000-0000-0000-0000-00000000000b/30000000-0000-0000-0000-0000000000a4/f1.jpg'],
+  '00000000-0000-0000-0000-00000000000b/30000000-0000-0000-0000-0000000000a4/clip-x1.mp4')$$, 'Bliv sælger først');
+select buy_now('30000000-0000-0000-0000-0000000000a1');
+select t.ok((select status = 'sold' from items where id = '30000000-0000-0000-0000-0000000000a1')
+            and exists (select 1 from sales where item_id = '30000000-0000-0000-0000-0000000000a1' and buyer_id = auth.uid()), 'videoannoncen kan købes med Køb nu');
+select t.throws($$select buy_now('30000000-0000-0000-0000-0000000000a2')$$, 'ægthedstjek');
+reset role;
+-- Lukker Relived sælgeren, bliver alt, sælgeren har til salg, taget af salg.
+update profiles set is_seller = false where id = '00000000-0000-0000-0000-00000000000a';
+select t.ok((select count(*) from items where seller_id = '00000000-0000-0000-0000-00000000000a' and status = 'unsold' and for_sale) = 0,
+            'en lukket sælger har ikke noget til salg');
+update profiles set is_seller = true where id = '00000000-0000-0000-0000-00000000000a';
+
 -- ── Nyt navn: beskeder fra siden selv står som Relived ──
 select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
 select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');

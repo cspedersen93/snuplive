@@ -49,7 +49,7 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
             <span className="b-view">Solgt</span>
           ) : null}
           {state === "for_sale" && item.clip_path ? (
-            <span className="b-view" title="Se tingen i et klip fra live-showet">
+            <span className="b-view" title="Se tingen på video">
               <IconPlay />
               Video
             </span>

@@ -209,7 +209,7 @@ export default function ClipFeed({ initial, batch }: { initial: FeedClip[]; batc
                   playsInline
                   preload={i === active ? "auto" : near ? "metadata" : "none"}
                   onClick={() => setPaused((p) => !p)}
-                  aria-label={`${c.name}, video fra live-showet`}
+                  aria-label={`${c.name}, video af tingen`}
                 />
                 {i === active && (paused || still) ? (
                   <button className="clip-play" type="button" onClick={() => (still ? (setStill(false), setPaused(false)) : setPaused(false))} aria-label="Afspil">

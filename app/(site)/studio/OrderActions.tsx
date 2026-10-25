@@ -324,7 +324,7 @@ export function ForSaleRow({ id, price, forSale }: { id: string; price: number; 
   );
 }
 
-/** Klippet fra live-showet på en ting: se det, eller slet det. */
+/** Videoen af en ting (fra live-showet eller en videoannonce): se den, eller slet den. */
 export function ClipRow({ id, href }: { id: string; href: string }) {
   const router = useRouter();
   const [ask, setAsk] = useState(false);
@@ -341,7 +341,7 @@ export function ClipRow({ id, href }: { id: string; href: string }) {
   }
   return (
     <span className="clip-row">
-      <a href={href}>Video fra showet</a>
+      <a href={href}>Se videoen</a>
       {" · "}
       {ask ? (
         <>

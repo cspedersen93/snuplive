@@ -80,7 +80,7 @@ export default function Vilkaar() {
         <li>
           Mærkevarer (fx Louis Vuitton, Gucci, Chanel, Hermès, Prada, Dior og Rolex) og ting i kategorien Luksus til 1.000 kr eller
           mere skal ægthedstjekkes af Relived, før de kan vises live eller købes. Du sender nærbilleder af logo, koder og syninger fra
-          dit studie, og vi godkender eller afviser. Er en ting falsk, får køberen alle pengene tilbage, og vi kan lukke din konto.
+          dit studie eller under Til salg, og vi godkender eller afviser. Er en ting falsk, får køberen alle pengene tilbage, og vi kan lukke din konto.
         </li>
         <li>Skønhedsprodukter (makeup, hudpleje og parfume) må kun sælges, hvis de er nye og uåbnede.</li>
         <li>Beskriv tingen ærligt, og vis fejl og slid tydeligt på video.</li>
@@ -88,6 +88,11 @@ export default function Vilkaar() {
           Når du viser en ting frem i et show, gemmer vi det billede, hvor tingen ses bedst, og et klip på op til 15 sekunder med lyd. Bliver tingen ikke solgt,
           vises klippet på tingens side, så køberne kan se den bagefter. Du giver os lov til at vise billedet og klippet på Relived,
           så længe tingen ligger her. Du kan slette klippet under Til salg i dit studie.
+        </li>
+        <li>
+          Lægger du en videoannonce op (Sælg med video), kan tingen købes med det samme til den pris, du har sat. Videoen og de
+          billeder, du vælger, vises på tingens side og under Klip, så længe tingen ligger her. Videoen må kun vise tingen, ikke
+          andre personer, der ikke har sagt ja til det.
         </li>
         <li>Prisen, du sætter, og et vindende bud er bindende for dig.</li>
         <li>Send pakken inden 3 hverdage efter, at køberen har betalt, eller aftal afhentning med køberen.</li>

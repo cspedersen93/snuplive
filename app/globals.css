@@ -1191,3 +1191,54 @@ img.v-thumb{object-fit:cover}
 .hidden-shows[open] summary::after{transform:translateY(2px) rotate(-135deg)}
 .hidden-shows summary:hover{color:var(--text)}
 .hidden-shows .table-wrap{margin-top:8px;opacity:.85}
+
+/* Sælg med video (videoannoncer) */
+.vl{display:flex;flex-direction:column;gap:16px}
+.vl-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.vl-start{display:flex;flex-direction:column;gap:16px}
+.vl-intro p{max-width:62ch;margin-top:4px}
+.vl-tips{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding:0}
+.vl-tips li{font-size:.84rem;padding:5px 11px;border-radius:99px;background:var(--surface-2);color:var(--muted)}
+.vl-file{position:relative;cursor:pointer}
+.vl-foot{display:flex;align-items:center;gap:6px}
+.vl-cam-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.vl-cam{position:relative;width:min(100%,420px);aspect-ratio:3/4;border-radius:22px;overflow:hidden;background:#000;border:2px solid var(--line-2)}
+.vl-cam.rec{border-color:var(--live)}
+.vl-cam video{width:100%;height:100%;object-fit:cover;display:block}
+.vl-cam-top{position:absolute;top:0;left:0;right:0;padding:12px 14px 22px;background:linear-gradient(rgba(0,0,0,.6),transparent);font-size:.9rem;font-weight:600;text-align:center;color:#fff}
+.vl-rec-time{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.85rem;background:var(--live);padding:4px 11px;border-radius:99px}
+.vl-cam-bottom{position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:center}
+.vl-shutter{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:rgba(0,0,0,.2);display:grid;place-items:center;cursor:pointer;padding:0}
+.vl-shutter span{width:54px;height:54px;border-radius:50%;background:var(--red);transition:width .2s,height .2s,border-radius .2s}
+.vl-shutter.stop span{width:28px;height:28px;border-radius:7px}
+.vl-shutter:disabled{opacity:.55;cursor:not-allowed}
+.vl-shutter:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.vl-cam-hint{text-align:center}
+.vl-bar{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.18)}
+.vl-bar span{display:block;height:100%;background:var(--live);transition:width .25s linear}
+.vl-bar.big{position:relative;height:8px;border-radius:99px;overflow:hidden;margin:14px 0 10px}
+.vl-picked{display:flex;flex-direction:column;gap:12px}
+.vl-preview{width:100%;max-width:420px;aspect-ratio:3/4;object-fit:contain;background:#000;border-radius:16px;display:block}
+.vl-edit{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:18px;align-items:start}
+.vl-media{position:sticky;top:96px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.vl-fields{display:flex;flex-direction:column;gap:16px;min-width:0}
+.vl-frames{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.vl-frame{position:relative;aspect-ratio:4/5;border-radius:10px;overflow:hidden;border:2px solid transparent;background:var(--surface);padding:0;cursor:pointer;color:var(--text)}
+.vl-frame img{width:100%;height:100%;object-fit:cover;display:block;opacity:.5;transition:opacity .15s}
+.vl-frame.on{border-color:var(--red)}
+.vl-frame.on img{opacity:1}
+.vl-frame:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.vl-n{position:absolute;top:5px;left:5px;min-width:22px;height:22px;border-radius:99px;background:var(--red);color:#fff;font-size:.78rem;font-weight:700;display:grid;place-items:center;padding:0 6px;line-height:1}
+.vl-cover{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);color:#fff;font-size:.7rem;font-weight:600;text-align:center;padding:3px 0}
+.vl-frame.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px dashed var(--line-2);color:var(--muted);font-size:1.5rem;line-height:1}
+.vl-add-t{font-size:.72rem}
+.vl-done{display:flex;flex-direction:column;gap:12px}
+.vl-entry{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.vl-entry p{max-width:60ch;font-size:.92rem;margin-top:2px}
+@media (max-width:820px){.vl-edit{grid-template-columns:1fr}.vl-media{position:static;align-items:stretch}.vl-preview{max-width:none;aspect-ratio:4/5}}
+.fs-auth{margin-top:4px}
+.fs-auth .auth-line{display:block;font-size:.8rem;color:var(--amber)}
+.fs-auth .auth-line.rejected{color:#ff8a9b}
+.fs-auth .auth-line .linkbtn{font-size:inherit;color:inherit}
+.fs-auth .box{margin-top:10px}
+.vl .btn .ico,.vl-entry .btn .ico{stroke:currentColor;width:18px;height:18px}

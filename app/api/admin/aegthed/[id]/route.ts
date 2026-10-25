@@ -60,7 +60,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
               "",
               `Begrundelse: ${note}`,
               "",
-              "Du kan sende nye billeder under Mine shows → showet → Send nye billeder. Indtil den er godkendt, kan den ikke vises live eller købes.",
+              "Du kan sende nye billeder under Mine shows (i showet eller under Til salg) → Send nye billeder. Indtil den er godkendt, kan den ikke vises live eller købes.",
             ]
         )
           .filter((l, i, a) => l !== "" || a[i - 1] !== "")

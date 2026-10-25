@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AccountNav from "@/components/AccountNav";
+import { IconCamera } from "@/components/Icons";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
 import { clock, dayLabel, when } from "@/lib/format";
@@ -59,7 +60,11 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
     .eq("seller_id", uid)
     .order("created_at", { ascending: false })
     .limit(50);
-  const all = (showsQ.data ?? []) as unknown as (Show & { items: { count: number }[] })[];
+  // Videoannoncerne ligger i et skjult "show" (0019_videoannoncer.sql). Det står ikke i listen.
+  const videoQ = await supabase.from("shows").select("id").eq("seller_id", uid).eq("kind", "video");
+  const canVideo = !videoQ.error;
+  const videoIds = new Set((videoQ.data ?? []).map((r) => r.id as string));
+  const all = ((showsQ.data ?? []) as unknown as (Show & { items: { count: number }[] })[]).filter((s) => !videoIds.has(s.id));
   const order = { live: 0, planned: 1, ended: 2 } as const;
   all.sort((a, b) => order[a.status] - order[b.status]);
   // Skjulte shows (findes først, når 0018_skjul.sql er kørt).
@@ -103,6 +108,18 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
         ) : null}
 
         <NewShowForm sellerId={uid} />
+
+        {canVideo ? (
+          <div className="box vl-entry">
+            <div>
+              <h2 className="h3">Sælg med video</h2>
+              <p className="muted">Har du ikke lyst til at gå live? Film tingen med telefonen, så sætter vi den til salg med video og billeder.</p>
+            </div>
+            <Link className="btn btn-line" href="/studio/video">
+              <IconCamera width={18} height={18} /> Film en ting
+            </Link>
+          </div>
+        ) : null}
 
         {shows.length ? (
           <ShowTable shows={shows} avatarPath={profile.avatar_path} canHide={canHide} hidden={false} />

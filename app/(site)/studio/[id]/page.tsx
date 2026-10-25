@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
 import { Suspense } from "react";
 import MitIdResult from "@/components/MitIdResult";
 import { mitidState } from "@/lib/mitid";
+import { videoShowId } from "@/lib/videoShow";
 import { ITEM_COLS, MESSAGE_COLS, SHOW_COLS, type Item, type Message, type Show } from "@/lib/types";
 import StudioClient, { type StudioSale } from "./StudioClient";
 
@@ -22,6 +23,8 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
 
   const { data: show } = await supabase.from("shows").select(SHOW_COLS).eq("id", id).eq("seller_id", uid).maybeSingle();
   if (!show) notFound();
+  // Videoannoncerne ligger i et skjult "show". Det har intet studie; de rettes under Mine shows → Til salg.
+  if ((await videoShowId(supabase, uid)) === id) redirect("/studio");
 
   const [mitid, items, messages, sales] = await Promise.all([
     mitidState(supabase, profile),
