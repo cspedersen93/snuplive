@@ -1076,3 +1076,48 @@ img.v-thumb{object-fit:cover}
 .pre-live .push-offer{text-align:left}
 .following .follow-count{display:none}
 .pre-live .follow .btn{white-space:normal;max-width:100%;text-align:center;line-height:1.25}
+
+/* Klip-feedet: Swipe og køb */
+.row-head-btns{display:flex;gap:10px;flex-wrap:wrap}
+.clip-open,.clip-open body{overflow:hidden;overscroll-behavior:none}
+.clipfeed{position:fixed;inset:0;z-index:80;background:#000;display:flex;flex-direction:column;color:#fff}
+.clip-bar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;height:calc(56px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 12px 0}
+.clip-bar h1{font-size:1.05rem;font-weight:700;letter-spacing:-.01em;margin:0}
+.clip-icon{flex:none;width:44px;height:44px;border-radius:99px;display:grid;place-items:center;background:rgba(255,255,255,.1);border:0;color:#fff;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.clip-icon:hover{background:rgba(255,255,255,.18)}
+.clip-icon:focus-visible,.clip-play:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.clip-icon svg{width:22px;height:22px}
+.clip-scroll{flex:1;min-height:0;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
+.clip-scroll::-webkit-scrollbar{display:none}
+.clip-slide{height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;justify-content:center}
+.clip-stage{position:relative;height:100%;width:min(100%,calc((100dvh - 56px) * 9 / 16));overflow:hidden;background:#0b0a0c}
+@media (min-width:700px){.clip-stage{border-radius:16px;height:calc(100% - 16px);margin-top:8px}}
+.clip-bg{position:absolute;inset:-24px;width:calc(100% + 48px);height:calc(100% + 48px);object-fit:cover;filter:blur(26px) brightness(.45)}
+.clip-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;cursor:pointer}
+.clip-stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:58%;background:linear-gradient(to top,rgba(0,0,0,.88),rgba(0,0,0,.35) 55%,rgba(0,0,0,0));pointer-events:none}
+.clip-info{position:absolute;left:0;right:62px;bottom:0;z-index:2;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.clip-side{position:absolute;right:10px;bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:2;display:flex;flex-direction:column;gap:12px}
+.clip-seller{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.clip-handle{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;text-decoration:none}
+.clip-handle .ava-img{border-radius:50%}
+.clip-info .follow{flex-direction:row;align-items:center}
+.clip-info .follow-row{gap:8px}
+.clip-follow{color:#fff;border-color:rgba(255,255,255,.45);background:transparent;padding-block:.35em}
+.clip-info .follow .btn.is-on{color:#fff;border-color:rgba(255,255,255,.3)}
+.clip-info .follow-count{color:rgba(255,255,255,.75)}
+.clip-info .push-offer{position:absolute;left:16px;right:-46px;bottom:100%;margin-bottom:8px;background:rgba(18,16,20,.95);color:#fff}
+.clip-name{font-size:1.3rem;line-height:1.2;letter-spacing:-.02em;margin:0 0 4px}
+.clip-name a{color:#fff;text-decoration:none}
+.clip-meta{margin:0 0 14px;color:rgba(255,255,255,.85);font-size:.95rem}
+.clip-meta strong{color:#fff;font-size:1.05rem}
+.clip-ctas{display:flex;gap:8px;flex-wrap:wrap}
+.clip-ctas .btn-ghost{background:rgba(255,255,255,.14);color:#fff}
+.clip-play{position:absolute;inset:0;margin:auto;width:76px;height:76px;border-radius:99px;border:0;background:rgba(0,0,0,.5);color:#fff;display:grid;place-items:center;z-index:2;cursor:pointer}
+.clip-play svg{width:34px;height:34px;margin-left:4px}
+.clip-end .clip-stage::after{display:none}
+.clip-endbox{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px}
+.clip-endbox strong{font-size:1.4rem}
+.clip-endbox p{color:rgba(255,255,255,.8);max-width:30ch;margin:0 0 6px}
+.clip-endbox .btn-line{color:#fff;border-color:rgba(255,255,255,.4)}
+.clip-nav{display:none}
+@media (min-width:700px) and (pointer:fine){.clip-nav{display:flex;flex-direction:column;gap:12px;position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:3}.clip-nav .clip-icon:disabled{opacity:.35;cursor:default}}

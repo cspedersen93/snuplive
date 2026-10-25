@@ -432,6 +432,21 @@ Kør `supabase/migrations/0015_klip.sql` i Supabase → SQL Editor (efter 0014).
 
 ---
 
+## Klip: "Swipe og køb"
+
+Siden `/klip` (menupunktet **Klip**) viser klippene af de usolgte ting som et feed i fuld skærm, ét klip ad gangen. Der skal
+ikke køres noget nyt i Supabase (det bruger klippene fra 0015).
+
+- Swipe op/ned på telefonen (pil op/ned, rullehjul eller knapperne til højre på computeren). Klippet på skærmen afspilles
+  uden lyd; lyden slås til én gang for alle klip. Tryk på videoen for pause.
+- Under hvert klip: sælgeren med **Følg**, navn, pris, **Køb nu** og **Se tingen**. Del-knappen deler tingens side.
+- De nyeste klip kommer først, og sælgerne blandes, så én sælger ikke fylder hele feedet. Feedet henter 12 ad gangen.
+- Kun de nærmeste klip hentes, så det ikke bruger unødig data. Har man slået *reducer bevægelse* til, starter intet af sig selv.
+- Et delt link kan starte med en bestemt ting: `/klip?ting=<id>`. Forsiden og *Til salg* har en knap *Swipe gennem klip*,
+  når der er klip.
+
+---
+
 ## Følg sælgere og besked på telefonen
 
 Kør `supabase/migrations/0016_foelg.sql` i Supabase → SQL Editor (efter 0015). Der skal ikke nye nøgler i Vercel.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { IconPlay } from "@/components/Icons";
 import CategoryCards from "@/components/CategoryCards";
 import ItemCard from "@/components/ItemCard";
 import PhoneMock from "@/components/PhoneMock";
@@ -102,7 +103,13 @@ export default async function Forside() {
 
       <ItemRow id="h-budsalg" title="Kommende budsalg – byd live" items={auctions} link={{ href: "/live", label: "Se programmet" }} />
       <ItemRow id="h-snart" title="Snart i et live-show" items={soon} link={{ href: "/live", label: "Se programmet" }} />
-      <ItemRow id="h-til-salg" title="Til salg nu – fundet i tidligere shows" items={forSale} link={{ href: "/til-salg", label: "Se alt til salg" }} />
+      <ItemRow
+        id="h-til-salg"
+        title="Til salg nu – fundet i tidligere shows"
+        items={forSale}
+        link={{ href: "/til-salg", label: "Se alt til salg" }}
+        extra={forSale.some((i) => i.clip_path) ? { href: "/klip", label: "Swipe gennem klip" } : undefined}
+      />
 
       <section className="sec band" aria-labelledby="h-how">
         <div className="wrap split">
@@ -146,14 +153,36 @@ export default async function Forside() {
 }
 
 /** En vandret række med ting (forsiden). Vises ikke, når der ikke er noget. */
-function ItemRow({ id, title, items, link }: { id: string; title: string; items: FeedItem[]; link: { href: string; label: string } }) {
+function ItemRow({
+  id,
+  title,
+  items,
+  link,
+  extra,
+}: {
+  id: string;
+  title: string;
+  items: FeedItem[];
+  link: { href: string; label: string };
+  extra?: { href: string; label: string };
+}) {
   if (!items.length) return null;
   return (
     <section className="sec tight" aria-labelledby={id}>
       <div className="wrap">
         <div className="row-head">
           <h2 className="h2" id={id}>{title}</h2>
-          <Link className="btn btn-line" href={link.href}>{link.label}</Link>
+          {extra ? (
+            <div className="row-head-btns">
+              <Link className="btn btn-red" href={extra.href}>
+                <IconPlay width={14} height={14} />
+                {extra.label}
+              </Link>
+              <Link className="btn btn-line" href={link.href}>{link.label}</Link>
+            </div>
+          ) : (
+            <Link className="btn btn-line" href={link.href}>{link.label}</Link>
+          )}
         </div>
         <div className="icards-scroll" style={{ "--n": items.length } as React.CSSProperties}>
           <div className="icards">

@@ -31,7 +31,7 @@ export default function SupportChat() {
   const fab = useRef<HTMLButtonElement>(null);
   const back = useRef<HTMLElement | null>(null);
   const admin = /^\/admin(\/|$)/.test(path);
-  const hidden = admin || /^\/(live|studio)\/[^/]+/.test(path);
+  const hidden = admin || /^\/(live|studio)\/[^/]+/.test(path) || path === "/klip";
 
   const show = useCallback(() => {
     if (document.activeElement instanceof HTMLElement) back.current = document.activeElement;

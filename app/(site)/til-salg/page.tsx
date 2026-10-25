@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { IconPlay } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import Pager from "@/components/Pager";
 import SortNote from "@/components/SortNote";
@@ -63,6 +64,12 @@ export default async function TilSalg({ searchParams }: Props) {
           {total ? <span className="label mint">{total} ting til salg</span> : null}
           <h1 className="h1" id="h-til-salg">{cat ? `${cat.label} til salg` : "Brugt til salg – køb nu til fast pris"}</h1>
           <p className="lede">Ting fra tidligere live-shows, som ikke blev solgt. Køb dem til fast pris lige nu.</p>
+          {items.some((i) => i.clip_path) ? (
+            <Link className="btn btn-red" href="/klip" style={{ marginTop: 18 }}>
+              <IconPlay width={14} height={14} />
+              Swipe gennem klip
+            </Link>
+          ) : null}
         </div>
       </section>
 

@@ -12,6 +12,7 @@ import { getSupabase } from "@/lib/supabase/client";
 const NAV = [
   { href: "/live", label: "Live nu" },
   { href: "/til-salg", label: "Til salg" },
+  { href: "/klip", label: "Klip" },
   { href: "/kategori", label: "Kategorier" },
   { href: "/saadan-virker-det", label: "Sådan virker det" },
 ];
