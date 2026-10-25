@@ -18,6 +18,7 @@ import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { Item, Message, Profile, Show } from "@/lib/types";
 import ItemForm from "./ItemForm";
+import SwipeCard from "./SwipeCard";
 import { SITE_HOST } from "@/lib/env";
 
 export interface StudioSale {
@@ -80,6 +81,9 @@ export default function StudioClient(props: Props) {
   const revenue = sold.reduce((a, i) => a + soldPrice(i), 0);
   const queued = items.filter((i) => i.status === "queued");
   const next = queued[0] ?? items.find((i) => i.status === "unsold" && i.id !== current?.id) ?? null;
+  // Den forrige ting (over den nuværende i køen), som ikke er solgt: kan vises igen, fx hvis en seer spørger til den.
+  const curIdx = current ? items.indexOf(current) : items.length;
+  const prev = items.slice(0, curIdx).reverse().find((i) => i.status === "unsold") ?? null;
   const shareUrl = `/live/${props.profile.handle}`;
 
   const fast = Boolean(current?.rush_ends_at || (current?.auction_ends_at && current.status === "live"));
@@ -508,7 +512,14 @@ export default function StudioClient(props: Props) {
                   {current && current.status !== "sold" && rushLeft !== null ? (
                     <div className="v-rush" role="timer">{rushLeft > 0 ? <>Lynrunde <span>{rushLeft}</span></> : "Lynrunden er slut"}</div>
                   ) : null}
-                  <div className="v-card">
+                  <SwipeCard
+                    onNext={() => next && present(next.id)}
+                    onPrev={() => prev && present(prev.id)}
+                    canNext={Boolean(live && !busy && next && !bidRunning)}
+                    canPrev={Boolean(live && !busy && prev && !bidRunning)}
+                    nextName={next?.name ?? null}
+                    prevName={prev?.name ?? null}
+                  >
                     <span
                       className="v-thumb"
                       style={
@@ -532,13 +543,13 @@ export default function StudioClient(props: Props) {
                               : `Start ${kr(auction.price)} · Tryk Start budsalg`
                           : current
                             ? itemMeta(current) || " "
-                            : "Tryk Vis næste"}
+                            : "Swipe, eller tryk Vis næste"}
                       </div>
                     </div>
                     {current ? (
                       <span className="v-buy" aria-hidden="true">{kr(auction?.high_bid ?? current.price)}</span>
                     ) : null}
-                  </div>
+                  </SwipeCard>
                 </>
               ) : null}
             </div>

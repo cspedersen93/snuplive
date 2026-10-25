@@ -432,6 +432,15 @@ Kør `supabase/migrations/0015_klip.sql` i Supabase → SQL Editor (efter 0014).
 
 ---
 
+## Studiet: swipe for at skifte ting
+
+Kortet nederst på kameraet i studiet ("Vises nu") kan swipes: **til venstre** viser den næste ting i køen, **til højre**
+den forrige ting, der ikke er solgt (fx hvis en seer spørger til den). Der er også pile i begge sider af kortet, og på
+computeren virker piletasterne venstre/højre (ikke mens man skriver). Knappen **Vis næste** under kameraet virker som før.
+Første gang står der "Swipe for at skifte ting" over kortet. Under et budsalg kan man ikke skifte.
+
+---
+
 ## Klip: "Swipe og køb"
 
 Siden `/klip` (menupunktet **Klip**) viser klippene af de usolgte ting som et feed i fuld skærm, ét klip ad gangen. Der skal

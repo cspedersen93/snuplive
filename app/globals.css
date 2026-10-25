@@ -1121,3 +1121,16 @@ img.v-thumb{object-fit:cover}
 .clip-endbox .btn-line{color:#fff;border-color:rgba(255,255,255,.4)}
 .clip-nav{display:none}
 @media (min-width:700px) and (pointer:fine){.clip-nav{display:flex;flex-direction:column;gap:12px;position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:3}.clip-nav .clip-icon:disabled{opacity:.35;cursor:default}}
+
+/* Studiet: swipe på kortet nederst på kameraet for at skifte ting */
+.v-swipe{padding-left:max(11cqw,44px);padding-right:max(11cqw,44px);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;transition:transform .22s ease,opacity .22s ease}
+.v-swipe.dragging{transition:none;cursor:grabbing}
+.v-arrow{position:absolute;top:50%;transform:translateY(-50%);width:max(8.5cqw,36px);height:max(8.5cqw,36px);border-radius:99px;border:0;display:grid;place-items:center;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.v-arrow.prev{left:max(1.4cqw,5px)}
+.v-arrow.next{right:max(1.4cqw,5px)}
+.v-arrow svg{width:55%;height:55%}
+.v-arrow:hover:not(:disabled){background:rgba(255,255,255,.26)}
+.v-arrow:disabled{opacity:.25;cursor:default}
+.v-arrow:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.v-swipe-hint,.v-swipe-peek{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(4.2% + max(22cqw,84px));z-index:6;padding:.45em .9em;border-radius:99px;background:rgba(0,0,0,.6);color:#fff;font-size:max(2.7cqw,12px);font-weight:600;white-space:nowrap;pointer-events:none;max-width:90%;overflow:hidden;text-overflow:ellipsis}
+.v-swipe-hint{animation:blink 1.6s ease-in-out 3}
