@@ -1325,3 +1325,9 @@ div.pip{cursor:default}
 .tour-card .tour-fine{font-size:.8rem;color:var(--dim)}
 @keyframes tour-in{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.tour-card{animation:none}.tour-spot{transition:none}}
+
+/* Testfase: tydelig gul bjælke øverst, indtil betalingen er rigtig */
+.testbar{background:#2A2208;border-bottom:1px solid rgba(242,196,107,.55);color:#F6DFAE;font-size:.86rem;line-height:1.4}
+.testbar .wrap{display:flex;align-items:center;justify-content:center;gap:12px;padding-block:8px;text-align:left}
+.testbar-chip{flex:none;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#1b1406;background:var(--amber);padding:4px 10px;border-radius:99px}
+@media (max-width:640px){.testbar{font-size:.8rem}.testbar .wrap{align-items:flex-start;gap:10px}.testbar-chip{margin-top:1px}}
