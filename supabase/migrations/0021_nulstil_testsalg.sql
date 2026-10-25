@@ -34,10 +34,11 @@ begin
   update public.items
      set high_bid = null, high_bidder = null, high_handle = null, bid_count = 0
    where bid_count > 0 or high_bid is not null;
-  delete from public.bids;
-  delete from public.sales;
+  -- "where true": Supabase kræver en WHERE ved DELETE (sikringen safeupdate), også her, hvor alt skal slettes.
+  delete from public.bids where true;
+  delete from public.sales where true;
   -- Sager, bedømmelser og fragtlabels hører til ordrerne og bliver slettet med dem.
-  delete from public.orders;
+  delete from public.orders where true;
   update public.profiles set rating_avg = null, rating_count = 0 where rating_count > 0 or rating_avg is not null;
   return v_counts;
 end;
