@@ -1,5 +1,5 @@
 /**
- * Kategorierne: de fem største inden for brugt, der passer til live, plus "Andet".
+ * Kategorierne: de største inden for brugt, der passer til live, plus Luksus, Skønhed og "Andet".
  * slug bruges i adressen (/kategori/<slug>), cover er reservebilledet til shows uden profilbillede.
  */
 export const CATEGORIES = [
@@ -28,6 +28,32 @@ export const CATEGORIES = [
     h1: "Brugt herretøj og sneakers – køb det live",
     title: "Brugt herretøj og sneakers – køb det live | Relived",
     description: "Køb brugt herretøj og sneakers live. Se jakken, jeansene eller skoene tæt på, spørg om størrelse og slid, og køb dem med ét tryk.",
+  },
+  {
+    key: "luksus",
+    /** Ordet i en sætning, fx "brugte designervarer". */
+    word: "designervarer",
+    slug: "luksus",
+    label: "Luksus: tasker, ure og smykker",
+    short: "Luksus",
+    cover: "/img/cover-luksus.jpg",
+    blurb: "Designertasker, ure og smykker. Mærkevarer bliver ægthedstjekket, før de kan købes.",
+    h1: "Brugte designertasker, ure og smykker – ægthedstjekket",
+    title: "Brugte designertasker og ure – ægthedstjekket | Relived",
+    description: "Køb brugte designertasker, ure og smykker live. Mærkevarer bliver ægthedstjekket af Relived, før de kan købes, og betalingen er beskyttet.",
+  },
+  {
+    key: "skoenhed",
+    /** Ordet i en sætning. Skønhed sælges kun ny og uåbnet. */
+    word: "skønhed",
+    slug: "skoenhed",
+    label: "Skønhed (ny og uåbnet)",
+    short: "Skønhed",
+    cover: "/img/cover-skoenhed.jpg",
+    blurb: "Parfume, makeup og hudpleje, der aldrig er åbnet. Til en lavere pris end i butikken.",
+    h1: "Uåbnet parfume, makeup og hudpleje – køb det live",
+    title: "Uåbnet parfume, makeup og hudpleje – køb live | Relived",
+    description: "Køb ny og uåbnet parfume, makeup og hudpleje live. Se pakken på video, spørg sælgeren, og køb til en lavere pris end i butikken.",
   },
   {
     key: "boernetoej",
@@ -85,8 +111,18 @@ export const CATEGORIES = [
 
 export type CategoryKey = (typeof CATEGORIES)[number]["key"];
 
-/** De fem kategorier, der vises i menuen og på forsiden (uden "Andet"). */
+/** Kategorierne i menuen og i bunden af siden (uden "Andet"). */
 export const MAIN_CATEGORIES = CATEGORIES.filter((c) => c.key !== "andet");
+
+/** Kategorier, hvor alt skal være nyt og uåbnet (af hensyn til hygiejne og reglerne for kosmetik). */
+export const NEW_ONLY_CATEGORIES: readonly string[] = ["skoenhed"];
+/** Standen, som ting i de kategorier altid får. */
+export const NEW_ONLY_CONDITION = "Ny og uåbnet";
+
+/** "brugt dametøj", men "uåbnet skønhed" for skønhed. */
+export function usedPhrase(c: { key: string; word: string }) {
+  return NEW_ONLY_CATEGORIES.includes(c.key) ? `uåbnet ${c.word}` : `brugt ${c.word}`;
+}
 
 export function category(key: string | null | undefined) {
   return CATEGORIES.find((c) => c.key === key) ?? CATEGORIES[CATEGORIES.length - 1];

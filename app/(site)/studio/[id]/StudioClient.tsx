@@ -19,6 +19,7 @@ import { errorText, toast } from "@/lib/toast";
 import type { Item, Message, Profile, Show } from "@/lib/types";
 import ItemForm from "./ItemForm";
 import SwipeCard from "./SwipeCard";
+import AuthPanel from "./AuthPanel";
 import { SITE_HOST } from "@/lib/env";
 
 export interface StudioSale {
@@ -49,6 +50,8 @@ function elapsed(ms: number) {
   return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
+type AuthInfo = { auth_required: boolean; auth_status: "pending" | "approved" | "rejected" | null; auth_note: string | null };
+
 export default function StudioClient(props: Props) {
   const router = useRouter();
   const sb = getSupabase();
@@ -71,6 +74,7 @@ export default function StudioClient(props: Props) {
   const [confirmEnd, setConfirmEnd] = useState(false);
   const [summary, setSummary] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
+  const [authOpen, setAuthOpen] = useState<string | null>(null);
   // Billede fra kameraet af den ting, der lige er vist frem.
   const [capture, setCapture] = useState<{ key: number; itemId: string } | null>(null);
 
@@ -79,11 +83,29 @@ export default function StudioClient(props: Props) {
   const current = items.find((i) => i.id === show.current_item_id) ?? null;
   const sold = items.filter((i) => i.status === "sold");
   const revenue = sold.reduce((a, i) => a + soldPrice(i), 0);
+  // Ægthedstjek (findes først, når 0017_aegthed.sql er kørt). Live-opdateringer af tingene har felterne med;
+  // første gang hentes de for sig.
+  const [authMap, setAuthMap] = useState<Record<string, AuthInfo>>({});
+  const itemKey = items.map((i) => `${i.id}:${i.name}:${i.price}:${i.category ?? ""}`).join("|");
+  const loadAuth = useCallback(async () => {
+    const { data, error } = await sb.from("items").select("id,auth_required,auth_status,auth_note").eq("show_id", show.id);
+    if (error || !data) return;
+    setAuthMap(Object.fromEntries((data as (AuthInfo & { id: string })[]).map((r) => [r.id, r])));
+  }, [sb, show.id]);
+  useEffect(() => {
+    void loadAuth();
+  }, [loadAuth, itemKey]);
+  const authOf = (it: Item): AuthInfo => {
+    const row = it as Item & Partial<AuthInfo>;
+    if (typeof row.auth_required === "boolean") return { auth_required: row.auth_required, auth_status: row.auth_status ?? null, auth_note: row.auth_note ?? null };
+    return authMap[it.id] ?? { auth_required: false, auth_status: null, auth_note: null };
+  };
+  const blocked = (it: Item) => authOf(it).auth_required && authOf(it).auth_status !== "approved";
   const queued = items.filter((i) => i.status === "queued");
-  const next = queued[0] ?? items.find((i) => i.status === "unsold" && i.id !== current?.id) ?? null;
+  const next = queued.find((i) => !blocked(i)) ?? items.find((i) => i.status === "unsold" && i.id !== current?.id && !blocked(i)) ?? null;
   // Den forrige ting (over den nuværende i køen), som ikke er solgt: kan vises igen, fx hvis en seer spørger til den.
   const curIdx = current ? items.indexOf(current) : items.length;
-  const prev = items.slice(0, curIdx).reverse().find((i) => i.status === "unsold") ?? null;
+  const prev = items.slice(0, curIdx).reverse().find((i) => i.status === "unsold" && !blocked(i)) ?? null;
   const shareUrl = `/live/${props.profile.handle}`;
 
   const fast = Boolean(current?.rush_ends_at || (current?.auction_ends_at && current.status === "live"));
@@ -341,10 +363,26 @@ export default function StudioClient(props: Props) {
                   const sale = saleFor(it.id);
                   const canShow = live && it.status !== "sold" && it.id !== current?.id;
                   const canRemove = !ended && (it.status === "queued" || it.status === "unsold");
+                  const auth = authOf(it);
                   return (
                     editing === it.id ? (
                       <li key={it.id} className="lot-edit">
                         <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} item={it} onSaved={saved} onCancel={() => setEditing(null)} />
+                      </li>
+                    ) : authOpen === it.id ? (
+                      <li key={it.id} className="lot-edit">
+                        <AuthPanel
+                          sellerId={me.id}
+                          itemId={it.id}
+                          itemName={it.name}
+                          note={auth.auth_status === "rejected" ? auth.auth_note : null}
+                          onSent={() => {
+                            setAuthOpen(null);
+                            setAuthMap((m) => ({ ...m, [it.id]: { ...auth, auth_status: "pending" } }));
+                            void loadAuth();
+                          }}
+                          onClose={() => setAuthOpen(null)}
+                        />
                       </li>
                     ) : (
                     <li key={it.id} className={`lot${it.id === current?.id ? " is-now" : ""}`}>
@@ -361,12 +399,33 @@ export default function StudioClient(props: Props) {
                           {itemMeta(it) ? ` · ${itemMeta(it)}` : ""}
                           {sale?.buyer ? ` · @${sale.buyer.handle}` : ""}
                         </span>
+                        {auth.auth_required ? (
+                          <span className={`auth-line ${auth.auth_status ?? "none"}`}>
+                            {auth.auth_status === "approved"
+                              ? "✓ Ægthed tjekket"
+                              : auth.auth_status === "pending"
+                                ? "Venter på ægthedstjek"
+                                : auth.auth_status === "rejected"
+                                  ? "Ægthedstjek afvist"
+                                  : "Skal ægthedstjekkes"}
+                            {(auth.auth_status === null || auth.auth_status === "rejected") && it.status !== "sold" ? (
+                              <>
+                                {" · "}
+                                <button className="linkbtn" type="button" onClick={() => setAuthOpen(it.id)}>
+                                  {auth.auth_status === "rejected" ? "Send nye billeder" : "Send billeder"}
+                                </button>
+                              </>
+                            ) : null}
+                          </span>
+                        ) : null}
                       </div>
                       <div className="lot-r">
                         {it.id === current?.id ? (
                           <span className="chip live"><span className="live-dot white" />Vises</span>
                         ) : it.status === "sold" ? (
                           <span className="chip mine">Solgt</span>
+                        ) : canShow && blocked(it) ? (
+                          <span className="chip warn" title="Kan vises, når Relived har tjekket den">Afventer tjek</span>
                         ) : canShow ? (
                           <button className="btn btn-ghost btn-sm" type="button" disabled={busy || bidRunning} onClick={() => present(it.id)}>Vis</button>
                         ) : (

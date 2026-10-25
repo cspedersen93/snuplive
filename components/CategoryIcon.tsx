@@ -1,8 +1,10 @@
-import { IconBear, IconBox, IconDress, IconLamp, IconRecord, IconSneaker } from "@/components/Icons";
+import { IconBear, IconBeauty, IconBox, IconDress, IconGem, IconLamp, IconRecord, IconSneaker } from "@/components/Icons";
 
 const ICONS = {
   dametoej: IconDress,
   herretoej: IconSneaker,
+  luksus: IconGem,
+  skoenhed: IconBeauty,
   boernetoej: IconBear,
   bolig: IconLamp,
   samlerting: IconRecord,

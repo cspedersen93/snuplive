@@ -43,12 +43,16 @@ const load = cache(async (rawHandle: string) => {
 
   let items: Item[] = [];
   let messages: Message[] = [];
+  let authOk: string[] = [];
   if (show) {
     const [i, m] = await Promise.all([
       sb.from("items").select(ITEM_COLS).eq("show_id", show.id).is("removed_at", null).order("position").order("created_at"),
       sb.from("messages").select(MESSAGE_COLS).eq("show_id", show.id).is("removed_at", null).order("id", { ascending: false }).limit(60),
     ]);
     items = (i.data ?? []) as Item[];
+    // Ting med mærket Ægthed tjekket (0017_aegthed.sql). Fejler det, vises mærket bare ikke.
+    const a = await sb.from("items").select("id").eq("show_id", show.id).eq("auth_required", true).eq("auth_status", "approved");
+    authOk = a.error ? [] : (a.data ?? []).map((r) => r.id as string);
     messages = ((m.data ?? []) as Message[]).reverse();
   }
   const r = await sb
@@ -58,7 +62,7 @@ const load = cache(async (rawHandle: string) => {
     .order("created_at", { ascending: false })
     .limit(10);
   const ratings = (r.data ?? []) as unknown as Rating[];
-  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings };
+  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk };
 });
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -142,6 +146,7 @@ export default async function SellerPage({ params }: Params) {
         items={d.items}
         messages={d.messages}
         serverNow={Date.now()}
+        authOk={d.authOk}
       />
       {d.ratings.length ? (
         <div className="wrap" style={{ paddingBottom: 64 }}>

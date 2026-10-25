@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IconBox, IconCamera, IconChat, IconShield, IconStar, IconUser } from "@/components/Icons";
+import { IconCamera, IconChat, IconShield, IconShieldCheck, IconStar, IconUser } from "@/components/Icons";
 
 export const metadata: Metadata = {
   title: { absolute: "Sådan virker live shopping | Relived" },
@@ -67,10 +67,10 @@ export default function Saadan() {
           </div>
           <div className="feat">
             <div><IconUser className="ico" /><h3>Sælgere med MitID</h3><p>Ved lanceringen bliver alle sælgere verificeret med MitID, før de kan sælge.</p></div>
-            <div><IconShield /><h3>Pengene holdes tilbage</h3><p>Sælgeren får først pengene, når du har modtaget dine ting.</p></div>
+            <div><IconShield /><h3>Pengene holdes tilbage</h3><p>Sælgeren får først pengene, når du har modtaget dine ting, og du kan følge pakken hele vejen.</p></div>
             <div><IconCamera /><h3>Du ser tingen live</h3><p>Bed om at se mærket, målene og standen tæt på, før du køber.</p></div>
             <div><IconStar /><h3>Bedømmelser</h3><p>Efter hver handel kan køberen give sælgeren stjerner, så du kan se, hvem du handler med.</p></div>
-            <div><IconBox /><h3>Sporing på pakken</h3><p>Du kan følge pakken fra sælgeren sender den, til den ligger i pakkeshoppen.</p></div>
+            <div><IconShieldCheck className="ico" /><h3>Mærkevarer bliver tjekket</h3><p>Designertasker, ure og andre mærkevarer bliver ægthedstjekket af Relived, før de kan købes. Er en vare falsk, får du alle pengene tilbage.</p></div>
             <div><IconChat /><h3>Hjælp, hvis noget går galt</h3><p>Tryk Meld et problem på ordren, inden pengene bliver udbetalt. Så holder vi pengene tilbage og hjælper jer med at finde en løsning.</p></div>
           </div>
           <p className="fine" style={{ marginTop: 18 }}>

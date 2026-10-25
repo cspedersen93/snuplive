@@ -12,7 +12,7 @@ import { itemMeta } from "@/components/Screen";
 import SellerFacts from "@/components/SellerFacts";
 import SetupNotice from "@/components/SetupNotice";
 import { SITE_URL } from "@/lib/env";
-import { category, clock, dayLabel, kr } from "@/lib/format";
+import { category, clock, dayLabel, kr, usedPhrase } from "@/lib/format";
 import { clipUrl, itemImages } from "@/lib/images";
 import { idFromSlug, itemHref, itemSlug, itemState, type ItemState } from "@/lib/items";
 import { isAuction, soldPrice } from "@/lib/auction";
@@ -22,6 +22,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { ITEM_COLS, SELLER_FACT_COLS, type Item, type SellerFactsData } from "@/lib/types";
 import BuyNow from "./BuyNow";
 import FollowButton from "@/components/FollowButton";
+import { IconShieldCheck } from "@/components/Icons";
 import Gallery from "./Gallery";
 
 export const revalidate = 30;
@@ -38,7 +39,7 @@ const load = cache(async (slug: string) => {
   if (!sb) return { setup: false as const };
   const id = idFromSlug(decodeURIComponent(slug));
   if (!id) return { setup: true as const, item: null };
-  const [{ data }, clipRes] = await Promise.all([
+  const [{ data }, clipRes, authRes] = await Promise.all([
     sb
       .from("items")
       .select(
@@ -49,12 +50,16 @@ const load = cache(async (slug: string) => {
       .maybeSingle(),
     // Klippet hentes for sig, så siden virker, også før 0015_klip.sql er kørt.
     sb.from("items").select("clip_path,clip_at").eq("id", id).maybeSingle(),
+    // Ægthedstjek (0017_aegthed.sql).
+    sb.from("items").select("auth_required,auth_status").eq("id", id).maybeSingle(),
   ]);
   const item = data as unknown as Loaded | null;
   // En ting eller et show, der er fjernet efter en anmeldelse, findes ikke længere.
   if (!item?.show || !item.seller || item.show.removed_at) return { setup: true as const, item: null };
   const clip = clipRes.error ? null : (clipRes.data as { clip_path: string | null; clip_at: string | null } | null);
-  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null };
+  const a = authRes.error ? null : (authRes.data as { auth_required: boolean; auth_status: string | null } | null);
+  const auth = a?.auth_required ? (a.auth_status === "approved" ? ("approved" as const) : ("waiting" as const)) : null;
+  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth };
 });
 
 function stateOf(it: Loaded): ItemState {
@@ -80,7 +85,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
             ? "Budsalg live nu"
             : "Sælgeren er live nu"
           : "Se lignende ting";
-  const title = `${it.name} – brugt ${cat.word}, ${kr(it.price)}`;
+  const title = `${it.name} – ${usedPhrase(cat)}, ${kr(it.price)}`;
   const images = itemImages(it);
   return {
     title: title.length <= 48 ? title : it.name.slice(0, 48),
@@ -134,7 +139,7 @@ export default async function ItemPage({ params }: Params) {
       {
         "@type": "Product",
         name: it.name,
-        description: it.description || `${it.name}${meta ? `, ${meta}` : ""}. Brugt ${cat.word} fra ${seller.handle} på Relived.`,
+        description: it.description || `${it.name}${meta ? `, ${meta}` : ""}. ${usedPhrase(cat).replace(/^./, (c) => c.toUpperCase())} fra ${seller.handle} på Relived.`,
         ...(images.length ? { image: images } : {}),
         category: cat.label,
         itemCondition: "https://schema.org/UsedCondition",
@@ -199,7 +204,17 @@ export default async function ItemPage({ params }: Params) {
             <div className="item-head">
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {bid ? <span className="chip bid">Budsalg</span> : null}
-                <StateChip state={state} startsAt={show.starts_at} />
+                {d.auth === "waiting" && state === "for_sale" ? (
+                  <span className="chip warn">Venter på tjek</span>
+                ) : (
+                  <StateChip state={state} startsAt={show.starts_at} />
+                )}
+                {d.auth === "approved" ? (
+                  <span className="chip auth" title="Relived har tjekket billeder af logo, koder og syninger">
+                    <IconShieldCheck />
+                    Ægthed tjekket
+                  </span>
+                ) : null}
               </div>
               <h1 className="item-h1">{it.name}</h1>
               <p className="item-price num">
@@ -221,11 +236,19 @@ export default async function ItemPage({ params }: Params) {
             </div>
 
             <div className="box item-cta">
-              {state === "for_sale" ? (
+              {d.auth === "waiting" && state !== "sold" ? (
+                <p className="auth-wait">
+                  <b>Venter på ægthedstjek.</b> Det er en mærkevare, så Relived tjekker, at den er ægte, før den kan købes. Følg sælgeren, så
+                  får du besked, når den bliver vist live.
+                </p>
+              ) : state === "for_sale" ? (
                 <>
                   {isAuction(it) ? <p>Ingen bød på den i showet, så nu kan du købe den til startprisen.</p> : null}
                   <BuyNow itemId={it.id} price={it.price} next={href} sellerId={it.seller_id} />
                   <p className="fine">Tingen bliver reserveret til dig, og du betaler under Mine køb.</p>
+                  {d.auth === "approved" ? (
+                    <p className="fine">Ægthed tjekket af Relived. Viser den sig at være falsk, får du alle pengene tilbage.</p>
+                  ) : null}
                 </>
               ) : state === "upcoming" && bid ? (
                 <>

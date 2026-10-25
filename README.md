@@ -432,6 +432,27 @@ Kør `supabase/migrations/0015_klip.sql` i Supabase → SQL Editor (efter 0014).
 
 ---
 
+## Luksus, Skønhed og ægthedstjek
+
+Kør `supabase/migrations/0017_aegthed.sql` i Supabase → SQL Editor (efter 0016). Der skal ikke nye nøgler i Vercel.
+
+- **Nye kategorier:** *Luksus* (tasker, ure og smykker) og *Skønhed* (kun ny og uåbnet). Ved Skønhed er standen altid
+  "Ny og uåbnet", og sælgeren skal sætte flueben ved, at produktet er uåbnet.
+- **Hvad skal tjekkes:** ting i Luksus til 1.000 kr eller mere, og alle ting, hvor navnet eller beskrivelsen nævner et
+  kendt mærke (Louis Vuitton, Gucci, Chanel, Hermès, Prada, Dior, Fendi, Balenciaga, Rolex, Cartier, Moncler m.fl.).
+  Listen står i `lib/luxury.ts` og i databasen (`luxury_brand`), og de skal ændres sammen.
+- **Sælgeren:** i studiet står der "Skal ægthedstjekkes" ved tingen. *Send billeder* åbner et panel med 4 krævede
+  nærbilleder (logo, serie-/datokode, foer, syninger og metaldele) og 2 valgfrie (kvittering, andet). Indtil tingen er
+  godkendt, kan den ikke vises live, bydes på eller købes (databasen stopper det). Skifter sælgeren navn eller kategori
+  efter godkendelsen, skal den tjekkes igen.
+- **I (Backoffice → Ægthed):** alle ting, der venter, med billederne i stor størrelse. *Godkend* eller *Afvis* (med en kort
+  begrundelse). Sælgeren får en mail. Admins får en mail, når en ting bliver sendt til tjek. Er I i tvivl, så kør billederne
+  gennem en ægthedstjeneste (fx LegitApp) først.
+- **Køberen:** godkendte ting har mærket *Ægthed tjekket* på tingens side og i live-showet. Under *Meld et problem* kan
+  køberen vælge *Tingen er falsk (en kopi)*. Giv pengene tilbage under Backoffice → Sager, og luk sælgeren.
+
+---
+
 ## Studiet: swipe for at skifte ting
 
 Kortet nederst på kameraet i studiet ("Vises nu") kan swipes: **til venstre** viser den næste ting i køen, **til højre**

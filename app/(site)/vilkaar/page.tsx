@@ -76,7 +76,13 @@ export default function Vilkaar() {
 
       <h3>7. Dine ting</h3>
       <ul>
-        <li>Du må kun sælge ting, du ejer, og som må sælges.</li>
+        <li>Du må kun sælge ting, du ejer, og som må sælges. Kopivarer og efterligninger af mærkevarer er forbudt.</li>
+        <li>
+          Mærkevarer (fx Louis Vuitton, Gucci, Chanel, Hermès, Prada, Dior og Rolex) og ting i kategorien Luksus til 1.000 kr eller
+          mere skal ægthedstjekkes af Relived, før de kan vises live eller købes. Du sender nærbilleder af logo, koder og syninger fra
+          dit studie, og vi godkender eller afviser. Er en ting falsk, får køberen alle pengene tilbage, og vi kan lukke din konto.
+        </li>
+        <li>Skønhedsprodukter (makeup, hudpleje og parfume) må kun sælges, hvis de er nye og uåbnede.</li>
         <li>Beskriv tingen ærligt, og vis fejl og slid tydeligt på video.</li>
         <li>
           Når du viser en ting frem i et show, gemmer vi det billede, hvor tingen ses bedst, og et klip på op til 15 sekunder med lyd. Bliver tingen ikke solgt,

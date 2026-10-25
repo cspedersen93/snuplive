@@ -7,7 +7,7 @@ import Avatar from "@/components/Avatar";
 import ReportButton from "@/components/ReportButton";
 import SellerFacts from "@/components/SellerFacts";
 import Chat from "@/components/Chat";
-import { IconBox, IconShare } from "@/components/Icons";
+import { IconBox, IconShare, IconShieldCheck } from "@/components/Icons";
 import { ViewerVideo } from "@/components/LiveVideo";
 import FollowButton from "@/components/FollowButton";
 import RemindButton from "@/components/RemindButton";
@@ -29,6 +29,8 @@ interface Props {
   items: Item[];
   messages: Message[];
   serverNow: number;
+  /** Ting, Relived har ægthedstjekket. */
+  authOk?: string[];
 }
 
 function useNow(ms: number) {
@@ -447,7 +449,15 @@ export default function ShowClient(props: Props) {
                       </span>
                     )}
                     <div style={{ minWidth: 0 }}>
-                      <div className="v-pin">{current ? (auction ? "Budsalg" : "Vises nu") : "Om lidt"}</div>
+                      <div className="v-pin">
+                        {current ? (auction ? "Budsalg" : "Vises nu") : "Om lidt"}
+                        {current && ((current as { auth_status?: string }).auth_status === "approved" || props.authOk?.includes(current.id)) ? (
+                          <span className="v-auth" title="Ægthed tjekket af Relived">
+                            <IconShieldCheck />
+                            Ægthed tjekket
+                          </span>
+                        ) : null}
+                      </div>
                       <div className="v-name">{current ? current.name : "Sælgeren finder næste ting frem"}</div>
                       <div className="v-meta" aria-live="polite">
                         {auction

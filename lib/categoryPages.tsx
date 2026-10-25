@@ -73,6 +73,64 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     ],
     sellH2: "Har du selv herretøj, der skal videre?",
   },
+  luksus: {
+    intro:
+      "Find brugte designertasker, ure og smykker. Mærkevarer bliver ægthedstjekket af Relived, før de kan købes, og du ser tingen tæt på video, før du beslutter dig.",
+    who: "Hvem sælger designertasker og ure live?",
+    soon: "Hvilke luksusvarer bliver vist snart?",
+    sale: "Brugte designervarer til salg nu",
+    saleAll: "Se alle designervarer til salg",
+    tipsH2: "Hvordan køber du brugte designervarer trygt?",
+    tips: [
+      {
+        h: "Kig efter mærket Ægthed tjekket",
+        p: "Mærkevarer som Louis Vuitton, Gucci, Chanel og Rolex skal tjekkes af Relived, før de kan købes. Sælgeren sender nærbilleder af logo, koder og syninger, og vi godkender dem.",
+      },
+      {
+        h: "Bed om koder og prægninger live",
+        p: "Bed sælgeren holde serie- eller datokoden, prægningen og metaldelene helt op til kameraet. Ægte varer har skarpe, lige bogstaver og pæne syninger.",
+      },
+      {
+        h: "Kvittering og ægthedsbevis",
+        p: "Spørg, om der følger kvittering, ægthedsbevis, dustbag eller æske med. Det gør tingen nemmere at sælge igen.",
+      },
+      {
+        h: "Er den falsk, får du pengene tilbage",
+        p: "Sælgeren får først pengene, når du har tingen. Viser den sig at være en kopi, melder du det under Mine køb, og så får du alle pengene tilbage.",
+      },
+    ],
+    sellH2: "Har du en designertaske eller et ur, der skal videre?",
+  },
+  skoenhed: {
+    intro:
+      "Find ny og uåbnet parfume, makeup og hudpleje til en lavere pris end i butikken. På Relived må skønhedsprodukter kun sælges, hvis de aldrig har været åbnet.",
+    who: "Hvem sælger skønhed live?",
+    soon: "Hvilke skønhedsprodukter bliver vist snart?",
+    sale: "Uåbnet skønhed til salg nu",
+    saleAll: "Se alt skønhed til salg",
+    tipsH2: "Hvad skal du kigge efter, når du køber skønhed?",
+    tips: [
+      {
+        h: "Forseglingen intakt",
+        p: "Bed sælgeren vise folien, forseglingen eller låget tæt på kameraet. Alt skal være nyt og uåbnet.",
+      },
+      {
+        h: "Holdbarhed og batchnummer",
+        p: "Spørg om udløbsdato eller batchnummer. Hudpleje og makeup holder ikke for evigt, heller ikke uåbnet.",
+      },
+      {
+        h: "Parfume fra kendte mærker",
+        p: "Parfume bliver ofte kopieret. Bed om at se æsken, stregkoden og flaskens bund, og sammenlign med mærkets egne billeder.",
+      },
+    ],
+    note: (
+      <p>
+        Brugt makeup og hudpleje må ikke sælges på Relived af hensyn til hygiejnen. Ser du noget, der er åbnet, så tryk{" "}
+        <b>Anmeld</b> på tingen. Læs mere om <Link href="/saadan-virker-det#tryg-handel">tryg handel</Link>.
+      </p>
+    ),
+    sellH2: "Har du skønhedsprodukter, du aldrig fik brugt?",
+  },
   boernetoej: {
     intro:
       "Find brugt børnetøj i den rigtige størrelse og legetøj, der stadig har mange timers leg i sig. Mange sælgere viser hele poser, så du kan købe en hel sæson på én gang.",

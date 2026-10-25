@@ -188,3 +188,22 @@ export const IconBlurBg = (p: P) => (
     <path d="M3 5h.01M3 9h.01M3 13h.01M21 5h.01M21 9h.01M21 13h.01M3 17h.01M21 17h.01" strokeWidth={2.6} />
   </svg>
 );
+export const IconGem = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M6.5 4h11L21 9l-9 11L3 9Z" />
+    <path d="M3 9h18M9.5 4 8 9l4 11 4-11-1.5-5" />
+  </svg>
+);
+export const IconBeauty = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <rect x="7" y="10" width="10" height="11" rx="2" />
+    <path d="M9.5 10V7h5v3M11 7V3.5h2V7" />
+    <path d="M10 14.5h4" />
+  </svg>
+);
+export const IconShieldCheck = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6Z" />
+    <path d="m8.8 12.2 2.3 2.3 4.3-4.6" />
+  </svg>
+);

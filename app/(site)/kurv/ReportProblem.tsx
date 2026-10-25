@@ -63,6 +63,12 @@ export default function ReportProblem({ orderId, business = false }: { orderId: 
           placeholder="Fx: Kjolen har en plet på ryggen, som ikke blev vist i showet."
         />
       </div>
+      {reason === "counterfeit" ? (
+        <p className="fine">
+          Fortæl, hvorfor du tror, den er falsk, og tag gerne billeder af logo og koder. Har du fået den vurderet af en ægthedstjeneste
+          eller en butik, så skriv det. Er den falsk, får du alle pengene tilbage, og sælgeren bliver lukket.
+        </p>
+      ) : null}
       <p className="fine">Pengene holdes tilbage hos Relived, indtil sagen er afgjort. Sælgeren kan se, hvad du skriver.</p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button className="btn btn-red btn-sm" type="submit" disabled={busy}>{busy ? "Sender …" : "Meld problemet"}</button>

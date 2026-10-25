@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CATEGORIES } from "@/lib/format";
+import { CATEGORIES, NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION } from "@/lib/format";
+import { needsAuth } from "@/lib/luxury";
 import { storageUrl } from "@/lib/images";
 import { resizeImage } from "@/lib/resizeImage";
 import { getSupabase } from "@/lib/supabase/client";
@@ -37,10 +38,14 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   const [desc, setDesc] = useState(item?.description ?? "");
   const [photos, setPhotos] = useState<Photo[]>(() => (item?.images ?? []).map((path) => ({ kind: "old", path })));
   const [more, setMore] = useState(Boolean(item?.description || item?.images?.length));
+  const [newOk, setNewOk] = useState(item?.condition === NEW_ONLY_CONDITION);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const uid = item?.id ?? "new";
+  // Skønhed må kun sælges ny og uåbnet. Mærkevarer skal ægthedstjekkes, før de kan sælges.
+  const newOnly = NEW_ONLY_CATEGORIES.includes(cat);
+  const authNeeded = needsAuth({ name, description: desc, category: cat, price: Number(price.replace(/[^\d]/g, "")) || 0 });
 
   useEffect(
     () => () => photos.forEach((p) => p.kind === "new" && URL.revokeObjectURL(p.url)),
@@ -72,6 +77,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
     const p = Number(price.replace(/[^\d]/g, ""));
     if (n.length < 2) return setErr('Skriv hvad tingen er, fx "Uldfrakke, kamel".');
     if (!Number.isInteger(p) || p < 1 || p > 100000) return setErr("Skriv en pris i hele kroner mellem 1 og 100.000.");
+    if (newOnly && !newOk) return setErr("Bekræft, at produktet er nyt og uåbnet. Brugt makeup og hudpleje må ikke sælges på Relived.");
     setErr(null);
     setBusy(true);
     try {
@@ -92,7 +98,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
       const fields = {
         name: n,
         size: size.trim() || null,
-        condition: cond.trim() || null,
+        condition: newOnly ? NEW_ONLY_CONDITION : cond.trim() || null,
         price: p,
         sale_type: saleType,
         category: cat === showCategory ? null : cat,
@@ -112,6 +118,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         setName("");
         setSize("");
         setCond("");
+        setNewOk(false);
         setPrice("");
         setDesc("");
         setPhotos([]);
@@ -154,9 +161,27 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         </div>
         <div className="field full">
           <label htmlFor={`ni-cond-${uid}`}>Stand</label>
-          <input id={`ni-cond-${uid}`} value={cond} onChange={(e) => setCond(e.target.value)} maxLength={40} placeholder="Fx Som ny" />
+          {newOnly ? (
+            <input id={`ni-cond-${uid}`} value={NEW_ONLY_CONDITION} readOnly aria-readonly="true" />
+          ) : (
+            <input id={`ni-cond-${uid}`} value={cond} onChange={(e) => setCond(e.target.value)} maxLength={40} placeholder="Fx Som ny" />
+          )}
         </div>
       </div>
+      {newOnly ? (
+        <label className="check-line">
+          <input type="checkbox" checked={newOk} onChange={(e) => setNewOk(e.target.checked)} />
+          <span>Produktet er nyt og uåbnet (forseglingen er intakt). Brugt makeup og hudpleje må ikke sælges.</span>
+        </label>
+      ) : null}
+      {authNeeded ? (
+        <p className="notice auth-note" role="status">
+          <span>
+            <b>Ægthedstjek:</b> mærkevarer skal tjekkes af Relived, før de kan vises live eller købes. Når tingen er i køen, trykker du
+            <b> Send billeder</b> og lægger nærbilleder af logo, koder og syninger op.
+          </span>
+        </p>
+      ) : null}
       {saleType === "auction" ? (
         <p className="fine" style={{ marginTop: -4 }}>
           Buddene starter ved startprisen, og det højeste bud vinder. Byder ingen, kan tingen købes til startprisen efter showet.

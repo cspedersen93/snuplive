@@ -766,6 +766,49 @@ select t.ok((select follower_count from profiles where id = '00000000-0000-0000-
 delete from shows where id in ('10000000-0000-0000-0000-0000000000f1', '10000000-0000-0000-0000-0000000000f2');
 drop table digest;
 
+-- ── Luksus, Skønhed og ægthedstjek ──
+select t.ok(luxury_brand('LV Neverfull') and luxury_brand('Taske fra HERMÈS') and luxury_brand('Gucci-bælte') and luxury_brand('louis  vuitton'), 'kendte mærker genkendes');
+select t.ok(not luxury_brand('Olivia kjole') and not luxury_brand('Omegaman') and not luxury_brand('Vintage lampe'), 'almindelige ord tæller ikke');
+insert into shows (id, seller_id, title, category, status, starts_at, started_at, ended_at) values
+  ('10000000-0000-0000-0000-0000000000f4', '00000000-0000-0000-0000-00000000000a', 'Tasker og smykker', 'luksus', 'ended', now() - interval '2 hours', now() - interval '2 hours', now() - interval '1 hour'),
+  ('10000000-0000-0000-0000-0000000000f5', '00000000-0000-0000-0000-00000000000a', 'Tøj', 'dametoej', 'ended', now() - interval '2 hours', now() - interval '2 hours', now() - interval '1 hour'),
+  ('10000000-0000-0000-0000-0000000000f6', '00000000-0000-0000-0000-00000000000a', 'Parfume', 'skoenhed', 'planned', now() + interval '2 hours', null, null);
+insert into items (id, show_id, seller_id, name, condition, price, position, status, for_sale) values
+  ('20000000-0000-0000-0000-0000000000a1', '10000000-0000-0000-0000-0000000000f4', '00000000-0000-0000-0000-00000000000a', 'Louis Vuitton Neverfull', 'God stand', 6000, 1, 'unsold', true),
+  ('20000000-0000-0000-0000-0000000000a2', '10000000-0000-0000-0000-0000000000f4', '00000000-0000-0000-0000-00000000000a', 'Lædertaske', 'God stand', 500, 2, 'unsold', true),
+  ('20000000-0000-0000-0000-0000000000a3', '10000000-0000-0000-0000-0000000000f4', '00000000-0000-0000-0000-00000000000a', 'Halskæde i guld', 'Som ny', 1500, 3, 'unsold', true),
+  ('20000000-0000-0000-0000-0000000000a4', '10000000-0000-0000-0000-0000000000f5', '00000000-0000-0000-0000-00000000000a', 'Gucci bælte', 'Brugt', 300, 1, 'unsold', true),
+  ('20000000-0000-0000-0000-0000000000a5', '10000000-0000-0000-0000-0000000000f6', '00000000-0000-0000-0000-00000000000a', 'Parfume 50 ml', 'Brugt', 300, 1, 'queued', false);
+select t.ok((select auth_required from items where id = '20000000-0000-0000-0000-0000000000a1')
+            and (select auth_required from items where id = '20000000-0000-0000-0000-0000000000a3')
+            and (select auth_required from items where id = '20000000-0000-0000-0000-0000000000a4')
+            and not (select auth_required from items where id = '20000000-0000-0000-0000-0000000000a2'), 'mærker og luksus over 1.000 kr skal tjekkes, en billig lædertaske ikke');
+select t.ok((select condition from items where id = '20000000-0000-0000-0000-0000000000a5') = 'Ny og uåbnet', 'skønhed er altid ny og uåbnet');
+select t.throws($$update items set status = 'live' where id = '20000000-0000-0000-0000-0000000000a4'$$, 'ægthedstjek');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select buy_now('20000000-0000-0000-0000-0000000000a1')$$, 'ægthedstjek');
+select t.ok((select status from buy_now('20000000-0000-0000-0000-0000000000a2')) = 'sold', 'en ting, der ikke skal tjekkes, kan købes som før');
+select t.throws($$select submit_auth('20000000-0000-0000-0000-0000000000a1', array['x/y/auth-a.jpg','x/y/auth-b.jpg','x/y/auth-c.jpg','x/y/auth-d.jpg'])$$, 'findes ikke');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.throws($$update items set auth_status = 'approved' where id = '20000000-0000-0000-0000-0000000000a1'$$, 'permission denied');
+select t.throws($$select submit_auth('20000000-0000-0000-0000-0000000000a1', array['00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-0000000000a1/auth-a.jpg'])$$, 'mindst 4');
+select t.throws($$select submit_auth('20000000-0000-0000-0000-0000000000a1', array['00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-0000000000a1/auth-a.jpg','00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-0000000000a1/auth-b.jpg','00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-0000000000a1/auth-c.jpg','00000000-0000-0000-0000-00000000000b/x/auth-d.jpg'])$$, 'kunne ikke gemmes');
+select t.throws($$select submit_auth('20000000-0000-0000-0000-0000000000a2', array['a','b','c','d'])$$, 'skal ikke');
+select t.ok((select auth_status from submit_auth('20000000-0000-0000-0000-0000000000a1', array['00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-0000000000a1/auth-a.jpg','00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-0000000000a1/auth-b.jpg','00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-0000000000a1/auth-c.jpg','00000000-0000-0000-0000-00000000000a/20000000-0000-0000-0000-0000000000a1/auth-d.jpg'])) = 'pending', 'sælgeren sender 4 billeder til tjek');
+reset role;
+update items set auth_status = 'approved', auth_at = now(), auth_by = '00000000-0000-0000-0000-00000000000a' where id in ('20000000-0000-0000-0000-0000000000a1', '20000000-0000-0000-0000-0000000000a3');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select status from buy_now('20000000-0000-0000-0000-0000000000a1')) = 'sold', 'efter godkendelsen kan tasken købes');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+update items set name = 'Halskæde i sølv' where id = '20000000-0000-0000-0000-0000000000a3';
+reset role;
+select t.ok((select auth_status is null from items where id = '20000000-0000-0000-0000-0000000000a3'), 'skifter sælgeren navn efter godkendelsen, skal tingen tjekkes igen');
+select t.ok((select pg_get_constraintdef(oid) like '%counterfeit%' from pg_constraint where conname = 'order_issues_reason_check'), 'Falsk vare kan meldes som problem');
+delete from sales where item_id in ('20000000-0000-0000-0000-0000000000a1', '20000000-0000-0000-0000-0000000000a2');
+delete from shows where id in ('10000000-0000-0000-0000-0000000000f4', '10000000-0000-0000-0000-0000000000f5', '10000000-0000-0000-0000-0000000000f6');
+
 -- ── Nyt navn: beskeder fra siden selv står som Relived ──
 select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
 select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');

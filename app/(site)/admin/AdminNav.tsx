@@ -8,6 +8,7 @@ const TABS = [
   { href: "/admin/support", label: "Support" },
   { href: "/admin/sager", label: "Sager" },
   { href: "/admin/anmeldelser", label: "Anmeldelser" },
+  { href: "/admin/aegthed", label: "Ægthed" },
   { href: "/admin/ordrer", label: "Ordrer" },
   { href: "/admin/medlemmer", label: "Medlemmer" },
   { href: "/admin/shows", label: "Shows" },
@@ -16,7 +17,17 @@ const TABS = [
   { href: "/admin/indstillinger", label: "Indstillinger" },
 ];
 
-export default function AdminNav({ openIssues, openReports = 0, unreadSupport = 0 }: { openIssues: number; openReports?: number; unreadSupport?: number }) {
+export default function AdminNav({
+  openIssues,
+  openReports = 0,
+  unreadSupport = 0,
+  pendingAuth = 0,
+}: {
+  openIssues: number;
+  openReports?: number;
+  unreadSupport?: number;
+  pendingAuth?: number;
+}) {
   const path = usePathname();
   return (
     <nav className="adm-nav" aria-label="Backoffice">
@@ -30,6 +41,7 @@ export default function AdminNav({ openIssues, openReports = 0, unreadSupport = 
               {t.href === "/admin/support" && unreadSupport ? <span className="count" aria-label={`${unreadSupport} ulæste`}>{unreadSupport}</span> : null}
               {t.href === "/admin/sager" && openIssues ? <span className="count">{openIssues}</span> : null}
               {t.href === "/admin/anmeldelser" && openReports ? <span className="count">{openReports}</span> : null}
+              {t.href === "/admin/aegthed" && pendingAuth ? <span className="count" aria-label={`${pendingAuth} venter`}>{pendingAuth}</span> : null}
             </Link>
           );
         })}
