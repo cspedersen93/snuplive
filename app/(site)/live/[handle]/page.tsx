@@ -13,6 +13,7 @@ import { ITEM_COLS, MESSAGE_COLS, SELLER_FACT_COLS, SHOW_COLS, type Item, type M
 import SellerRatings, { type Rating } from "./SellerRatings";
 import { sweepStaleShows } from "@/lib/queries";
 import ShowClient from "./ShowClient";
+import FollowButton from "@/components/FollowButton";
 
 export const dynamic = "force-dynamic";
 
@@ -106,9 +107,12 @@ export default async function SellerPage({ params }: Params) {
             <span className="muted">{[d.seller.display_name, d.seller.area].filter(Boolean).join(" · ")}</span>
           </div>
         </div>
+        {d.seller.is_seller ? <FollowButton sellerId={d.seller.id} handle={d.seller.handle} next={`/live/${d.seller.handle}`} className="btn btn-red btn-sm" /> : null}
         {d.seller.is_seller ? <SellerFacts seller={d.seller} /> : null}
         <div className="empty" style={{ marginTop: 18 }}>
-          <p style={{ marginBottom: 14 }}>{d.seller.handle} har ikke planlagt et show endnu.</p>
+          <p style={{ marginBottom: 14 }}>
+            {d.seller.handle} har ikke planlagt et show endnu.{d.seller.is_seller ? " Følg sælgeren, så får du besked, når der kommer et." : ""}
+          </p>
           <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
         </div>
         <SellerRatings handle={d.seller.handle} ratings={d.ratings} avg={d.seller.rating_avg} count={d.seller.rating_count} />

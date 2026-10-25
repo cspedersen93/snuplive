@@ -21,6 +21,7 @@ import { fetchFeed } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { ITEM_COLS, SELLER_FACT_COLS, type Item, type SellerFactsData } from "@/lib/types";
 import BuyNow from "./BuyNow";
+import FollowButton from "@/components/FollowButton";
 import Gallery from "./Gallery";
 
 export const revalidate = 30;
@@ -307,6 +308,7 @@ export default async function ItemPage({ params }: Params) {
                 </span>
               </span>
             </Link>
+            <FollowButton sellerId={it.seller_id} handle={seller.handle} next={href} />
             <SellerFacts seller={seller} />
 
             <ul className="item-trust">

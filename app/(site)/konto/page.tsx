@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AccountNav from "@/components/AccountNav";
+import Avatar from "@/components/Avatar";
+import FollowButton from "@/components/FollowButton";
+import { PushToggle } from "@/components/PushOffer";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
 import { kr } from "@/lib/format";
@@ -29,6 +32,19 @@ export default async function Konto() {
     profile.is_seller ? supabase.from("shows").select("id,status").eq("seller_id", uid) : Promise.resolve({ data: [] as { id: string; status: string }[] }),
   ]);
   const mitid = profile.is_seller ? await mitidState(supabase, profile) : null;
+  // Følg sælgere (findes først, når 0016_foelg.sql er kørt).
+  const [fol, fc] = await Promise.all([
+    supabase
+      .from("follows")
+      .select("created_at,seller:profiles!follows_seller_id_fkey(id,handle,display_name,area,avatar_path)")
+      .eq("follower_id", uid)
+      .order("created_at", { ascending: false })
+      .limit(100),
+    profile.is_seller ? supabase.from("profiles").select("follower_count").eq("id", uid).maybeSingle() : Promise.resolve({ data: null, error: null }),
+  ]);
+  type Followed = { id: string; handle: string; display_name: string | null; area: string | null; avatar_path: string | null };
+  const following = fol.error ? null : ((fol.data ?? []) as unknown as { seller: Followed | null }[]).map((r) => r.seller).filter((x): x is Followed => !!x);
+  const followers = fc.error ? null : ((fc.data as { follower_count?: number } | null)?.follower_count ?? 0);
   const snup = mine.data ?? [];
   const sold = sales.data ?? [];
   const myShows = shows.data ?? [];
@@ -77,6 +93,7 @@ export default async function Konto() {
           </Link>
           {profile.is_seller ? (
             <>
+              {followers !== null ? <div className="stat"><span className="k">Følgere</span><span className="v">{followers}</span></div> : null}
               <div className="stat"><span className="k">Shows</span><span className="v">{myShows.length}</span></div>
               <div className="stat"><span className="k">Solgte ting</span><span className="v">{sold.length}</span></div>
               <div className="stat"><span className="k">Omsætning</span><span className="v">{kr(sold.reduce((a, b) => a + b.price, 0))}</span></div>
@@ -85,6 +102,33 @@ export default async function Konto() {
         </div>
 
         <ProfileForm profile={profile} />
+
+        {following ? (
+          <div className="box" id="foelger">
+            <h2 className="h3" style={{ marginBottom: 8 }}>Du følger</h2>
+            {following.length ? (
+              <ul className="following">
+                {following.map((f) => (
+                  <li key={f.id}>
+                    <Link className="who" href={`/live/${f.handle}`}>
+                      <Avatar handle={f.handle} path={f.avatar_path} size={40} />
+                      <span style={{ minWidth: 0 }}>
+                        <strong>{f.handle}</strong>
+                        <span className="muted" style={{ fontSize: ".85rem" }}>{[f.display_name, f.area].filter(Boolean).join(" · ")}</span>
+                      </span>
+                    </Link>
+                    <FollowButton sellerId={f.id} handle={f.handle} next="/konto" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted" style={{ fontSize: ".95rem", marginBottom: 6 }}>
+                Du følger ikke nogen endnu. Tryk <b>Følg</b> hos en sælger, så får du besked, når sælgeren går live.
+              </p>
+            )}
+            <PushToggle />
+          </div>
+        ) : null}
 
         {profile.is_seller ? (
           <div className="box" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 14 }}>

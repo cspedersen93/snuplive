@@ -35,7 +35,7 @@ export default function Saadan() {
             <div className="ctas"><Link className="btn btn-red" href="/live">Se hvem der er live</Link></div>
           </div>
           <ol className="steps">
-            <li><div><h3>Find et show eller en ting</h3><p>Se hvem der er live under Live nu, eller find en ting, der bliver vist snart, og tryk Husk mig. Så får du en mail, når showet starter.</p></div></li>
+            <li><div><h3>Find et show eller en ting</h3><p>Se hvem der er live under Live nu, eller find en ting, der bliver vist snart, og tryk Husk mig. Så får du besked, når showet starter. Tryk Følg hos en sælger, så får du besked, hver gang sælgeren går live.</p></div></li>
             <li><div><h3>Spørg i chatten</h3><p>Bed sælgeren vise mærket, målene eller stoffet tæt på. Svaret kommer, mens du ser med.</p></div></li>
             <li><div><h3>Køb med ét tryk</h3><p>Den første, der trykker Køb, får tingen. Den lander med det samme under Mine køb.</p></div></li>
             <li><div><h3>Eller byd på budsalg</h3><p>Står der Budsalg på tingen, byder du i stedet for at købe med det samme. Du har 30 sekunder, og det højeste bud vinder.</p></div></li>

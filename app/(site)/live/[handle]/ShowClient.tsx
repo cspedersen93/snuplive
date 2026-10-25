@@ -9,6 +9,7 @@ import SellerFacts from "@/components/SellerFacts";
 import Chat from "@/components/Chat";
 import { IconBox, IconShare } from "@/components/Icons";
 import { ViewerVideo } from "@/components/LiveVideo";
+import FollowButton from "@/components/FollowButton";
 import RemindButton from "@/components/RemindButton";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useMe } from "@/components/useMe";
@@ -298,6 +299,7 @@ export default function ShowClient(props: Props) {
                 </span>
               </div>
             </div>
+            <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} className="btn btn-red btn-sm" />
             <SellerFacts seller={props.seller} />
             <button className="btn btn-line btn-sm" type="button" onClick={share} style={{ alignSelf: "flex-start" }}>
               Del showet
@@ -391,6 +393,7 @@ export default function ShowClient(props: Props) {
                       ) : (
                         <Link className="btn btn-red btn-sm" href="/live">Find et andet show</Link>
                       )}
+                      <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} label={`Følg @${handle}, og få besked næste gang`} />
                     </>
                   )}
                 </div>

@@ -714,6 +714,58 @@ reset role;
 select t.ok((select clip_path is null from items where id = '20000000-0000-0000-0000-000000000093'), 'klippet er væk fra tingen');
 delete from items where id in ('20000000-0000-0000-0000-000000000091', '20000000-0000-0000-0000-000000000092', '20000000-0000-0000-0000-000000000093');
 
+-- ── Følg sælgere: kun sine egne, antal på profilen, blokering, morgenmail ──
+insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000f1', 'ikke.saelger@mail.dk');
+update profiles set follower_count = 0 where id = '00000000-0000-0000-0000-00000000000a';
+delete from follows;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+insert into follows (follower_id, seller_id) values (auth.uid(), '00000000-0000-0000-0000-00000000000a');
+select t.ok((select count(*) from follows) = 1, 'Liva følger Maja');
+select t.throws($$insert into follows (follower_id, seller_id) values (auth.uid(), '00000000-0000-0000-0000-00000000000a')$$, 'duplicate key');
+select t.throws($$insert into follows (follower_id, seller_id) values (auth.uid(), auth.uid())$$, 'row-level security');
+select t.throws($$insert into follows (follower_id, seller_id) values (auth.uid(), '00000000-0000-0000-0000-0000000000f1')$$, 'row-level security');
+select t.throws($$insert into follows (follower_id, seller_id) values ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000a')$$, 'row-level security');
+select t.throws($$update profiles set follower_count = 999 where id = auth.uid()$$, 'permission denied');
+select t.throws($$select * from follower_recipients('00000000-0000-0000-0000-00000000000a')$$, 'permission denied');
+select t.throws($$select * from follow_digest()$$, 'permission denied');
+select t.throws($$insert into push_subscriptions (user_id, endpoint, p256dh, auth) values (auth.uid(), 'https://fcm.googleapis.com/x', repeat('a', 40), repeat('b', 16))$$, 'permission denied');
+select t.throws($$select * from app_secrets$$, 'permission denied');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.ok((select count(*) from follows) = 0, 'Ole kan ikke se, hvem Liva følger');
+insert into follows (follower_id, seller_id) values (auth.uid(), '00000000-0000-0000-0000-00000000000a');
+reset role;
+select t.ok((select follower_count from profiles where id = '00000000-0000-0000-0000-00000000000a') = 2, 'Maja har 2 følgere');
+select t.ok((select count(*) from follower_recipients('00000000-0000-0000-0000-00000000000a')) = 2, 'begge følgere får besked, når Maja går live');
+-- Maja blokerer Ole: han følger hende ikke længere
+insert into seller_blocks (seller_id, user_id) values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000c') on conflict do nothing;
+select t.ok((select follower_count from profiles where id = '00000000-0000-0000-0000-00000000000a') = 1, 'en blokeret bruger følger ikke længere');
+select t.ok((select array_agg(email) from follower_recipients('00000000-0000-0000-0000-00000000000a')) = array['Liva.K@gmail.com'], 'kun Liva får besked');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$insert into follows (follower_id, seller_id) values (auth.uid(), '00000000-0000-0000-0000-00000000000a')$$, 'blokeret');
+reset role;
+delete from seller_blocks where seller_id = '00000000-0000-0000-0000-00000000000a' and user_id = '00000000-0000-0000-0000-00000000000c';
+-- Morgenmail: shows inden for et døgn, kun én gang
+insert into shows (id, seller_id, title, category, status, starts_at) values
+  ('10000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-00000000000a', 'Morgenshow', 'dametoej', 'planned', now() + interval '3 hours'),
+  ('10000000-0000-0000-0000-0000000000f2', '00000000-0000-0000-0000-00000000000a', 'Senere show', 'dametoej', 'planned', now() + interval '30 hours');
+insert into items (id, show_id, seller_id, name, price, position) values
+  ('20000000-0000-0000-0000-0000000000f1', '10000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-00000000000a', 'Kjole', 100, 1);
+create temp table digest as select * from follow_digest();
+select t.ok((select count(*) from digest where show_id = '10000000-0000-0000-0000-0000000000f1') = 1
+            and (select item_count from digest where show_id = '10000000-0000-0000-0000-0000000000f1') = 1
+            and (select email from digest where show_id = '10000000-0000-0000-0000-0000000000f1') = 'Liva.K@gmail.com', 'morgenmailen har dagens show til Liva');
+select t.ok(not exists (select 1 from digest where show_id = '10000000-0000-0000-0000-0000000000f2'), 'et show om mere end et døgn kommer ikke med endnu');
+select t.ok(not exists (select 1 from follow_digest() where show_id = '10000000-0000-0000-0000-0000000000f1'), 'det samme show kommer kun med én gang');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+delete from follows where seller_id = '00000000-0000-0000-0000-00000000000a';
+reset role;
+select t.ok((select follower_count from profiles where id = '00000000-0000-0000-0000-00000000000a') = 0, 'følgere tælles ned, når man stopper med at følge');
+delete from shows where id in ('10000000-0000-0000-0000-0000000000f1', '10000000-0000-0000-0000-0000000000f2');
+drop table digest;
+
 -- ── Nyt navn: beskeder fra siden selv står som Relived ──
 select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
 select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');

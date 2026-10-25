@@ -1,5 +1,6 @@
 import { fail, json } from "@/lib/api";
 import { unquoteEnv } from "@/lib/env";
+import { sendFollowDigest } from "@/lib/followDigest";
 import { dailyMaintenance } from "@/lib/orders";
 import { getStripe } from "@/lib/stripe";
 import { sweepSupportNotices } from "@/lib/support";
@@ -21,12 +22,15 @@ export async function GET(req: Request) {
   const supportDeleted = await admin.rpc("support_cleanup");
   // Klip fra live-showene: slettes 14 dage efter salget, og når en ting er fjernet.
   const clipsDeleted = await cleanClips(admin);
+  // Morgenmail til følgere om dagens shows.
+  const followDigest = await sendFollowDigest(admin);
   return json({
     ...(await dailyMaintenance(admin, stripe)),
     staleShowsEnded: stale.data ?? 0,
     supportMailed,
     supportDeleted: supportDeleted.data ?? 0,
     clipsDeleted,
+    followDigest,
   });
 }
 

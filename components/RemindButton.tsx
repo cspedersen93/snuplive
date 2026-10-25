@@ -52,13 +52,13 @@ export default function RemindButton({ showId, itemId = null, next, className = 
       setBusy(false);
       if (error) return toast(errorText(error));
       setOn(false);
-      toast("Du får ikke en mail om det her show.");
+      toast("Du får ikke besked om det her show.");
     } else {
       const { error } = await sb.from("reminders").insert({ user_id: uid, show_id: showId, item_id: itemId });
       setBusy(false);
       if (error && !/duplicate/i.test(error.message)) return toast(errorText(error));
       setOn(true);
-      toast("Vi sender dig en mail, når showet starter.");
+      toast("Vi giver dig besked, når showet starter.");
     }
   }
 

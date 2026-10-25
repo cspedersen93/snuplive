@@ -55,6 +55,6 @@ function carry(from: NextResponse, to: NextResponse) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|img/|mediapipe/|icon.png|apple-icon.png|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|img/|mediapipe/|sw.js|manifest.webmanifest|icon.png|apple-icon.png|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

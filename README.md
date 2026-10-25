@@ -432,6 +432,25 @@ Kør `supabase/migrations/0015_klip.sql` i Supabase → SQL Editor (efter 0014).
 
 ---
 
+## Følg sælgere og besked på telefonen
+
+Kør `supabase/migrations/0016_foelg.sql` i Supabase → SQL Editor (efter 0015). Der skal ikke nye nøgler i Vercel.
+
+- **Følg:** knappen står ved showet, på sælgerens side og ved hver ting. Er man ikke logget ind, kommer man til login og
+  følger sælgeren med det samme bagefter. Antallet af følgere står ved knappen. Sælgeren kan ikke se, hvem der følger.
+- **Når sælgeren går live**, får følgerne (og dem, der har trykket *Husk mig*) besked. Har de slået *besked på telefonen*
+  til, kommer den dér. Ellers får de en mail. Går en sælger live flere gange inden for 2 timer, får følgerne kun besked
+  første gang.
+- **Morgenmail:** det daglige job sender én mail til hver følger med de shows, der starter inden for et døgn hos de
+  sælgere, de følger.
+- **Besked på telefonen:** efter *Følg* spørger siden, om man vil have besked på telefonen. Det virker i Chrome, Edge og
+  Firefox og på Android. På iPhone skal Relived først lægges på hjemmeskærmen (Del → Føj til hjemmeskærm). Under
+  **Min konto → Du følger** kan man slå det til og fra. Nøglerne til beskederne laves automatisk første gang og gemmes i
+  databasen, hvor kun serveren kan se dem.
+- Blokerer en sælger en bruger, følger brugeren ikke længere sælgeren.
+
+---
+
 ## Billedet af tingene (Claude vælger)
 
 Når sælgeren trykker **Vis**, tager studiet 6 billeder i løbet af de næste 15 sekunder (efter 1, 3, 5, 7½, 10 og 13 sekunder).
