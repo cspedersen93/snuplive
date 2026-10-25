@@ -188,20 +188,20 @@ function SplitGrid({
   localRef?: React.Ref<HTMLVideoElement>;
 }) {
   return (
-    <div className={`split split-${Math.min(cams.length, 3)}`}>
+    <div className={`cam-split cam-split-${Math.min(cams.length, 3)}`}>
       {cams.map((c) => {
         const on = Boolean(active) && crewId(c.participant.identity) === active;
         return (
-          <div key={c.participant.identity} className={`split-tile${on ? " on" : ""}`}>
+          <div key={c.participant.identity} className={`cam-tile${on ? " on" : ""}`}>
             <VideoTrack
               ref={c.participant.isLocal ? localRef : undefined}
               trackRef={c}
-              className="split-video"
+              className="cam-tile-video"
               playsInline
               muted
               style={mirrorLocal && c.participant.isLocal ? { transform: "scaleX(-1)" } : undefined}
             />
-            <span className="split-name">
+            <span className="cam-tile-name">
               {c.participant.isLocal ? "Dig" : c.participant.name || "Gæst"}
               {on ? <b>Viser nu</b> : null}
             </span>
@@ -242,7 +242,7 @@ function ViewerStage({
   if (layout !== "focus" && cams.length >= 2) {
     return (
       <>
-        <div className="split-bg" aria-hidden="true" />
+        <div className="cam-split-bg" aria-hidden="true" />
         <SplitGrid cams={crewOrder(cams)} active={spotlight} />
         <StartAudio label="Tryk for lyd" className="btn btn-red btn-sm start-audio" />
       </>
@@ -437,7 +437,7 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, shown, on
     <>
       {split && cam && isTrackReference(cam) ? (
         <>
-          <div className="split-bg" aria-hidden="true" />
+          <div className="cam-split-bg" aria-hidden="true" />
           <SplitGrid cams={crewOrder([cam, ...others])} active={active} mirrorLocal={facing === "user"} localRef={videoRef} />
         </>
       ) : cam ? (
