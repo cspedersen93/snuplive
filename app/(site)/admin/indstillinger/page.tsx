@@ -4,6 +4,8 @@ import { num, requireAdmin } from "@/lib/admin";
 import { mitidEnabled } from "@/lib/mitid";
 import SettingToggle from "./SettingToggle";
 import Testers, { type Tester } from "./Testers";
+import ResetTestSales from "./ResetTestSales";
+import { canResetTestSales } from "@/lib/stripe";
 import { SITE_HOST } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -14,12 +16,15 @@ export default async function Indstillinger() {
   const { admin } = await requireAdmin("/admin/indstillinger");
   if (!admin) return <SetupNotice />;
   const enabled = mitidEnabled();
-  const [setting, open, testers, sellers, verified] = await Promise.all([
+  const testMode = canResetTestSales();
+  const [setting, open, testers, sellers, verified, orderCount, saleCount] = await Promise.all([
     admin.from("settings").select("value").eq("key", "mitid_required").maybeSingle(),
     admin.from("settings").select("value").eq("key", "site_open").maybeSingle(),
     admin.from("beta_access").select("email,note").order("added_at", { ascending: true }),
     admin.from("profiles").select("id", { count: "exact", head: true }).eq("is_seller", true),
     admin.from("profiles").select("id", { count: "exact", head: true }).eq("is_seller", true).not("mitid_verified_at", "is", null),
+    admin.from("orders").select("id", { count: "exact", head: true }),
+    admin.from("sales").select("id", { count: "exact", head: true }),
   ]);
   const required = setting.data?.value === true;
   const siteIsOpen = open.data ? open.data.value !== false : true;
@@ -63,6 +68,19 @@ export default async function Indstillinger() {
           help="Shows, der allerede er live, kører videre. Sælgere, der ikke har bekræftet sig, får en knap til MitID i studiet."
         />
       </section>
+
+      {testMode ? (
+        <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <h2 className="h3">Nulstil testsalg</h2>
+          <p className="muted" style={{ fontSize: ".95rem" }}>
+            Betalingen kører i testtilstand. Her kan I slette alle testkøb, så omsætningen (og indberetningen til Skat) starter
+            forfra. Det sletter køb, ordrer, bud, sager, bedømmelser og fragtlabels. Solgte ting bliver ikke til salg (sælgeren kan
+            sætte dem til salg igen). Shows, ting, sælgere, købere og følgere bliver liggende. Knappen forsvinder, når I skifter til
+            rigtige Stripe-nøgler.
+          </p>
+          <ResetTestSales orders={orderCount.count ?? 0} sales={saleCount.count ?? 0} />
+        </section>
+      ) : null}
     </div>
   );
 }

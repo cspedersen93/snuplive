@@ -492,6 +492,19 @@ For sælgere, der ikke har lyst til at gå live:
 
 ---
 
+## Nulstil testsalg (før lanceringen)
+
+Kør `supabase/migrations/0021_nulstil_testsalg.sql` i Supabase → SQL Editor (efter 0020).
+
+**Backoffice → Indstillinger → Nulstil testsalg** sletter alle køb, ordrer, bud, sager, bedømmelser og fragtlabels, så
+omsætningen (og indberetningen til Skat) starter forfra. Solgte ting bliver *Ikke til salg* (sælgeren kan sætte dem til salg
+igen). Shows, ting, sælgere, købere og følgere bliver liggende. Man skal skrive NULSTIL for at bekræfte.
+
+Knappen findes kun, mens Stripe kører med testnøgler (`sk_test_…`). Med rigtige nøgler forsvinder den, og databasen nægter
+også, hvis der er en rigtig betaling. Fragtlabels, der er købt hos Shipmondo, bliver ikke annulleret der.
+
+---
+
 ## Cookies
 
 Relived bruger kun nødvendige cookies (login, MitID og supportchatten) og gemmer et par valg i browseren (fx pakkeshop).

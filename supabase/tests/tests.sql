@@ -954,6 +954,26 @@ delete from shows where id = '10000000-0000-0000-0000-0000000000f9';
 update profiles set is_seller = false
  where id in ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000d', '00000000-0000-0000-0000-00000000000e');
 
+-- ── Nulstil testsalg (Backoffice → Indstillinger) ──
+reset role;
+select t.ok((select count(*) from orders) > 0 and (select count(*) from sales) > 0 and (select count(*) from items where status = 'sold') > 0, 'der er testsalg før nulstillingen');
+select t.ok(has_function_privilege('service_role', 'public.admin_reset_test_sales()', 'execute')
+            and not has_function_privilege('authenticated', 'public.admin_reset_test_sales()', 'execute')
+            and not has_function_privilege('anon', 'public.admin_reset_test_sales()', 'execute'), 'kun serveren kan nulstille');
+update orders set stripe_session_id = 'cs_live_rigtig' where id = (select id from orders order by created_at limit 1);
+select t.throws($$select admin_reset_test_sales()$$, 'rigtige betalinger');
+update orders set stripe_session_id = 'cs_test_x' where stripe_session_id = 'cs_live_rigtig';
+create temp table t_before as select (select count(*) from shows) s, (select count(*) from items) i, (select count(*) from profiles) p;
+set role service_role;
+select admin_reset_test_sales();
+reset role;
+select t.ok((select count(*) from orders) = 0 and (select count(*) from sales) = 0 and (select count(*) from bids) = 0
+            and (select count(*) from ratings) = 0 and (select count(*) from order_issues) = 0, 'alle køb, ordrer, bud, sager og bedømmelser er slettet');
+select t.ok((select count(*) from items where status = 'sold' or bid_count > 0) = 0, 'ingen ting står som solgt eller med bud');
+select t.ok((select count(*) from profiles where rating_count > 0 or rating_avg is not null) = 0, 'sælgernes bedømmelser er nulstillet');
+select t.ok((select s = (select count(*) from shows) and i = (select count(*) from items) and p = (select count(*) from profiles) from t_before), 'shows, ting og brugere er der stadig');
+select t.ok((admin_overview(now() - interval '10 years') ->> 'gmv')::int = 0, 'omsætningen i Backoffice er 0');
+
 -- ── Nyt navn: beskeder fra siden selv står som Relived ──
 select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
 select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');

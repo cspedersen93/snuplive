@@ -25,5 +25,10 @@ export function stripeTestMode() {
   return unquoteEnv(process.env.STRIPE_SECRET_KEY).startsWith("sk_test_");
 }
 
+/** Må testsalg nulstilles (Backoffice → Indstillinger)? Kun mens Stripe kører med testnøgler eller ikke er sat op. */
+export function canResetTestSales() {
+  return !unquoteEnv(process.env.STRIPE_SECRET_KEY) || stripeTestMode();
+}
+
 /** Kroner til øre (Stripe regner i mindste enhed). */
 export const ore = (kr: number) => Math.round(kr * 100);
