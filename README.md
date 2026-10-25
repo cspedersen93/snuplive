@@ -505,6 +505,20 @@ også, hvis der er en rigtig betaling. Fragtlabels, der er købt hos Shipmondo, 
 
 ---
 
+## Rundvisning i studiet
+
+Første gang en sælger åbner et studie (før showet går live), spørger siden: *Vil du se, hvordan studiet virker?* med
+**Ja, vis mig** og **Nej tak**. Siger sælgeren ja, bliver én ting ad gangen fremhævet med en kort forklaring og **OK**:
+køen, hvordan man sætter en ting til salg, kameraet og knapperne på det, Vises nu og swipe, Vis næste / lynrunde /
+budsalg, tallene, chatten, gæster, deling og hvad der sker efter showet. Gæster i et show får deres egen, kortere udgave.
+
+- *Nej tak*, *Spring resten over* og *Færdig* gør, at den ikke kommer igen af sig selv (husket i browseren, se `/cookies`).
+- Knappen **Rundvisning** øverst i studiet starter den forfra.
+- Et show, der er live, bliver ikke forstyrret af spørgsmålet.
+- Teksterne står i `app/(site)/studio/[id]/StudioTour.tsx`. Det, der fremhæves, er markeret med `data-tour="…"` i studiet.
+
+---
+
 ## Cookies
 
 Relived bruger kun nødvendige cookies (login, MitID og supportchatten) og gemmer et par valg i browseren (fx pakkeshop).

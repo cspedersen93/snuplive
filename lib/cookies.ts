@@ -42,9 +42,21 @@ export const LOCAL: StoredThing[] = [
   { name: "relived-push-nej", what: "At du har sagt nej tak til besked på telefonen, så vi ikke spørger igen.", how_long: "Til du sletter den", who: "Relived" },
   { name: "relived-kamerafiltre", what: "Sælgere: om Lys op og Slør baggrund er slået til i studiet.", how_long: "Til du sletter den", who: "Relived" },
   { name: "relived-swipe-ok", what: "Sælgere: at du har set tippet om at swipe i studiet.", how_long: "Til du sletter den", who: "Relived" },
+  { name: "relived-rundvisning", what: "Sælgere: at du har set (eller sagt nej tak til) rundvisningen i studiet.", how_long: "Til du sletter den", who: "Relived" },
+  { name: "relived-rundvisning-gaest", what: "Gæster i et show: det samme for rundvisningen som gæst.", how_long: "Til du sletter den", who: "Relived" },
 ];
+
+/** Rundvisningen i studiet (vært og gæst). */
+export const TOUR_KEYS = { host: "relived-rundvisning", guest: "relived-rundvisning-gaest" } as const;
 
 export const COOKIE_NOTICE_KEY = "relived-cookie-info";
 
 /** Nøglerne, "Glem mine valg" sletter (ikke login og ikke en åben supportsamtale). */
-export const FORGETTABLE = ["snuplive:pakkeshop", "relived-push-nej", "relived-kamerafiltre", "relived-swipe-ok"];
+export const FORGETTABLE = [
+  "snuplive:pakkeshop",
+  "relived-push-nej",
+  "relived-kamerafiltre",
+  "relived-swipe-ok",
+  "relived-rundvisning",
+  "relived-rundvisning-gaest",
+];

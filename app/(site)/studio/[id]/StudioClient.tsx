@@ -23,6 +23,7 @@ import AuthPanel from "./AuthPanel";
 import { SITE_HOST } from "@/lib/env";
 import { MAX_GUESTS, type Guest } from "@/lib/guests";
 import GuestsBox from "./GuestsBox";
+import StudioTour from "./StudioTour";
 
 export interface StudioSale {
   id: string;
@@ -80,6 +81,8 @@ export default function StudioClient(props: Props) {
   const [out, setOut] = useState(false);
   // Side om side eller fokus på den, der viser. Skifter værten, kommer det med det samme (også til gæsterne).
   const layoutReady = props.camLayout != null;
+  // Rundvisningen: knappen øverst starter den forfra.
+  const [tour, setTour] = useState(0);
   const [layout, setLayout] = useState<CamLayout>(props.camLayout ?? "split");
   const { show, items, messages, setItems, resync } = useShowRealtime({
     show: props.show,
@@ -449,7 +452,7 @@ export default function StudioClient(props: Props) {
       </div>
       <div className="studio">
         <aside className="show-side left" aria-label="Køen">
-          <div className="box">
+          <div className="box" data-tour="queue">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
               <h2>Køen</h2>
               <span className="muted" style={{ fontSize: ".85rem" }}>
@@ -555,9 +558,12 @@ export default function StudioClient(props: Props) {
             )}
           </div>
           {!ended && !out ? (
-            <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} onSaved={saved} />
+            <div data-tour="item-form">
+              <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} onSaved={saved} />
+            </div>
           ) : null}
           {guestsReady && !out ? (
+            <div data-tour="guests">
             <GuestsBox
               showId={show.id}
               isHost={isHost}
@@ -575,6 +581,7 @@ export default function StudioClient(props: Props) {
                 router.refresh();
               }}
             />
+            </div>
           ) : null}
           <div className="box ship-note">
             <IconBulb />
@@ -599,7 +606,9 @@ export default function StudioClient(props: Props) {
                       ? "Showet er slut"
                       : `${when(show.starts_at)} · gæst hos @${host.handle}`}{" "}
                 ·{" "}
-                <button className="linkbtn" type="button" onClick={copyLink}>Kopiér link til showet</button>
+                <button className="linkbtn" type="button" onClick={copyLink} data-tour="share">Kopiér link til showet</button>
+                {" · "}
+                <button className="linkbtn" type="button" onClick={() => setTour((n) => n + 1)}>Rundvisning</button>
               </span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -611,7 +620,7 @@ export default function StudioClient(props: Props) {
               <span className="timer">{live ? elapsed(startedMs) : "00:00"}</span>
             </div>
           </div>
-          <div className="player">
+          <div className="player" data-tour="player">
             <div className="screen">
               {cameraOn && video ? (
                 <StudioVideo
@@ -784,7 +793,7 @@ export default function StudioClient(props: Props) {
             </div>
           </div>
           <div className="studio-ctrl">
-            <div className="box">
+            <div className="box" data-tour="ticker">
               <div className="ticker">
                 <div><span className="k">Seere</span><span className="v">{live ? viewers : 0}</span></div>
                 <div><span className="k">{isHost && !guests.length ? "Solgt" : "Dine solgt"}</span><span className="v">{isHost && !guests.length ? sold.length : mineSold.length}</span></div>
@@ -792,7 +801,7 @@ export default function StudioClient(props: Props) {
               </div>
             </div>
             {isHost ? (
-            <div className="box" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div className="box" style={{ display: "flex", flexDirection: "column", gap: 8 }} data-tour="ctrl">
               <div className="ctrl">
                 <button className="btn btn-ghost" type="button" disabled={!live || busy || !next || bidRunning} onClick={() => next && present(next.id)}>
                   Vis næste
@@ -822,7 +831,7 @@ export default function StudioClient(props: Props) {
               </button>
             </div>
             ) : (
-              <div className="box guest-ctrl">
+              <div className="box guest-ctrl" data-tour="ctrl">
                 <p className="fine">
                   @{host.handle} styrer showet: hvad der vises, budsalg og lynrunder. Når en af dine ting bliver vist, er det dit kamera,
                   seerne ser stort.
@@ -851,10 +860,12 @@ export default function StudioClient(props: Props) {
           ) : null}
         </div>
 
-        <aside className="show-side" aria-label="Styring og chat">
+        <aside className="show-side" aria-label="Styring og chat" data-tour="chat">
           <Chat showId={show.id} messages={messages} me={me} live={live} loginHref="/login" hint="Seerne skriver her" canModerate={isHost} />
         </aside>
       </div>
+
+      <StudioTour role={isHost ? "host" : "guest"} host={host.handle} auto={!live && !ended && !out} replay={tour} />
 
       {confirmEnd ? (
         <div className="modal" role="dialog" aria-modal="true" aria-labelledby="m-end">
