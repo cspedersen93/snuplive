@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IconBolt, IconBox, IconCamera, IconCard, IconList, IconPlay } from "@/components/Icons";
+import { IconBolt, IconBox, IconCamera, IconCard, IconClip, IconList } from "@/components/Icons";
 
 export const metadata: Metadata = {
   title: { absolute: "Sælg brugt tøj live på video | Relived" },
@@ -68,7 +68,7 @@ export default function Saelg() {
             <div><IconBolt /><h3>Lynrunder og budsalg</h3><p>Lynrunder på ti sekunder til fast pris, eller budsalg på 30 sekunder, hvor det højeste bud vinder. Det giver liv i showet.</p></div>
             <div><IconBox /><h3>Fragtlabels med ét tryk</h3><p>Køberen har valgt pakkeshop og betalt fragten. Du printer labelen og afleverer pakken hos DAO eller GLS.</p></div>
             <div><IconCard /><h3>Udbetaling til din konto</h3><p>Tilknyt din bankkonto via Stripe. Pengene udbetales, når køberen har fået sine ting.</p></div>
-            <div><IconPlay /><h3>Sælg også uden at være live</h3><p>Det, der ikke bliver solgt, kan købes bagefter til fast pris med et klip fra showet. Har du ikke lyst til at gå live, kan du filme tingen uden selv at være med og sætte den til salg med <b>Sælg med video</b>.</p></div>
+            <div><IconClip /><h3>Sælg også uden at være live</h3><p>Det, der ikke bliver solgt, kan købes bagefter til fast pris med et klip fra showet. Har du ikke lyst til at gå live, kan du filme tingen uden selv at være med og sætte den til salg med <b>Sælg med video</b>.</p></div>
           </div>
         </div>
       </section>

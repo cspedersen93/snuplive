@@ -158,6 +158,13 @@ export const IconBell = (p: P) => (
     <path d="M10 20.5a2 2 0 0 0 4 0" />
   </svg>
 );
+/** Video-ikon i samme streg som de andre små ikoner (fx på /saelg). */
+export const IconClip = (p: P) => (
+  <svg {...base} className="ico" {...p}>
+    <rect x="3" y="4.5" width="18" height="15" rx="3" />
+    <path d="M10 9.2v5.6l4.6-2.8L10 9.2Z" />
+  </svg>
+);
 export const IconPlay = (p: P) => (
   <svg {...base} fill="currentColor" {...p}>
     <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" />
