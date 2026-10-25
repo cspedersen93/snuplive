@@ -2,7 +2,7 @@
 
 import { ConnectionState, RoomEvent, type RemoteParticipant, type Room } from "livekit-client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IconHeart } from "@/components/Icons";
+import { IconHeart, IconSmilePlus } from "@/components/Icons";
 import {
   BIG,
   BIG_COOLDOWN_MS,
@@ -63,17 +63,6 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const pick = <T,>(xs: readonly T[]) => xs[Math.floor(Math.random() * xs.length)];
 const sum = (c: Counts) => Object.values(c).reduce((a, n) => a + (n ?? 0), 0);
 let seq = 0;
-
-function IconSmile() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round">
-      <path d="M20.5 11.5a8.5 8.5 0 1 1-6.2-8.2" />
-      <path d="M8.6 14.4c.9 1.2 2.1 1.8 3.4 1.8s2.5-.6 3.4-1.8" />
-      <path d="M9 9.6v.6M15 9.6v.6" strokeWidth={2.4} />
-      <path d="M19 2.5v5M16.5 5h5" />
-    </svg>
-  );
-}
 
 function IconStar() {
   return (
@@ -465,7 +454,7 @@ export default function Reactions({
               aria-label="Flere reaktioner og effekter"
               onClick={() => setOpen((o) => !o)}
             >
-              <IconSmile />
+              <IconSmilePlus />
             </button>
           </div>
           {open ? (

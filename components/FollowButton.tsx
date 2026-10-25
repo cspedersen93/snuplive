@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { PushOffer } from "@/components/PushOffer";
 import { hasSupabase } from "@/lib/env";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
+
+/** Flere knapper for samme sælger på siden (fx på videoen og i boksen ved siden af) følger hinanden. */
+const SYNC = "relived:follow";
+type SyncDetail = { sellerId: string; on: boolean; delta: number; from: string };
 
 /**
  * "Følg" en sælger: besked, når sælgeren går live (på telefonen eller som mail), og en mail om morgenen,
@@ -17,6 +21,8 @@ export default function FollowButton({
   next,
   className = "btn btn-line btn-sm",
   label = "Følg",
+  compact = false,
+  onFollowed,
 }: {
   sellerId: string;
   handle: string;
@@ -24,13 +30,33 @@ export default function FollowButton({
   className?: string;
   /** Teksten på knappen, før man følger. */
   label?: string;
+  /**
+   * Lille knap (på videoen): uden antal følgere og uden tilbuddet om besked på telefonen.
+   * Følger man allerede sælgeren, vises den ikke.
+   */
+  compact?: boolean;
+  /** Kaldes, når man lige er begyndt at følge. */
+  onFollowed?: () => void;
 }) {
+  const self = useId();
   const [uid, setUid] = useState<string | null | undefined>(undefined);
   const [on, setOn] = useState(false);
   const [count, setCount] = useState<number | null>(null);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [offer, setOffer] = useState(false);
+  // Den lille knap bliver stående som "Følger ✓", hvis man lige har trykket på den (ellers skjules den).
+  const [just, setJust] = useState(false);
+  // I en ref, så en ny funktion fra forælderen ikke får siden til at hente det hele igen.
+  const onFollowedRef = useRef(onFollowed);
+  useEffect(() => {
+    onFollowedRef.current = onFollowed;
+  }, [onFollowed]);
+  const tell = useCallback(
+    (on: boolean, delta: number) =>
+      window.dispatchEvent(new CustomEvent<SyncDetail>(SYNC, { detail: { sellerId, on, delta, from: self } })),
+    [sellerId, self],
+  );
 
   const follow = useCallback(
     async (me: string) => {
@@ -39,12 +65,30 @@ export default function FollowButton({
       setBusy(false);
       if (error && !/duplicate/i.test(error.message)) return toast(errorText(error));
       setOn(true);
+      setJust(true);
       if (!error) setCount((c) => (c ?? 0) + 1);
+      tell(true, error ? 0 : 1);
       toast(`Du følger nu @${handle}. Vi giver dig besked, når @${handle} går live.`);
-      setOffer(true);
+      if (!compact) setOffer(true);
+      onFollowedRef.current?.();
     },
-    [sellerId, handle],
+    [sellerId, handle, tell, compact],
   );
+
+  useEffect(() => {
+    const on = (e: Event) => {
+      const d = (e as CustomEvent<SyncDetail>).detail;
+      if (!d || d.sellerId !== sellerId || d.from === self) return;
+      setOn(d.on);
+      if (!d.on) {
+        setJust(false);
+        setOffer(false);
+      }
+      if (d.delta) setCount((c) => Math.max(0, (c ?? 0) + d.delta));
+    };
+    window.addEventListener(SYNC, on);
+    return () => window.removeEventListener(SYNC, on);
+  }, [sellerId, self]);
 
   useEffect(() => {
     if (!hasSupabase) return;
@@ -82,7 +126,7 @@ export default function FollowButton({
   const countText = count ? `${count.toLocaleString("da-DK")} ${count === 1 ? "følger" : "følgere"}` : null;
 
   if (uid === sellerId) {
-    return countText ? <span className="follow-count">{countText}</span> : null;
+    return countText && !compact ? <span className="follow-count">{countText}</span> : null;
   }
 
   async function unfollow() {
@@ -93,8 +137,30 @@ export default function FollowButton({
     if (error) return toast(errorText(error));
     setOn(false);
     setOffer(false);
+    setJust(false);
     setCount((c) => Math.max(0, (c ?? 1) - 1));
+    tell(false, -1);
     toast(`Du følger ikke længere @${handle}.`);
+  }
+
+  if (compact) {
+    if (on && !just) return null;
+    return uid ? (
+      <button
+        className={`${className}${on ? " is-on" : ""}`}
+        type="button"
+        aria-pressed={on}
+        disabled={busy}
+        onClick={() => (on ? unfollow() : follow(uid))}
+        title={on ? `Stop med at følge @${handle}` : `Få besked, når @${handle} går live`}
+      >
+        {on ? "Følger ✓" : label}
+      </button>
+    ) : (
+      <Link className={className} href={`/login?next=${encodeURIComponent(`${next}#foelg`)}`} title={`Log ind, og følg @${handle}`}>
+        {label}
+      </Link>
+    );
   }
 
   return (

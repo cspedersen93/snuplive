@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Avatar from "@/components/Avatar";
 import { IconEye } from "@/components/Icons";
 
@@ -8,6 +9,7 @@ export function ScreenTop({
   live,
   viewers,
   guests,
+  action,
 }: {
   handle: string;
   avatarPath?: string | null;
@@ -16,6 +18,8 @@ export function ScreenTop({
   viewers: number;
   /** Gæster i showet (vises som "+ @lise"). */
   guests?: { handle: string; avatar_path: string | null }[];
+  /** Fx "Følg" ved siden af navnet (kun for seerne). */
+  action?: ReactNode;
 }) {
   return (
     <div className="v-top">
@@ -32,6 +36,7 @@ export function ScreenTop({
           {guests?.length ? `${handle} + ${guests.map((g) => g.handle).join(" + ")}` : handle}
           {guests?.length ? <small>Sælger sammen</small> : area ? <small>{area}</small> : null}
         </span>
+        {action}
       </div>
       {live ? (
         <div className="v-badges">

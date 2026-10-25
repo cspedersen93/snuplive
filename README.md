@@ -610,6 +610,8 @@ Kør `supabase/migrations/0016_foelg.sql` i Supabase → SQL Editor (efter 0015)
 
 - **Følg:** knappen står ved showet, på sælgerens side og ved hver ting. Er man ikke logget ind, kommer man til login og
   følger sælgeren med det samme bagefter. Antallet af følgere står ved knappen. Sælgeren kan ikke se, hvem der følger.
+  Mens showet er live, står der også en lille **Følg** på selve videoen ved sælgerens navn. Den forsvinder, når man
+  følger sælgeren, og de to knapper følger hinanden.
 - **Når sælgeren går live**, får følgerne (og dem, der har trykket *Husk mig*) besked. Har de slået *besked på telefonen*
   til, kommer den dér. Ellers får de en mail. Går en sælger live flere gange inden for 2 timer, får følgerne kun besked
   første gang.

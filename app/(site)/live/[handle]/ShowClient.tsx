@@ -12,6 +12,7 @@ import { ViewerVideo } from "@/components/LiveVideo";
 import FollowButton from "@/components/FollowButton";
 import Reactions from "@/components/Reactions";
 import RemindButton from "@/components/RemindButton";
+import { PushOffer } from "@/components/PushOffer";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useMe } from "@/components/useMe";
 import { useShowRealtime } from "@/components/useShowRealtime";
@@ -87,6 +88,9 @@ export default function ShowClient(props: Props) {
   const [offset] = useState(() => props.serverNow - Date.now());
   const [video, setVideo] = useState<{ token: string; url: string } | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
+  // Følger man sælgeren via knappen på videoen, kommer tilbuddet om besked på telefonen under videoen.
+  const [pushAsk, setPushAsk] = useState(false);
+  const onFollowed = useCallback(() => setPushAsk(true), []);
   const [videoErr, setVideoErr] = useState<string | null>(null);
   const [viewers, setViewers] = useState(0);
   const [mine, setMine] = useState<Set<string>>(() => new Set());
@@ -448,7 +452,19 @@ export default function ShowClient(props: Props) {
                 <img className="feed" src={cover} alt="" />
               )}
               <div className="shade" />
-              <ScreenTop handle={handle} avatarPath={props.seller.avatar_path} area={props.seller.area} live={live} viewers={viewers} guests={guests} />
+              <ScreenTop
+                handle={handle}
+                avatarPath={props.seller.avatar_path}
+                area={props.seller.area}
+                live={live}
+                viewers={viewers}
+                guests={guests}
+                action={
+                  live ? (
+                    <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} className="v-follow" compact onFollowed={onFollowed} />
+                  ) : null
+                }
+              />
 
               {!live ? (
                 <div className="pre-live">
@@ -560,6 +576,11 @@ export default function ShowClient(props: Props) {
               ) : null}
             </div>
           </div>
+          {pushAsk ? (
+            <div className="show-push">
+              <PushOffer handle={handle} />
+            </div>
+          ) : null}
           {live ? (
             <p className="fine" style={{ textAlign: "center" }}>
               {auction

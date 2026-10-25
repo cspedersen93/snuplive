@@ -158,6 +158,15 @@ export const IconBell = (p: P) => (
     <path d="M10 20.5a2 2 0 0 0 4 0" />
   </svg>
 );
+/** Smiley med et plus: flere reaktioner i et live-show. */
+export const IconSmilePlus = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" {...p}>
+    <path d="M20.5 11.5a8.5 8.5 0 1 1-6.2-8.2" />
+    <path d="M8.6 14.4c.9 1.2 2.1 1.8 3.4 1.8s2.5-.6 3.4-1.8" />
+    <path d="M9 9.6v.6M15 9.6v.6" strokeWidth={2.4} />
+    <path d="M19 2.5v5M16.5 5h5" />
+  </svg>
+);
 /** Video-ikon i samme streg som de andre små ikoner (fx på /saelg). */
 export const IconClip = (p: P) => (
   <svg {...base} className="ico" {...p}>

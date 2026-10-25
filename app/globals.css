@@ -159,12 +159,6 @@ em.s{font-style:normal;color:var(--red-text)}
 .b-live{display:flex;align-items:center;gap:1.2cqw;background:var(--live);font-family:var(--mono);font-weight:500;font-size:2.8cqw;letter-spacing:.08em;padding:1cqw 2.2cqw;border-radius:1.6cqw}
 .b-view{display:flex;align-items:center;gap:1.2cqw;background:rgba(0,0,0,.4);font-family:var(--mono);font-size:2.8cqw;padding:1cqw 2.2cqw;border-radius:1.6cqw;font-variant-numeric:tabular-nums}
 .b-view svg{width:3.4cqw;height:3.4cqw}
-.rail{position:absolute;right:4%;bottom:31%;z-index:4;display:flex;flex-direction:column;align-items:center;gap:4.2cqw}
-.rail span{display:flex;flex-direction:column;align-items:center;gap:.8cqw;font-size:2.7cqw;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.5)}
-.rail svg{width:8.4cqw;height:8.4cqw;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45))}
-.hearts{position:absolute;right:5%;bottom:38%;width:12cqw;height:44%;z-index:3;pointer-events:none}
-.heart{position:absolute;bottom:0;left:50%;width:6cqw;height:6cqw;margin-left:-3cqw;animation:rise 2.6s ease-out forwards}
-@keyframes rise{0%{opacity:0;transform:translate(0,0) scale(.5)}12%{opacity:1;transform:translate(0,-8%) scale(1)}100%{opacity:0;transform:translate(var(--x,0),-640%) scale(.9) rotate(var(--r,0))}}
 .v-chat{position:absolute;left:4.5%;right:22%;bottom:30%;height:24%;z-index:4;display:flex;flex-direction:column;justify-content:flex-end;gap:1.8cqw;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 35%);mask-image:linear-gradient(to bottom,transparent 0,#000 35%)}
 .msg{display:flex;gap:2cqw;align-items:flex-start;font-size:3.25cqw;line-height:1.3;text-shadow:0 1px 3px rgba(0,0,0,.55);animation:msgIn .35s ease both}
 .msg i{flex:none;width:5.4cqw;height:5.4cqw;border-radius:50%;margin-top:.2cqw;background:var(--c,#7a6f78)}
@@ -1412,3 +1406,21 @@ div.pip{cursor:default}
   .rx-banner{animation:rxFade 3.6s ease both;transform:translateX(-50%)}
   .rx-heart svg.bump{animation:none}
 }
+
+/* Tegningen på forsiden: samme knapper og hjerter som i et rigtigt show, men kun til pynt og altid i gang. */
+.rx-demo .rx-p,.rx-demo .rx-p-in{animation-iteration-count:infinite}
+.rx-demo .rx-rail{pointer-events:none}
+.phone .rx-btn{width:10cqw;height:10cqw}
+.phone .rx-heart{width:12cqw;height:12cqw}
+.phone .rx-viewer .rx-stream{width:12cqw;bottom:calc(4.2% + 31cqw + 18.4cqw)}
+
+/* "Følg" på videoen (seersiden). */
+a.v-follow,button.v-follow{display:inline-flex;align-items:center;justify-content:center;flex:none;min-height:max(28px,7cqw);padding:0 max(11px,2.8cqw);font:700 max(12px,2.9cqw)/1 var(--sans);text-decoration:none;color:#fff;transition:background-color .2s,transform .12s}
+a.v-follow:hover,button.v-follow:hover{background:var(--red-hi)}
+button.v-follow.is-on{background:rgba(255,255,255,.2)}
+a.v-follow:active,button.v-follow:active{transform:scale(.95)}
+a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.v-seller{max-width:100%}
+.v-seller .v-who{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-seller .v-who small{overflow:hidden;text-overflow:ellipsis}
+.show-push{display:flex;justify-content:center}

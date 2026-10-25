@@ -1,4 +1,16 @@
-import { IconEye, IconHeart, IconShare } from "@/components/Icons";
+import { IconEye, IconHeart, IconSmilePlus } from "@/components/Icons";
+
+// Hjerter og emojis, der svæver op hele tiden (samme udseende som i et rigtigt show, se components/Reactions.tsx).
+const DEMO = [
+  { c: "#EB0029", x0: 0, x1: -5, rot: -12, s: 7.5 },
+  { c: "#FF8A9B", x0: 1.5, x1: 3, rot: 14, s: 6.5 },
+  { e: "🔥", x0: -1, x1: -6, rot: -6, s: 7 },
+  { c: "#FFFFFF", x0: 2, x1: -2, rot: 10, s: 6 },
+  { c: "#F2C46B", x0: -2, x1: 2.5, rot: -16, s: 7 },
+  { e: "😍", x0: 1, x1: -4, rot: 8, s: 7 },
+  { c: "#FF5A70", x0: -1.5, x1: -7, rot: 16, s: 8 },
+  { c: "#B9D9C6", x0: 0.5, x1: 1.5, rot: -10, s: 6.5 },
+];
 
 /** Stillbillede af et live-show til forsiden (ingen rigtig video). */
 export default function PhoneMock() {
@@ -26,9 +38,29 @@ export default function PhoneMock() {
               <span className="b-view"><IconEye />214</span>
             </div>
           </div>
-          <div className="rail">
-            <span><IconHeart />2.418</span>
-            <span><IconShare />Del</span>
+          <div className="rx rx-viewer rx-demo">
+            <div className="rx-stream">
+              {DEMO.map((p, i) => (
+                <span key={i} className="rx-p" style={{ ["--dur" as string]: "3.2s", ["--delay" as string]: `${-i * 0.4}s` }}>
+                  <span
+                    className="rx-p-in"
+                    style={{
+                      ["--s" as string]: `${p.s}cqw`,
+                      ["--x0" as string]: `${p.x0}cqw`,
+                      ["--x1" as string]: `${p.x1}cqw`,
+                      ["--rot" as string]: `${p.rot}deg`,
+                      color: p.c,
+                    }}
+                  >
+                    {p.e ? <span className="rx-emoji">{p.e}</span> : <IconHeart fill="currentColor" />}
+                  </span>
+                </span>
+              ))}
+            </div>
+            <div className="rx-rail">
+              <span className="rx-btn rx-heart"><IconHeart /></span>
+              <span className="rx-btn rx-more"><IconSmilePlus /></span>
+            </div>
           </div>
           <div className="v-chat">
             <div className="msg" style={{ ["--c" as string]: "#9DB4E0" }}><i /><div><b>liva.k</b>Hvor lang er frakken?</div></div>
