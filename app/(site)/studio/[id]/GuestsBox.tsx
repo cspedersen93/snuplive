@@ -4,6 +4,7 @@ import { useState } from "react";
 import Avatar from "@/components/Avatar";
 import { MAX_GUESTS, type Guest } from "@/lib/guests";
 import { getSupabase } from "@/lib/supabase/client";
+import type { CamLayout } from "@/lib/types";
 import { errorText, toast } from "@/lib/toast";
 
 /**
@@ -19,6 +20,8 @@ export default function GuestsBox({
   ended,
   onChanged,
   onLeft,
+  layout,
+  onLayout,
 }: {
   showId: string;
   isHost: boolean;
@@ -28,6 +31,9 @@ export default function GuestsBox({
   ended: boolean;
   onChanged: () => void;
   onLeft: () => void;
+  /** Hvordan seerne ser kameraerne (null: kan ikke vælges endnu). */
+  layout?: CamLayout | null;
+  onLayout?: (l: CamLayout) => void;
 }) {
   const [link, setLink] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -118,6 +124,27 @@ export default function GuestsBox({
           </li>
         ))}
       </ul>
+      {isHost && !ended && guests.length > 0 && layout ? (
+        <div className="guests-layout">
+          <span className="flabel">Seerne ser jer</span>
+          <fieldset className="seg sale-seg">
+            <legend className="sr-only">Seerne ser jer</legend>
+            <label>
+              <input type="radio" name="cam-layout" checked={layout === "split"} onChange={() => onLayout?.("split")} />
+              <span>Side om side</span>
+            </label>
+            <label>
+              <input type="radio" name="cam-layout" checked={layout === "focus"} onChange={() => onLayout?.("focus")} />
+              <span>Fokus</span>
+            </label>
+          </fieldset>
+          <p className="fine">
+            {layout === "split"
+              ? "Alle kameraer lige store. Den, hvis ting vises, får en rød kant."
+              : "Kameraet hos den, hvis ting vises, er stort. De andre er små i hjørnet."}
+          </p>
+        </div>
+      ) : null}
       {isHost && !ended ? (
         room > 0 ? (
           link ? (

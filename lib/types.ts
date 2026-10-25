@@ -38,7 +38,11 @@ export interface Show {
   cover_path?: string | null;
   cover_at?: string | null;
   created_at: string;
+  /** Hvordan seerne ser kameraerne, når der er gæster (0022_side_om_side.sql). Ikke med i SHOW_COLS. */
+  cam_layout?: CamLayout;
 }
+
+export type CamLayout = "split" | "focus";
 
 export interface ShowWithSeller extends Show {
   seller: Pick<Profile, "handle" | "display_name" | "area" | "avatar_path"> | null;

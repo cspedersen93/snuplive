@@ -19,6 +19,7 @@ import { CLIP_MIN_MS, CLIP_SECONDS, recordClip } from "@/lib/clipRecorder";
 import { frameFromVideo } from "@/lib/resizeImage";
 import { IconBlurBg, IconFlip, IconMic, IconSun } from "@/components/Icons";
 import type { CameraFilters } from "@/lib/cameraFilters";
+import type { CamLayout } from "@/lib/types";
 import { toast } from "@/lib/toast";
 
 type FilterModule = typeof import("@/lib/cameraFilters");
@@ -165,13 +166,67 @@ function PipRow({ cams, onPick, mirrorLocal }: { cams: CamRef[]; onPick?: (id: s
   );
 }
 
+/** Værten først, så gæsterne (altid i samme rækkefølge). */
+function crewOrder(cams: CamRef[]) {
+  return [...cams].sort((a, b) => {
+    const ah = isSeller(a.participant.identity) ? 0 : 1;
+    const bh = isSeller(b.participant.identity) ? 0 : 1;
+    return ah - bh || a.participant.identity.localeCompare(b.participant.identity);
+  });
+}
+
+/** Side om side: alle kameraer lige store. Den, hvis ting vises nu, får en rød kant. */
+function SplitGrid({
+  cams,
+  active,
+  mirrorLocal,
+  localRef,
+}: {
+  cams: CamRef[];
+  active?: string | null;
+  mirrorLocal?: boolean;
+  localRef?: React.Ref<HTMLVideoElement>;
+}) {
+  return (
+    <div className={`split split-${Math.min(cams.length, 3)}`}>
+      {cams.map((c) => {
+        const on = Boolean(active) && crewId(c.participant.identity) === active;
+        return (
+          <div key={c.participant.identity} className={`split-tile${on ? " on" : ""}`}>
+            <VideoTrack
+              ref={c.participant.isLocal ? localRef : undefined}
+              trackRef={c}
+              className="split-video"
+              playsInline
+              muted
+              style={mirrorLocal && c.participant.isLocal ? { transform: "scaleX(-1)" } : undefined}
+            />
+            <span className="split-name">
+              {c.participant.isLocal ? "Dig" : c.participant.name || "Gæst"}
+              {on ? <b>Viser nu</b> : null}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ── Seer ──────────────────────────────────────────────────────────────── */
 
 /**
  * Det store billede er kameraet hos den, der ejer tingen, der vises nu (værten eller en gæst).
  * Ellers værtens. De andre kameraer står små i hjørnet.
  */
-function ViewerStage({ onViewers, spotlight }: { onViewers: (n: number) => void; spotlight?: string | null }) {
+function ViewerStage({
+  onViewers,
+  spotlight,
+  layout,
+}: {
+  onViewers: (n: number) => void;
+  spotlight?: string | null;
+  layout?: CamLayout;
+}) {
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: true });
   const cams = tracks.filter((t): t is TrackReference => isTrackReference(t) && isCrew(t.participant.identity));
   const [picked, setPicked] = useState<string | null>(null);
@@ -184,6 +239,15 @@ function ViewerStage({ onViewers, spotlight }: { onViewers: (n: number) => void;
     cams[0];
   const state = useConnectionState();
   useViewerCount(onViewers);
+  if (layout !== "focus" && cams.length >= 2) {
+    return (
+      <>
+        <div className="split-bg" aria-hidden="true" />
+        <SplitGrid cams={crewOrder(cams)} active={spotlight} />
+        <StartAudio label="Tryk for lyd" className="btn btn-red btn-sm start-audio" />
+      </>
+    );
+  }
   return (
     <>
       {cam ? (
@@ -204,8 +268,10 @@ export function ViewerVideo(props: {
   url: string;
   onViewers: (n: number) => void;
   onError: (e: Error) => void;
-  /** Sælgeren, hvis ting vises nu. Hendes kamera bliver stort. */
+  /** Sælgeren, hvis ting vises nu. Hendes kamera bliver stort (eller får en rød kant side om side). */
   spotlight?: string | null;
+  /** Med gæster: side om side eller fokus på den, der viser. */
+  layout?: CamLayout;
 }) {
   return (
     <LiveKitRoom
@@ -218,7 +284,7 @@ export function ViewerVideo(props: {
       options={{ adaptiveStream: true, dynacast: true }}
       onError={props.onError}
     >
-      <ViewerStage onViewers={props.onViewers} spotlight={props.spotlight} />
+      <ViewerStage onViewers={props.onViewers} spotlight={props.spotlight} layout={props.layout} />
       <RoomAudioRenderer />
     </LiveKitRoom>
   );
@@ -238,9 +304,13 @@ interface StageProps {
   shown?: { key: number; itemId: string } | null;
   onClip?: (itemId: string, video: Blob, ext: "mp4" | "webm") => void;
   onPhotos?: (itemId: string, photos: PhotoCandidate[]) => void;
+  /** Med gæster: vis kameraerne, som seerne ser dem. */
+  layout?: CamLayout;
+  /** Sælgeren, hvis ting vises nu. */
+  active?: string | null;
 }
 
-function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, shown, onClip, onPhotos }: StageProps) {
+function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, shown, onClip, onPhotos, layout, active }: StageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
@@ -362,9 +432,15 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, shown, on
     }
   }
 
+  const split = layout !== "focus" && Boolean(cam) && others.length >= 1;
   return (
     <>
-      {cam ? (
+      {split && cam && isTrackReference(cam) ? (
+        <>
+          <div className="split-bg" aria-hidden="true" />
+          <SplitGrid cams={crewOrder([cam, ...others])} active={active} mirrorLocal={facing === "user"} localRef={videoRef} />
+        </>
+      ) : cam ? (
         <VideoTrack
           ref={videoRef}
           trackRef={cam}
@@ -376,7 +452,7 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, shown, on
       ) : (
         <div className="stage-msg">{state === ConnectionState.Connected ? "Tænder kameraet …" : "Forbinder …"}</div>
       )}
-      <PipRow cams={others} />
+      {split ? null : <PipRow cams={others} />}
       <div className="cam-ctrl">
         <button
           type="button"
@@ -441,6 +517,8 @@ export function StudioVideo(props: {
   shown?: { key: number; itemId: string } | null;
   onClip?: (itemId: string, video: Blob, ext: "mp4" | "webm") => void;
   onPhotos?: (itemId: string, photos: PhotoCandidate[]) => void;
+  layout?: CamLayout;
+  active?: string | null;
 }) {
   return (
     <LiveKitRoom
@@ -462,6 +540,8 @@ export function StudioVideo(props: {
         shown={props.shown}
         onClip={props.onClip}
         onPhotos={props.onPhotos}
+        layout={props.layout}
+        active={props.active}
       />
       {/* Værten og gæsterne kan høre hinanden. */}
       <RoomAudioRenderer />

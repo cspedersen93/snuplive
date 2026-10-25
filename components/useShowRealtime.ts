@@ -39,7 +39,8 @@ export function useShowRealtime(initial: { show: Show; items: Item[]; messages: 
       sb.from("items").select(ITEM_COLS).eq("show_id", id).is("removed_at", null),
       sb.from("messages").select(MESSAGE_COLS).eq("show_id", id).is("removed_at", null).order("id", { ascending: false }).limit(60),
     ]);
-    if (s.data) setShow(s.data as Show);
+    // Flettes ind, så felter, der ikke er med i SHOW_COLS (fx visningen af kameraerne), ikke forsvinder.
+    if (s.data) setShow((prev) => ({ ...prev, ...(s.data as Show) }));
     if (i.data) setItems(sortItems(i.data as Item[]));
     if (m.data) setMessages((m.data as Message[]).reverse());
   }, [id]);

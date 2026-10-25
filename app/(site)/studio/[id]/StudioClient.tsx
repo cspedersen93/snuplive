@@ -16,7 +16,7 @@ import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
-import type { Item, Message, Profile, Show } from "@/lib/types";
+import type { CamLayout, Item, Message, Profile, Show } from "@/lib/types";
 import ItemForm from "./ItemForm";
 import SwipeCard from "./SwipeCard";
 import AuthPanel from "./AuthPanel";
@@ -46,6 +46,8 @@ interface Props {
   guests?: Guest[];
   /** Er 0020_gaester.sql kørt? */
   guestsReady?: boolean;
+  /** Hvordan seerne ser kameraerne (null: 0022_side_om_side.sql er ikke kørt, så er det altid side om side). */
+  camLayout?: CamLayout | null;
 }
 
 /** Kortet nederst på kameraet. Værten kan swipe for at skifte ting; gæsten ser bare, hvad der vises. */
@@ -76,6 +78,9 @@ export default function StudioClient(props: Props) {
   const [guests, setGuests] = useState<Guest[]>(props.guests ?? []);
   // Gæsten er taget ud af showet eller har forladt det.
   const [out, setOut] = useState(false);
+  // Side om side eller fokus på den, der viser. Skifter værten, kommer det med det samme (også til gæsterne).
+  const layoutReady = props.camLayout != null;
+  const [layout, setLayout] = useState<CamLayout>(props.camLayout ?? "split");
   const { show, items, messages, setItems, resync } = useShowRealtime({
     show: props.show,
     items: props.items,
@@ -172,6 +177,19 @@ export default function StudioClient(props: Props) {
       alive = false;
     };
   }, [cameraOn, ended, show.id]);
+
+  useEffect(() => {
+    if (show.cam_layout) setLayout(show.cam_layout);
+  }, [show.cam_layout]);
+  async function changeLayout(next: CamLayout) {
+    const before = layout;
+    setLayout(next);
+    const { error } = await sb.from("shows").update({ cam_layout: next }).eq("id", show.id);
+    if (error) {
+      setLayout(before);
+      toast(errorText(error));
+    }
+  }
 
   // Gæsterne i showet: hentes igen hvert 15. sekund (en gæst kan komme med eller gå).
   const loadGuests = useCallback(async () => {
@@ -548,6 +566,8 @@ export default function StudioClient(props: Props) {
               meId={me.id}
               ended={ended}
               onChanged={() => void loadGuests()}
+              layout={layoutReady ? layout : null}
+              onLayout={changeLayout}
               onLeft={() => {
                 setOut(true);
                 setCameraOn(false);
@@ -606,6 +626,8 @@ export default function StudioClient(props: Props) {
                   shown={live ? capture : null}
                   onClip={onClip}
                   onPhotos={onPhotos}
+                  layout={layout}
+                  active={current?.seller_id ?? null}
                 />
               ) : live ? (
                 <div className="screen-dark" />

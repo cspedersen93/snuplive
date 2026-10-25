@@ -21,7 +21,7 @@ import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
-import type { Item, Message, Profile, SellerFactsData, Show } from "@/lib/types";
+import type { CamLayout, Item, Message, Profile, SellerFactsData, Show } from "@/lib/types";
 import type { Guest } from "@/lib/guests";
 
 interface Props {
@@ -34,6 +34,8 @@ interface Props {
   authOk?: string[];
   /** Gæster i showet (andre sælgere, der sælger med). */
   guests?: Guest[];
+  /** Side om side eller fokus på den, der viser (værten vælger). */
+  camLayout?: CamLayout;
 }
 
 function useNow(ms: number) {
@@ -132,6 +134,10 @@ export default function ShowClient(props: Props) {
       });
   }, [unknownKey]);
   const multi = guests.length > 0 || items.some((i) => i.seller_id !== props.seller.id);
+  const [layout, setLayout] = useState<CamLayout>(props.camLayout ?? "split");
+  useEffect(() => {
+    if (show.cam_layout) setLayout(show.cam_layout);
+  }, [show.cam_layout]);
 
   // Hent en videoadgang, når showet er live.
   useEffect(() => {
@@ -429,6 +435,7 @@ export default function ShowClient(props: Props) {
                   onViewers={setViewers}
                   onError={onVideoError}
                   spotlight={current?.seller_id ?? null}
+                  layout={layout}
                 />
               ) : live ? (
                 <div className="screen-dark" />

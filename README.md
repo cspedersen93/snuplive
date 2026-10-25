@@ -528,8 +528,11 @@ Kør `supabase/migrations/0020_gaester.sql` i Supabase → SQL Editor (efter 001
   sender. Op til 2 gæster. *Lav et nyt link* gør det gamle ugyldigt.
 - **Gæsten siger ja:** gæsten skal være sælger (og MitID-bekræftet, når det er slået til). Gæsten lander i værtens studie,
   kan tænde sit kamera før showet og lægger sine egne ting i køen. Under Mine shows står *Du er gæst i*.
-- **Under showet:** værten og gæsterne ser og hører hinanden. Seerne ser kameraet hos den, hvis ting vises nu, stort, og de
-  andre små i hjørnet (et tryk gør et lille kamera stort). Ved tingene står *fra @gæst* og *Sælges af @gæst*.
+- **Under showet:** værten og gæsterne ser og hører hinanden. Ved tingene står *fra @gæst* og *Sælges af @gæst*.
+- **Side om side eller fokus:** værten vælger i boksen *Gæster i showet*, hvordan seerne ser jer: *Side om side* (alle
+  kameraer lige store; den, hvis ting vises, får en rød kant og "Viser nu") eller *Fokus* (den, der viser, er stor, de
+  andre små). Det skifter med det samme hos alle. Kræver `supabase/migrations/0022_side_om_side.sql` (efter 0021); uden
+  den er det altid side om side.
 - **Værten styrer** hvad der vises, budsalg, lynrunder og chatten. Gæsten kan ikke gå live, vise ting eller afslutte showet.
 - **Pengene** for en gæsts ting går til gæsten, og gæsten sender selv tingene (som altid går salget til den, der ejer tingen).
   Billedet og klippet af en gæsts ting tages med gæstens kamera. Køberen får en pakke fra hver sælger.

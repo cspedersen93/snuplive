@@ -9,7 +9,7 @@ import SetupNotice from "@/components/SetupNotice";
 import { when } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { createPublicClient } from "@/lib/supabase/public";
-import { ITEM_COLS, MESSAGE_COLS, SELLER_FACT_COLS, SHOW_COLS, type Item, type Message, type Profile, type Show } from "@/lib/types";
+import { ITEM_COLS, MESSAGE_COLS, SELLER_FACT_COLS, SHOW_COLS, type CamLayout, type Item, type Message, type Profile, type Show } from "@/lib/types";
 import SellerRatings, { type Rating } from "./SellerRatings";
 import { sweepStaleShows } from "@/lib/queries";
 import ShowClient from "./ShowClient";
@@ -68,8 +68,12 @@ const load = cache(async (rawHandle: string) => {
       .find((x) => x?.status === "live" && !x.removed_at && x.host);
     if (liveShow?.host) guestAt = { host: liveShow.host.handle, title: liveShow.title };
   }
+  let camLayout: CamLayout = "split";
   if (show) {
     guests = await showGuests(sb, show.id);
+    // Side om side eller fokus (0022_side_om_side.sql). Uden den er det side om side.
+    const lq = await sb.from("shows").select("cam_layout").eq("id", show.id).maybeSingle();
+    if (!lq.error && (lq.data as { cam_layout?: CamLayout } | null)?.cam_layout === "focus") camLayout = "focus";
     const [i, m] = await Promise.all([
       sb.from("items").select(ITEM_COLS).eq("show_id", show.id).is("removed_at", null).order("position").order("created_at"),
       sb.from("messages").select(MESSAGE_COLS).eq("show_id", show.id).is("removed_at", null).order("id", { ascending: false }).limit(60),
@@ -87,7 +91,7 @@ const load = cache(async (rawHandle: string) => {
     .order("created_at", { ascending: false })
     .limit(10);
   const ratings = (r.data ?? []) as unknown as Rating[];
-  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt };
+  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt, camLayout };
 });
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -179,6 +183,7 @@ export default async function SellerPage({ params }: Params) {
         serverNow={Date.now()}
         authOk={d.authOk}
         guests={d.guests}
+        camLayout={d.camLayout}
       />
       {d.ratings.length ? (
         <div className="wrap" style={{ paddingBottom: 64 }}>
