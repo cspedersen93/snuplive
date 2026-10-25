@@ -33,7 +33,7 @@ export default function Privatliv() {
         <li><b>Problemer og anmeldelser:</b> melder du et problem med en ordre, kan sælgeren læse det, du skriver. Anmelder du noget, gemmer vi anmeldelsen og eventuelt din e-mail, så vi kan svare dig. Vi siger ikke til den anmeldte, hvem der har anmeldt.</li>
         <li><b>MitID:</b> når du som sælger bekræfter dig med MitID, får vi dit navn, din fødselsdato og et id fra MitID gennem Idura. Vi gemmer navn, fødselsdato, tidspunktet og et fingeraftryk af id&apos;et (ikke selve id&apos;et), så det samme MitID ikke kan bruges på flere konti. Vi får ikke dit CPR-nummer. Køberne kan kun se, at du er MitID-bekræftet.</li>
         <li><b>Sælgere og udbetaling:</b> for at få udbetalt penge opretter du en konto hos Stripe, som tjekker din identitet og bankkonto. Din afsenderadresse står på fragtlabelen og deles med Shipmondo og fragtfirmaet.</li>
-        <li id="video"><b>Video:</b> videoen fra et live-show bliver sendt direkte til seerne. Når sælgeren viser en ting frem, gemmer vi et stillbillede af den og et klip på op til 15 sekunder med lyd. Bliver tingen ikke solgt i showet, vises klippet på tingens side, hvor alle kan se det. Sælgeren kan slette klippet, og vi sletter det 14 dage efter, at tingen er solgt, eller når tingen bliver fjernet. Resten af showet gemmer vi ikke.</li>
+        <li id="video"><b>Video:</b> videoen fra et live-show bliver sendt direkte til seerne. Når sælgeren viser en ting frem, tager vi nogle stillbilleder og gemmer det, hvor tingen ses bedst, og et klip på op til 15 sekunder med lyd. For at finde det bedste billede sender vi små udgaver af stillbillederne til Anthropic (Claude), som kun bruges til at vælge billedet. Bliver tingen ikke solgt i showet, vises klippet på tingens side, hvor alle kan se det. Sælgeren kan slette klippet, og vi sletter det 14 dage efter, at tingen er solgt, eller når tingen bliver fjernet. Resten af showet gemmer vi ikke.</li>
       </ul>
 
       <h2>Hvorfor, og hvor længe?</h2>
@@ -54,7 +54,7 @@ export default function Privatliv() {
       <h2>Hvem hjælper os?</h2>
       <p>
         Vi bruger databehandlere til drift: Supabase (database og login), LiveKit (video), Vercel (hosting), Stripe (betaling og
-        udbetaling), Shipmondo (fragtlabels og sporing), Resend (mails) og Idura (MitID). De må kun bruge oplysningerne til at hjælpe os.
+        udbetaling), Shipmondo (fragtlabels og sporing), Resend (mails), Idura (MitID) og Anthropic (valg af billedet af tingene). De må kun bruge oplysningerne til at hjælpe os.
       </p>
 
       <h2>Cookies</h2>

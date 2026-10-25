@@ -10,6 +10,7 @@ import MitIdButton from "@/components/MitIdButton";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useShowRealtime, sortItems } from "@/components/useShowRealtime";
 import { AUCTION_SECONDS, auctionLeft, isAuction, soldPrice } from "@/lib/auction";
+import { blobToBase64, localPick, type PhotoCandidate } from "@/lib/bestPhoto";
 import { gradFor, kr, when } from "@/lib/format";
 import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
@@ -167,21 +168,37 @@ export default function StudioClient(props: Props) {
     [sb, me.id, show.id],
   );
 
-  const onCapture = useCallback(
-    async (jpeg: Blob) => {
-      const target = capture?.itemId;
-      if (!target) return;
-      const it = items.find((x) => x.id === target);
-      if (!it || (it.images?.length ?? 0) >= 6) return;
-      const path = `${me.id}/${target}/live-${Date.now().toString(36)}.jpg`;
-      const up = await sb.storage.from("items").upload(path, jpeg, { contentType: "image/jpeg", cacheControl: "31536000" });
-      if (up.error) return console.warn("[snuplive] billede af tingen:", up.error.message);
-      const { error } = await sb.rpc("add_item_photo", { p_item: target, p_path: path });
-      if (error) console.warn("[snuplive] billede af tingen:", error.message);
+  // Billedet af tingen: studiet har taget nogle billeder, mens tingen blev vist. Claude vælger det, hvor tingen
+  // ses bedst (eller intet, hvis den ikke ses). Er Claude ikke sat op, vælger telefonen selv det skarpeste.
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+  const onPhotos = useCallback(
+    async (itemId: string, photos: PhotoCandidate[]) => {
+      const it = itemsRef.current.find((x) => x.id === itemId);
+      if (!it || (it.images?.length ?? 0) >= 6 || !photos.length) return;
+      let pick: number | null = null;
+      try {
+        const images = await Promise.all(photos.map((p) => blobToBase64(p.small)));
+        const r = await fetch("/api/studio/photo-pick", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ itemId, images }),
+        });
+        const j = (await r.json().catch(() => null)) as { pick?: number | null } | null;
+        if (r.ok && typeof j?.pick === "number") pick = j.pick;
+      } catch {
+        // Ingen forbindelse til billedvalget. Telefonen vælger selv.
+      }
+      if (pick === 0) return; // Tingen kunne ikke ses på nogen af billederne.
+      const chosen = photos[pick ? pick - 1 : localPick(photos)];
+      if (!chosen) return;
+      const path = `${me.id}/${itemId}/live-${Date.now().toString(36)}.jpg`;
+      const up = await sb.storage.from("items").upload(path, chosen.full, { contentType: "image/jpeg", cacheControl: "31536000" });
+      if (up.error) return console.warn("[relived] billede af tingen:", up.error.message);
+      const { error } = await sb.rpc("add_item_photo", { p_item: itemId, p_path: path });
+      if (error) console.warn("[relived] billede af tingen:", error.message);
     },
-    // items ændrer sig hele tiden; vi læser bare den aktuelle liste.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [capture?.itemId, sb, me.id],
+    [sb, me.id],
   );
 
   // Klip af tingen (op til 15 sekunder). Bliver den ikke solgt, vises klippet på annoncen.
@@ -410,10 +427,9 @@ export default function StudioClient(props: Props) {
                   onCamera={setCameraReady}
                   onSnapshot={onSnapshot}
                   snapshotEvery={live ? 60000 : null}
-                  captureKey={live ? (capture?.key ?? null) : null}
-                  onCapture={onCapture}
-                  clip={live ? capture : null}
+                  shown={live ? capture : null}
                   onClip={onClip}
+                  onPhotos={onPhotos}
                 />
               ) : live ? (
                 <div className="screen-dark" />
@@ -567,8 +583,9 @@ export default function StudioClient(props: Props) {
           </div>
           {live ? (
             <p className="fine" style={{ textAlign: "center", marginTop: 10 }}>
-              Hold studiet åbent og kameraet tændt. Er de slukket i 15 minutter, slutter showet af sig selv. Når du viser en ting frem,
-              gemmer vi de første 15 sekunder som video på tingens side, hvis den ikke bliver solgt.
+              Hold studiet åbent og kameraet tændt. Er de slukket i 15 minutter, slutter showet af sig selv. Hold tingen tæt på
+              kameraet, når du viser den frem. Vi vælger det billede, hvor den ses bedst, og gemmer de første 15 sekunder som video
+              på tingens side, hvis den ikke bliver solgt.
             </p>
           ) : null}
           {!live && !ended ? (

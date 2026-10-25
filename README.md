@@ -432,6 +432,25 @@ Kør `supabase/migrations/0015_klip.sql` i Supabase → SQL Editor (efter 0014).
 
 ---
 
+## Billedet af tingene (Claude vælger)
+
+Når sælgeren trykker **Vis**, tager studiet 6 billeder i løbet af de næste 15 sekunder (efter 1, 3, 5, 7½, 10 og 13 sekunder).
+Viser sælgeren den næste ting før tid, bruges de billeder, der er nået. Bagefter sendes små udgaver til Claude (Haiku 5.5)
+sammen med tingens navn, og Claude vælger det billede, hvor tingen ses bedst. Ses tingen ikke på nogen af dem, gemmes der
+intet billede. Det koster ca. 0,2 øre pr. ting.
+
+**Sådan sætter du det op (du skal ikke sende nøglen til nogen):**
+1. Gå til **console.anthropic.com**, og opret en konto (samme e-mail som jeres Claude-konto er fin). API'et har sin egen
+   regning, uafhængigt af et Pro-abonnement.
+2. **Billing:** køb kredit, fx 5 dollar (rækker til ca. 15.000 ting). Sæt gerne en månedlig grænse under *Limits*.
+3. **API Keys → Create Key:** kald den `relived-billeder`, og kopiér nøglen (den vises kun én gang).
+4. **Vercel → Settings → Environment Variables:** tilføj `ANTHROPIC_API_KEY` med nøglen (Production), og lav en **Redeploy**.
+
+Uden nøglen (eller hvis Claude ikke svarer) vælger telefonen selv det skarpeste billede. Valgfrit: `ANTHROPIC_MODEL`
+skifter model (standard `claude-haiku-5-5`).
+
+---
+
 ## Kamerafiltre i studiet
 
 Ved kameraet i studiet er der to knapper under *Skift kamera*. Der skal ikke køres noget i Supabase eller sættes nøgler i Vercel.

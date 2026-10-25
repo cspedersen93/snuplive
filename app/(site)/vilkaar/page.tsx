@@ -79,7 +79,7 @@ export default function Vilkaar() {
         <li>Du må kun sælge ting, du ejer, og som må sælges.</li>
         <li>Beskriv tingen ærligt, og vis fejl og slid tydeligt på video.</li>
         <li>
-          Når du viser en ting frem i et show, gemmer vi et billede og et klip på op til 15 sekunder med lyd. Bliver tingen ikke solgt,
+          Når du viser en ting frem i et show, gemmer vi det billede, hvor tingen ses bedst, og et klip på op til 15 sekunder med lyd. Bliver tingen ikke solgt,
           vises klippet på tingens side, så køberne kan se den bagefter. Du giver os lov til at vise billedet og klippet på Relived,
           så længe tingen ligger her. Du kan slette klippet under Til salg i dit studie.
         </li>

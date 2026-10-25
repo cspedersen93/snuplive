@@ -12,6 +12,7 @@ import {
 } from "@livekit/components-react";
 import { ConnectionState, MediaDeviceFailure, Track, VideoPresets, type LocalVideoTrack } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
+import { PHOTO_TIMES, takeCandidate, type PhotoCandidate } from "@/lib/bestPhoto";
 import { CLIP_MIN_MS, CLIP_SECONDS, recordClip } from "@/lib/clipRecorder";
 import { frameFromVideo } from "@/lib/resizeImage";
 import { IconBlurBg, IconFlip, IconMic, IconSun } from "@/components/Icons";
@@ -170,15 +171,16 @@ interface StageProps {
   onCamera: (ready: boolean) => void;
   onSnapshot?: (jpeg: Blob) => void;
   snapshotEvery?: number | null;
-  /** Skifter værdien, tages et billede i 4:5 (til tingen, der lige er vist frem). */
-  captureKey?: number | null;
-  onCapture?: (jpeg: Blob) => void;
-  /** Skifter den, optages et klip på op til 15 sekunder af tingen, der lige er vist frem. */
-  clip?: { key: number; itemId: string } | null;
+  /**
+   * Tingen, sælgeren lige har vist frem. Skifter den, optages et klip på op til 15 sekunder,
+   * og der tages billeder undervejs, så det bedste kan blive tingens billede.
+   */
+  shown?: { key: number; itemId: string } | null;
   onClip?: (itemId: string, video: Blob, ext: "mp4" | "webm") => void;
+  onPhotos?: (itemId: string, photos: PhotoCandidate[]) => void;
 }
 
-function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, captureKey, onCapture, clip, onClip }: StageProps) {
+function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, shown, onClip, onPhotos }: StageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
@@ -215,25 +217,52 @@ function StudioStage({ onViewers, onCamera, onSnapshot, snapshotEvery, captureKe
     };
   }, [ready, snapshotEvery, onSnapshot]);
 
-  // Billede af tingen, et øjeblik efter at sælgeren har vist den frem.
+  // Billeder af tingen, mens den vises (samme 15 sekunder som klippet). Når sælgeren viser den næste ting,
+  // eller tiden er gået, sendes billederne videre, så det bedste kan blive tingens billede.
+  const shownKey = shown?.key ?? null;
+  const shownItem = shown?.itemId ?? null;
+  const onPhotosRef = useRef(onPhotos);
+  onPhotosRef.current = onPhotos;
   useEffect(() => {
-    if (!ready || !captureKey || !onCapture) return;
-    const t = setTimeout(async () => {
+    if (!ready || !shownKey || !shownItem || !onPhotosRef.current) return;
+    if (Date.now() - shownKey > 10_000) return;
+    const shots: { at: number; c: PhotoCandidate }[] = [];
+    const inflight: Promise<void>[] = [];
+    let stopped = false;
+    const take = (at: number) => {
       const v = videoRef.current;
-      if (!v) return;
-      try {
-        const blob = await frameFromVideo(v, 1080, 1350, 0.82);
-        if (blob) onCapture(blob);
-      } catch {
-        // Intet billede denne gang
-      }
-    }, 1500);
-    return () => clearTimeout(t);
-  }, [ready, captureKey, onCapture]);
+      if (!v || stopped) return;
+      inflight.push(
+        takeCandidate(v).then((c) => {
+          if (c) shots.push({ at, c });
+        }),
+      );
+    };
+    const deliver = async () => {
+      if (stopped) return;
+      stopped = true;
+      timers.forEach(clearTimeout);
+      await Promise.all(inflight);
+      if (shots.length) onPhotosRef.current?.(shownItem, shots.sort((a, b) => a.at - b.at).map((x) => x.c));
+    };
+    const since = Date.now() - shownKey;
+    const timers = PHOTO_TIMES.map((sec, i) =>
+      setTimeout(
+        () => {
+          take(i);
+          if (i === PHOTO_TIMES.length - 1) void deliver();
+        },
+        Math.max(0, sec * 1000 - since),
+      ),
+    );
+    return () => void deliver();
+    // Kun når en ny ting bliver vist (eller kameraet bliver klar).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, shownKey, shownItem]);
 
   // Klip af tingen: optager fra kameraet og mikrofonen, til 15 sekunder er gået, eller sælgeren viser den næste.
-  const clipKey = clip?.key ?? null;
-  const clipItem = clip?.itemId ?? null;
+  const clipKey = shownKey;
+  const clipItem = shownItem;
   const onClipRef = useRef(onClip);
   onClipRef.current = onClip;
   useEffect(() => {
@@ -344,10 +373,9 @@ export function StudioVideo(props: {
   onCamera: (ready: boolean) => void;
   onSnapshot?: (jpeg: Blob) => void;
   snapshotEvery?: number | null;
-  captureKey?: number | null;
-  onCapture?: (jpeg: Blob) => void;
-  clip?: { key: number; itemId: string } | null;
+  shown?: { key: number; itemId: string } | null;
   onClip?: (itemId: string, video: Blob, ext: "mp4" | "webm") => void;
+  onPhotos?: (itemId: string, photos: PhotoCandidate[]) => void;
 }) {
   return (
     <LiveKitRoom
@@ -366,10 +394,9 @@ export function StudioVideo(props: {
         onCamera={props.onCamera}
         onSnapshot={props.onSnapshot}
         snapshotEvery={props.snapshotEvery}
-        captureKey={props.captureKey}
-        onCapture={props.onCapture}
-        clip={props.clip}
+        shown={props.shown}
         onClip={props.onClip}
+        onPhotos={props.onPhotos}
       />
     </LiveKitRoom>
   );
