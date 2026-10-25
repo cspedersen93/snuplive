@@ -1331,3 +1331,5 @@ div.pip{cursor:default}
 .testbar .wrap{display:flex;align-items:center;justify-content:center;gap:12px;padding-block:8px;text-align:left}
 .testbar-chip{flex:none;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#1b1406;background:var(--amber);padding:4px 10px;border-radius:99px}
 @media (max-width:640px){.testbar{font-size:.8rem}.testbar .wrap{align-items:flex-start;gap:10px}.testbar-chip{margin-top:1px}}
+.test-banner-set{display:flex;flex-direction:column;gap:10px}
+.test-banner-set .seg{max-width:420px}

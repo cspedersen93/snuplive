@@ -25,6 +25,11 @@ export function stripeTestMode() {
   return unquoteEnv(process.env.STRIPE_SECRET_KEY).startsWith("sk_test_");
 }
 
+/** Kører betalingen ikke rigtigt endnu (testnøgler eller ingen nøgle)? */
+export function paymentsAreTest() {
+  return !unquoteEnv(process.env.STRIPE_SECRET_KEY) || stripeTestMode();
+}
+
 /** Må testsalg nulstilles (Backoffice → Indstillinger)? Kun mens Stripe kører med testnøgler eller ikke er sat op. */
 export function canResetTestSales() {
   return !unquoteEnv(process.env.STRIPE_SECRET_KEY) || stripeTestMode();

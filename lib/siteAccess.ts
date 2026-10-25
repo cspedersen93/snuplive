@@ -29,8 +29,31 @@ export async function siteOpen(): Promise<boolean> {
   return value;
 }
 
+let bannerCache: { value: boolean | null; at: number } | null = null;
+
+/**
+ * TESTFASE-bjælken øverst (Backoffice → Indstillinger): true = vis den, false = skjul den, null = automatisk
+ * (vises, så længe Stripe kører i testtilstand).
+ */
+export async function testBannerSetting(): Promise<boolean | null> {
+  if (bannerCache && Date.now() - bannerCache.at < OPEN_TTL) return bannerCache.value;
+  let value: boolean | null = null;
+  try {
+    const sb = createPublicClient();
+    if (sb) {
+      const { data, error } = await sb.from("settings").select("value").eq("key", "test_banner").maybeSingle();
+      value = error || !data || typeof data.value !== "boolean" ? null : data.value;
+    }
+  } catch {
+    value = null;
+  }
+  bannerCache = { value, at: Date.now() };
+  return value;
+}
+
 export function clearSiteCache() {
   openCache = null;
+  bannerCache = null;
   testerCache.clear();
 }
 

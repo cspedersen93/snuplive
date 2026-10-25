@@ -1,13 +1,14 @@
-import { unquoteEnv } from "@/lib/env";
+import { testBannerSetting } from "@/lib/siteAccess";
+import { paymentsAreTest } from "@/lib/stripe";
 
 /**
- * Bjælken øverst. Indtil Relived bruger rigtige Stripe-nøgler, står der tydeligt TESTFASE, så ingen tror, at køb og
- * betalinger er rigtige. Med rigtige nøgler (sk_live_…) forsvinder testfasen af sig selv.
+ * Bjælken øverst. TESTFASE vises, så længe betalingen kører i testtilstand, så ingen tror, at køb og betalinger er
+ * rigtige. I Backoffice → Indstillinger kan I selv slå den til eller fra (eller lade betalingen bestemme).
  */
-export default function BetaBar() {
-  const key = unquoteEnv(process.env.STRIPE_SECRET_KEY);
-  const testing = !key || key.startsWith("sk_test_");
-  if (testing) {
+export default async function BetaBar() {
+  const test = paymentsAreTest();
+  const forced = await testBannerSetting();
+  if (forced ?? test) {
     return (
       <div className="testbar" role="note" aria-label="Testfase">
         <div className="wrap">
@@ -20,6 +21,8 @@ export default function BetaBar() {
       </div>
     );
   }
+  // Slået fra, mens betalingen stadig er en test: ingen bjælke (den gamle tekst om rigtig betaling ville ikke passe).
+  if (test) return null;
   return (
     <div className="demobar" role="note">
       <div className="wrap">

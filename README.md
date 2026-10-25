@@ -519,6 +519,18 @@ budsalg, tallene, chatten, gæster, deling og hvad der sker efter showet. Gæste
 
 ---
 
+## TESTFASE-bjælken øverst
+
+Indtil Relived åbner, står der en gul **TESTFASE**-bjælke øverst på alle sider: "Relived er ikke åbnet endnu. Alt, der
+købes og sælges her, er en test …". Under **Backoffice → Indstillinger → TESTFASE øverst på siden** vælger I:
+
+- **Automatisk** (standard): bjælken vises, så længe Stripe kører med testnøgler, og forsvinder, når I skifter til rigtige.
+- **Vis** eller **Skjul**: uanset betalingen. Vælger I Vis, mens betalingen er rigtig, får I en advarsel.
+
+Det slår igennem på siden inden for et minut. Der skal ikke køres noget i Supabase (det gemmes i `settings`).
+
+---
+
 ## Cookies
 
 Relived bruger kun nødvendige cookies (login, MitID og supportchatten) og gemmer et par valg i browseren (fx pakkeshop).
