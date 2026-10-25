@@ -50,6 +50,7 @@ export default function Footer() {
               <li><Link href="/handelsbetingelser">Handelsbetingelser</Link></li>
               <li><Link href="/vilkaar">Vilkår</Link></li>
               <li><Link href="/privatliv">Privatlivspolitik</Link></li>
+              <li><Link href="/cookies">Cookies</Link></li>
               <li><Link href="/om-relived">Om Relived og kontakt</Link></li>
               <li><Link href="/saadan-virker-det#sortering">Sådan sorterer vi</Link></li>
             </ul>

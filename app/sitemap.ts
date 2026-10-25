@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!(await siteOpen())) {
     return [
       { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
-      ...["/om-relived", "/privatliv", "/handelsbetingelser", "/vilkaar"].map((p) => ({
+      ...["/om-relived", "/privatliv", "/cookies", "/handelsbetingelser", "/vilkaar"].map((p) => ({
         url: `${SITE_URL}${p}`,
         lastModified: now,
         changeFrequency: "yearly" as const,
@@ -39,6 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/opret`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
     { url: `${SITE_URL}/privatliv`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/cookies`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/handelsbetingelser`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/vilkaar`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/om-relived`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },

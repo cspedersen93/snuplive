@@ -492,6 +492,21 @@ For sælgere, der ikke har lyst til at gå live:
 
 ---
 
+## Cookies
+
+Relived bruger kun nødvendige cookies (login, MitID og supportchatten) og gemmer et par valg i browseren (fx pakkeshop).
+Der er ingen statistik, reklame eller sporing. Derfor skal der ikke spørges om lov, men vi fortæller om det:
+
+- **Siden `/cookies`** viser alle cookies og alt, der gemmes i browseren, og har knappen *Glem mine valg på denne enhed*.
+  Listen står i `lib/cookies.ts`. Lægger I en ny cookie ind, så skriv den på listen.
+- **En lille besked første gang** (nederst til venstre, med *OK*). Den kommer ikke igen på samme enhed. Den vises ikke på
+  `/klip` og ikke for automatiske browsere.
+- Links til Cookies i bunden af siden, på "Kommer snart" og i privatlivspolitikken. Siden kan ses, mens Relived er lukket.
+- **Kommer der statistik eller annoncer** (fx Google Analytics eller en Meta-pixel), skal beskeden laves om, så man kan
+  sige ja eller nej, før de bliver slået til.
+
+---
+
 ## Gæst i showet (flere sælgere i samme show)
 
 Kør `supabase/migrations/0020_gaester.sql` i Supabase → SQL Editor (efter 0019). Der skal ikke nye nøgler i Vercel.

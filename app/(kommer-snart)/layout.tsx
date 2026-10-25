@@ -21,6 +21,7 @@ export default function SoonLayout({ children }: { children: React.ReactNode }) 
           <nav aria-label="Om Relived">
             <SupportLink>Skriv til os</SupportLink>
             <Link href="/privatliv">Privatlivspolitik</Link>
+            <Link href="/cookies">Cookies</Link>
             <Link href="/om-relived">Om Relived og kontakt</Link>
             <Link href="/login">Tester? Log ind</Link>
           </nav>

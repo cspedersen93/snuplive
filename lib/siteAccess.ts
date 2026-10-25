@@ -68,6 +68,7 @@ export function alwaysOpen(path: string) {
     path.startsWith("/auth/") ||
     path.startsWith("/api/") ||
     path === "/privatliv" ||
+    path === "/cookies" ||
     path === "/handelsbetingelser" ||
     path === "/vilkaar" ||
     path === "/om-relived" ||

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import CompanyInfo from "@/components/CompanyInfo";
 import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/company";
@@ -63,7 +64,8 @@ export default function Privatliv() {
       <p>
         Vi bruger kun de cookies, der er nødvendige for, at du kan være logget ind, betale og fortsætte en samtale i supportchatten.
         Har du skrevet til os, husker din browser det, så du kan se, når vi har svaret. Vi bruger ikke cookies til reklame eller
-        sporing, og vores skrifttyper hentes fra vores egen server.
+        sporing, og vores skrifttyper hentes fra vores egen server. Se hele listen under{" "}
+        <Link href="/cookies">cookies</Link>.
       </p>
 
       <h2>Dine rettigheder</h2>

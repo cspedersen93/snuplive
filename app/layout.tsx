@@ -2,6 +2,7 @@ import "@fontsource-variable/familjen-grotesk";
 import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import CookieNotice from "@/components/CookieNotice";
 import SupportChat from "@/components/SupportChat";
 import Toaster from "@/components/Toaster";
 import { SITE_URL } from "@/lib/env";
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <SupportChat />
+        <CookieNotice />
         <Toaster />
       </body>
     </html>
