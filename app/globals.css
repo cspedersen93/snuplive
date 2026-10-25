@@ -1169,3 +1169,25 @@ img.v-thumb{object-fit:cover}
 .adm-auth-photos figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
 .adm-auth-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .adm-auth-actions textarea{flex:1;min-width:240px;min-height:60px;font:inherit;font-size:.9rem;color:var(--text);background:var(--bg);border:1px solid var(--line-2);border-radius:10px;padding:.6em .7em}
+
+/* Mine shows: ⋯-menu og skjulte shows */
+.row-actions{display:inline-flex;align-items:center;gap:6px;justify-content:flex-end}
+.show-menu{position:relative}
+.show-menu-btn{width:36px;height:36px;border-radius:99px;border:1px solid transparent;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.show-menu-btn:hover,.show-menu-btn[aria-expanded=true]{background:var(--surface-2);color:var(--text)}
+.show-menu-btn:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.show-menu-btn svg{width:20px;height:20px}
+.show-menu-pop{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:220px;max-width:280px;padding:6px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface);box-shadow:0 18px 40px -12px rgba(0,0,0,.6);text-align:left}
+.show-menu-pop>button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:0;background:transparent;color:var(--text);font:inherit;font-weight:600;font-size:.92rem;cursor:pointer}
+.show-menu-pop>button:hover{background:var(--surface-2)}
+.show-menu-pop>button.danger{color:#ff8a9b}
+.show-menu-note{font-size:.78rem;color:var(--muted);padding:0 12px 8px;margin:0;line-height:1.35;white-space:normal}
+.show-menu-ask{padding:8px 10px;white-space:normal}
+.show-menu-ask p{font-size:.88rem;margin:0 0 10px;line-height:1.4}
+.show-menu-ask div{display:flex;gap:8px}
+.hidden-shows{margin-top:14px}
+.hidden-shows summary{display:inline-flex;justify-content:flex-start;gap:8px;cursor:pointer;color:var(--muted);font-size:.92rem;padding:8px 0}
+.hidden-shows summary::after{content:"";width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.hidden-shows[open] summary::after{transform:translateY(2px) rotate(-135deg)}
+.hidden-shows summary:hover{color:var(--text)}
+.hidden-shows .table-wrap{margin-top:8px;opacity:.85}

@@ -16,6 +16,7 @@ import NewShowForm from "./NewShowForm";
 import BlockedUsers from "./BlockedUsers";
 import ForSale from "./ForSale";
 import SellerPayments from "./SellerPayments";
+import ShowMenu from "./ShowMenu";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Mine shows", robots: { index: false } };
@@ -58,9 +59,15 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
     .eq("seller_id", uid)
     .order("created_at", { ascending: false })
     .limit(50);
-  const shows = (showsQ.data ?? []) as unknown as (Show & { items: { count: number }[] })[];
+  const all = (showsQ.data ?? []) as unknown as (Show & { items: { count: number }[] })[];
   const order = { live: 0, planned: 1, ended: 2 } as const;
-  shows.sort((a, b) => order[a.status] - order[b.status]);
+  all.sort((a, b) => order[a.status] - order[b.status]);
+  // Skjulte shows (findes først, når 0018_skjul.sql er kørt).
+  const hiddenQ = await supabase.from("shows").select("id").eq("seller_id", uid).not("hidden_at", "is", null);
+  const canHide = !hiddenQ.error;
+  const hiddenIds = new Set((hiddenQ.data ?? []).map((r) => r.id as string));
+  const shows = all.filter((s) => !hiddenIds.has(s.id));
+  const hiddenShows = all.filter((s) => hiddenIds.has(s.id));
 
   return (
     <div className="wrap dash">
@@ -98,56 +105,83 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
         <NewShowForm sellerId={uid} />
 
         {shows.length ? (
-          <div className="table-wrap">
-            <table className="dtable">
-              <thead>
-                <tr>
-                  <th scope="col">Show</th>
-                  <th scope="col">Tidspunkt</th>
-                  <th scope="col">Ting</th>
-                  <th scope="col">Status</th>
-                  <th scope="col" className="r"><span style={{ position: "absolute", left: -9999 }}>Handling</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                {shows.map((s) => {
-                  const [cls, label] = STATUS_CHIP[s.status];
-                  return (
-                    <tr key={s.id}>
-                      <td>
-                        <div className="it">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={showImage({ ...s, seller: { avatar_path: profile.avatar_path } })} alt="" />
-                          <strong style={{ fontWeight: 600 }}>{s.title}</strong>
-                        </div>
-                      </td>
-                      <td className="muted">{s.status === "ended" && s.ended_at ? `${dayLabel(s.ended_at)} ${clock(s.ended_at)}` : when(s.starts_at)}</td>
-                      <td className="num">{s.items?.[0]?.count ?? 0}</td>
-                      <td>
-                        <span className={`chip ${cls}`}>
-                          {s.status === "live" ? <span className="live-dot white" /> : null}
-                          {label}
-                        </span>
-                      </td>
-                      <td className="r">
-                        <Link className={`btn btn-sm ${s.status === "ended" ? "btn-ghost" : "btn-red"}`} href={`/studio/${s.id}`}>
-                          {s.status === "ended" ? "Se showet" : s.status === "live" ? "Til studiet" : "Åbn studiet"}
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ShowTable shows={shows} avatarPath={profile.avatar_path} canHide={canHide} hidden={false} />
         ) : (
-          <div className="empty">Du har ikke oprettet nogen shows endnu. Start med formularen ovenfor.</div>
+          <div className="empty">
+            {hiddenShows.length ? "Alle dine shows er skjult." : "Du har ikke oprettet nogen shows endnu. Start med formularen ovenfor."}
+          </div>
         )}
+        {hiddenShows.length ? (
+          <details className="hidden-shows">
+            <summary>Vis skjulte shows ({hiddenShows.length})</summary>
+            <ShowTable shows={hiddenShows} avatarPath={profile.avatar_path} canHide={canHide} hidden />
+          </details>
+        ) : null}
 
         <SellerPayments uid={uid} search={sp} displayName={profile.display_name ?? ""} />
         <ForSale uid={uid} />
         <BlockedUsers uid={uid} />
       </div>
+    </div>
+  );
+}
+
+function ShowTable({
+  shows,
+  avatarPath,
+  canHide,
+  hidden,
+}: {
+  shows: (Show & { items: { count: number }[] })[];
+  avatarPath?: string | null;
+  canHide: boolean;
+  hidden: boolean;
+}) {
+  return (
+    <div className="table-wrap">
+      <table className="dtable">
+        <thead>
+          <tr>
+            <th scope="col">Show</th>
+            <th scope="col">Tidspunkt</th>
+            <th scope="col">Ting</th>
+            <th scope="col">Status</th>
+            <th scope="col" className="r"><span style={{ position: "absolute", left: -9999 }}>Handling</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {shows.map((s) => {
+            const [cls, label] = STATUS_CHIP[s.status];
+            return (
+              <tr key={s.id}>
+                <td>
+                  <div className="it">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={showImage({ ...s, seller: { avatar_path: avatarPath ?? null } })} alt="" />
+                    <strong style={{ fontWeight: 600 }}>{s.title}</strong>
+                  </div>
+                </td>
+                <td className="muted">{s.status === "ended" && s.ended_at ? `${dayLabel(s.ended_at)} ${clock(s.ended_at)}` : when(s.starts_at)}</td>
+                <td className="num">{s.items?.[0]?.count ?? 0}</td>
+                <td>
+                  <span className={`chip ${cls}`}>
+                    {s.status === "live" ? <span className="live-dot white" /> : null}
+                    {label}
+                  </span>
+                </td>
+                <td className="r">
+                  <div className="row-actions">
+                    <Link className={`btn btn-sm ${s.status === "ended" ? "btn-ghost" : "btn-red"}`} href={`/studio/${s.id}`}>
+                      {s.status === "ended" ? "Se showet" : s.status === "live" ? "Til studiet" : "Åbn studiet"}
+                    </Link>
+                    <ShowMenu id={s.id} title={s.title} status={s.status} hidden={hidden} canHide={canHide} />
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

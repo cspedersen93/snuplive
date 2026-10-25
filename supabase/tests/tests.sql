@@ -809,6 +809,27 @@ select t.ok((select pg_get_constraintdef(oid) like '%counterfeit%' from pg_const
 delete from sales where item_id in ('20000000-0000-0000-0000-0000000000a1', '20000000-0000-0000-0000-0000000000a2');
 delete from shows where id in ('10000000-0000-0000-0000-0000000000f4', '10000000-0000-0000-0000-0000000000f5', '10000000-0000-0000-0000-0000000000f6');
 
+-- ── Mine shows: skjul afsluttede shows, slet planlagte ──
+insert into shows (id, seller_id, title, category, status, starts_at, started_at, ended_at) values
+  ('10000000-0000-0000-0000-0000000000f7', '00000000-0000-0000-0000-00000000000a', 'Gammelt show', 'dametoej', 'ended', now() - interval '3 days', now() - interval '3 days', now() - interval '3 days'),
+  ('10000000-0000-0000-0000-0000000000f8', '00000000-0000-0000-0000-00000000000a', 'Næste show', 'dametoej', 'planned', now() + interval '3 days', null, null);
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select set_show_hidden('10000000-0000-0000-0000-0000000000f7', true);
+select t.ok((select hidden_at is not null from shows where id = '10000000-0000-0000-0000-0000000000f7'), 'et afsluttet show kan skjules');
+select set_show_hidden('10000000-0000-0000-0000-0000000000f7', false);
+select t.ok((select hidden_at is null from shows where id = '10000000-0000-0000-0000-0000000000f7'), 'og vises igen');
+select t.throws($$select set_show_hidden('10000000-0000-0000-0000-0000000000f8', true)$$, 'Kun afsluttede');
+select t.throws($$update shows set hidden_at = now() where id = '10000000-0000-0000-0000-0000000000f7'$$, 'permission denied');
+delete from shows where id = '10000000-0000-0000-0000-0000000000f7';
+select t.ok(exists (select 1 from shows where id = '10000000-0000-0000-0000-0000000000f7'), 'et afsluttet show kan ikke slettes');
+delete from shows where id = '10000000-0000-0000-0000-0000000000f8';
+select t.ok(not exists (select 1 from shows where id = '10000000-0000-0000-0000-0000000000f8'), 'et planlagt show kan slettes');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select set_show_hidden('10000000-0000-0000-0000-0000000000f7', true)$$, 'findes ikke');
+reset role;
+delete from shows where id = '10000000-0000-0000-0000-0000000000f7';
+
 -- ── Nyt navn: beskeder fra siden selv står som Relived ──
 select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
 select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');

@@ -453,6 +453,22 @@ Kør `supabase/migrations/0017_aegthed.sql` i Supabase → SQL Editor (efter 001
 
 ---
 
+## Mine shows: slet og skjul
+
+Kør `supabase/migrations/0018_skjul.sql` i Supabase → SQL Editor (efter 0017). Der skal ikke nye nøgler i Vercel.
+
+Hvert show under *Mine shows* har en **⋯**-knap:
+
+- **Planlagt show:** *Slet show*. Siden spørger først ("Det kan ikke fortrydes"). Tingene i køen bliver slettet med.
+- **Afsluttet show:** *Skjul fra listen*. Showet forsvinder fra listen, men salg, ordrer og ting, der stadig er til salg,
+  bliver liggende. Afsluttede shows kan ikke slettes, fordi der hænger salg og ordrer på dem.
+- **Skjulte shows** står under *Vis skjulte shows (N)* nederst i listen. Der kan de vises igen med *Vis i listen igen*.
+- **Live-shows** har ingen ⋯.
+
+Indtil 0018 er kørt, kan man kun slette planlagte shows (afsluttede shows har ingen ⋯).
+
+---
+
 ## Studiet: swipe for at skifte ting
 
 Kortet nederst på kameraet i studiet ("Vises nu") kan swipes: **til venstre** viser den næste ting i køen, **til højre**
