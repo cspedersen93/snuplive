@@ -1333,3 +1333,82 @@ div.pip{cursor:default}
 @media (max-width:640px){.testbar{font-size:.8rem}.testbar .wrap{align-items:flex-start;gap:10px}.testbar-chip{margin-top:1px}}
 .test-banner-set{display:flex;flex-direction:column;gap:10px}
 .test-banner-set .seg{max-width:420px}
+
+/* ── Reaktioner i live-shows: hjerter og emojis op langs højre side, store effekter over hele billedet ── */
+.player .screen{touch-action:manipulation}
+.rx{position:absolute;inset:0;z-index:6;pointer-events:none}
+.rx-stream{position:absolute;right:4%;bottom:calc(4.2% + 31cqw);width:max(46px,12cqw);height:30%}
+.rx-viewer .rx-stream{bottom:calc(4.2% + 31cqw + max(40px,10cqw) + 2.4cqw + max(23px,6cqw));height:34%}
+.rx-p{position:absolute;inset:0;animation:rxUp var(--dur) cubic-bezier(.2,.6,.35,1) var(--delay) both}
+.rx-p-in{position:absolute;left:50%;bottom:0;width:var(--s);height:var(--s);margin-left:calc(var(--s)/-2);display:grid;place-items:center;animation:rxSway var(--dur) ease-in-out var(--delay) both}
+.rx-p-in svg{width:100%;height:100%;filter:drop-shadow(0 1px 3px rgba(0,0,0,.35))}
+.rx-emoji{font-size:calc(var(--s)*.86);line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.35))}
+@keyframes rxUp{0%{transform:translateY(0);opacity:0}8%{opacity:1}70%{opacity:1}100%{transform:translateY(-100%);opacity:0}}
+@keyframes rxSway{0%{transform:translateX(var(--x0)) scale(.3)}12%{transform:translateX(var(--x0)) scale(1.1)}22%{transform:translateX(var(--x0)) scale(1)}100%{transform:translateX(var(--x1)) scale(.85) rotate(var(--rot))}}
+.rx-pop{position:absolute;width:20cqw;height:20cqw;margin:-10cqw 0 0 -10cqw;animation:rxPop .9s ease-out both}
+.rx-pop svg{width:100%;height:100%;fill:var(--red);filter:drop-shadow(0 4px 16px rgba(235,0,41,.55))}
+@keyframes rxPop{0%{transform:scale(.2) rotate(-14deg);opacity:0}18%{transform:scale(1.15) rotate(-8deg);opacity:1}34%{transform:scale(.95) rotate(-8deg)}72%{opacity:1}100%{transform:translateY(-16%) scale(1.05) rotate(-8deg);opacity:0}}
+
+/* Knapperne (kun seerne) */
+.rx-rail{position:absolute;right:4%;bottom:calc(4.2% + 31cqw);z-index:7;display:flex;flex-direction:column;align-items:center;gap:2.4cqw;pointer-events:auto}
+.rx-btn{width:max(40px,10cqw);height:max(40px,10cqw);border-radius:50%;display:grid;place-items:center;padding:0;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.42);color:#fff;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:transform .15s,background-color .2s,border-color .2s;-webkit-tap-highlight-color:transparent}
+.rx-btn svg{width:54%;height:54%}
+.rx-btn:hover{background:rgba(0,0,0,.6)}
+.rx-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.rx-btn[aria-expanded="true"]{background:#fff;border-color:#fff;color:#0b0b0c}
+.rx-heart{width:max(46px,12cqw);height:max(46px,12cqw);background:var(--red);border-color:var(--red);box-shadow:0 6px 18px -6px rgba(235,0,41,.7)}
+.rx-heart:hover{background:var(--red-hi)}
+.rx-heart:active{transform:scale(.9)}
+.rx-heart svg{width:50%;height:50%}
+.rx-heart svg.bump{animation:rxBump .32s ease}
+@keyframes rxBump{40%{transform:scale(1.3)}}
+.rx-panel{position:absolute;right:calc(4% + max(46px,12cqw) + 2.4cqw);bottom:calc(4.2% + 31cqw);z-index:8;width:min(70cqw,320px);padding:max(10px,2.8cqw);border-radius:max(14px,4cqw);pointer-events:auto;background:rgba(18,13,20,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 40px -12px rgba(0,0,0,.75);animation:msgIn .18s ease both}
+.rx-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px}
+.rx-emo{aspect-ratio:1;border:0;border-radius:50%;background:transparent;padding:0;display:grid;place-items:center;font-size:max(20px,6.2cqw);line-height:1;cursor:pointer;transition:transform .12s,background-color .15s;-webkit-tap-highlight-color:transparent}
+.rx-emo:hover{background:rgba(255,255,255,.1);transform:scale(1.12)}
+.rx-emo:active{transform:scale(.88)}
+.rx-emo:focus-visible,.rx-big:focus-visible{outline:2px solid #fff;outline-offset:1px}
+.rx-head{margin:max(8px,2.4cqw) 2px max(6px,1.6cqw);font:700 max(10px,2.5cqw)/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.rx-bigrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:max(6px,1.6cqw)}
+.rx-big{display:flex;flex-direction:column;align-items:center;gap:max(4px,1cqw);padding:max(8px,2cqw) 4px;border-radius:max(10px,2.8cqw);border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font:600 max(11px,2.8cqw)/1.15 var(--sans);transition:background-color .15s,border-color .15s,transform .12s}
+.rx-big span{font-size:max(22px,6.6cqw);line-height:1}
+.rx-big:hover:not(:disabled){background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.32)}
+.rx-big:active:not(:disabled){transform:scale(.95)}
+.rx-big:disabled{opacity:.42;cursor:default}
+.rx-note{margin:max(8px,1.8cqw) 0 0;font-size:max(11px,2.7cqw);color:rgba(255,255,255,.66);text-align:center;font-variant-numeric:tabular-nums}
+
+/* Store effekter */
+.rx-banner{position:absolute;left:50%;top:15.5%;z-index:7;max-width:80%;display:flex;align-items:center;gap:max(6px,1.6cqw);padding:max(6px,1.4cqw) max(12px,3cqw) max(6px,1.4cqw) max(8px,1.8cqw);border-radius:99px;background:rgba(18,13,20,.8);border:1px solid rgba(255,255,255,.18);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 10px 30px -10px rgba(0,0,0,.6);font-size:max(12px,3.2cqw);font-weight:600;animation:rxBanner 3.6s ease both}
+.rx-banner>span{font-size:1.45em;line-height:1;flex:none}
+.rx-banner em{font-style:normal;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rx-banner b{color:#FF8A9B}
+@keyframes rxBanner{0%{opacity:0;transform:translate(-50%,-30%) scale(.9)}8%{opacity:1;transform:translate(-50%,0) scale(1)}88%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-20%)}}
+.rx-fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.rx-conf>i,.rx-rain>i{position:absolute;top:0;width:0;height:100%}
+.rx-conf>i{animation:rxFall var(--t) cubic-bezier(.35,.15,.6,1) var(--d) both}
+.rx-conf>i>b{position:absolute;top:-4cqw;left:0;width:var(--w);height:calc(var(--w)*.5);background:var(--c);border-radius:1px;animation:rxFlutter .9s ease-in-out var(--d) infinite alternate}
+.rx-conf>i>b.round{height:var(--w);border-radius:50%}
+@keyframes rxFall{0%{transform:translateY(-4%)}85%{opacity:1}100%{transform:translateY(104%);opacity:0}}
+@keyframes rxFlutter{0%{transform:translateX(calc(var(--dx)*-1)) rotate(0) rotateY(0)}100%{transform:translateX(var(--dx)) rotate(var(--r)) rotateY(180deg)}}
+.rx-rain>i{animation:rxRise var(--t) cubic-bezier(.3,.5,.4,1) var(--d) both}
+.rx-rain>i>b{position:absolute;bottom:calc(var(--s)*-1);left:calc(var(--s)/-2);width:var(--s);height:var(--s);color:var(--c);animation:rxWobble 1.1s ease-in-out var(--d) infinite alternate}
+.rx-rain svg{width:100%;height:100%;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+@keyframes rxRise{0%{transform:translateY(0);opacity:0}10%{opacity:1}80%{opacity:1}100%{transform:translateY(-108%);opacity:0}}
+@keyframes rxWobble{0%{transform:translateX(calc(var(--dx)*-1)) rotate(-10deg)}100%{transform:translateX(var(--dx)) rotate(10deg)}}
+.rx-shoot{position:absolute;left:-20%;top:30%;width:140%;height:0;transform:rotate(16deg)}
+.rx-star{position:absolute;top:0;left:0;width:10cqw;height:10cqw;margin:-5cqw 0 0 -5cqw;color:#fff;animation:rxShoot 1.8s cubic-bezier(.45,.05,.55,.95) .1s both}
+.rx-star svg{position:relative;width:100%;height:100%;fill:currentColor;filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 16px rgba(242,196,107,.9))}
+.rx-star::before{content:"";position:absolute;right:50%;top:50%;width:52cqw;height:1.2cqw;margin-top:-.6cqw;border-radius:99px;background:linear-gradient(90deg,transparent,rgba(242,196,107,.25) 35%,rgba(255,255,255,.95))}
+@keyframes rxShoot{0%{left:0;opacity:0}8%{opacity:1}88%{opacity:1}100%{left:100%;opacity:0}}
+.rx-spark{position:absolute;width:var(--s);height:var(--s);margin:calc(var(--s)/-2) 0 0 calc(var(--s)/-2);color:var(--c);animation:rxTwinkle 1.4s ease-out var(--d) both}
+.rx-spark svg{width:100%;height:100%;fill:currentColor;filter:drop-shadow(0 0 4px currentColor)}
+@keyframes rxTwinkle{0%{transform:scale(0) rotate(0);opacity:0}25%{transform:scale(1.2) rotate(45deg);opacity:1}100%{transform:scale(0) rotate(120deg);opacity:0}}
+@keyframes rxFade{0%,100%{opacity:0}15%,80%{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  .rx-p{animation:rxFade var(--dur) ease var(--delay) both}
+  .rx-p-in{animation:none;transform:translateX(var(--x0))}
+  .rx-fx{display:none}
+  .rx-pop{animation:rxFade .9s ease both}
+  .rx-banner{animation:rxFade 3.6s ease both;transform:translateX(-50%)}
+  .rx-heart svg.bump{animation:none}
+}

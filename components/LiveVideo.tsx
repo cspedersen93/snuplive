@@ -9,10 +9,11 @@ import {
   useLocalParticipant,
   isTrackReference,
   useParticipants,
+  useRoomContext,
   useTracks,
   type TrackReference,
 } from "@livekit/components-react";
-import { ConnectionState, MediaDeviceFailure, Track, VideoPresets, type LocalVideoTrack } from "livekit-client";
+import { ConnectionState, MediaDeviceFailure, Track, VideoPresets, type LocalVideoTrack, type Room } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
 import { PHOTO_TIMES, takeCandidate, type PhotoCandidate } from "@/lib/bestPhoto";
 import { CLIP_MIN_MS, CLIP_SECONDS, recordClip } from "@/lib/clipRecorder";
@@ -131,6 +132,16 @@ function useViewerCount(onViewers: (n: number) => void, studio = false) {
 }
 
 type CamRef = TrackReference;
+
+/** Giver forbindelsen videre, så fx reaktionerne kan bruge den uden for videoen. */
+function RoomBridge({ onRoom }: { onRoom: (room: Room | null) => void }) {
+  const room = useRoomContext();
+  useEffect(() => {
+    onRoom(room);
+    return () => onRoom(null);
+  }, [room, onRoom]);
+  return null;
+}
 
 /** De andre kameraer i showet, små i hjørnet. Et tryk gør kameraet stort (kun for den, der trykker). */
 function PipRow({ cams, onPick, mirrorLocal }: { cams: CamRef[]; onPick?: (id: string) => void; mirrorLocal?: boolean }) {
@@ -272,6 +283,8 @@ export function ViewerVideo(props: {
   spotlight?: string | null;
   /** Med gæster: side om side eller fokus på den, der viser. */
   layout?: CamLayout;
+  /** Forbindelsen til showet (til reaktionerne). */
+  onRoom?: (room: Room | null) => void;
 }) {
   return (
     <LiveKitRoom
@@ -285,6 +298,7 @@ export function ViewerVideo(props: {
       onError={props.onError}
     >
       <ViewerStage onViewers={props.onViewers} spotlight={props.spotlight} layout={props.layout} />
+      {props.onRoom ? <RoomBridge onRoom={props.onRoom} /> : null}
       <RoomAudioRenderer />
     </LiveKitRoom>
   );
@@ -519,6 +533,7 @@ export function StudioVideo(props: {
   onPhotos?: (itemId: string, photos: PhotoCandidate[]) => void;
   layout?: CamLayout;
   active?: string | null;
+  onRoom?: (room: Room | null) => void;
 }) {
   return (
     <LiveKitRoom
@@ -543,6 +558,7 @@ export function StudioVideo(props: {
         layout={props.layout}
         active={props.active}
       />
+      {props.onRoom ? <RoomBridge onRoom={props.onRoom} /> : null}
       {/* Værten og gæsterne kan høre hinanden. */}
       <RoomAudioRenderer />
     </LiveKitRoom>

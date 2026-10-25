@@ -74,6 +74,16 @@ function hostSteps(): Step[] {
       ),
     },
     {
+      target: "player",
+      title: "Hjerter og effekter",
+      body: (
+        <p>
+          Seerne kan sende hjerter og emojis, som svæver op i højre side af billedet. De kan også sende store effekter som
+          konfetti, og så står deres navn øverst. Det er et godt tegn på, at de kan lide det, du viser. Sig gerne tak.
+        </p>
+      ),
+    },
+    {
       target: "ctrl",
       title: "Styr showet",
       body: (

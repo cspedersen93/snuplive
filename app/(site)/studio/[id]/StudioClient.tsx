@@ -24,6 +24,8 @@ import { SITE_HOST } from "@/lib/env";
 import { MAX_GUESTS, type Guest } from "@/lib/guests";
 import GuestsBox from "./GuestsBox";
 import StudioTour from "./StudioTour";
+import Reactions from "@/components/Reactions";
+import type { Room } from "livekit-client";
 
 export interface StudioSale {
   id: string;
@@ -95,6 +97,7 @@ export default function StudioClient(props: Props) {
   const [cameraOn, setCameraOn] = useState(props.show.status === "live");
   const [cameraReady, setCameraReady] = useState(false);
   const [video, setVideo] = useState<{ token: string; url: string } | null>(null);
+  const [room, setRoom] = useState<Room | null>(null);
   const [videoErr, setVideoErr] = useState<string | null>(null);
   const [viewers, setViewers] = useState(0);
   const [count, setCount] = useState<number | null>(null);
@@ -637,6 +640,7 @@ export default function StudioClient(props: Props) {
                   onPhotos={onPhotos}
                   layout={layout}
                   active={current?.seller_id ?? null}
+                  onRoom={setRoom}
                 />
               ) : live ? (
                 <div className="screen-dark" />
@@ -788,6 +792,9 @@ export default function StudioClient(props: Props) {
                       <span className="v-buy" aria-hidden="true">{kr(auction?.high_bid ?? current.price)}</span>
                     ) : null}
                   </NowCard>
+                  {cameraOn && video && !out ? (
+                    <Reactions room={room} role={isHost ? "host" : "guest"} hostIdentity={`seller:${host.id}`} />
+                  ) : null}
                 </>
               ) : null}
             </div>

@@ -469,6 +469,17 @@ Indtil 0018 er kørt, kan man kun slette planlagte shows (afsluttede shows har i
 
 ---
 
+## Hjerter og effekter i live-shows
+
+Seerne kan sende reaktioner, mens showet er live. De ses af alle: seerne, værten og gæsterne i studiet.
+
+- **Hjerter og emojis** (❤️ 🔥 😍 👏 😂 😮): hjerteknappen i højre side af videoen, dobbelttryk på videoen, eller smileyen for flere. De svæver op langs højre side. Alle kan sende dem, også uden login.
+- **Store effekter** (🎉 Konfetti, 💖 Hjerteregn, 🌠 Stjerneskud): fylder hele billedet i et par sekunder, og der står "@navn sendte konfetti" øverst. De kræver login, og hver seer kan sende én hvert 30. sekund.
+
+Sådan virker det: reaktionerne sendes over videoforbindelsen (LiveKit), ikke gennem databasen, så de ikke kan forsinke chat og bud. Seerne sender kun til værten. Værtens studie bremser (højst 6 i sekundet pr. seer og 40 pr. halve sekund i alt), samler dem og sender én opsamling til alle hvert halve sekund. Store effekter vises én ad gangen, højst tre i kø. Intet bliver gemt. Er værten ikke forbundet, ser seerne kun deres egne tryk.
+
+Koden ligger i `lib/reactions.ts` (logikken) og `components/Reactions.tsx` (visningen). Der skal ikke køres noget i databasen.
+
 ## Sælg med video (videoannoncer)
 
 Kør `supabase/migrations/0019_videoannoncer.sql` i Supabase → SQL Editor (efter 0018). Der skal ikke nye nøgler i Vercel.
@@ -690,9 +701,10 @@ ligger i databasen. Browseren kan ikke snyde sig udenom.
 
 ## Næste trin
 
-1. **Forhåndsbud og maks-bud, følg sælgere og lukkede shows** (kun med et hemmeligt link).
-2. **MitID i produktion** via Idura, når CVR-nummeret er på plads (koden er klar, se *MitID for sælgere*).
-3. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
-4. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
+1. **AI skriver annoncen** ud fra billeder eller video (navn, kategori, stand, beskrivelse og evt. et prisforslag).
+2. **Forhåndsbud og maks-bud** og **lukkede shows** (kun med et hemmeligt link).
+3. **MitID i produktion** via Idura, når CVR-nummeret er på plads (koden er klar, se *MitID for sælgere*).
+4. **Shipmondo**, Stripe med rigtige penge og Vercel Pro, når CVR-nummeret er på plads.
+5. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
 
 Husk også at oprette mailadressen `kontakt@relived.dk`, som privatlivspolitikken henviser til. 

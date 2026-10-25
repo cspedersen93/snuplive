@@ -23,6 +23,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
       ["Hvordan virker budsalg?", "Nogle ting sælges på budsalg. Buddene starter ved startprisen, og når sælgeren starter budsalget, har du 30 sekunder til at byde. Hvert bud er et fast trin højere: 5 kr under 100 kr, 10 kr op til 500 kr, 25 kr op til 1.000 kr og 50 kr derover. Byder nogen i de sidste 10 sekunder, får alle 10 sekunder mere. Det højeste bud vinder."],
       ["Er mit bud bindende?", "Ja. Vinder du budsalget, lander tingen under Mine køb til dit bud, og du betaler inden 3 dage, ligesom når du køber med det samme. Byder ingen, kan tingen købes bagefter til startprisen."],
       ["Hvad er en lynrunde?", "I en lynrunde har du ti sekunder til at købe tingen. Sælgeren starter lynrunder, når mange vil have den samme ting."],
+      ["Kan jeg sende hjerter i et live-show?", "Ja. Tryk på hjertet i højre side af videoen, eller tryk to gange på videoen. Under smileyen finder du flere emojis og store effekter som konfetti, hjerteregn og stjerneskud. Hjerter og emojis kan alle sende. Store effekter kræver, at du er logget ind, for dit brugernavn bliver vist, og du kan sende én hvert 30. sekund."],
       ["Kan andre se, hvad jeg køber?", "Når du køber noget, bliver dit brugernavn vist i chatten i showet, ligesom på et loppemarked. Din liste over køb kan kun du og sælgeren se."],
     ],
   },

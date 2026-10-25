@@ -10,6 +10,7 @@ import Chat from "@/components/Chat";
 import { IconBox, IconShare, IconShieldCheck } from "@/components/Icons";
 import { ViewerVideo } from "@/components/LiveVideo";
 import FollowButton from "@/components/FollowButton";
+import Reactions from "@/components/Reactions";
 import RemindButton from "@/components/RemindButton";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useMe } from "@/components/useMe";
@@ -23,6 +24,7 @@ import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { CamLayout, Item, Message, Profile, SellerFactsData, Show } from "@/lib/types";
 import type { Guest } from "@/lib/guests";
+import type { Room } from "livekit-client";
 
 interface Props {
   seller: Pick<Profile, "id" | "handle" | "display_name" | "area" | "avatar_path"> & SellerFactsData;
@@ -84,6 +86,7 @@ export default function ShowClient(props: Props) {
   const { show, items, messages } = useShowRealtime({ show: props.show, items: props.items, messages: props.messages });
   const [offset] = useState(() => props.serverNow - Date.now());
   const [video, setVideo] = useState<{ token: string; url: string } | null>(null);
+  const [room, setRoom] = useState<Room | null>(null);
   const [videoErr, setVideoErr] = useState<string | null>(null);
   const [viewers, setViewers] = useState(0);
   const [mine, setMine] = useState<Set<string>>(() => new Set());
@@ -436,6 +439,7 @@ export default function ShowClient(props: Props) {
                   onError={onVideoError}
                   spotlight={current?.seller_id ?? null}
                   layout={layout}
+                  onRoom={setRoom}
                 />
               ) : live ? (
                 <div className="screen-dark" />
@@ -549,6 +553,9 @@ export default function ShowClient(props: Props) {
                       </button>
                     ) : null}
                   </div>
+                  {video ? (
+                    <Reactions room={room} role="viewer" hostIdentity={`seller:${props.seller.id}`} loggedIn={Boolean(me)} loginHref={loginHref} />
+                  ) : null}
                 </>
               ) : null}
             </div>

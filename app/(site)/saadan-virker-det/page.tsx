@@ -36,7 +36,7 @@ export default function Saadan() {
           </div>
           <ol className="steps">
             <li><div><h3>Find et show eller en ting</h3><p>Se hvem der er live under Live nu, eller find en ting, der bliver vist snart, og tryk Husk mig. Så får du besked, når showet starter. Tryk Følg hos en sælger, så får du besked, hver gang sælgeren går live.</p></div></li>
-            <li><div><h3>Spørg i chatten</h3><p>Bed sælgeren vise mærket, målene eller stoffet tæt på. Svaret kommer, mens du ser med.</p></div></li>
+            <li><div><h3>Spørg i chatten</h3><p>Bed sælgeren vise mærket, målene eller stoffet tæt på. Svaret kommer, mens du ser med. Kan du lide det, du ser, så send et hjerte.</p></div></li>
             <li><div><h3>Køb med ét tryk</h3><p>Den første, der trykker Køb, får tingen. Den lander med det samme under Mine køb.</p></div></li>
             <li><div><h3>Eller byd på budsalg</h3><p>Står der Budsalg på tingen, byder du i stedet for at købe med det samme. Du har 30 sekunder, og det højeste bud vinder.</p></div></li>
             <li><div><h3>Eller køb til fast pris</h3><p>Ting, der ikke blev solgt i showet, og ting, sælgerne har filmet i en videoannonce, er <Link href="/til-salg">til salg</Link> til fast pris. Tryk Køb nu, så er tingen din.</p></div></li>

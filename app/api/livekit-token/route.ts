@@ -75,7 +75,9 @@ export async function POST(req: Request) {
     roomJoin: true,
     canSubscribe: true,
     canPublish,
-    canPublishData: false,
+    // Reaktioner (hjerter og effekter) sendes over videoforbindelsen. Seerne sender kun til værten, og værtens side
+    // bremser og samler dem (se lib/reactions.ts). Ukendte beskeder bliver kasseret.
+    canPublishData: true,
     canUpdateOwnMetadata: false,
   });
 
