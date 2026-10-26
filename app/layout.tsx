@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | Relived",
   },
   description:
-    "Sælg og køb brugt tøj og ting live på video. Chat med sælgeren, køb med ét tryk og få det hele i én pakke. Prøv Relived.",
+    "Køb og sælg brugt tøj og ting live på video. Se tingen, før du køber, spørg sælgeren i chatten, og køb med ét tryk.",
   applicationName: "Relived",
   openGraph: {
     type: "website",

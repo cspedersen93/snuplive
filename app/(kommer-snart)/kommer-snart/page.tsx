@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 };
 
 const POINTS = [
-  { h: "Se det live", p: "Sælgeren viser mærke, mål og slid på video, og du kan spørge løs i chatten." },
-  { h: "Køb med ét tryk", p: "Den første, der trykker, får tingen. Eller byd med, når der er budsalg." },
-  { h: "Tryg betaling", p: "Sælgeren får først pengene, når du har fået dine ting." },
+  { h: "Se det live", p: "Sælgeren viser mærke, mål og slid på video, og du kan spørge løs i chatten. Ingen slørede billeder." },
+  { h: "Køb med ét tryk", p: "Den første, der trykker Køb, får tingen. Eller byd med, når der er budsalg, og det højeste bud vinder." },
+  { h: "Tryg betaling", p: "Sælgeren får først pengene, når du har fået dine ting. Går noget galt, hjælper vi dig." },
 ];
 
 /** Forsiden, mens Relived er lukket: hvad det er, og tilmelding til ventelisten. */
@@ -74,7 +74,8 @@ export default function KommerSnart() {
             <span className="label red">Til sælgere</span>
             <h2 className="h2" id="h-soon-saelg" style={{ maxWidth: "16ch" }}>Vil du være en af de første sælgere?</h2>
             <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>
-              Gå live fra stuen, og sælg en hel bunke tøj, design eller samleobjekter på én aften. Skriv dig op som sælger, så kontakter vi dig før åbningen.
+              Gå live fra stuen, og sælg en hel bunke tøj, design eller samleobjekter på én aften i stedet for at lægge annoncer op én
+              ad gangen. Skriv dig op som sælger, så kontakter vi dig før åbningen.
             </p>
             <a className="btn btn-red" href="?rolle=saelger#tilmeld">Skriv mig op som sælger</a>
           </article>

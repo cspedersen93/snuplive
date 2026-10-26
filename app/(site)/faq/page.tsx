@@ -12,6 +12,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
   {
     title: "Køb",
     qa: [
+      ["Hvad er Relived?", "Relived er en dansk markedsplads for brugt tøj og ting, hvor sælgerne viser tingene frem live på video. Du kan spørge sælgeren i chatten, købe med ét tryk eller byde på budsalg, og det, der ikke bliver solgt, kan købes bagefter til fast pris."],
       ["Skal jeg hente en app for at købe?", "Nej. Du ser shows, chatter og køber direkte her på siden, både på telefonen og computeren."],
       ["Hvordan køber jeg i et live-show?", "Når sælgeren viser en ting frem, kan du trykke Køb. Den første, der trykker, får tingen, og den lander med det samme under Mine køb."],
       ["Hvad betyder Husk mig?", "Sælgerne kan lægge deres ting på Relived før showet. Trykker du Husk mig på en ting eller et show, giver vi dig besked, når showet starter. Du kan købe tingen, mens den bliver vist live."],
@@ -30,6 +31,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
   {
     title: "Betaling og fragt",
     qa: [
+      ["Hvad koster det at købe?", "Du betaler prisen på tingen, fragten og en køberbeskyttelse på 5 % af tingene + 5 kr pr. pakke. Med køberbeskyttelsen holder vi pengene tilbage, til du har fået tingen, og vi hjælper dig, hvis noget går galt. Du kan se den samlede pris, før du betaler."],
       ["Hvordan betaler jeg?", "Under Mine køb betaler du samlet for alt, du har købt, med MobilePay, kort, Apple Pay eller Google Pay. Du har 3 dage til at betale."],
       ["Hvad hvis jeg køber hos flere sælgere i samme show?", "Nogle shows har gæster, så flere sælgere sælger sammen. Ved hver ting står, hvem der sælger den. Køber du hos flere af dem, får du en pakke fra hver sælger, og fragten betales pr. pakke."],
       ["Hvad koster fragten?", "49 kr til en DAO- eller GLS-pakkeshop, én gang pr. sælger, uanset hvor mange ting du køber hos sælgeren (op til 5 kg). Afhentning hos sælgeren er gratis."],

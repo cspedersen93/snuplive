@@ -13,10 +13,10 @@ import { fetchFeed, fetchListing } from "@/lib/queries";
 export const revalidate = 30;
 
 export const metadata: Metadata = {
-  title: { absolute: "Second hand live-salg: tøj, design og samleobjekter" },
+  title: { absolute: "Køb og sælg second hand live på video | Relived" },
   description:
-    "Køb brugt tøj, børnetøj, design og samleobjekter live. Se tingen på video, spørg i chatten, og køb den med ét tryk. Betalingen er beskyttet.",
-  openGraph: { title: "Køb live – second hand: tøj, design og samleobjekter" },
+    "Køb second hand live: se tøjet, tasken eller lampen på video, spørg sælgeren i chatten, og køb med ét tryk. Sælgeren får først pengene, når du har tingen.",
+  openGraph: { title: "Second hand, du kan se live, før du køber" },
   alternates: { canonical: "/" },
 };
 
@@ -47,19 +47,23 @@ export default async function Forside() {
           <div className="hero-copy">
             <span className="eyebrow label">
               <span className="live-dot" aria-hidden="true" />
-              {live.length ? `${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu` : "Brugt tøj og ting på video"}
+              {live.length ? `${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu` : "Live Sale. Second Hand."}
             </span>
             <h1 id="h-forside" className="hero-h1">
-              Køb <em className="s">live</em> – second hand: tøj, design og samleobjekter
+              Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
-            <p className="lede">Se tingen på video, spørg i chatten, og køb den med ét tryk.</p>
+            <p className="lede">
+              Sælgeren viser tingen frem på video, du spørger løs i chatten, og den første, der trykker Køb, får den. Ingen slørede
+              billeder og ingen »Er den stadig til salg?«.
+            </p>
             <div className="ctas">
               <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
-              <Link className="btn btn-line" href="/til-salg">Køb nu til fast pris</Link>
+              <Link className="btn btn-line" href="/til-salg">Køb til fast pris</Link>
             </div>
             <ul className="points">
-              <li>Beskyttet betaling</li>
+              <li>Sælgeren får først pengene, når du har tingen</li>
               <li>Fragt {DELIVERY.ship.price} kr til pakkeshop</li>
+              <li>Ingen app at hente</li>
             </ul>
           </div>
           <PhoneMock />
@@ -94,18 +98,21 @@ export default async function Forside() {
             </div>
           ) : (
             <div className="empty">
-              <p style={{ marginBottom: 14 }}>Ingen er live lige nu. Kig forbi i aften, eller se hvad der er til salg.</p>
+              <p style={{ marginBottom: 14 }}>
+                Ingen er live lige nu. Tryk Husk mig på et show, der starter senere, eller køb noget af det, der allerede er vist frem
+                på video.
+              </p>
               <Link className="btn btn-red" href="/til-salg">Se ting til salg</Link>
             </div>
           )}
         </div>
       </section>
 
-      <ItemRow id="h-budsalg" title="Kommende budsalg – byd live" items={auctions} link={{ href: "/live", label: "Se programmet" }} />
+      <ItemRow id="h-budsalg" title="Kommende budsalg – byd med live" items={auctions} link={{ href: "/live", label: "Se programmet" }} />
       <ItemRow id="h-snart" title="Snart i et live-show" items={soon} link={{ href: "/live", label: "Se programmet" }} />
       <ItemRow
         id="h-til-salg"
-        title="Til salg nu – fundet i tidligere shows"
+        title="Til salg nu – køb til fast pris"
         items={forSale}
         link={{ href: "/til-salg", label: "Se alt til salg" }}
         extra={forSale.some((i) => i.clip_path) ? { href: "/klip", label: "Swipe gennem klip" } : undefined}
@@ -124,9 +131,9 @@ export default async function Forside() {
           <div>
             <h2 className="h2" id="h-how" style={{ marginBottom: 24 }}>Hvordan køber man brugt live?</h2>
             <ol className="steps">
-              <li><div><h3>Find et show eller en ting</h3><p>Se hvem der er live, eller tryk Husk mig.</p></div></li>
-              <li><div><h3>Se den tæt på, og spørg</h3><p>Sælgeren viser mærke, mål og slid på video.</p></div></li>
-              <li><div><h3>Køb eller byd</h3><p>Du betaler samlet, og alt fra samme sælger kommer i én pakke.</p></div></li>
+              <li><div><h3>Find et show eller en ting</h3><p>Se, hvem der er live, eller tryk Husk mig på et show, der starter senere. Så giver vi dig besked.</p></div></li>
+              <li><div><h3>Se den tæt på, og spørg</h3><p>Bed sælgeren vise mærket, målene og slid tæt på. Du får svar, mens du ser med.</p></div></li>
+              <li><div><h3>Køb eller byd</h3><p>Tryk Køb, eller byd med på budsalg. Du betaler samlet bagefter, og alt fra samme sælger kommer i én pakke.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
               <Link className="btn btn-red" href="/live">Find et show</Link>
@@ -143,7 +150,10 @@ export default async function Forside() {
             <img src="/img/sell-phone.jpg" alt="Telefon på stativ med ringlys filmer en sælger, der viser en kjole" loading="lazy" />
             <span className="label red">Til sælgere</span>
             <h2 className="h2" id="h-saelg" style={{ maxWidth: "16ch" }}>Har du selv noget, der skal videre?</h2>
-            <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>Gå live fra stuen, og sælg en hel bunke på én aften.</p>
+            <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>
+              Gå live fra stuen, og sælg en hel bunke på én aften i stedet for at lægge annoncer op én ad gangen. Det er gratis at
+              sælge, mens vi er i beta.
+            </p>
             <Link className="btn btn-red" href="/saelg">Sådan sælger du live</Link>
           </article>
         </div>

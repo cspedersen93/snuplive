@@ -31,7 +31,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title: { absolute: cat ? `${cat.label} til salg brugt | Relived`.slice(0, 60) : "Brugt til salg – køb nu til fast pris | Relived" },
     description:
-      "Køb brugt tøj, børnetøj, design og samleobjekter til fast pris. Tingene er vist frem live, så du ved, hvad du får. Fragt 49 kr til pakkeshop.",
+      "Køb brugt tøj, børnetøj, design og samleobjekter til fast pris. Alt er vist frem på video, så du ved, hvad du får. Fragt 49 kr til pakkeshop.",
     alternates: { canonical: href(cat?.slug ?? null, page) },
     // Filtrerede lister findes også som kategorisider, så kun den samlede liste skal i Google.
     robots: cat ? { index: false, follow: true } : undefined,
@@ -63,7 +63,7 @@ export default async function TilSalg({ searchParams }: Props) {
           </nav>
           {total ? <span className="label mint">{total} ting til salg</span> : null}
           <h1 className="h1" id="h-til-salg">{cat ? `${cat.label} til salg` : "Brugt til salg – køb nu til fast pris"}</h1>
-          <p className="lede">Ting fra tidligere live-shows, som ikke blev solgt. Køb dem til fast pris lige nu.</p>
+          <p className="lede">Alt her er vist frem på video, i et live-show eller i en videoannonce. Køb det til fast pris lige nu.</p>
           {items.some((i) => i.clip_path) ? (
             <Link className="btn btn-red" href="/klip" style={{ marginTop: 18 }}>
               <IconPlay width={14} height={14} />
@@ -101,7 +101,7 @@ export default async function TilSalg({ searchParams }: Props) {
                   ? "Der er ikke flere ting på den her side."
                   : cat
                     ? `Der er intet til salg i ${cat.label.toLowerCase()} lige nu. Kig forbi igen efter næste show.`
-                    : "Der er ingen ting til salg lige nu. Usolgte ting fra live-shows lander her, når showet er slut."}
+                    : "Der er ingen ting til salg lige nu. Ting fra live-shows og videoannoncer lander her."}
               </p>
               <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
             </div>

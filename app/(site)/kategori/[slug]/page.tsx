@@ -131,7 +131,7 @@ export default async function Kategori({ params }: Params) {
           ) : (
             <div className="empty">
               <p style={{ marginBottom: 14 }}>
-                Der er intet til salg i {cat.label.toLowerCase()} lige nu. Usolgte ting lander her, når et show er slut.
+                Der er intet til salg i {cat.label.toLowerCase()} lige nu. Ting fra live-shows og videoannoncer lander her.
               </p>
               <Link className="btn btn-line" href="/til-salg">Se alt til salg</Link>
             </div>

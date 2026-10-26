@@ -13,7 +13,7 @@ export default function Footer() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/img/logo.svg" alt="Relived" width={129} height={38} loading="lazy" />
             </Link>
-            <p>Køb brugt tøj og ting live. Se tingen på video, spørg i chatten, og køb den med ét tryk.</p>
+            <p>Second hand, du kan se live, før du køber. Spørg sælgeren i chatten, og køb med ét tryk.</p>
           </div>
           <div>
             <h2>Køb</h2>

@@ -46,9 +46,12 @@ export default async function LiveNu() {
           ) : (
             <div className="empty">
               <p style={{ marginBottom: 14 }}>
-                Der er ingen live-shows lige nu.{upcoming.length ? " Se programmet herunder." : ""}
+                Ingen er live lige nu.
+                {upcoming.length
+                  ? " Se, hvem der går live senere, og tryk Husk mig, så giver vi dig besked."
+                  : " Følg de sælgere, du kan lide, så giver vi dig besked, når de går live."}
               </p>
-              <Link className="btn btn-red" href="/til-salg">Køb ting fra tidligere shows</Link>
+              <Link className="btn btn-red" href="/til-salg">Køb til fast pris</Link>
             </div>
           )}
         </div>
