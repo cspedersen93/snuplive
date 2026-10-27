@@ -13,13 +13,14 @@ function defaultStart() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export default function NewShowForm({ sellerId }: { sellerId: string }) {
+export default function NewShowForm({ sellerId, englishReady = false }: { sellerId: string; englishReady?: boolean }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [cat, setCat] = useState<string>("dametoej");
   const [start, setStart] = useState(defaultStart);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [english, setEnglish] = useState(false);
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
@@ -31,7 +32,14 @@ export default function NewShowForm({ sellerId }: { sellerId: string }) {
     setErr(null);
     const { data, error } = await getSupabase()
       .from("shows")
-      .insert({ seller_id: sellerId, title: t, category: cat, starts_at: when ? when.toISOString() : null })
+      .insert({
+        seller_id: sellerId,
+        title: t,
+        category: cat,
+        starts_at: when ? when.toISOString() : null,
+        // Kun når 0023_engelsk.sql er kørt (ellers findes kolonnen ikke).
+        ...(englishReady && english ? { language: "en" } : {}),
+      })
       .select("id")
       .single();
     setBusy(false);
@@ -60,6 +68,16 @@ export default function NewShowForm({ sellerId }: { sellerId: string }) {
           <input id="ns-start" type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} />
         </div>
       </div>
+      {englishReady ? (
+        <label className="ns-lang">
+          <input type="checkbox" checked={english} onChange={(e) => setEnglish(e.target.checked)} />
+          <span>
+            <b>Showet er på engelsk</b>
+            <br />
+            Så får det mærket English, og engelsktalende købere kan finde det på siden Relived in English.
+          </span>
+        </label>
+      ) : null}
       {err ? <p className="err" role="alert">{err}</p> : null}
       <div>
         <button className="btn btn-red" type="submit" disabled={busy}>{busy ? "Opretter …" : "Opret show og læg ting ind"}</button>

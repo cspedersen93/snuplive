@@ -75,6 +75,9 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
   const shows = all.filter((s) => !hiddenIds.has(s.id));
   // Shows, sælgeren er gæst i (0020_gaester.sql).
   const guestShows = await myGuestShows(supabase, uid);
+  // Show på engelsk (0023_engelsk.sql). Uden den kan man ikke vælge sprog.
+  const langQ = await supabase.from("shows").select("language").limit(1);
+  const englishReady = !langQ.error;
   const hiddenShows = all.filter((s) => hiddenIds.has(s.id));
 
   return (
@@ -131,7 +134,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           </div>
         ) : null}
 
-        <NewShowForm sellerId={uid} />
+        <NewShowForm sellerId={uid} englishReady={englishReady} />
 
         {canVideo ? (
           <div className="box vl-entry">

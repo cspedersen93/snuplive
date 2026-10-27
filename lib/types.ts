@@ -40,7 +40,11 @@ export interface Show {
   created_at: string;
   /** Hvordan seerne ser kameraerne, når der er gæster (0022_side_om_side.sql). Ikke med i SHOW_COLS. */
   cam_layout?: CamLayout;
+  /** Sproget i showet (0023_engelsk.sql). Ikke med i SHOW_COLS; lister sætter det med englishShows(). */
+  language?: ShowLanguage;
 }
+
+export type ShowLanguage = "da" | "en";
 
 export type CamLayout = "split" | "focus";
 

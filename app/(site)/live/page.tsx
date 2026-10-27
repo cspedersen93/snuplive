@@ -78,6 +78,11 @@ export default async function LiveNu() {
                     <div>
                       <h3>
                         <Link href={`/live/${handle}`}>{s.title}</Link>
+                        {s.language === "en" ? (
+                          <span className="b-lang" lang="en" title="Showet er på engelsk">
+                            English
+                          </span>
+                        ) : null}
                       </h3>
                       <span className="handle">
                         <Avatar handle={handle} path={s.seller?.avatar_path} />

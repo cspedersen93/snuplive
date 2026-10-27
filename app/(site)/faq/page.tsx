@@ -46,6 +46,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
       ["Hvad skal jeg bruge for at gå live?", "En telefon eller computer med kamera og en stabil internetforbindelse. Du går live direkte i browseren."],
       ["Skal jeg være god til at stå foran et kamera?", "Nej. De bedste shows minder om en snak ved et bord på loppemarkedet. Start med et kort show og få ting."],
       ["Kan vi være flere sælgere i samme show?", "Ja. I studiet trykker du Inviter en sælger og sender linket til en anden sælger. Op til 2 gæster kan være med. I er på kameraet sammen, og gæsterne lægger deres egne ting i køen. Pengene for en gæsts ting går til gæsten, og gæsten sender selv sine ting. Du styrer showet: hvad der vises, budsalg, lynrunder og chatten. Følgerne af gæsterne får også besked, når showet går live."],
+      ["Kan jeg holde mit show på engelsk?", "Ja. Sæt flueben i Showet er på engelsk, når du opretter showet, eller tryk English øverst i studiet. Så får showet mærket English, og det kommer med på siden Relived in English, hvor engelsktalende købere kan finde det."],
       ["Kan jeg sælge uden at gå live?", "Ja. Under Mine shows trykker du Sælg med video og filmer tingen i op til 45 sekunder med telefonens kamera. Du skal ikke selv være med. Vi finder billederne i videoen, du skriver pris og stand, og så kan tingen købes med det samme med Køb nu. Videoen vises på annoncen og under Klip."],
     ],
   },

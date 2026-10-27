@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "Køb second hand live: se tøjet, tasken eller lampen på video, spørg sælgeren i chatten, og køb med ét tryk. Sælgeren får først pengene, når du har tingen.",
   openGraph: { title: "Second hand, du kan se live, før du køber" },
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", languages: { "da-DK": "/", en: "/en" } },
 };
 
 export default async function Forside() {

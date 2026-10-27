@@ -432,7 +432,14 @@ export default function ShowClient(props: Props) {
         </aside>
 
         <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
-          <h1 className="show-title">{show.title}</h1>
+          <h1 className="show-title">
+            {show.title}
+            {show.language === "en" ? (
+              <span className="b-lang" lang="en" title="Showet er på engelsk">
+                English
+              </span>
+            ) : null}
+          </h1>
           <div className="player">
             <div className="screen">
               {live && video ? (

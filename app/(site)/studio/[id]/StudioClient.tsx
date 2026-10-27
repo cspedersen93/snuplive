@@ -16,7 +16,7 @@ import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
-import type { CamLayout, Item, Message, Profile, Show } from "@/lib/types";
+import type { CamLayout, Item, Message, Profile, Show, ShowLanguage } from "@/lib/types";
 import ItemForm from "./ItemForm";
 import SwipeCard from "./SwipeCard";
 import AuthPanel from "./AuthPanel";
@@ -51,6 +51,8 @@ interface Props {
   guestsReady?: boolean;
   /** Hvordan seerne ser kameraerne (null: 0022_side_om_side.sql er ikke kørt, så er det altid side om side). */
   camLayout?: CamLayout | null;
+  /** Sproget i showet (null: 0023_engelsk.sql er ikke kørt, så kan det ikke vælges). */
+  language?: ShowLanguage | null;
 }
 
 /** Kortet nederst på kameraet. Værten kan swipe for at skifte ting; gæsten ser bare, hvad der vises. */
@@ -187,6 +189,23 @@ export default function StudioClient(props: Props) {
   useEffect(() => {
     if (show.cam_layout) setLayout(show.cam_layout);
   }, [show.cam_layout]);
+
+  // Show på engelsk: værten slår det til og fra (vises som "English" ved showet).
+  const langReady = props.language != null;
+  const [lang, setLang] = useState<ShowLanguage>(props.language ?? "da");
+  const [langBusy, setLangBusy] = useState(false);
+  useEffect(() => {
+    if (show.language) setLang(show.language);
+  }, [show.language]);
+  async function toggleLang() {
+    const next: ShowLanguage = lang === "en" ? "da" : "en";
+    setLangBusy(true);
+    const { error } = await sb.from("shows").update({ language: next }).eq("id", show.id);
+    setLangBusy(false);
+    if (error) return toast(errorText(error));
+    setLang(next);
+    toast(next === "en" ? "Showet står nu som English, så engelsktalende købere kan finde det." : "Showet står nu som dansk.");
+  }
   async function changeLayout(next: CamLayout) {
     const before = layout;
     setLayout(next);
@@ -615,6 +634,20 @@ export default function StudioClient(props: Props) {
               </span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {langReady && isHost && !ended ? (
+                <button
+                  className="lang-toggle"
+                  type="button"
+                  aria-pressed={lang === "en"}
+                  disabled={langBusy}
+                  onClick={toggleLang}
+                  title={lang === "en" ? "Showet er på engelsk. Tryk for at sætte det til dansk." : "Er showet på engelsk? Tryk, så kan engelsktalende købere finde det."}
+                >
+                  English{lang === "en" ? " ✓" : ""}
+                </button>
+              ) : lang === "en" ? (
+                <span className="b-lang" lang="en">English</span>
+              ) : null}
               {live ? (
                 <span className="chip live"><span className="live-dot white" />Live</span>
               ) : (

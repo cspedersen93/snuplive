@@ -978,5 +978,21 @@ select t.ok((admin_overview(now() - interval '10 years') ->> 'gmv')::int = 0, 'o
 select t.ok((select count(*) from messages where user_id is null and handle = 'SnupLive') = 0, 'ingen beskeder fra "SnupLive" i chatten');
 select t.ok((select count(*) from messages where user_id is null and handle = 'Relived') > 0, 'beskeder fra siden står som Relived');
 
+-- ── Show på engelsk (0023_engelsk.sql) ──
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+insert into shows (id, seller_id, title, category, starts_at, language)
+  values ('10000000-0000-0000-0000-0000000000e1', auth.uid(), 'Vintage in English', 'dametoej', now() + interval '2 hours', 'en');
+select t.ok((select language from shows where id = '10000000-0000-0000-0000-0000000000e1') = 'en', 'Maja opretter et show på engelsk');
+update shows set language = 'da' where id = '10000000-0000-0000-0000-0000000000e1';
+select t.ok((select language from shows where id = '10000000-0000-0000-0000-0000000000e1') = 'da', 'og kan sætte det til dansk igen');
+select t.throws($$update shows set language = 'de' where id = '10000000-0000-0000-0000-0000000000e1'$$, 'check constraint');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+update shows set language = 'en' where id = '10000000-0000-0000-0000-0000000000e1';
+reset role;
+select t.ok((select language from shows where id = '10000000-0000-0000-0000-0000000000e1') = 'da', 'andre kan ikke ændre sproget');
+select t.ok((select count(*) from shows where language <> 'da' and id <> '10000000-0000-0000-0000-0000000000e1') = 0, 'shows er på dansk, medmindre sælgeren vælger andet');
+delete from shows where id = '10000000-0000-0000-0000-0000000000e1';
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

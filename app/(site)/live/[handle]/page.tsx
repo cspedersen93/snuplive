@@ -74,6 +74,9 @@ const load = cache(async (rawHandle: string) => {
     // Side om side eller fokus (0022_side_om_side.sql). Uden den er det side om side.
     const lq = await sb.from("shows").select("cam_layout").eq("id", show.id).maybeSingle();
     if (!lq.error && (lq.data as { cam_layout?: CamLayout } | null)?.cam_layout === "focus") camLayout = "focus";
+    // Show på engelsk (0023_engelsk.sql). Uden den er alle shows på dansk.
+    const sq = await sb.from("shows").select("language").eq("id", show.id).maybeSingle();
+    if (!sq.error && (sq.data as { language?: string } | null)?.language === "en") (show as Show).language = "en";
     const [i, m] = await Promise.all([
       sb.from("items").select(ITEM_COLS).eq("show_id", show.id).is("removed_at", null).order("position").order("created_at"),
       sb.from("messages").select(MESSAGE_COLS).eq("show_id", show.id).is("removed_at", null).order("id", { ascending: false }).limit(60),

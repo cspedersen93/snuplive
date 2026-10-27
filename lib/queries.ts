@@ -49,13 +49,52 @@ export async function fetchListing(limitLive = 30, limitUpcoming = 20, category?
         .order("starts_at", { ascending: true })
         .limit(limitUpcoming),
     ]);
-    return {
+    const out = {
       ok: !live.error && !upcoming.error,
       live: (live.data ?? []) as unknown as ShowWithSeller[],
       upcoming: (upcoming.data ?? []) as unknown as ShowWithSeller[],
     };
+    await markEnglish(sb, [...out.live, ...out.upcoming]);
+    return out;
   } catch {
     return { ok: false, live: [], upcoming: [] };
+  }
+}
+
+/**
+ * Sætter language = "en" på de shows, der er på engelsk (mærket "English").
+ * Sproget er ikke med i SHOW_COLS, så siden virker, før 0023_engelsk.sql er kørt. Så sker der bare ingenting.
+ */
+export async function markEnglish(sb: NonNullable<ReturnType<typeof createPublicClient>>, shows: ShowWithSeller[]) {
+  if (!shows.length) return;
+  const { data, error } = await sb
+    .from("shows")
+    .select("id")
+    .in("id", shows.map((s) => s.id))
+    .eq("language", "en");
+  if (error || !data?.length) return;
+  const en = new Set((data as { id: string }[]).map((r) => r.id));
+  for (const s of shows) if (en.has(s.id)) s.language = "en";
+}
+
+/** Shows på engelsk, der er live eller starter snart (siden /en). Tom liste, før 0023_engelsk.sql er kørt. */
+export async function fetchEnglishShows(limit = 12): Promise<ShowWithSeller[]> {
+  try {
+    const sb = createPublicClient();
+    if (!sb) return [];
+    const since = new Date(Date.now() - 2 * 3600e3).toISOString();
+    const sel = `${SHOW_COLS},${SELLER_EMBED},${ITEM_COUNT_EMBED}`;
+    const base = () => sb.from("shows").select(sel).is("removed_at", null).eq("language", "en");
+    const [live, upcoming] = await Promise.all([
+      base().eq("status", "live").order("started_at", { ascending: false }).limit(limit),
+      base().eq("status", "planned").gte("starts_at", since).order("starts_at", { ascending: true }).limit(limit),
+    ]);
+    if (live.error || upcoming.error) return [];
+    const shows = [...(live.data ?? []), ...(upcoming.data ?? [])] as unknown as ShowWithSeller[];
+    for (const s of shows) s.language = "en";
+    return shows.slice(0, limit);
+  } catch {
+    return [];
   }
 }
 

@@ -23,6 +23,11 @@ export default function ShowCard({ show, priority = false }: { show: ShowWithSel
             {dayLabel(show.starts_at)} {clock(show.starts_at)}
           </span>
         ) : null}
+        {show.language === "en" ? (
+          <span className="b-lang" lang="en" title="Showet er på engelsk">
+            English
+          </span>
+        ) : null}
       </div>
       <div className="scard-info">
         <h3>{show.title}</h3>

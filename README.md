@@ -469,6 +469,18 @@ Indtil 0018 er kørt, kan man kun slette planlagte shows (afsluttede shows har i
 
 ---
 
+## Show på engelsk og siden Relived in English
+
+Kør `supabase/migrations/0023_engelsk.sql` i Supabase → SQL Editor (efter 0022). Der skal ikke nye nøgler i Vercel.
+Uden den virker alt som før; man kan bare ikke vælge sprog, og listen på /en er tom.
+
+- **Sælgeren** sætter flueben i *Showet er på engelsk*, når showet oprettes under Mine shows, eller trykker **English**
+  øverst i studiet (kun værten, og kun indtil showet er slut).
+- **Mærket English** står ved showet på forsiden, under Live nu, i programmet og ved titlen på showets side.
+- **/en (Relived in English):** én side på engelsk til engelsktalende i Danmark: shows på engelsk, sådan virker det, de
+  danske ord, man møder på siden, tryg handel og godt at vide (kroner, levering i Danmark, at de danske vilkår gælder).
+  Resten af siden er på dansk, og browseren kan oversætte den. Linket står i bunden af siden.
+
 ## Hjerter og effekter i live-shows
 
 Seerne kan sende reaktioner, mens showet er live. De ses af alle: seerne, værten og gæsterne i studiet.
