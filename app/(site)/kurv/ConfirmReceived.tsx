@@ -28,7 +28,7 @@ export default function ConfirmReceived({ orderId, pickup }: { orderId: string; 
   if (!ask) {
     return (
       <button className="btn btn-red btn-sm" type="button" onClick={() => setAsk(true)}>
-        {pickup ? "Jeg har hentet mine ting" : "Jeg har fået mine ting"}
+        {pickup ? "Jeg har hentet mine varer" : "Jeg har fået mine varer"}
       </button>
     );
   }

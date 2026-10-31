@@ -57,7 +57,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           "Hej",
           "",
           report.target_type === "profile"
-            ? "Vi har lukket din sælgerkonto på Relived efter en anmeldelse. Dine kommende shows og ting er fjernet."
+            ? "Vi har lukket din sælgerkonto på Relived efter en anmeldelse. Dine kommende shows og varer er fjernet."
             : `Vi har fjernet ${info.label} fra Relived efter en anmeldelse.`,
           "",
           `Begrundelse: ${decision}`,

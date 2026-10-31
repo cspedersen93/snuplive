@@ -64,14 +64,14 @@ export default function BecomeSeller({ profile, label = "Bliv sælger", next }: 
           <input type="radio" name={`${id}-type`} checked={type === "private"} onChange={() => setType("private")} />
           <span>
             <b>Privatperson</b>
-            <span className="muted">Du sælger dine egne brugte ting.</span>
+            <span className="muted">Du sælger dine egne brugte varer.</span>
           </span>
         </label>
         <label className={`seller-opt${type === "business" ? " on" : ""}`}>
           <input type="radio" name={`${id}-type`} checked={type === "business"} onChange={() => setType("business")} />
           <span>
             <b>Virksomhed</b>
-            <span className="muted">Du har købt tingene for at sælge dem igen, eller du sælger jævnligt for at tjene penge.</span>
+            <span className="muted">Du har købt varerne for at sælge dem igen, eller du sælger jævnligt for at tjene penge.</span>
           </span>
         </label>
       </fieldset>

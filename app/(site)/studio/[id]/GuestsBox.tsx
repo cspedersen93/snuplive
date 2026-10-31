@@ -140,8 +140,8 @@ export default function GuestsBox({
           </fieldset>
           <p className="fine">
             {layout === "split"
-              ? "Alle kameraer lige store. Den, hvis ting vises, får en rød kant."
-              : "Kameraet hos den, hvis ting vises, er stort. De andre er små i hjørnet."}
+              ? "Alle kameraer lige store. Den, hvis vare vises, får en rød kant."
+              : "Kameraet hos den, hvis vare vises, er stort. De andre er små i hjørnet."}
           </p>
         </div>
       ) : null}
@@ -161,7 +161,7 @@ export default function GuestsBox({
             <>
               <p className="fine">
                 Sælg sammen med {guests.length ? "endnu en sælger" : "op til 2 andre sælgere"}. Gæsten er på kameraet sammen med
-                dig, lægger sine egne ting i køen og får selv pengene for dem. Du styrer, hvad der vises.
+                dig, lægger sine egne varer i køen og får selv pengene for dem. Du styrer, hvad der vises.
               </p>
               <button className="btn btn-ghost btn-sm" type="button" onClick={() => invite(false)} disabled={busy} style={{ alignSelf: "flex-start" }}>
                 + Inviter en sælger
@@ -175,7 +175,7 @@ export default function GuestsBox({
       {!isHost && !ended ? (
         ask === "leave" ? (
           <div className="guests-ask">
-            <span className="fine">Forlad showet? Dine ting i køen kommer til salg, når showet slutter.</span>
+            <span className="fine">Forlad showet? Dine varer i køen kommer til salg, når showet slutter.</span>
             <button className="btn btn-line btn-sm" type="button" onClick={leave} disabled={busy}>Ja, forlad showet</button>
             <button className="linkbtn" type="button" onClick={() => setAsk(null)}>Bliv</button>
           </div>

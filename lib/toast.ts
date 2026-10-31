@@ -1,5 +1,7 @@
 "use client";
 
+import { vareTekst } from "@/lib/format";
+
 export interface ToastDetail {
   text: string;
   href?: string;
@@ -20,5 +22,5 @@ export function errorText(err: unknown, fallback = "Noget gik galt. Prøv igen."
   if (/row-level security|permission denied|JWT/i.test(msg)) return "Det har du ikke adgang til. Log ind igen.";
   if (/Failed to fetch|NetworkError|network/i.test(msg)) return "Ingen forbindelse. Tjek dit internet.";
   if (/check constraint/i.test(msg)) return "Tjek felterne og prøv igen.";
-  return msg;
+  return vareTekst(msg);
 }

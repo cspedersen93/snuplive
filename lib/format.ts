@@ -79,7 +79,7 @@ export const CATEGORIES = [
     blurb: "Lamper, keramik og vintage, som du kan se fra alle vinkler, før du køber.",
     h1: "Brugt design til hjemmet – lamper, keramik og vintage live",
     title: "Brugt design, lamper og keramik – køb det live | Relived",
-    description: "Køb brugt design live: lamper, keramik, glas og vintage. Se tingen fra alle vinkler på video, spørg om mærke og stand, og køb den.",
+    description: "Køb brugt design live: lamper, keramik, glas og vintage. Se varen fra alle vinkler på video, spørg om mærke og stand, og køb den.",
   },
   {
     key: "samlerting",
@@ -96,16 +96,16 @@ export const CATEGORIES = [
   },
   {
     key: "andet",
-    /** Ordet i en sætning, fx "brugt ting". */
-    word: "ting",
+    /** Ordet i en sætning, fx "brugt vare". */
+    word: "vare",
     slug: "andet",
     label: "Andet",
     short: "Andet",
     cover: "/img/cover-andet.jpg",
     blurb: "Bøger, sport, værktøj og alt det, der ikke passer i de andre kategorier.",
-    h1: "Andre brugte ting – køb dem live",
-    title: "Andre brugte ting – køb dem live | Relived",
-    description: "Køb brugte ting live: bøger, sport, værktøj og alt det, der ikke passer i de andre kategorier. Se tingen på video, og køb den.",
+    h1: "Andre brugte varer – køb dem live",
+    title: "Andre brugte varer – køb dem live | Relived",
+    description: "Køb brugte varer live: bøger, sport, værktøj og alt det, der ikke passer i de andre kategorier. Se varen på video, og køb den.",
   },
 ] as const;
 
@@ -137,6 +137,22 @@ export function categoryBySlug(slug: string) {
 }
 
 const nf = new Intl.NumberFormat("da-DK");
+/** "vare" eller "varer" efter antallet: "1 vare", "3 varer". */
+export function vareOrd(n: number | string | null | undefined) {
+  return Number(n) === 1 ? "vare" : "varer";
+}
+
+/**
+ * Beskederne fra databasen (fx "Tingen er allerede solgt") er skrevet i migrationerne. I stedet for at lave dem
+ * om dér, bliver ordet ting til vare, når beskeden vises. Så siger hele siden vare.
+ */
+export function vareTekst(msg: string) {
+  return msg.replace(/(?<!\p{L})([Tt])ing(ene|en)?(?!\p{L})/gu, (_, t: string, end?: string) => {
+    const w = end === "ene" ? "varerne" : end === "en" ? "varen" : "varer";
+    return t === "T" ? w[0].toUpperCase() + w.slice(1) : w;
+  });
+}
+
 export function kr(n: number) {
   return `${nf.format(n)} kr`;
 }

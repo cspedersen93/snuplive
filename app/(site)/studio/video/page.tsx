@@ -41,8 +41,8 @@ export default async function VideoListingPage() {
           <>
             <div className="notice" role="status">
               <span>
-                <b>Bekræft, hvem du er, med MitID, før du sætter ting til salg.</b> Det tager et minut, og køberne ser mærket
-                MitID-bekræftet ved dine ting.
+                <b>Bekræft, hvem du er, med MitID, før du sætter varer til salg.</b> Det tager et minut, og køberne ser mærket
+                MitID-bekræftet ved dine varer.
               </span>
               <MitIdButton next="/studio/video" className="btn btn-red btn-sm" />
             </div>

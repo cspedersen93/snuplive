@@ -251,7 +251,7 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
       </div>
       <aside className="summary" aria-label="Oversigt">
         <h2 className="h3">Oversigt</h2>
-        <div className="sum-row"><span>Ting</span><span className="num">{kr(total.items)}</span></div>
+        <div className="sum-row"><span>Varer</span><span className="num">{kr(total.items)}</span></div>
         <div className="sum-row"><span>Fragt</span><span className="num">{kr(total.shipping)}</span></div>
         <div className="sum-row"><span>Køberbeskyttelse</span><span className="num">{kr(total.fee)}</span></div>
         <div className="sum-row total"><span>I alt</span><span className="num">{kr(total.total)}</span></div>
@@ -268,7 +268,7 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
         </p>
         <div className="protect">
           <IconShield />
-          <span>Pengene holdes tilbage hos Relived, indtil du har fået dine ting. Køberbeskyttelsen er 5 % + 5 kr pr. pakke.</span>
+          <span>Pengene holdes tilbage hos Relived, indtil du har fået dine varer. Køberbeskyttelsen er 5 % + 5 kr pr. pakke.</span>
         </div>
       </aside>
     </div>

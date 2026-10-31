@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 const POINTS = [
   { h: "Se det live", p: "Sælgeren viser mærke, mål og slid på video, og du kan spørge løs i chatten. Ingen slørede billeder." },
-  { h: "Køb med ét tryk", p: "Den første, der trykker Køb, får tingen. Eller byd med, når der er budsalg, og det højeste bud vinder." },
-  { h: "Tryg betaling", p: "Sælgeren får først pengene, når du har fået dine ting. Går noget galt, hjælper vi dig." },
+  { h: "Køb med ét tryk", p: "Den første, der trykker Køb, får varen. Eller byd med, når der er budsalg, og det højeste bud vinder." },
+  { h: "Tryg betaling", p: "Sælgeren får først pengene, når du har fået dine varer. Går noget galt, hjælper vi dig." },
 ];
 
 /** Forsiden, mens Relived er lukket: hvad det er, og tilmelding til ventelisten. */
@@ -41,7 +41,7 @@ export default function KommerSnart() {
               Køb og sælg second hand <em className="s">live</em>
             </h1>
             <p className="lede">
-              Se tingen på video, spørg sælgeren i chatten, og køb den med ét tryk. Skriv dig op, så får du besked, når Relived åbner.
+              Se varen på video, spørg sælgeren i chatten, og køb den med ét tryk. Skriv dig op, så får du besked, når Relived åbner.
             </p>
             <Suspense fallback={null}>
               <WaitlistForm />

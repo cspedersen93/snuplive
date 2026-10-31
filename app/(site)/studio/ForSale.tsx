@@ -51,8 +51,8 @@ export default async function ForSale({ uid }: { uid: string }) {
     <div className="box">
       <h2 className="h3" style={{ marginBottom: 4 }}>Til salg</h2>
       <p className="muted" style={{ fontSize: ".9rem", marginBottom: 6 }}>
-        {live} {live === 1 ? "ting" : "ting"} fra dine shows og videoannoncer kan købes til fast pris. Ret prisen, eller tag en
-        ting af, hvis du vil vise den i dit næste show.
+        {live} {live === 1 ? "vare" : "varer"} fra dine shows og videoannoncer kan købes til fast pris. Ret prisen, eller tag en
+        vare af, hvis du vil vise den i dit næste show.
       </p>
       <ul className="list">
         {rows.map((r) => (

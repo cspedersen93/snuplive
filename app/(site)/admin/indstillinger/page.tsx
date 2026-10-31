@@ -48,8 +48,8 @@ export default async function Indstillinger() {
           settingKey="site_open"
           value={siteIsOpen}
           label="Siden er åben for alle"
-          confirmOn="Åbn siden for alle nu? Alle kan se shows, ting og sælgere, og Kommer snart forsvinder."
-          help="Slå til, når I lancerer. Så forsvinder Kommer snart, og alle kan se shows, ting og sælgere. Det virker inden for et minut."
+          confirmOn="Åbn siden for alle nu? Alle kan se shows, varer og sælgere, og Kommer snart forsvinder."
+          help="Slå til, når I lancerer. Så forsvinder Kommer snart, og alle kan se shows, varer og sælgere. Det virker inden for et minut."
         />
         <h3 style={{ fontSize: "1rem", marginTop: 8 }}>Testere, der må se hele siden før åbningen</h3>
         <p className="muted" style={{ fontSize: ".9rem" }}>Testeren logger ind på {SITE_HOST}/login med den e-mail, du skriver her.</p>
@@ -85,8 +85,8 @@ export default async function Indstillinger() {
           <h2 className="h3">Nulstil testsalg</h2>
           <p className="muted" style={{ fontSize: ".95rem" }}>
             Betalingen kører i testtilstand. Her kan I slette alle testkøb, så omsætningen (og indberetningen til Skat) starter
-            forfra. Det sletter køb, ordrer, bud, sager, bedømmelser og fragtlabels. Solgte ting bliver ikke til salg (sælgeren kan
-            sætte dem til salg igen). Shows, ting, sælgere, købere og følgere bliver liggende. Knappen forsvinder, når I skifter til
+            forfra. Det sletter køb, ordrer, bud, sager, bedømmelser og fragtlabels. Solgte varer bliver ikke til salg (sælgeren kan
+            sætte dem til salg igen). Shows, varer, sælgere, købere og følgere bliver liggende. Knappen forsvinder, når I skifter til
             rigtige Stripe-nøgler.
           </p>
           <ResetTestSales orders={orderCount.count ?? 0} sales={saleCount.count ?? 0} />

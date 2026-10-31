@@ -11,7 +11,7 @@ import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useShowRealtime, sortItems } from "@/components/useShowRealtime";
 import { AUCTION_SECONDS, auctionLeft, isAuction, soldPrice } from "@/lib/auction";
 import { blobToBase64, localPick, type PhotoCandidate } from "@/lib/bestPhoto";
-import { gradFor, kr, when } from "@/lib/format";
+import { gradFor, kr, vareOrd, when } from "@/lib/format";
 import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
@@ -328,7 +328,7 @@ export default function StudioClient(props: Props) {
       } catch {
         // Ingen forbindelse til billedvalget. Telefonen vælger selv.
       }
-      if (pick === 0) return; // Tingen kunne ikke ses på nogen af billederne.
+      if (pick === 0) return; // Varen kunne ikke ses på nogen af billederne.
       const chosen = photos[pick ? pick - 1 : localPick(photos)];
       if (!chosen) return;
       const path = `${me.id}/${itemId}/live-${Date.now().toString(36)}.jpg`;
@@ -578,7 +578,7 @@ export default function StudioClient(props: Props) {
                 })}
               </ul>
             ) : (
-              <p className="muted" style={{ fontSize: ".9rem" }}>Læg de ting ind, du vil vise frem. Med billeder og beskrivelse kan købere finde dem før showet.</p>
+              <p className="muted" style={{ fontSize: ".9rem" }}>Læg de varer ind, du vil vise frem. Med billeder og beskrivelse kan købere finde dem før showet.</p>
             )}
           </div>
           {!ended && !out ? (
@@ -689,7 +689,7 @@ export default function StudioClient(props: Props) {
               {out ? (
                 <div className="pre-live">
                   <strong style={{ fontSize: "1.3rem" }}>Du er ikke med i showet længere</strong>
-                  <span style={{ maxWidth: "32ch" }}>Dine ting i køen kommer til salg, når showet slutter. Du finder dem under Mine shows.</span>
+                  <span style={{ maxWidth: "32ch" }}>Dine varer i køen kommer til salg, når showet slutter. Du finder dem under Mine shows.</span>
                   <Link className="btn btn-red btn-sm" href="/studio">Til mine shows</Link>
                 </div>
               ) : !live && !ended && !isHost ? (
@@ -705,7 +705,7 @@ export default function StudioClient(props: Props) {
                   ) : (
                     <ul className="checks">
                       <li className={cameraReady ? "" : "wait"}>{cameraReady ? "Kamera og mikrofon virker" : "Venter på kameraet …"}</li>
-                      <li className={queued.some(mine) ? "" : "wait"}>{queued.some(mine) ? `${queued.filter(mine).length} af dine ting i køen` : "Læg dine ting i køen"}</li>
+                      <li className={queued.some(mine) ? "" : "wait"}>{queued.some(mine) ? `${queued.filter(mine).length} af dine varer i køen` : "Læg dine varer i køen"}</li>
                       <li className="wait">Venter på, at @{host.handle} går live …</li>
                     </ul>
                   )}
@@ -732,7 +732,7 @@ export default function StudioClient(props: Props) {
                       <strong style={{ fontSize: "1.3rem" }}>Klar til at gå live?</strong>
                       <ul className="checks">
                         <li className={cameraReady ? "" : "wait"}>{cameraReady ? "Kamera og mikrofon virker" : "Venter på kameraet …"}</li>
-                        <li className={queued.length ? "" : "wait"}>{queued.length ? `${queued.length} ting i køen` : "Læg ting i køen"}</li>
+                        <li className={queued.length ? "" : "wait"}>{queued.length ? `${queued.length} ${vareOrd(queued.length)} i køen` : "Læg varer i køen"}</li>
                       </ul>
                       <button className="btn btn-red" type="button" disabled={!cameraReady || busy} onClick={() => setCount(3)}>
                         <span className="live-dot white" aria-hidden="true" />
@@ -750,7 +750,7 @@ export default function StudioClient(props: Props) {
                   <span>
                     {isHost
                       ? "Dine seere kan ikke se dig lige nu. Tænder du ikke kameraet igen inden 15 minutter, slutter showet af sig selv."
-                      : `Seerne ser @${host.handle} lige nu. Tænd kameraet, så du er klar, når dine ting bliver vist.`}
+                      : `Seerne ser @${host.handle} lige nu. Tænd kameraet, så du er klar, når dine varer bliver vist.`}
                   </span>
                   <button className="btn btn-red" type="button" onClick={() => setCameraOn(true)}>Tænd kameraet igen</button>
                   {videoErr ? <span className="err-msg" role="alert">{videoErr}</span> : null}
@@ -762,7 +762,7 @@ export default function StudioClient(props: Props) {
               {ended ? (
                 <div className="pre-live">
                   <strong style={{ fontSize: "1.3rem" }}>Showet er slut</strong>
-                  <span>{isHost ? `${sold.length} solgt` : `${mineSold.length} af dine ting solgt`} · {kr(revenue)} til dig</span>
+                  <span>{isHost ? `${sold.length} solgt` : `${mineSold.length} af dine varer solgt`} · {kr(revenue)} til dig</span>
                   <Link className="btn btn-red btn-sm" href="/studio">Til mine shows</Link>
                 </div>
               ) : null}
@@ -805,10 +805,10 @@ export default function StudioClient(props: Props) {
                     </span>
                     <div style={{ minWidth: 0 }}>
                       <div className="v-pin">
-                        {current ? (auction ? "Budsalg" : "Vises nu") : "Ingen ting vises"}
+                        {current ? (auction ? "Budsalg" : "Vises nu") : "Ingen vare vises"}
                         {current && !mine(current) ? ` · @${ownerHandle(current) ?? ""}` : current && guests.length ? " · din" : ""}
                       </div>
-                      <div className="v-name">{current ? current.name : !isHost ? `@${host.handle} viser næste ting frem` : next ? `Næste: ${next.name}` : "Køen er tom"}</div>
+                      <div className="v-name">{current ? current.name : !isHost ? `@${host.handle} viser næste vare frem` : next ? `Næste: ${next.name}` : "Køen er tom"}</div>
                       <div className="v-meta">
                         {auction
                           ? auction.high_bid
@@ -875,7 +875,7 @@ export default function StudioClient(props: Props) {
             ) : (
               <div className="box guest-ctrl" data-tour="ctrl">
                 <p className="fine">
-                  @{host.handle} styrer showet: hvad der vises, budsalg og lynrunder. Når en af dine ting bliver vist, er det dit kamera,
+                  @{host.handle} styrer showet: hvad der vises, budsalg og lynrunder. Når en af dine varer bliver vist, er det dit kamera,
                   seerne ser stort.
                 </p>
               </div>
@@ -883,15 +883,15 @@ export default function StudioClient(props: Props) {
           </div>
           {live && isHost ? (
             <p className="fine" style={{ textAlign: "center", marginTop: 10 }}>
-              Hold studiet åbent og kameraet tændt. Er de slukket i 15 minutter, slutter showet af sig selv. Hold tingen tæt på
+              Hold studiet åbent og kameraet tændt. Er de slukket i 15 minutter, slutter showet af sig selv. Hold varen tæt på
               kameraet, når du viser den frem. Vi vælger det billede, hvor den ses bedst, og gemmer de første 15 sekunder som video
-              på tingens side, hvis den ikke bliver solgt.
+              på varens side, hvis den ikke bliver solgt.
             </p>
           ) : null}
           {live && !isHost && !out ? (
             <p className="fine" style={{ textAlign: "center", marginTop: 10 }}>
-              Hold studiet åbent og kameraet tændt. Hold tingen tæt på kameraet, når den bliver vist. Vi vælger det billede, hvor den
-              ses bedst, og gemmer de første 15 sekunder som video på tingens side, hvis den ikke bliver solgt.
+              Hold studiet åbent og kameraet tændt. Hold varen tæt på kameraet, når den bliver vist. Vi vælger det billede, hvor den
+              ses bedst, og gemmer de første 15 sekunder som video på varens side, hvis den ikke bliver solgt.
             </p>
           ) : null}
           {!live && !ended && isHost ? (
@@ -914,7 +914,7 @@ export default function StudioClient(props: Props) {
           <div className="modal-card">
             <span className="label red">Afslut show</span>
             <h2 className="h2" id="m-end" style={{ fontSize: "2rem" }}>Vil du afslutte showet?</h2>
-            <p className="muted">Videoen stopper for alle seere. Ting, der ikke er solgt, bliver sat til salg til fast pris, så de kan købes bagefter.</p>
+            <p className="muted">Videoen stopper for alle seere. Varer, der ikke er solgt, bliver sat til salg til fast pris, så de kan købes bagefter.</p>
             <div className="ctas">
               <button className="btn btn-red" type="button" onClick={endShow}>Ja, afslut</button>
               <button className="btn btn-line" type="button" onClick={() => setConfirmEnd(false)}>Fortsæt showet</button>
@@ -929,12 +929,12 @@ export default function StudioClient(props: Props) {
             <span className="label red">Showet er slut</span>
             <h2 className="h2" id="m-sum" style={{ fontSize: "2rem" }}>Flot show, {props.profile.display_name || props.profile.handle}!</h2>
             <div className="ticker" style={{ gridTemplateColumns: "repeat(2,minmax(0,1fr))" }}>
-              <div><span className="k">Solgte ting</span><span className="v">{sold.length}</span></div>
+              <div><span className="k">Solgte varer</span><span className="v">{sold.length}</span></div>
               <div><span className="k">Omsætning</span><span className="v">{kr(revenue)}</span></div>
             </div>
             <p className="muted">
               {items.length - sold.length
-                ? `${items.length - sold.length} ting blev ikke solgt. De er nu til salg til fast pris under Til salg. Du kan rette prisen eller tage dem af under Mine shows.`
+                ? `${items.length - sold.length} ${vareOrd(items.length - sold.length)} blev ikke solgt. De er nu til salg til fast pris under Til salg. Du kan rette prisen eller tage dem af under Mine shows.`
                 : "Alt blev solgt. Godt gået!"}
             </p>
             <div className="ctas">

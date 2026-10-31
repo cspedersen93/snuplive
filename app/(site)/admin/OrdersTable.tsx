@@ -66,7 +66,7 @@ export default function OrdersTable({ orders }: { orders: AdminOrder[] }) {
                 <Link href={`/admin/medlemmer/${o.buyer_id}`}>@{o.buyer?.handle}</Link> →{" "}
                 <Link href={`/admin/medlemmer/${o.seller_id}`}>@{o.seller?.handle}</Link>
                 <span className="sub">
-                  {o.show?.title} · {o.sales.length} {o.sales.length === 1 ? "ting" : "ting"}
+                  {o.show?.title} · {o.sales.length} {o.sales.length === 1 ? "vare" : "varer"}
                 </span>
               </td>
               <td>

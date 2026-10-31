@@ -44,7 +44,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
             <div>
               <span className="label red">Sælg live</span>
               <h1 className="h3" style={{ fontSize: "1.5rem", margin: "6px 0" }}>Bliv sælger på Relived</h1>
-              <p className="muted">Opret et show, læg dine ting i køen, og gå live direkte fra browseren. Det er gratis i beta-perioden.</p>
+              <p className="muted">Opret et show, læg dine varer i køen, og gå live direkte fra browseren. Det er gratis i beta-perioden.</p>
             </div>
             <BecomeSeller />
           </div>
@@ -95,7 +95,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
         {mitid.needed ? (
           <div className="notice" role="status">
             <span>
-              <b>Bekræft, hvem du er, med MitID, før du går live.</b> Det tager et minut, og køberne ser mærket MitID-bekræftet ved dine ting.
+              <b>Bekræft, hvem du er, med MitID, før du går live.</b> Det tager et minut, og køberne ser mærket MitID-bekræftet ved dine varer.
             </span>
             <MitIdButton next="/studio" className="btn btn-red btn-sm" />
           </div>
@@ -140,10 +140,10 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           <div className="box vl-entry">
             <div>
               <h2 className="h3">Sælg med video</h2>
-              <p className="muted">Har du ikke lyst til at gå live? Film tingen med telefonen, så sætter vi den til salg med video og billeder.</p>
+              <p className="muted">Har du ikke lyst til at gå live? Film varen med telefonen, så sætter vi den til salg med video og billeder.</p>
             </div>
             <Link className="btn btn-line" href="/studio/video">
-              <IconCamera width={18} height={18} /> Film en ting
+              <IconCamera width={18} height={18} /> Film en vare
             </Link>
           </div>
         ) : null}
@@ -188,7 +188,7 @@ function ShowTable({
           <tr>
             <th scope="col">Show</th>
             <th scope="col">Tidspunkt</th>
-            <th scope="col">Ting</th>
+            <th scope="col">Varer</th>
             <th scope="col">Status</th>
             <th scope="col" className="r"><span style={{ position: "absolute", left: -9999 }}>Handling</span></th>
           </tr>

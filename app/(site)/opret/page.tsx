@@ -3,7 +3,7 @@ import AuthPage from "@/components/AuthPage";
 
 export const metadata: Metadata = {
   title: { absolute: "Opret konto – køb og sælg live | Relived" },
-  description: "Opret en gratis konto på Relived med din e-mail, og begynd at købe eller sælge brugte ting live på video.",
+  description: "Opret en gratis konto på Relived med din e-mail, og begynd at købe eller sælge brugte varer live på video.",
   alternates: { canonical: "/opret" },
 };
 

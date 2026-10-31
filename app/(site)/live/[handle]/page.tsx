@@ -112,10 +112,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
   return {
-    title: `${d.seller.handle} – live shopping med brugte ting`.slice(0, 48),
+    title: `${d.seller.handle} – live shopping med brugte varer`.slice(0, 48),
     description: d.show
       ? `Følg ${name} på Relived. ${d.show.status === "planned" ? `Næste show: ${d.show.title}, ${when(d.show.starts_at).toLowerCase()}.` : "Se, hvornår næste show starter."}`.slice(0, 155)
-      : `${name} sælger brugte ting live på Relived. Kig forbi, når næste show starter.`.slice(0, 155),
+      : `${name} sælger brugte varer live på Relived. Kig forbi, når næste show starter.`.slice(0, 155),
     alternates: { canonical },
   };
 }

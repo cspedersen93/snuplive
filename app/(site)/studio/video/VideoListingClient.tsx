@@ -215,7 +215,7 @@ export default function VideoListingClient({ sellerId }: { sellerId: string }) {
         setPickedUrl(null);
         if (!c) {
           fr.forEach((f) => URL.revokeObjectURL(f.url));
-          if (!stop.signal.aborted) setErr("Videoen kunne ikke gøres klar. Prøv igen, eller film tingen direkte her.");
+          if (!stop.signal.aborted) setErr("Videoen kunne ikke gøres klar. Prøv igen, eller film varen direkte her.");
           setStep("start");
           return;
         }
@@ -313,7 +313,7 @@ export default function VideoListingClient({ sellerId }: { sellerId: string }) {
     if (!clip) return;
     const n = name.trim();
     const p = Number(price.replace(/[^\d]/g, ""));
-    if (n.length < 2) return setErr('Skriv hvad tingen er, fx "Strikkjole, grøn".');
+    if (n.length < 2) return setErr('Skriv hvad varen er, fx "Strikkjole, grøn".');
     if (!cat) return setErr("Vælg en kategori.");
     if (!Number.isInteger(p) || p < 1 || p > 100000) return setErr("Skriv en pris i hele kroner mellem 1 og 100.000.");
     if (newOnly && !newOk) return setErr("Bekræft, at produktet er nyt og uåbnet. Brugt makeup og hudpleje må ikke sælges på Relived.");
@@ -418,10 +418,10 @@ export default function VideoListingClient({ sellerId }: { sellerId: string }) {
       {step === "start" ? (
         <div className="box vl-start">
           <div className="vl-intro">
-            <h2 className="h3">Film tingen, og sæt den til salg</h2>
+            <h2 className="h3">Film varen, og sæt den til salg</h2>
             <p className="muted">
-              Har du ikke lyst til at gå live? Film tingen i op til {VIDEO_MAX_S} sekunder med telefonens kamera. Du skal ikke selv
-              være med. Vi finder billederne i videoen, og køberne kan se tingen i bevægelse.
+              Har du ikke lyst til at gå live? Film varen i op til {VIDEO_MAX_S} sekunder med telefonens kamera. Du skal ikke selv
+              være med. Vi finder billederne i videoen, og køberne kan se varen i bevægelse.
             </p>
             <ul className="vl-tips">
               <li>Forside og bagside</li>
@@ -452,7 +452,7 @@ export default function VideoListingClient({ sellerId }: { sellerId: string }) {
                   <span className="live-dot white" /> {fmt(elapsed)} / {fmt(VIDEO_MAX_S)}
                 </span>
               ) : (
-                <span>Vis tingen forfra, bagfra og tæt på mærket</span>
+                <span>Vis varen forfra, bagfra og tæt på mærket</span>
               )}
             </div>
             {recording ? (

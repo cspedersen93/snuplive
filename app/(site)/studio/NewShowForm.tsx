@@ -80,7 +80,7 @@ export default function NewShowForm({ sellerId, englishReady = false }: { seller
       ) : null}
       {err ? <p className="err" role="alert">{err}</p> : null}
       <div>
-        <button className="btn btn-red" type="submit" disabled={busy}>{busy ? "Opretter …" : "Opret show og læg ting ind"}</button>
+        <button className="btn btn-red" type="submit" disabled={busy}>{busy ? "Opretter …" : "Opret show og læg varer ind"}</button>
       </div>
     </form>
   );

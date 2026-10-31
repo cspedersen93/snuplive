@@ -3,7 +3,7 @@ import Link from "next/link";
 import SortNote from "@/components/SortNote";
 import Avatar from "@/components/Avatar";
 import RemindButton from "@/components/RemindButton";
-import { clock, dayLabel } from "@/lib/format";
+import { clock, dayLabel, vareOrd } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { fetchListing, itemCount } from "@/lib/queries";
 import LiveGrid from "./LiveGrid";
@@ -11,7 +11,7 @@ import LiveGrid from "./LiveGrid";
 export const revalidate = 15;
 
 export const metadata: Metadata = {
-  title: { absolute: "Live shopping lige nu – brugt tøj og ting | Relived" },
+  title: { absolute: "Live shopping lige nu – brugt tøj og andre varer | Relived" },
   description:
     "Se hvem der er live lige nu. Find live-shows med vintagetøj, vinyl og retro design, og køb det, du kan lide, med ét tryk.",
   alternates: { canonical: "/live" },
@@ -87,7 +87,7 @@ export default async function LiveNu() {
                       <span className="handle">
                         <Avatar handle={handle} path={s.seller?.avatar_path} />
                         {handle}
-                        {n ? ` · ${n} ting` : ""}
+                        {n ? ` · ${n} ${vareOrd(n)}` : ""}
                       </span>
                     </div>
                     <RemindButton showId={s.id} next="/live" className="btn btn-line btn-sm remind" />

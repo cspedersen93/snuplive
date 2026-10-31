@@ -9,8 +9,8 @@ type Props = { searchParams: Promise<{ ting?: string }> };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const metadata: Metadata = {
-  title: { absolute: "Swipe og køb brugte ting i videoklip | Relived" },
-  description: "Swipe gennem korte videoer af brugt tøj, design og samleobjekter. Se tingen med lyd og billede, og køb den med ét tryk.",
+  title: { absolute: "Swipe og køb brugte varer i videoklip | Relived" },
+  description: "Swipe gennem korte videoer af brugt tøj, design og samleobjekter. Se varen med lyd og billede, og køb den med ét tryk.",
   alternates: { canonical: "/klip" },
 };
 
@@ -35,7 +35,7 @@ export default async function KlipPage({ searchParams }: Props) {
         <h1 className="h1" style={{ marginTop: 18 }}>Swipe og køb</h1>
         <div className="empty" style={{ marginTop: 18 }}>
           <p style={{ marginBottom: 14 }}>
-            Der er ingen klip lige nu. Her kan du swipe gennem korte videoer af ting til salg, fra live-shows og videoannoncer. Kig forbi igen efter næste show.
+            Der er ingen klip lige nu. Her kan du swipe gennem korte videoer af varer til salg, fra live-shows og videoannoncer. Kig forbi igen efter næste show.
           </p>
           <Link className="btn btn-red" href="/til-salg">Se alt til salg</Link>
         </div>

@@ -11,6 +11,6 @@ export const REPORT_REASONS = {
 export type ReportReason = keyof typeof REPORT_REASONS;
 export const isReportReason = (v: unknown): v is ReportReason => typeof v === "string" && v in REPORT_REASONS;
 
-export const REPORT_TARGETS = { item: "tingen", show: "showet", profile: "profilen" } as const;
+export const REPORT_TARGETS = { item: "varen", show: "showet", profile: "profilen" } as const;
 export type ReportTarget = keyof typeof REPORT_TARGETS;
 export const isReportTarget = (v: unknown): v is ReportTarget => typeof v === "string" && v in REPORT_TARGETS;

@@ -63,7 +63,7 @@ export function RefundButton({ orderId, amount }: { orderId: string; amount: str
   }
   return (
     <div className="confirm-ask">
-      <span>Køberen får {amount} tilbage, og tingene kan sælges igen. Det kan ikke fortrydes.</span>
+      <span>Køberen får {amount} tilbage, og varerne kan sælges igen. Det kan ikke fortrydes.</span>
       <div style={{ display: "flex", gap: 8 }}>
         <button className="btn btn-red btn-sm" type="button" onClick={refund} disabled={busy}>{busy ? "Refunderer …" : "Ja, refundér"}</button>
         <button className="btn btn-line btn-sm" type="button" onClick={() => setAsk(false)} disabled={busy}>Fortryd</button>
@@ -80,7 +80,7 @@ export function CancelReservation({ saleId }: { saleId: string }) {
     const { error } = await getSupabase().rpc("cancel_reservation", { p_sale: saleId });
     setBusy(false);
     if (error) return toast(errorText(error));
-    toast("Købet er annulleret, og tingen kan sælges igen.");
+    toast("Købet er annulleret, og varen kan sælges igen.");
     router.refresh();
   }
   return (
@@ -316,7 +316,7 @@ export function ForSaleRow({ id, price, forSale }: { id: string; price: number; 
           disabled={busy}
           onChange={(e) => {
             setOn(e.target.checked);
-            void save({ for_sale: e.target.checked }, e.target.checked ? "Tingen er til salg igen." : "Tingen er taget af.");
+            void save({ for_sale: e.target.checked }, e.target.checked ? "Varen er til salg igen." : "Varen er taget af.");
           }}
         />
         <span>{on ? "Til salg" : "Taget af"}</span>

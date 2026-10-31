@@ -71,7 +71,7 @@ export default async function GuestInvite({ params }: { params: Promise<{ code: 
         </div>
         <ul className="guest-points">
           <li>Du er på kameraet sammen med @{info.host_handle}, og I kan høre hinanden.</li>
-          <li>Du lægger dine egne ting i køen. Pengene for dem går til dig, og du sender dem selv.</li>
+          <li>Du lægger dine egne varer i køen. Pengene for dem går til dig, og du sender dem selv.</li>
           <li>@{info.host_handle} styrer showet: hvad der vises, budsalg, lynrunder og chatten.</li>
           <li>Dine følgere får besked, når showet går live.</li>
         </ul>
@@ -92,7 +92,7 @@ export default async function GuestInvite({ params }: { params: Promise<{ code: 
           <JoinButton code={clean as string} hostHandle={info.host_handle} />
         )}
         <p className="fine">
-          Du står selv for dine ting, som når du sælger i dit eget show. Læs <Link href="/vilkaar">vilkårene for sælgere</Link>.
+          Du står selv for dine varer, som når du sælger i dit eget show. Læs <Link href="/vilkaar">vilkårene for sælgere</Link>.
         </p>
       </div>
     );

@@ -115,7 +115,7 @@ export default function Header() {
           ))}
           <Link href="/kurv">Mine køb</Link>
           <Link href={signedIn === false ? "/login" : "/konto"}>{signedIn === false ? "Log ind" : "Min konto"}</Link>
-          <Link href={sellHref}>Sælg dine ting</Link>
+          <Link href={sellHref}>Sælg dine varer</Link>
         </div>
       </div>
     </header>

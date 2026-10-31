@@ -1,5 +1,5 @@
 import { SITE_URL } from "@/lib/env";
-import { when } from "@/lib/format";
+import { vareOrd, when } from "@/lib/format";
 import { sendMailBatch } from "@/lib/mail";
 import type { createAdminClient } from "@/lib/supabase/admin";
 
@@ -26,7 +26,7 @@ export async function sendFollowDigest(admin: Admin) {
       ? `${when(one.starts_at)}: @${one.handle} går live med ${one.title}`
       : `${shows.length} sælgere, du følger, går live snart`;
     const lines = shows.flatMap((s) => [
-      `${when(s.starts_at)} · @${s.handle} · ${s.title}${s.item_count ? ` (${s.item_count} ting)` : ""}`,
+      `${when(s.starts_at)} · @${s.handle} · ${s.title}${s.item_count ? ` (${s.item_count} ${vareOrd(s.item_count)})` : ""}`,
       `${SITE_URL}/live/${s.handle}`,
       "",
     ]);

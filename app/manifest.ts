@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Relived",
     short_name: "Relived",
-    description: "Live shopping med brugte ting. Se tingen live, spørg i chatten, og køb med ét tryk.",
+    description: "Live shopping med brugte varer. Se varen live, spørg i chatten, og køb med ét tryk.",
     lang: "da",
     start_url: "/",
     scope: "/",

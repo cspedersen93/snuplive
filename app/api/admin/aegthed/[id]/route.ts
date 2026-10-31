@@ -18,7 +18,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
   const admin = createAdminClient();
   if (!admin) return fail("Databasen er ikke sat op.", 503);
   const { id } = await ctx.params;
-  if (!UUID.test(id)) return fail("Tingen findes ikke.", 404);
+  if (!UUID.test(id)) return fail("Varen findes ikke.", 404);
   const b = (await req.json().catch(() => null)) as { decision?: unknown; note?: unknown } | null;
   const decision = b?.decision === "approve" ? "approved" : b?.decision === "reject" ? "rejected" : null;
   const note = typeof b?.note === "string" ? b.note.trim().slice(0, 500) : "";
@@ -33,7 +33,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
     .select("id,name,seller_id")
     .maybeSingle();
   if (error) return fail(error.message, 400);
-  if (!data) return fail("Tingen er allerede afgjort eller findes ikke.", 409);
+  if (!data) return fail("Varen er allerede afgjort eller findes ikke.", 409);
 
   const item = data as { id: string; name: string; seller_id: string };
   const { data: u } = await admin.auth.admin.getUserById(item.seller_id);
@@ -51,7 +51,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
               `Vi har ægthedstjekket "${item.name}", og den er godkendt. Den kan nu vises live og købes, og den har mærket Ægthed tjekket.`,
               note ? `\nBesked fra Relived: ${note}` : "",
               "",
-              `Se tingen: ${link}`,
+              `Se varen: ${link}`,
             ]
           : [
               "Hej",

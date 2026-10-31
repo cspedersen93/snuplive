@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   if (!images.every((b) => typeof b === "string" && b.length > 100 && b.length <= MAX_B64 && /^[A-Za-z0-9+/=]+$/.test(b)))
     return fail("Billederne kunne ikke læses.", 400);
   if (body?.mode === "video") return videoPick(supabase, uid, images as string[]);
-  if (!UUID.test(itemId)) return fail("Ukendt ting.", 400);
+  if (!UUID.test(itemId)) return fail("Ukendt vare.", 400);
 
   const { data: item } = await supabase
     .from("items")
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     seller_id: string;
     show: { status: string; category: string; ended_at: string | null } | null;
   } | null;
-  if (!it || it.seller_id !== uid || !it.show) return fail("Tingen findes ikke.", 404);
+  if (!it || it.seller_id !== uid || !it.show) return fail("Varen findes ikke.", 404);
   // Kun mens showet kører (eller lige er slut: billederne af den sidste ting sendes, når showet afsluttes).
   const justEnded = it.show.status === "ended" && it.show.ended_at && Date.now() - new Date(it.show.ended_at).getTime() < 5 * 60_000;
   if (it.show.status !== "live" && !justEnded) return fail("Showet kører ikke.", 409);

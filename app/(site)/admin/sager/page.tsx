@@ -87,7 +87,7 @@ export default async function Admin() {
             <div className="addr">
               <b>Sælger:</b> @{o.seller?.handle} · {o.show?.title}
               <br />
-              <b>Ting:</b> {o.sales.map((s) => `${s.item?.name ?? "Ting"} (${kr(s.price)})`).join(", ")}
+              <b>Varer:</b> {o.sales.map((s) => `${s.item?.name ?? "Vare"} (${kr(s.price)})`).join(", ")}
               <br />
               <b>Levering:</b> {DELIVERY[o.delivery].label}
               {o.sp_name ? ` · ${isCarrier(o.sp_carrier) ? CARRIERS[o.sp_carrier].name : ""} ${o.sp_name}` : ""}

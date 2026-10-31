@@ -29,7 +29,7 @@ export default function BuyNow({ itemId, price, next, sellerId }: { itemId: stri
     );
   }
   if (uid === sellerId) {
-    return <p className="fine">Det er din egen ting. Du kan rette prisen eller tage den af under Mine shows.</p>;
+    return <p className="fine">Det er din egen vare. Du kan rette prisen eller tage den af under Mine shows.</p>;
   }
 
   async function buy() {

@@ -146,7 +146,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
         deadline: deadline(s.created_at),
         items: [],
       } satisfies PayGroup);
-    g.items.push({ id: s.id, name: s.item?.name ?? "Ting", meta: s.item ? itemMeta(s.item) : "", price: s.price });
+    g.items.push({ id: s.id, name: s.item?.name ?? "Vare", meta: s.item ? itemMeta(s.item) : "", price: s.price });
     groupsMap.set(key, g);
     showsOf.set(key, (showsOf.get(key) ?? new Set()).add(s.show_id));
   }
@@ -169,7 +169,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
         {banner === "ok" ? (
           <div className="notice ok" role="status">
             <IconInfo />
-            <span><b>Tak for din betaling!</b> Sælgeren får besked og pakker dine ting. Du kan følge ordren herunder.</span>
+            <span><b>Tak for din betaling!</b> Sælgeren får besked og pakker dine varer. Du kan følge ordren herunder.</span>
           </div>
         ) : banner === "venter" ? (
           <div className="notice" role="status">
@@ -188,7 +188,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
             <div className="sec-mini">
               <h2 className="h3">Til betaling</h2>
               <p className="muted" style={{ fontSize: ".92rem" }}>
-                Betal inden {RESERVATION_DAYS} dage, ellers bliver købet annulleret, og sælgeren kan sælge tingen igen.
+                Betal inden {RESERVATION_DAYS} dage, ellers bliver købet annulleret, og sælgeren kan sælge varen igen.
               </p>
             </div>
             {ready && stripeTestMode() ? (
@@ -253,7 +253,7 @@ function OrderCard({ o }: { o: OrderRow }) {
       {o.sales.map((s) => (
         <div className="citem" key={s.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
           <div style={{ minWidth: 0 }}>
-            <strong>{s.item?.name ?? "Ting"}</strong>
+            <strong>{s.item?.name ?? "Vare"}</strong>
             {s.item && itemMeta(s.item) ? <span className="from">{itemMeta(s.item)}</span> : null}
           </div>
           <div className="right"><span className="num">{kr(s.price)}</span></div>
@@ -279,7 +279,7 @@ function OrderCard({ o }: { o: OrderRow }) {
             </span>
           ) : null}
           {o.status === "paid" && o.delivery === "pickup" ? (
-            <span className="muted">Sælgeren kontakter dig om afhentning. Bekræft, når du har hentet tingene.</span>
+            <span className="muted">Sælgeren kontakter dig om afhentning. Bekræft, når du har hentet varerne.</span>
           ) : null}
           {o.status === "shipped" ? (
             <span className="muted">

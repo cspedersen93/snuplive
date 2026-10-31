@@ -42,7 +42,7 @@ export default function Gallery({
                 className="thumb-video"
                 onClick={() => setI(n)}
                 aria-pressed={n === i}
-                aria-label={filmed ? "Video af tingen" : "Video fra live-showet"}
+                aria-label={filmed ? "Video af varen" : "Video fra live-showet"}
               >
                 {images[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -101,7 +101,7 @@ function Clip({ src, poster, alt, filmed }: { src: string; poster?: string; alt:
         loop
         playsInline
         preload="metadata"
-        aria-label={`${alt}, ${filmed ? "video af tingen" : "video fra live-showet"}`}
+        aria-label={`${alt}, ${filmed ? "video af varen" : "video fra live-showet"}`}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onClick={togglePlay}

@@ -18,7 +18,7 @@ import { useMe } from "@/components/useMe";
 import { useShowRealtime } from "@/components/useShowRealtime";
 import { hasSupabase } from "@/lib/env";
 import { auctionLeft, isAuction, nextBid, soldPrice } from "@/lib/auction";
-import { gradFor, kr, when } from "@/lib/format";
+import { gradFor, kr, vareOrd, when } from "@/lib/format";
 import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
@@ -382,7 +382,7 @@ export default function ShowClient(props: Props) {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
               <h2>I dette show</h2>
               <span className="muted" style={{ fontSize: ".85rem" }}>
-                {items.length} ting{soldCount ? ` · ${soldCount} solgt` : ""}
+                {items.length} {vareOrd(items.length)}{soldCount ? ` · ${soldCount} solgt` : ""}
               </span>
             </div>
             {items.length ? (
@@ -420,7 +420,7 @@ export default function ShowClient(props: Props) {
                 })}
               </ul>
             ) : (
-              <p className="muted" style={{ fontSize: ".9rem" }}>Sælgeren har ikke lagt ting ind endnu.</p>
+              <p className="muted" style={{ fontSize: ".9rem" }}>Sælgeren har ikke lagt varer ind endnu.</p>
             )}
           </div>
           <div className="box ship-note">
@@ -490,8 +490,8 @@ export default function ShowClient(props: Props) {
                     <>
                       <strong style={{ fontSize: "1.4rem" }}>Showet er slut</strong>
                       <span>
-                        {soldCount ? `${soldCount} ting blev solgt.` : "Tak fordi du kiggede forbi."}
-                        {forSaleCount ? ` ${forSaleCount} ting kan stadig købes til fast pris.` : ""}
+                        {soldCount ? `${soldCount} ${vareOrd(soldCount)} blev solgt.` : "Tak fordi du kiggede forbi."}
+                        {forSaleCount ? ` ${forSaleCount} ${vareOrd(forSaleCount)} kan stadig købes til fast pris.` : ""}
                       </span>
                       {forSaleCount ? (
                         <a className="btn btn-red btn-sm" href="#i-showet">Se hvad der er tilbage</a>
@@ -561,7 +561,7 @@ export default function ShowClient(props: Props) {
                           </span>
                         ) : null}
                       </div>
-                      <div className="v-name">{current ? current.name : "Sælgeren finder næste ting frem"}</div>
+                      <div className="v-name">{current ? current.name : "Sælgeren finder næste vare frem"}</div>
                       {current && ownerOf(current) ? <div className="v-owner">Sælges af @{ownerOf(current)}</div> : null}
                       <div className="v-meta" aria-live="polite">
                         {auction
@@ -594,7 +594,7 @@ export default function ShowClient(props: Props) {
           {live ? (
             <p className="fine" style={{ textAlign: "center" }}>
               {auction
-                ? "Dit bud er bindende. Vinder du, lander tingen under Mine køb, og du betaler inden 3 dage."
+                ? "Dit bud er bindende. Vinder du, lander varen under Mine køb, og du betaler inden 3 dage."
                 : "Når du køber, vises dit brugernavn i chatten. Du betaler samlet under Mine køb inden 3 dage."}
             </p>
           ) : null}

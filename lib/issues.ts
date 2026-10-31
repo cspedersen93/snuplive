@@ -2,9 +2,9 @@
 
 export const ISSUE_REASONS = {
   not_received: "Jeg har ikke fået pakken",
-  not_as_shown: "Tingen er ikke som vist eller beskrevet",
-  damaged: "Tingen er gået i stykker undervejs",
-  counterfeit: "Tingen er falsk (en kopi)",
+  not_as_shown: "Varen er ikke som vist eller beskrevet",
+  damaged: "Varen er gået i stykker undervejs",
+  counterfeit: "Varen er falsk (en kopi)",
   withdrawal: "Jeg vil fortryde købet (kun ved køb fra en virksomhed)",
   other: "Noget andet",
 } as const;

@@ -15,7 +15,7 @@ export const revalidate = 30;
 export const metadata: Metadata = {
   title: { absolute: "Køb og sælg second hand live på video | Relived" },
   description:
-    "Køb second hand live: se tøjet, tasken eller lampen på video, spørg sælgeren i chatten, og køb med ét tryk. Sælgeren får først pengene, når du har tingen.",
+    "Køb second hand live: se tøjet, tasken eller lampen på video, spørg sælgeren i chatten, og køb med ét tryk. Sælgeren får først pengene, når du har varen.",
   openGraph: { title: "Second hand, du kan se live, før du køber" },
   alternates: { canonical: "/", languages: { "da-DK": "/", en: "/en" } },
 };
@@ -53,7 +53,7 @@ export default async function Forside() {
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
             <p className="lede">
-              Sælgeren viser tingen frem på video, du spørger løs i chatten, og den første, der trykker Køb, får den. Ingen slørede
+              Sælgeren viser varen frem på video, du spørger løs i chatten, og den første, der trykker Køb, får den. Ingen slørede
               billeder og ingen »Er den stadig til salg?«.
             </p>
             <div className="ctas">
@@ -61,7 +61,7 @@ export default async function Forside() {
               <Link className="btn btn-line" href="/til-salg">Køb til fast pris</Link>
             </div>
             <ul className="points">
-              <li>Sælgeren får først pengene, når du har tingen</li>
+              <li>Sælgeren får først pengene, når du har varen</li>
               <li>Fragt {DELIVERY.ship.price} kr til pakkeshop</li>
               <li>Ingen app at hente</li>
             </ul>
@@ -102,7 +102,7 @@ export default async function Forside() {
                 Ingen er live lige nu. Tryk Husk mig på et show, der starter senere, eller køb noget af det, der allerede er vist frem
                 på video.
               </p>
-              <Link className="btn btn-red" href="/til-salg">Se ting til salg</Link>
+              <Link className="btn btn-red" href="/til-salg">Se varer til salg</Link>
             </div>
           )}
         </div>
@@ -131,7 +131,7 @@ export default async function Forside() {
           <div>
             <h2 className="h2" id="h-how" style={{ marginBottom: 24 }}>Hvordan køber man brugt live?</h2>
             <ol className="steps">
-              <li><div><h3>Find et show eller en ting</h3><p>Se, hvem der er live, eller tryk Husk mig på et show, der starter senere. Så giver vi dig besked.</p></div></li>
+              <li><div><h3>Find et show eller en vare</h3><p>Se, hvem der er live, eller tryk Husk mig på et show, der starter senere. Så giver vi dig besked.</p></div></li>
               <li><div><h3>Se den tæt på, og spørg</h3><p>Bed sælgeren vise mærket, målene og slid tæt på. Du får svar, mens du ser med.</p></div></li>
               <li><div><h3>Køb eller byd</h3><p>Tryk Køb, eller byd med på budsalg. Du betaler samlet bagefter, og alt fra samme sælger kommer i én pakke.</p></div></li>
             </ol>

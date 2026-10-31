@@ -2,7 +2,7 @@ import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import SetupNotice from "@/components/SetupNotice";
 import { num, PERIODS, periodStart, requireAdmin } from "@/lib/admin";
-import { clock, dayLabel, kr } from "@/lib/format";
+import { clock, dayLabel, kr, vareOrd } from "@/lib/format";
 import OverviewChart, { type Bucket } from "./OverviewChart";
 
 export const dynamic = "force-dynamic";
@@ -165,7 +165,7 @@ export default async function Overblik({ searchParams }: { searchParams: Promise
         <span className="k">Omsætning · {period.label.toLowerCase()}</span>
         <span className="v">{kr(o.gmv)}</span>
         <span className="d">
-          {num(o.orders)} {o.orders === 1 ? "ordre" : "ordrer"} fra {num(o.buyers)} {o.buyers === 1 ? "køber" : "købere"} · ting for {kr(o.items_value)}
+          {num(o.orders)} {o.orders === 1 ? "ordre" : "ordrer"} fra {num(o.buyers)} {o.buyers === 1 ? "køber" : "købere"} · varer for {kr(o.items_value)}
         </span>
       </section>
 
@@ -211,7 +211,7 @@ export default async function Overblik({ searchParams }: { searchParams: Promise
           </span>
         </Link>
         <div className="stat">
-          <span className="k">Solgte ting</span>
+          <span className="k">Solgte varer</span>
           <span className="v">{num(o.items_sold)}</span>
           <span className="d muted">
             {o.unpaid_snups ? `${num(o.unpaid_snups)} køb for ${kr(o.unpaid_value)} venter på betaling` : "Ingen køb venter på betaling"}
@@ -220,7 +220,7 @@ export default async function Overblik({ searchParams }: { searchParams: Promise
       </div>
       <p className="fine">
         Indtjeningen er før Stripes gebyrer og moms. Gebyrerne kan du se i Stripe under Balances. Omsætningen er det, køberne
-        har betalt (ting, fragt og køberbeskyttelse) for ordrer, der ikke er refunderet.
+        har betalt (varer, fragt og køberbeskyttelse) for ordrer, der ikke er refunderet.
       </p>
 
       <OverviewChart buckets={buckets} unit={unit} />
@@ -235,7 +235,7 @@ export default async function Overblik({ searchParams }: { searchParams: Promise
                   <Avatar handle={t.handle} path={t.avatar_path} />
                   <div>
                     <strong><Link href={`/admin/medlemmer/${t.seller_id}`}>@{t.handle}</Link></strong>
-                    <span>{num(t.items)} ting i {num(t.orders)} {Number(t.orders) === 1 ? "ordre" : "ordrer"}</span>
+                    <span>{num(t.items)} {vareOrd(t.items)} i {num(t.orders)} {Number(t.orders) === 1 ? "ordre" : "ordrer"}</span>
                   </div>
                   <span className="num">{kr(Number(t.items_value))}</span>
                 </li>

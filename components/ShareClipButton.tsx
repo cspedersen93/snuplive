@@ -106,7 +106,7 @@ export default function ShareClipButton({ src, name, price, href }: { src: strin
             <a className={`btn btn-sm ${canShare ? "btn-line" : "btn-red"}`} href={url} download={file.name}>Hent videoen</a>
             <button className="btn btn-line btn-sm" type="button" onClick={copy}>Kopiér link</button>
           </span>
-          <span className="muted">Læg den op på TikTok, Instagram eller Facebook, og sæt linket ind i teksten, så køberne kan finde tingen.</span>
+          <span className="muted">Læg den op på TikTok, Instagram eller Facebook, og sæt linket ind i teksten, så køberne kan finde varen.</span>
         </span>
       </span>
     );

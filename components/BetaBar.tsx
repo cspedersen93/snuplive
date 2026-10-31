@@ -15,7 +15,7 @@ export default async function BetaBar() {
           <strong className="testbar-chip">Testfase</strong>
           <span>
             Relived er ikke åbnet endnu. Alt, der købes og sælges her, er en test: der bliver ikke trukket rigtige penge, og
-            ingen ting bliver sendt.
+            ingen varer bliver sendt.
           </span>
         </div>
       </div>

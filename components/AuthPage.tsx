@@ -20,7 +20,7 @@ export default function AuthPage({ mode }: { mode: "login" | "opret" }) {
         </p>
         <ul className="ticks">
           <li>Gratis at oprette</li>
-          <li>Køb ting i live-shows med ét tryk</li>
+          <li>Køb varer i live-shows med ét tryk</li>
           <li>Gå live fra telefonen eller computeren, direkte i browseren</li>
         </ul>
       </div>

@@ -98,7 +98,7 @@ export default async function Konto() {
             <>
               {followers !== null ? <div className="stat"><span className="k">Følgere</span><span className="v">{followers}</span></div> : null}
               <div className="stat"><span className="k">Shows</span><span className="v">{myShows.length}</span></div>
-              <div className="stat"><span className="k">Solgte ting</span><span className="v">{sold.length}</span></div>
+              <div className="stat"><span className="k">Solgte varer</span><span className="v">{sold.length}</span></div>
               <div className="stat"><span className="k">Omsætning</span><span className="v">{kr(sold.reduce((a, b) => a + b.price, 0))}</span></div>
             </>
           ) : null}
@@ -146,7 +146,7 @@ export default async function Konto() {
             <div>
               <span className="label red">Sælg live</span>
               <h2 className="h3" style={{ marginTop: 6 }}>Har du et skab, der skal ryddes?</h2>
-              <p className="muted" style={{ fontSize: ".95rem" }}>Bliv sælger, læg dine ting i køen, og gå live fra telefonen eller computeren.</p>
+              <p className="muted" style={{ fontSize: ".95rem" }}>Bliv sælger, læg dine varer i køen, og gå live fra telefonen eller computeren.</p>
             </div>
             <BecomeSeller />
           </div>
@@ -163,13 +163,13 @@ export default async function Konto() {
               <div className="mitid-status">
                 <span className="mitid-ok">MitID-bekræftet</span>
                 <p className="muted">
-                  Du bekræftede dig {new Date(profile.mitid_verified_at as string).toLocaleDateString("da-DK", { day: "numeric", month: "long", year: "numeric" })}. Køberne kan se mærket ved dine ting og shows.
+                  Du bekræftede dig {new Date(profile.mitid_verified_at as string).toLocaleDateString("da-DK", { day: "numeric", month: "long", year: "numeric" })}. Køberne kan se mærket ved dine varer og shows.
                 </p>
               </div>
             ) : mitid?.enabled ? (
               <div className="mitid-status">
                 <p>
-                  Bekræft, hvem du er, med MitID. Så ser køberne mærket <b>MitID-bekræftet</b> ved dine ting og shows.
+                  Bekræft, hvem du er, med MitID. Så ser køberne mærket <b>MitID-bekræftet</b> ved dine varer og shows.
                   {mitid.required ? " Du skal gøre det, før du kan gå live." : ""}
                 </p>
                 <MitIdButton next="/konto#saelger" />

@@ -157,7 +157,7 @@ export async function POST(req: Request) {
           currency: "dkk",
           unit_amount: ore(s.price),
           product_data: {
-            name: s.item?.name ?? "Ting",
+            name: s.item?.name ?? "Vare",
             description: [s.item?.size ? `Str. ${s.item.size}` : null, s.item?.condition, `fra @${handle}`].filter(Boolean).join(" · "),
           },
         },
@@ -187,7 +187,7 @@ export async function POST(req: Request) {
       unit_amount: ore(feeTotal),
       product_data: {
         name: "Køberbeskyttelse",
-        description: "Pengene holdes tilbage, til du har fået dine ting",
+        description: "Pengene holdes tilbage, til du har fået dine varer",
       },
     },
   });
@@ -210,7 +210,7 @@ export async function POST(req: Request) {
         },
         metadata: { checkout_id: checkoutId, buyer_id: user.id },
         custom_text: {
-          submit: { message: "Relived holder pengene tilbage, indtil du har fået dine ting." },
+          submit: { message: "Relived holder pengene tilbage, indtil du har fået dine varer." },
         },
         expires_at: Math.floor(Date.now() / 1000) + 35 * 60,
         success_url: `${origin}/kurv?betaling={CHECKOUT_SESSION_ID}`,

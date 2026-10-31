@@ -183,7 +183,7 @@ export default function ClipFeed({ initial, batch }: { initial: FeedClip[]; batc
         </button>
       </div>
 
-      <div className="clip-scroll" ref={scroller} role="feed" aria-label="Klip af ting til salg">
+      <div className="clip-scroll" ref={scroller} role="feed" aria-label="Klip af varer til salg">
         {clips.map((c, i) => {
           const poster = c.images?.[0] ? storageUrl("items", c.images[0]) : undefined;
           const near = Math.abs(i - active) <= 1;
@@ -209,7 +209,7 @@ export default function ClipFeed({ initial, batch }: { initial: FeedClip[]; batc
                   playsInline
                   preload={i === active ? "auto" : near ? "metadata" : "none"}
                   onClick={() => setPaused((p) => !p)}
-                  aria-label={`${c.name}, video af tingen`}
+                  aria-label={`${c.name}, video af varen`}
                 />
                 {i === active && (paused || still) ? (
                   <button className="clip-play" type="button" onClick={() => (still ? (setStill(false), setPaused(false)) : setPaused(false))} aria-label="Afspil">
@@ -218,7 +218,7 @@ export default function ClipFeed({ initial, batch }: { initial: FeedClip[]; batc
                 ) : null}
 
                 <div className="clip-side">
-                  <button className="clip-icon" type="button" onClick={() => share(c)} aria-label="Del tingen">
+                  <button className="clip-icon" type="button" onClick={() => share(c)} aria-label="Del varen">
                     <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                       <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 3v12M7 8l5-5 5 5" />
                     </svg>
@@ -246,7 +246,7 @@ export default function ClipFeed({ initial, batch }: { initial: FeedClip[]; batc
                     {sold ? (
                       <Link className="btn btn-line" href="/kurv">Din! Betal under Mine køb</Link>
                     ) : isMine ? (
-                      <Link className="btn btn-line" href={itemHref(c)}>Din egen ting</Link>
+                      <Link className="btn btn-line" href={itemHref(c)}>Din egen vare</Link>
                     ) : uid === null ? (
                       <Link className="btn btn-red" href={`/login?next=${encodeURIComponent(`/klip?ting=${c.id}`)}`}>
                         Log ind og køb · {kr(c.price)}
@@ -256,7 +256,7 @@ export default function ClipFeed({ initial, batch }: { initial: FeedClip[]; batc
                         {busy === c.id ? "Reserverer …" : `Køb nu · ${kr(c.price)}`}
                       </button>
                     )}
-                    <Link className="btn btn-ghost" href={itemHref(c)}>Se tingen</Link>
+                    <Link className="btn btn-ghost" href={itemHref(c)}>Se varen</Link>
                   </div>
                 </div>
               </div>
@@ -268,7 +268,7 @@ export default function ClipFeed({ initial, batch }: { initial: FeedClip[]; batc
             <div className="clip-stage">
               <div className="clip-endbox">
                 <strong>Du har set alle klip</strong>
-                <p>Følg sælgerne, så får du besked, når de går live med nye ting.</p>
+                <p>Følg sælgerne, så får du besked, når de går live med nye varer.</p>
                 <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
                 <Link className="btn btn-line" href="/til-salg">Alt til salg</Link>
               </div>

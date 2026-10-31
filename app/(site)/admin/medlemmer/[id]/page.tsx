@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Avatar from "@/components/Avatar";
 import SetupNotice from "@/components/SetupNotice";
 import { num, requireAdmin } from "@/lib/admin";
-import { clock, dayLabel, kr } from "@/lib/format";
+import { clock, dayLabel, kr, vareOrd } from "@/lib/format";
 import OrdersTable, { ORDER_SELECT, type AdminOrder } from "../../OrdersTable";
 import ShowsTable, { type ShowRow } from "../../ShowsTable";
 import type { MemberRow } from "../../types";
@@ -54,7 +54,7 @@ export default async function Medlem({ params }: { params: Promise<{ id: string 
           <div><dt>Ubetalte køb</dt><dd>{unpaid.length ? `${unpaid.length} for ${kr(unpaid.reduce((a, b) => a + b.price, 0))}` : "Ingen"}</dd></div>
           {m.is_seller ? (
             <>
-              <div><dt>Har solgt</dt><dd>{num(m.items_sold)} ting · {kr(Number(m.earned))}</dd></div>
+              <div><dt>Har solgt</dt><dd>{num(m.items_sold)} {vareOrd(m.items_sold)} · {kr(Number(m.earned))}</dd></div>
               <div><dt>Shows</dt><dd>{num(m.shows)}</dd></div>
               <div><dt>Udbetaling</dt><dd>{m.payout_ready ? "Klar hos Stripe" : "Ikke tilknyttet endnu"}</dd></div>
               <div>

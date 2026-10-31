@@ -120,7 +120,7 @@ export default function ShowMenu({
           {status === "planned" ? (
             ask ? (
               <div className="show-menu-ask">
-                <p>Slet showet og tingene i køen? Det kan ikke fortrydes.</p>
+                <p>Slet showet og varerne i køen? Det kan ikke fortrydes.</p>
                 <div>
                   <button className="btn btn-red btn-sm" type="button" onClick={remove} disabled={busy}>
                     {busy ? "Sletter …" : "Ja, slet"}
@@ -144,7 +144,7 @@ export default function ShowMenu({
               <button type="button" role="menuitem" onClick={() => hide(true)} disabled={busy}>
                 Skjul fra listen
               </button>
-              <p className="show-menu-note">Salg, ordrer og ting til salg bliver liggende.</p>
+              <p className="show-menu-note">Salg, ordrer og varer til salg bliver liggende.</p>
             </>
           )}
         </div>

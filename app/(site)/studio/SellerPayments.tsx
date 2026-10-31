@@ -139,7 +139,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
               <h2 className="h3">Udbetaling</h2>
               <p className="muted" style={{ fontSize: ".92rem", maxWidth: "52ch" }}>
                 {acct?.payouts_enabled
-                  ? "Klar. Når køberen har fået sine ting, går pengene for tingene til din bankkonto."
+                  ? "Klar. Når køberen har fået sine varer, går pengene for varerne til din bankkonto."
                   : acct?.details_submitted
                     ? "Stripe er ved at tjekke dine oplysninger, eller der mangler noget. Dine penge venter sikkert hos Relived imens."
                     : "Tilknyt din bankkonto via Stripe, så du kan få pengene fra dine salg. Det tager et par minutter og kræver MitID eller ID."}
@@ -201,7 +201,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                           </p>
                         ) : null}
                         <p className="fine">
-                          Pak tingene godt ind, sæt labelen på, og aflever pakken i en {isCarrier(o.sp_carrier) ? CARRIERS[o.sp_carrier].name : ""}-pakkeshop.
+                          Pak varerne godt ind, sæt labelen på, og aflever pakken i en {isCarrier(o.sp_carrier) ? CARRIERS[o.sp_carrier].name : ""}-pakkeshop.
                           Ordren skifter selv til &quot;Sendt&quot;, når pakken bliver scannet.
                           {o.tracking ? ` Sporingsnummer ${o.tracking}.` : ""}
                         </p>
@@ -214,7 +214,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                     ) : (
                       <p className="fine">Fragtlabels er ikke slået til lige nu. Prøv igen senere.</p>
                     )}
-                    <p className="fine">Køberen har betalt fragten. Du får {kr(sellerPayout(o))} for tingene, når køberen har fået pakken.</p>
+                    <p className="fine">Køberen har betalt fragten. Du får {kr(sellerPayout(o))} for varerne, når køberen har fået pakken.</p>
                   </>
                 ) : o.delivery === "ship" ? (
                   <>
@@ -232,13 +232,13 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                         </>
                       ) : null}
                     </address>
-                    <p className="fine">Send til nærmeste pakkeshop ved adressen (fx med GLS, PostNord eller DAO). Køberen har betalt {kr(o.shipping_amount)} i fragt, som du får sammen med tingene.</p>
+                    <p className="fine">Send til nærmeste pakkeshop ved adressen (fx med GLS, PostNord eller DAO). Køberen har betalt {kr(o.shipping_amount)} i fragt, som du får sammen med varerne.</p>
                     <ShipForm orderId={o.id} />
                   </>
                 ) : (
                   <p className="addr">
                     <b>Afhentning:</b> kontakt {o.ship_name ?? `@${o.buyer?.handle}`}
-                    {o.buyer_phone ? ` på ${o.buyer_phone}` : ""} og aftal tid og sted. Køberen bekræfter i appen, når tingene er hentet.
+                    {o.buyer_phone ? ` på ${o.buyer_phone}` : ""} og aftal tid og sted. Køberen bekræfter i appen, når varerne er hentet.
                   </p>
                 )}
                 <IssueNote o={o} />
@@ -247,7 +247,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
             ))}
           </div>
         ) : (
-          <p className="muted" style={{ fontSize: ".95rem" }}>Når nogen har betalt for dine ting, står pakkerne her med adressen.</p>
+          <p className="muted" style={{ fontSize: ".95rem" }}>Når nogen har betalt for dine varer, står pakkerne her med adressen.</p>
         )}
       </div>
 
@@ -281,7 +281,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
             {[...sent, ...finished].map((o) => (
               <li key={o.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
                 <div>
-                  <strong>@{o.buyer?.handle ?? "køber"} · {o.sales.length} {o.sales.length === 1 ? "ting" : "ting"}</strong>
+                  <strong>@{o.buyer?.handle ?? "køber"} · {o.sales.length} {o.sales.length === 1 ? "vare" : "varer"}</strong>
                   <span>
                     {o.status === "shipped"
                       ? o.sp_id && trackingText(o.tracking_status)

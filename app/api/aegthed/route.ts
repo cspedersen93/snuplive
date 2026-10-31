@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   const b = (await req.json().catch(() => null)) as { itemId?: unknown; photos?: unknown } | null;
   const itemId = typeof b?.itemId === "string" ? b.itemId : "";
   const photos = Array.isArray(b?.photos) ? b.photos.filter((x): x is string => typeof x === "string") : [];
-  if (!UUID.test(itemId)) return fail("Ukendt ting.", 400);
+  if (!UUID.test(itemId)) return fail("Ukendt vare.", 400);
 
   // Reglerne (sælgerens egen ting, 4-8 billeder i den rigtige mappe) tjekkes i databasen.
   const { data, error } = await supabase.rpc("submit_auth", { p_item: itemId, p_photos: photos });
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
           "",
           `Se billederne, og godkend eller afvis: ${SITE_URL}/admin/aegthed`,
           "",
-          "Tingen kan ikke vises live eller købes, før den er godkendt.",
+          "Varen kan ikke vises live eller købes, før den er godkendt.",
         ].join("\n"),
       }),
     );

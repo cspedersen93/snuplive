@@ -125,7 +125,7 @@ export function prepareVideo(file: File): Promise<PreparedVideo> {
       clearTimeout(t);
       v.remove();
       URL.revokeObjectURL(url);
-      reject(new Error("Videoen kan ikke afspilles i din browser. Film tingen direkte her på siden i stedet."));
+      reject(new Error("Videoen kan ikke afspilles i din browser. Film varen direkte her på siden i stedet."));
     };
     const t = setTimeout(fail, 20000);
     v.onerror = fail;
@@ -182,7 +182,7 @@ export function convertVideo(p: PreparedVideo, onProgress: (share: number) => vo
     canvas.width = Math.round((v.videoWidth * scale) / 2) * 2;
     canvas.height = Math.round((v.videoHeight * scale) / 2) * 2;
     const ctx = canvas.getContext("2d");
-    if (!ctx || typeof canvas.captureStream !== "function") throw new Error("Din browser kan ikke gøre videoen klar. Film tingen direkte her på siden i stedet.");
+    if (!ctx || typeof canvas.captureStream !== "function") throw new Error("Din browser kan ikke gøre videoen klar. Film varen direkte her på siden i stedet.");
     const stream = canvas.captureStream(30);
     audio.forEach((t) => stream.addTrack(t));
     const stop = new AbortController();

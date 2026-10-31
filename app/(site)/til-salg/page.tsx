@@ -4,7 +4,7 @@ import { IconPlay } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import Pager from "@/components/Pager";
 import SortNote from "@/components/SortNote";
-import { CATEGORIES, categoryBySlug } from "@/lib/format";
+import { CATEGORIES, categoryBySlug, vareOrd } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
 import { fetchFeed } from "@/lib/queries";
 
@@ -61,7 +61,7 @@ export default async function TilSalg({ searchParams }: Props) {
               <span>Til salg</span>
             )}
           </nav>
-          {total ? <span className="label mint">{total} ting til salg</span> : null}
+          {total ? <span className="label mint">{total} {vareOrd(total)} til salg</span> : null}
           <h1 className="h1" id="h-til-salg">{cat ? `${cat.label} til salg` : "Brugt til salg – køb nu til fast pris"}</h1>
           <p className="lede">Alt her er vist frem på video, i et live-show eller i en videoannonce. Køb det til fast pris lige nu.</p>
           {items.some((i) => i.clip_path) ? (
@@ -73,7 +73,7 @@ export default async function TilSalg({ searchParams }: Props) {
         </div>
       </section>
 
-      <section className="sec tight" aria-label="Ting til salg">
+      <section className="sec tight" aria-label="Varer til salg">
         <div className="wrap">
           <nav className="filters" aria-label="Kategorier">
             <Link className="fchip" href="/til-salg" aria-current={cat ? undefined : "page"}>Alle</Link>
@@ -98,10 +98,10 @@ export default async function TilSalg({ searchParams }: Props) {
             <div className="empty">
               <p style={{ marginBottom: 14 }}>
                 {page > 1
-                  ? "Der er ikke flere ting på den her side."
+                  ? "Der er ikke flere varer på den her side."
                   : cat
                     ? `Der er intet til salg i ${cat.label.toLowerCase()} lige nu. Kig forbi igen efter næste show.`
-                    : "Der er ingen ting til salg lige nu. Ting fra live-shows og videoannoncer lander her."}
+                    : "Der er ingen varer til salg lige nu. Varer fra live-shows og videoannoncer lander her."}
               </p>
               <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
             </div>

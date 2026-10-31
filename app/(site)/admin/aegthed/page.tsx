@@ -79,7 +79,7 @@ export default async function Aegthed() {
                   @{r.seller?.handle} · {category(r.category ?? r.show?.category).short} · {r.show?.title} · sendt {at(r.auth_at)}
                 </span>
               </div>
-              <Link className="linkbtn" href={itemHref(r)} target="_blank">Se tingen</Link>
+              <Link className="linkbtn" href={itemHref(r)} target="_blank">Se varen</Link>
             </div>
             {r.description ? <p style={{ fontSize: ".92rem" }}>{r.description}</p> : null}
             <div className="adm-auth-photos">
@@ -97,7 +97,7 @@ export default async function Aegthed() {
           </section>
         ))
       ) : (
-        <p className="muted">Ingen ting venter på ægthedstjek lige nu.</p>
+        <p className="muted">Ingen varer venter på ægthedstjek lige nu.</p>
       )}
 
       {done.length ? (

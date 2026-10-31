@@ -75,7 +75,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
   },
   luksus: {
     intro:
-      "Find brugte designertasker, ure og smykker. Mærkevarer bliver ægthedstjekket af Relived, før de kan købes, og du ser tingen tæt på video, før du beslutter dig.",
+      "Find brugte designertasker, ure og smykker. Mærkevarer bliver ægthedstjekket af Relived, før de kan købes, og du ser varen tæt på video, før du beslutter dig.",
     who: "Hvem sælger designertasker og ure live?",
     soon: "Hvilke luksusvarer bliver vist snart?",
     sale: "Brugte designervarer til salg nu",
@@ -92,11 +92,11 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
       },
       {
         h: "Kvittering og ægthedsbevis",
-        p: "Spørg, om der følger kvittering, ægthedsbevis, dustbag eller æske med. Det gør tingen nemmere at sælge igen.",
+        p: "Spørg, om der følger kvittering, ægthedsbevis, dustbag eller æske med. Det gør varen nemmere at sælge igen.",
       },
       {
         h: "Er den falsk, får du pengene tilbage",
-        p: "Sælgeren får først pengene, når du har tingen. Viser den sig at være en kopi, melder du det under Mine køb, og så får du alle pengene tilbage.",
+        p: "Sælgeren får først pengene, når du har varen. Viser den sig at være en kopi, melder du det under Mine køb, og så får du alle pengene tilbage.",
       },
     ],
     sellH2: "Har du en designertaske eller et ur, der skal videre?",
@@ -126,7 +126,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     note: (
       <p>
         Brugt makeup og hudpleje må ikke sælges på Relived af hensyn til hygiejnen. Ser du noget, der er åbnet, så tryk{" "}
-        <b>Anmeld</b> på tingen. Læs mere om <Link href="/saadan-virker-det#tryg-handel">tryg handel</Link>.
+        <b>Anmeld</b> på varen. Læs mere om <Link href="/saadan-virker-det#tryg-handel">tryg handel</Link>.
       </p>
     ),
     sellH2: "Har du skønhedsprodukter, du aldrig fik brugt?",
@@ -142,7 +142,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     tips: [
       {
         h: "Hvad er der i posen?",
-        p: "Bed sælgeren holde hver ting op, så du ved, hvad du får. Spørg også, om alt er i samme størrelse.",
+        p: "Bed sælgeren holde hver vare op, så du ved, hvad du får. Spørg også, om alt er i samme størrelse.",
       },
       { h: "Knæ, numse og manchetter", p: "Det er her, børnetøj bliver slidt først. Bed om at se dem tæt på." },
       {
@@ -156,7 +156,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     ],
     note: (
       <>
-        Køber du flere ting hos samme sælger, betaler du kun fragt én gang. Det gælder op til 5 kg. LEGO finder du under{" "}
+        Køber du flere varer hos samme sælger, betaler du kun fragt én gang. Det gælder op til 5 kg. LEGO finder du under{" "}
         <Link href="/kategori/samleobjekter">Samleobjekter</Link>.
       </>
     ),
@@ -164,7 +164,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
   },
   bolig: {
     intro:
-      "Find brugte lamper, keramik, glas og vintage til hjemmet. På video kan sælgeren vende tingen, tænde lampen og vise stemplet i bunden.",
+      "Find brugte lamper, keramik, glas og vintage til hjemmet. På video kan sælgeren vende varen, tænde lampen og vise stemplet i bunden.",
     who: "Hvem sælger brugt design live?",
     soon: "Hvilket design bliver vist snart?",
     sale: "Brugt design til salg nu",
@@ -177,12 +177,12 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
       },
       {
         h: "Skår og revner",
-        p: "Bed sælgeren dreje tingen mod lyset. Små skår i kanten og hårfine revner i glasuren er nemmere at se, når den bevæger sig.",
+        p: "Bed sælgeren dreje varen mod lyset. Små skår i kanten og hårfine revner i glasuren er nemmere at se, når den bevæger sig.",
       },
       { h: "Tænd lampen", p: "Bed sælgeren tænde lampen og vise ledningen og stikket." },
       {
-        h: "Store og tunge ting",
-        p: "Fragt til pakkeshop gælder op til 5 kg. Møbler og andre tunge ting henter du gratis hos sælgeren.",
+        h: "Store og tunge varer",
+        p: "Fragt til pakkeshop gælder op til 5 kg. Møbler og andre tunge varer henter du gratis hos sælgeren.",
       },
     ],
     sellH2: "Har du selv design, der skal videre?",
@@ -213,18 +213,18 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     sellH2: "Har du selv samleobjekter, der skal videre?",
   },
   andet: {
-    intro: "Bøger, sport, værktøj, hobby og meget mere. Se tingen på video, spørg sælgeren, og køb den med ét tryk.",
-    who: "Hvem sælger brugte ting live?",
+    intro: "Bøger, sport, værktøj, hobby og meget mere. Se varen på video, spørg sælgeren, og køb den med ét tryk.",
+    who: "Hvem sælger brugte varer live?",
     soon: "Hvad bliver vist snart?",
-    sale: "Andre brugte ting til salg nu",
-    saleAll: "Se alle andre ting til salg",
-    tipsH2: "Hvad skal du kigge efter, når du køber brugte ting?",
+    sale: "Andre brugte varer til salg nu",
+    saleAll: "Se alle andre varer til salg",
+    tipsH2: "Hvad skal du kigge efter, når du køber brugte varer?",
     tips: [
-      { h: "Se den virke", p: "Bed sælgeren tænde, starte eller prøve tingen, mens du ser med." },
+      { h: "Se den virke", p: "Bed sælgeren tænde, starte eller prøve varen, mens du ser med." },
       { h: "Er alt med?", p: "Spørg til opladere, ledninger, låg og andre dele, der let bliver væk." },
       {
         h: "Mål og vægt",
-        p: "Fragt til pakkeshop gælder op til 5 kg. Tungere ting henter du gratis hos sælgeren.",
+        p: "Fragt til pakkeshop gælder op til 5 kg. Tungere varer henter du gratis hos sælgeren.",
       },
     ],
   },

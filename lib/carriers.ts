@@ -26,7 +26,7 @@ export interface Pakkeshop {
 /** Vægtklasser, sælgeren vælger imellem, når labelen laves. Køberen betaler det samme uanset vægt. */
 export const LABEL_WEIGHTS = [
   { grams: 1000, label: "Op til 1 kg", hint: "Fx tøj og vinyl" },
-  { grams: 5000, label: "1–5 kg", hint: "Fx sko, jakker og flere ting" },
+  { grams: 5000, label: "1–5 kg", hint: "Fx sko, jakker og flere varer" },
 ] as const;
 
 export const isLabelWeight = (v: unknown): v is number => LABEL_WEIGHTS.some((w) => w.grams === v);

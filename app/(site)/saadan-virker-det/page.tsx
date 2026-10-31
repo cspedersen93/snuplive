@@ -5,7 +5,7 @@ import { IconCamera, IconChat, IconShield, IconShieldCheck, IconStar, IconUser }
 export const metadata: Metadata = {
   title: { absolute: "Sådan virker live shopping | Relived" },
   description:
-    "Sådan køber og sælger du brugte ting live: find et show, spørg i chatten, køb med ét tryk, og få alt fra samme sælger i én pakke.",
+    "Sådan køber og sælger du brugte varer live: find et show, spørg i chatten, køb med ét tryk, og få alt fra samme sælger i én pakke.",
   alternates: { canonical: "/saadan-virker-det" },
 };
 
@@ -21,7 +21,7 @@ export default function Saadan() {
           </nav>
           <h1 className="h1" id="h-saadan">Sådan virker live shopping på Relived</h1>
           <p className="lede">
-            Hele vejen, fra du finder et show, til du står med tingen i hånden. Og hvordan vi passer på dig undervejs.
+            Hele vejen, fra du finder et show, til du står med varen i hånden. Og hvordan vi passer på dig undervejs.
           </p>
         </div>
       </section>
@@ -35,13 +35,13 @@ export default function Saadan() {
             <div className="ctas"><Link className="btn btn-red" href="/live">Se hvem der er live</Link></div>
           </div>
           <ol className="steps">
-            <li><div><h3>Find et show eller en ting</h3><p>Se hvem der er live under Live nu, eller find en ting, der bliver vist snart, og tryk Husk mig. Så får du besked, når showet starter. Tryk Følg hos en sælger, så får du besked, hver gang sælgeren går live.</p></div></li>
+            <li><div><h3>Find et show eller en vare</h3><p>Se hvem der er live under Live nu, eller find en vare, der bliver vist snart, og tryk Husk mig. Så får du besked, når showet starter. Tryk Følg hos en sælger, så får du besked, hver gang sælgeren går live.</p></div></li>
             <li><div><h3>Spørg i chatten</h3><p>Bed sælgeren vise mærket, målene eller stoffet tæt på. Svaret kommer, mens du ser med. Kan du lide det, du ser, så send et hjerte.</p></div></li>
-            <li><div><h3>Køb med ét tryk</h3><p>Den første, der trykker Køb, får tingen. Den lander med det samme under Mine køb, og du kan blive ved med at handle i showet.</p></div></li>
-            <li><div><h3>Eller byd på budsalg</h3><p>Står der Budsalg på tingen, byder du i stedet for at købe med det samme. Du har 30 sekunder, og det højeste bud vinder.</p></div></li>
-            <li><div><h3>Eller køb til fast pris</h3><p>Ting, der ikke blev solgt i showet, og ting, sælgerne har filmet i en videoannonce, er <Link href="/til-salg">til salg</Link> til fast pris. Tryk Køb nu, så er tingen din.</p></div></li>
+            <li><div><h3>Køb med ét tryk</h3><p>Den første, der trykker Køb, får varen. Den lander med det samme under Mine køb, og du kan blive ved med at handle i showet.</p></div></li>
+            <li><div><h3>Eller byd på budsalg</h3><p>Står der Budsalg på varen, byder du i stedet for at købe med det samme. Du har 30 sekunder, og det højeste bud vinder.</p></div></li>
+            <li><div><h3>Eller køb til fast pris</h3><p>Varer, der ikke blev solgt i showet, og varer, sælgerne har filmet i en videoannonce, er <Link href="/til-salg">til salg</Link> til fast pris. Tryk Køb nu, så er varen din.</p></div></li>
             <li><div><h3>Betal samlet</h3><p>Betal med MobilePay eller kort under Mine køb inden 3 dage. Alt fra samme sælger sendes i én pakke, så du kun betaler fragt én gang.</p></div></li>
-            <li><div><h3>Hent din pakke</h3><p>Hent pakken i pakkeshoppen, eller hent tingen hos sælgeren, og bekræft, at alt er i orden. Først derefter bliver pengene udbetalt til sælgeren.</p></div></li>
+            <li><div><h3>Hent din pakke</h3><p>Hent pakken i pakkeshoppen, eller hent varen hos sælgeren, og bekræft, at alt er i orden. Først derefter bliver pengene udbetalt til sælgeren.</p></div></li>
           </ol>
         </div>
       </section>
@@ -51,7 +51,7 @@ export default function Saadan() {
           <div className="sec-head" style={{ marginBottom: 0 }}>
             <span className="label red">For sælgere</span>
             <h2 className="h2" id="h-seller">Hvordan sælger jeg på Relived?</h2>
-            <p className="lede">Opret et show, læg dine ting i køen, og gå live fra studiet. Har du ikke lyst til at gå live, kan du filme tingen og sætte den til salg med Sælg med video.</p>
+            <p className="lede">Opret et show, læg dine varer i køen, og gå live fra studiet. Har du ikke lyst til at gå live, kan du filme varen og sætte den til salg med Sælg med video.</p>
             <div className="ctas">
               <Link className="btn btn-red" href="/saelg">Læs om at sælge live</Link>
               <Link className="btn btn-line" href="/studio">Gå til studiet</Link>
@@ -67,8 +67,8 @@ export default function Saadan() {
           </div>
           <div className="feat">
             <div><IconUser className="ico" /><h3>Sælgere med MitID</h3><p>Ved lanceringen bliver alle sælgere verificeret med MitID, før de kan sælge.</p></div>
-            <div><IconShield /><h3>Pengene holdes tilbage</h3><p>Sælgeren får først pengene, når du har modtaget dine ting, og du kan følge pakken hele vejen.</p></div>
-            <div><IconCamera /><h3>Du ser tingen live</h3><p>Bed om at se mærket, målene og standen tæt på, før du køber.</p></div>
+            <div><IconShield /><h3>Pengene holdes tilbage</h3><p>Sælgeren får først pengene, når du har modtaget dine varer, og du kan følge pakken hele vejen.</p></div>
+            <div><IconCamera /><h3>Du ser varen live</h3><p>Bed om at se mærket, målene og standen tæt på, før du køber.</p></div>
             <div><IconStar /><h3>Bedømmelser</h3><p>Efter hver handel kan køberen give sælgeren stjerner, så du kan se, hvem du handler med.</p></div>
             <div><IconShieldCheck className="ico" /><h3>Mærkevarer bliver tjekket</h3><p>Designertasker, ure og andre mærkevarer bliver ægthedstjekket af Relived, før de kan købes. Er en vare falsk, får du alle pengene tilbage.</p></div>
             <div><IconChat /><h3>Hjælp, hvis noget går galt</h3><p>Tryk Meld et problem på ordren, inden pengene bliver udbetalt. Så holder vi pengene tilbage og hjælper jer med at finde en løsning.</p></div>
@@ -86,8 +86,8 @@ export default function Saadan() {
           <ul className="sort-list">
             <li><b>Live nu:</b> de shows, der er startet senest, står først.</li>
             <li><b>Snart live og budsalg:</b> efter hvornår showet starter. Budsalg, der kører lige nu, står først.</li>
-            <li><b>Til salg:</b> de ting, der senest er kommet til salg, står først.</li>
-            <li><b>Kategorier og sælgere:</b> samme rækkefølge, kun med de ting, der passer.</li>
+            <li><b>Til salg:</b> de varer, der senest er kommet til salg, står først.</li>
+            <li><b>Kategorier og sælgere:</b> samme rækkefølge, kun med de varer, der passer.</li>
           </ul>
           <p className="muted" style={{ marginTop: 14 }}>Ingen sælger kan betale sig til en bedre plads, og vi sorterer ikke efter, hvad vi tjener.</p>
         </div>

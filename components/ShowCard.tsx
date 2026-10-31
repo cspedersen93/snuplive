@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
-import { clock, dayLabel } from "@/lib/format";
+import { clock, dayLabel, vareOrd } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { itemCount } from "@/lib/queries";
 import type { ShowWithSeller } from "@/lib/types";
@@ -34,7 +34,7 @@ export default function ShowCard({ show, priority = false }: { show: ShowWithSel
         <span className="handle">
           <Avatar handle={handle} path={show.seller?.avatar_path} />
           {handle}
-          {n ? ` · ${n} ting` : ""}
+          {n ? ` · ${n} ${vareOrd(n)}` : ""}
         </span>
       </div>
     </Link>

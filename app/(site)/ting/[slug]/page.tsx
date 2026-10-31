@@ -72,7 +72,7 @@ function stateOf(it: Loaded): ItemState {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const d = await load(slug);
-  if (!d.setup || !d.item) return { title: "Tingen findes ikke", robots: { index: false } };
+  if (!d.setup || !d.item) return { title: "Varen findes ikke", robots: { index: false } };
   const it = d.item;
   const cat = category(it.category ?? it.show?.category);
   const state = stateOf(it);
@@ -87,7 +87,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
           ? bid
             ? "Budsalg live nu"
             : "Sælgeren er live nu"
-          : "Se lignende ting";
+          : "Se lignende varer";
   const title = `${it.name} – ${usedPhrase(cat)}, ${kr(it.price)}`;
   const images = itemImages(it);
   return {
@@ -111,6 +111,8 @@ export default async function ItemPage({ params }: Params) {
   const show = it.show;
   const seller = it.seller;
   const cat = category(it.category ?? show.category);
+  // "mere dametøj", men "flere designervarer" og "flere varer" (Andet).
+  const more = cat.key === "andet" ? "flere varer" : /er$/.test(cat.word) ? `flere ${cat.word}` : `mere ${cat.word}`;
   const state = stateOf(it);
   const images = itemImages(it);
   // Klippet fra live-showet vises, når tingen er til salg bagefter (eller solgt, til klippet bliver slettet).
@@ -248,7 +250,7 @@ export default async function ItemPage({ params }: Params) {
                 <>
                   {isAuction(it) ? <p>Ingen bød på den i showet, så nu kan du købe den til startprisen.</p> : null}
                   <BuyNow itemId={it.id} price={it.price} next={href} sellerId={it.seller_id} />
-                  <p className="fine">Tingen bliver reserveret til dig, og du betaler under Mine køb.</p>
+                  <p className="fine">Varen bliver reserveret til dig, og du betaler under Mine køb.</p>
                   {d.auth === "approved" ? (
                     <p className="fine">Ægthed tjekket af Relived. Viser den sig at være falsk, får du alle pengene tilbage.</p>
                   ) : null}
@@ -285,11 +287,11 @@ export default async function ItemPage({ params }: Params) {
                       </>
                     ) : bid ? (
                       <>
-                        <b>{seller.handle} er live nu.</b> Budsalget starter, når tingen bliver vist.
+                        <b>{seller.handle} er live nu.</b> Budsalget starter, når varen bliver vist.
                       </>
                     ) : (
                       <>
-                        <b>{seller.handle} er live nu.</b> Tingen er i køen. Gå ind i showet og køb den, når den bliver vist.
+                        <b>{seller.handle} er live nu.</b> Varen er i køen. Gå ind i showet og køb den, når den bliver vist.
                       </>
                     )}
                   </p>
@@ -305,12 +307,12 @@ export default async function ItemPage({ params }: Params) {
                     noget lignende i kategorien, eller kig forbi, når {seller.handle} går live igen.
                   </p>
                   <Link className="btn btn-line btn-block" href={`/kategori/${cat.slug}`}>
-                    Se mere {cat.word}
+                    Se {more}
                   </Link>
                 </>
               ) : (
                 <>
-                  <p>Tingen er ikke til salg lige nu. Sælgeren viser den måske i et kommende show.</p>
+                  <p>Varen er ikke til salg lige nu. Sælgeren viser den måske i et kommende show.</p>
                   <Link className="btn btn-line btn-block" href={liveHref}>
                     Se {seller.handle}s shows
                   </Link>
@@ -338,9 +340,9 @@ export default async function ItemPage({ params }: Params) {
             <SellerFacts seller={seller} />
 
             <ul className="item-trust">
-              <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har tingen.</li>
+              <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har varen.</li>
               <li>Fragt {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>
-              <li>Køber du flere ting fra {seller.handle}, får du dem i én pakke.</li>
+              <li>Køber du flere varer fra {seller.handle}, får du dem i én pakke.</li>
             </ul>
             <ReportButton type="item" id={it.id} className="item-report" />
           </div>
@@ -365,7 +367,7 @@ export default async function ItemPage({ params }: Params) {
         {similarOther.length ? (
           <section className="item-more" aria-labelledby="h-lignende">
             <div className="row-head">
-              <h2 className="h3" id="h-lignende">Mere {cat.word} til salg</h2>
+              <h2 className="h3" id="h-lignende">{more.replace(/^./, (c) => c.toUpperCase())} til salg</h2>
               <Link className="linkbtn" href={`/kategori/${cat.slug}`}>Se hele kategorien</Link>
             </div>
             <div className="icards">

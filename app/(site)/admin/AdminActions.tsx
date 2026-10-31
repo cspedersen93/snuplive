@@ -7,7 +7,7 @@ import { errorText, toast } from "@/lib/toast";
 type Action = "refund" | "release" | "close";
 
 const TEXT: Record<Action, { button: string; ask: string; done: string }> = {
-  refund: { button: "Refundér køberen", ask: "Køberen får alle pengene tilbage, og tingene kan sælges igen.", done: "Køberen har fået pengene tilbage." },
+  refund: { button: "Refundér køberen", ask: "Køberen får alle pengene tilbage, og varerne kan sælges igen.", done: "Køberen har fået pengene tilbage." },
   release: { button: "Send pengene til sælgeren", ask: "Ordren afsluttes, og sælgeren får pengene.", done: "Pengene er sendt til sælgeren." },
   close: { button: "Luk sagen", ask: "Sagen lukkes uden at flytte penge. Ordren afsluttes derefter som normalt.", done: "Sagen er lukket." },
 };

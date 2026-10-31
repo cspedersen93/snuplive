@@ -1,25 +1,25 @@
 # Relived
 
-Køb brugt live: sælgeren viser tingene frem på video, køberne chatter med og køber med ét tryk.
+Køb brugt live: sælgeren viser varerne frem på video, køberne chatter med og køber med ét tryk.
 Det, der ikke bliver solgt, kan købes bagefter til fast pris. Det hele kører i browseren på relived.dk.
 
 ## Hvad virker nu?
 
 - Login med e-mail (link eller kode, ingen adgangskode)
 - Profil med brugernavn og en fast side pr. sælger: `relived.dk/live/brugernavn`
-- Sælgere opretter shows, lægger ting i køen og går live med kamera og mikrofon fra studiet
-- Seerne ser videoen live, chatter og køber. Den første, der trykker, får tingen
+- Sælgere opretter shows, lægger varer i køen og går live med kamera og mikrofon fra studiet
+- Seerne ser videoen live, chatter og køber. Den første, der trykker, får varen
 - Lynrunder på 10 sekunder
 - "Live nu" med alle live-shows og et program over kommende shows
 - "Mine køb" for købere og en salgsoversigt for sælgere
 - SEO-sider: forside, Sælg live, Sådan virker det, FAQ (med FAQ-schema), sitemap og robots.txt
 - Profilbilleder og live-billeder fra kameraet på kortene under Live nu
-- Betaling med MobilePay og kort via Stripe. Pengene holdes tilbage, til køberen har fået sine ting, og går derefter til sælgerens bankkonto
+- Betaling med MobilePay og kort via Stripe. Pengene holdes tilbage, til køberen har fået sine varer, og går derefter til sælgerens bankkonto
 - Fragt til DAO- og GLS-pakkeshops med fragtlabels og sporing via Shipmondo
 - Moderation i chatten (fjern beskeder, blokér brugere) og "Meld et problem" på ordrer med en admin-side til sager
 - Backoffice på /admin med tal, ordrer, medlemmer og shows
-- En forside til købere, fem kategorier (`/kategori/...`) og en side for hver ting (`/ting/...`) med billeder, beskrivelse og pris
-- "Husk mig" på ting og shows før showet (mail, når showet starter) og "Køb nu" til fast pris for det, der ikke blev solgt
+- En forside til købere, fem kategorier (`/kategori/...`) og en side for hver vare (`/ting/...`) med billeder, beskrivelse og pris
+- "Husk mig" på varer og shows før showet (mail, når showet starter) og "Køb nu" til fast pris for det, der ikke blev solgt
 - Budsalg live: 30 sekunder, faste budtrin og 10 sekunder ekstra ved sene bud. "Kommende budsalg" på forsiden
 
 MitID kommer senere (se nederst).
@@ -131,10 +131,10 @@ Retter du en nøgle senere, skal du trykke **Redeploy**, før ændringen virker.
 
 1. Åbn relived.dk på computeren, tryk **Log ind**, og skriv din e-mail. Log ind med koden eller linket.
 2. Gå til **Min konto**, ret dit brugernavn, og tryk **Bliv sælger**.
-3. Opret et show, og læg 3–4 ting i køen.
+3. Opret et show, og læg 3–4 varer i køen.
 4. Tryk **Tænd kameraet** i studiet, og giv browseren lov til kamera og mikrofon. Tryk **Gå live**.
 5. Åbn `relived.dk/live/dit-brugernavn` på telefonen (eller bed en ven om det). Videoen skal vise dig.
-6. Tryk **Vis næste** i studiet, og køb tingen fra telefonen. Prøv chatten og en lynrunde.
+6. Tryk **Vis næste** i studiet, og køb varen fra telefonen. Prøv chatten og en lynrunde.
 7. Tryk **Afslut show**. Salget står nu under **Mine shows** og hos køberen under **Mine køb**.
 
 ---
@@ -142,8 +142,8 @@ Retter du en nøgle senere, skal du trykke **Redeploy**, før ændringen virker.
 ## Betaling med Stripe
 
 Køberen betaler alt i kurven på én gang med MobilePay, kort, Apple Pay eller Google Pay. Pengene står hos Relived,
-indtil køberen trykker "Jeg har fået mine ting" (eller automatisk 7 dage efter, at sælgeren har markeret pakken som sendt).
-Så sendes beløbet for tingene til sælgerens Stripe-konto (og fragten, hvis sælgeren selv har sendt pakken uden Reliveds label).
+indtil køberen trykker "Jeg har fået mine varer" (eller automatisk 7 dage efter, at sælgeren har markeret pakken som sendt).
+Så sendes beløbet for varerne til sælgerens Stripe-konto (og fragten, hvis sælgeren selv har sendt pakken uden Reliveds label).
 Relived beholder køberbeskyttelsen (5 % + 5 kr pr. pakke).
 
 Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der bliver ikke flyttet rigtige penge.
@@ -177,7 +177,7 @@ Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der 
 5. **Test:**
    - Som sælger: gå til **Mine shows → Tilknyt udbetaling**. I testmiljøet har Stripe knapper til at udfylde med testdata.
    - Som køber (en anden konto): køb noget, gå til **Mine køb**, og betal med kortnummer `4242 4242 4242 4242`.
-   - Som sælger: markér pakken som sendt. Som køber: tryk **Jeg har fået mine ting**. Overførslen kan ses i Stripe under **Connect → Transfers**.
+   - Som sælger: markér pakken som sendt. Som køber: tryk **Jeg har fået mine varer**. Overførslen kan ses i Stripe under **Connect → Transfers**.
 
 **Før rigtige penge:** aktivér Stripe-kontoen med virksomhedsoplysninger (CVR og bankkonto), skift til de rigtige nøgler
 (`sk_live_…` og nye webhook-secrets), tjek at **Accounts v1 support** også er slået til uden for testmiljøet, opgrader Vercel til Pro, og få en revisor til at se på moms af køberbeskyttelsen.
@@ -186,7 +186,7 @@ Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der 
 
 Køberen vælger en **DAO- eller GLS-pakkeshop** i kurven og betaler 49 kr i fragt pr. pakke (op til 5 kg). Sælgeren trykker
 **Lav fragtlabel** under Mine shows, printer labelen og afleverer pakken. Relived betaler labelen hos Shipmondo med de penge,
-køberen har betalt i fragt, og sælgeren får beløbet for tingene. Sporingen kommer fra Shipmondo, så ordren skifter selv til
+køberen har betalt i fragt, og sælgeren får beløbet for varerne. Sporingen kommer fra Shipmondo, så ordren skifter selv til
 "Sendt", når pakken bliver scannet, og afsluttes 2 dage efter, at køberen har hentet den.
 
 Uden Shipmondo-nøgler virker siden som før: køberen vælger ikke pakkeshop, og sælgeren sender selv og får fragten.
@@ -234,7 +234,7 @@ dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPM
 
 3. **Deploy**, log ind med din admin-e-mail, og gå til **Min konto**. Der står, hvor mange sager der venter.
 
-## Ting, kategorier, "Husk mig" og "Køb nu"
+## Varer, kategorier, "Husk mig" og "Køb nu"
 
 1. **Supabase → SQL Editor:** kør [`supabase/migrations/0007_varer.sql`](supabase/migrations/0007_varer.sql), **før** den nye
    version kommer på Vercel. Ellers kan show- og studiesiderne ikke hentes. Har du ikke kørt 0005 og 0006 endnu, så kør dem først.
@@ -246,13 +246,13 @@ Sådan virker det:
 
 - **Kategorier:** Dametøj, sko og tasker · Herretøj og sneakers · Børnetøj og legetøj · Bolig og design · Samleobjekter · Andet. I databasen hedder Samleobjekter stadig `samlerting`, og /kategori/samlerting sendes videre til /kategori/samleobjekter.
   Gamle shows bliver flyttet over automatisk (tøj og overtøj til dametøj, denim til herretøj, vinyl til samlerting, design til bolig).
-- **Før showet:** sælgeren kan give hver ting op til 4 billeder, en beskrivelse og en anden kategori end showets
-  (under "+ Billeder, beskrivelse og kategori" i studiet). Tingene kan ses på forsiden, i kategorien og på deres egen side.
-  Køberne kan trykke **Husk mig** på en ting eller et show. Når sælgeren går live, får de én mail.
-- **Under showet** tager studiet selv et billede fra kameraet, når en ting bliver vist, og lægger det på tingen.
-- **Efter showet** kommer alt, der ikke blev solgt, til salg til den samme pris. Køberen trykker **Køb nu**, og tingen lander under
-  Mine køb. Sælgeren kan rette prisen eller tage en ting af salg under **Mine shows → Til salg**. Bliver et køb ikke betalt, eller
-  annullerer sælgeren det, kommer tingen til salg igen. Refunderede ting skal sælgeren selv sætte til salg igen.
+- **Før showet:** sælgeren kan give hver vare op til 4 billeder, en beskrivelse og en anden kategori end showets
+  (under "+ Billeder, beskrivelse og kategori" i studiet). Varerne kan ses på forsiden, i kategorien og på deres egen side.
+  Køberne kan trykke **Husk mig** på en vare eller et show. Når sælgeren går live, får de én mail.
+- **Under showet** tager studiet selv et billede fra kameraet, når en vare bliver vist, og lægger det på varen.
+- **Efter showet** kommer alt, der ikke blev solgt, til salg til den samme pris. Køberen trykker **Køb nu**, og varen lander under
+  Mine køb. Sælgeren kan rette prisen eller tage en vare af salg under **Mine shows → Til salg**. Bliver et køb ikke betalt, eller
+  annullerer sælgeren det, kommer varen til salg igen. Refunderede varer skal sælgeren selv sætte til salg igen.
 - **Én pakke pr. sælger:** alt, køberen har købt hos samme sælger, betales og sendes samlet, også når det er fra flere shows.
 
 ## Budsalg
@@ -262,13 +262,13 @@ Sådan virker det:
 
 Sådan virker det:
 
-- **I studiet** vælger sælgeren *Fast pris* eller *Budsalg* på hver ting. Ved budsalg er prisen startprisen.
-- **Live:** sælgeren viser tingen frem og trykker **Start budsalg 30 s**. Køberne trykker **Byd**, som altid byder næste trin:
+- **I studiet** vælger sælgeren *Fast pris* eller *Budsalg* på hver vare. Ved budsalg er prisen startprisen.
+- **Live:** sælgeren viser varen frem og trykker **Start budsalg 30 s**. Køberne trykker **Byd**, som altid byder næste trin:
   5 kr under 100 kr, 10 kr op til 500 kr, 25 kr op til 1.000 kr og 50 kr derover. Man kan ikke byde over sig selv.
-  Kommer der et bud i de sidste 10 sekunder, står uret på 10 igen. Næste ting kan først vises, når budsalget er slut.
+  Kommer der et bud i de sidste 10 sekunder, står uret på 10 igen. Næste vare kan først vises, når budsalget er slut.
 - **Når uret står på 0**, lukker studiet budsalget. Det højeste bud bliver til et køb i køberens Mine køb til buddets pris,
   og vinderen står i chatten. Afslutter sælgeren showet midt i et budsalg, vinder det højeste bud.
-- **Ingen bud:** tingen kommer til salg til startprisen med Køb nu, når showet slutter.
+- **Ingen bud:** varen kommer til salg til startprisen med Køb nu, når showet slutter.
 - Alt det, der afgør et budsalg (tid, trin, vinder), sker i databasen, så det er det samme for alle, og ingen kan snyde.
   Alle bud gemmes i tabellen `bids`.
 
@@ -277,13 +277,13 @@ Sådan virker det:
 På [relived.dk/admin](https://relived.dk/admin) (kun for e-mails i `ADMIN_EMAILS`) er der:
 
 - **Overblik:** omsætning, din indtjening (køberbeskyttelse og fragt minus labels, før Stripes gebyrer og moms), udbetalt til
-  sælgere, penge der holdes tilbage, refunderinger, medlemmer, sælgere, shows og solgte ting for 7 dage, 30 dage, 90 dage, i år
+  sælgere, penge der holdes tilbage, refunderinger, medlemmer, sælgere, shows og solgte varer for 7 dage, 30 dage, 90 dage, i år
   eller altid, plus en graf pr. dag, uge eller måned, de sælgere der har solgt mest, nyeste medlemmer og seneste ordrer.
 - **Sager**, **Ordrer** (med filtre), **Medlemmer** (søg på brugernavn, navn eller e-mail, og se køb, salg og shows for hver)
   og **Shows**.
 
 Kør [`supabase/migrations/0006_backoffice.sql`](supabase/migrations/0006_backoffice.sql) i Supabase først. Filen retter også en
-fejl, så en ting, der er blevet annulleret eller refunderet, kan købes igen.
+fejl, så en vare, der er blevet annulleret eller refunderet, kan købes igen.
 
 ## Klar til lancering: vilkår, sælgertype, anmeldelser, bedømmelser og Skat
 
@@ -304,10 +304,10 @@ Det er nyt:
 - **Handelsbetingelser, vilkår og Om Relived** på `/handelsbetingelser`, `/vilkaar` og `/om-relived`, linket fra bunden af
   alle sider, fra login og fra betalingen.
 - **Privat eller erhverv:** man vælger, når man bliver sælger, og kan skifte under Min konto. En erhvervssælger skriver
-  firmanavn og CVR. Køberne ser det ved hver ting og hvert show sammen med, om fortrydelsesretten gælder. Køb fra en
+  firmanavn og CVR. Køberne ser det ved hver vare og hvert show sammen med, om fortrydelsesretten gælder. Køb fra en
   erhvervssælger kan fortrydes med *Meld et problem*. Sælgere fra før skal bekræfte under Min konto.
-- **Anmeld** på ting, shows og profiler, også uden login. Du får en mail, og afgør dem under **Backoffice → Anmeldelser**:
-  fjern tingen, fjern showet, luk sælgerkontoen eller afvis. Sælgeren får begrundelsen på mail, og den, der anmeldte, får
+- **Anmeld** på varer, shows og profiler, også uden login. Du får en mail, og afgør dem under **Backoffice → Anmeldelser**:
+  fjern varen, fjern showet, luk sælgerkontoen eller afvis. Sælgeren får begrundelsen på mail, og den, der anmeldte, får
   besked om afgørelsen.
 - **Bedømmelser:** når en ordre er afsluttet, kan køberen give sælgeren 1–5 stjerner under Mine køb. Gennemsnittet står ved
   sælgeren, og de nyeste bedømmelser står på sælgerens side.
@@ -349,7 +349,7 @@ kategori eller et show, og ved det daglige job, så det kræver ikke et ekstra c
 
 Sådan virker det: sælgeren trykker **Bekræft med MitID** (under Min konto eller i studiet), logger ind med MitID hos Idura og
 kommer tilbage. Vi gemmer navn, fødselsdato og et fingeraftryk af MitID-id'et (ikke CPR), så det samme MitID ikke kan bruges på
-flere konti, og sælgeren skal være fyldt 18. Køberne ser mærket **MitID-bekræftet** ved sælgerens ting og shows. Når kravet er
+flere konti, og sælgeren skal være fyldt 18. Køberne ser mærket **MitID-bekræftet** ved sælgerens varer og shows. Når kravet er
 slået til, kan man ikke gå live uden MitID; det tjekkes også i databasen.
 
 ## Kommer snart og lukket side
@@ -415,17 +415,30 @@ og snuplive.dk sender videre. Gør det her i rækkefølge:
 
 ---
 
-## Videoklip af tingene fra showet
+## Ordet "vare"
+
+Siden siger **vare/varen/varer/varerne** om det, der bliver solgt (før stod der "ting"). Adresserne er de samme
+(`/ting/<navn>-<id>` og `/klip?ting=<id>`), så links og Googles sider virker som før.
+
+- **Beskeder fra databasen** (fx "Tingen er allerede solgt") står stadig med "ting" i migrationerne. De bliver lavet om
+  til "vare", når de vises (`vareTekst` i `lib/format.ts`, brugt i `errorText` og `fail`). Der skal ikke køres noget i
+  Supabase.
+- **Antal:** "1 vare", "3 varer" (`vareOrd`).
+- **Vilkår, handelsbetingelser og privatlivspolitik** er ikke rettet. De ændres kun efter aftale.
+
+---
+
+## Videoklip af varerne fra showet
 
 Kør `supabase/migrations/0015_klip.sql` i Supabase → SQL Editor (efter 0014). Der skal ikke nye nøgler i Vercel.
 
-- **Når sælgeren viser en ting frem**, optager studiet de første 15 sekunder (med lyd) i sælgerens browser og lægger klippet
-  i mappen `clips` i Supabase Storage. Viser sælgeren den næste ting før tid, gemmes det, der er nået (mindst 4 sekunder).
-  Viser sælgeren samme ting igen, erstatter det nye klip det gamle.
-- **Bliver tingen ikke solgt**, vises klippet først på tingens side (uden lyd, i loop, med knap til lyd), og kortet under
+- **Når sælgeren viser en vare frem**, optager studiet de første 15 sekunder (med lyd) i sælgerens browser og lægger klippet
+  i mappen `clips` i Supabase Storage. Viser sælgeren den næste vare før tid, gemmes det, der er nået (mindst 4 sekunder).
+  Viser sælgeren samme vare igen, erstatter det nye klip det gamle.
+- **Bliver varen ikke solgt**, vises klippet først på varens side (uden lyd, i loop, med knap til lyd), og kortet under
   *Til salg* får mærket *Video*. Har man slået *reducer bevægelse* til på sin enhed, starter klippet ikke af sig selv.
 - **Sælgeren kan slette klippet** under **Studie → Til salg** (*Slet video*).
-- **Oprydning:** det daglige job sletter klip 14 dage efter, at tingen er solgt, og klip af ting, der er fjernet.
+- **Oprydning:** det daglige job sletter klip 14 dage efter, at varen er solgt, og klip af varer, der er fjernet.
 - Klip fylder ca. 2-3 MB stykket (højst 15 MB). Supabase Free har 1 GB lagerplads, så hold øje med *Storage* i Supabase, når
   der kommer mange sælgere.
 - Er 0015 ikke kørt, sker der ingenting: studiet springer klippet over, og siderne virker som før.
@@ -438,18 +451,18 @@ Kør `supabase/migrations/0017_aegthed.sql` i Supabase → SQL Editor (efter 001
 
 - **Nye kategorier:** *Luksus* (tasker, ure og smykker) og *Skønhed* (kun ny og uåbnet). Ved Skønhed er standen altid
   "Ny og uåbnet", og sælgeren skal sætte flueben ved, at produktet er uåbnet.
-- **Hvad skal tjekkes:** ting i Luksus til 1.000 kr eller mere, og alle ting, hvor navnet eller beskrivelsen nævner et
+- **Hvad skal tjekkes:** varer i Luksus til 1.000 kr eller mere, og alle varer, hvor navnet eller beskrivelsen nævner et
   kendt mærke (Louis Vuitton, Gucci, Chanel, Hermès, Prada, Dior, Fendi, Balenciaga, Rolex, Cartier, Moncler m.fl.).
   Listen står i `lib/luxury.ts` og i databasen (`luxury_brand`), og de skal ændres sammen.
-- **Sælgeren:** i studiet står der "Skal ægthedstjekkes" ved tingen. *Send billeder* åbner et panel med 4 krævede
-  nærbilleder (logo, serie-/datokode, foer, syninger og metaldele) og 2 valgfrie (kvittering, andet). Indtil tingen er
+- **Sælgeren:** i studiet står der "Skal ægthedstjekkes" ved varen. *Send billeder* åbner et panel med 4 krævede
+  nærbilleder (logo, serie-/datokode, foer, syninger og metaldele) og 2 valgfrie (kvittering, andet). Indtil varen er
   godkendt, kan den ikke vises live, bydes på eller købes (databasen stopper det). Skifter sælgeren navn eller kategori
   efter godkendelsen, skal den tjekkes igen.
-- **I (Backoffice → Ægthed):** alle ting, der venter, med billederne i stor størrelse. *Godkend* eller *Afvis* (med en kort
-  begrundelse). Sælgeren får en mail. Admins får en mail, når en ting bliver sendt til tjek. Er I i tvivl, så kør billederne
+- **I (Backoffice → Ægthed):** alle varer, der venter, med billederne i stor størrelse. *Godkend* eller *Afvis* (med en kort
+  begrundelse). Sælgeren får en mail. Admins får en mail, når en vare bliver sendt til tjek. Er I i tvivl, så kør billederne
   gennem en ægthedstjeneste (fx LegitApp) først.
-- **Køberen:** godkendte ting har mærket *Ægthed tjekket* på tingens side og i live-showet. Under *Meld et problem* kan
-  køberen vælge *Tingen er falsk (en kopi)*. Giv pengene tilbage under Backoffice → Sager, og luk sælgeren.
+- **Køberen:** godkendte varer har mærket *Ægthed tjekket* på varens side og i live-showet. Under *Meld et problem* kan
+  køberen vælge *Varen er falsk (en kopi)*. Giv pengene tilbage under Backoffice → Sager, og luk sælgeren.
 
 ---
 
@@ -459,8 +472,8 @@ Kør `supabase/migrations/0018_skjul.sql` i Supabase → SQL Editor (efter 0017)
 
 Hvert show under *Mine shows* har en **⋯**-knap:
 
-- **Planlagt show:** *Slet show*. Siden spørger først ("Det kan ikke fortrydes"). Tingene i køen bliver slettet med.
-- **Afsluttet show:** *Skjul fra listen*. Showet forsvinder fra listen, men salg, ordrer og ting, der stadig er til salg,
+- **Planlagt show:** *Slet show*. Siden spørger først ("Det kan ikke fortrydes"). Varerne i køen bliver slettet med.
+- **Afsluttet show:** *Skjul fra listen*. Showet forsvinder fra listen, men salg, ordrer og varer, der stadig er til salg,
   bliver liggende. Afsluttede shows kan ikke slettes, fordi der hænger salg og ordrer på dem.
 - **Skjulte shows** står under *Vis skjulte shows (N)* nederst i listen. Der kan de vises igen med *Vis i listen igen*.
 - **Live-shows** har ingen ⋯.
@@ -483,12 +496,12 @@ spørges om lov. Cookies-siden og privatlivspolitikken fortæller om det.
 
 ## Del klip på TikTok og Instagram
 
-Under **Mine shows → Til salg** står **Lav video til TikTok og Instagram** ved hver ting med et klip. Browseren laver en
-lodret video (720 × 1280) af klippet med Relived-logo, tingens navn og pris og "Køb den på relived.dk", og til sidst et
+Under **Mine shows → Til salg** står **Lav video til TikTok og Instagram** ved hver vare med et klip. Browseren laver en
+lodret video (720 × 1280) af klippet med Relived-logo, varens navn og pris og "Køb den på relived.dk", og til sidst et
 slutbillede på 2 sekunder med logoet og relived.dk. Det tager lige så lang tid som klippet, og siden skal være åben imens.
 
 Bagefter kan sælgeren **dele videoen** direkte fra telefonen (TikTok, Instagram, Facebook og andre apps, hvor telefonen
-kan), **hente den** eller **kopiere linket** til tingen til teksten. Videoen bliver ikke gemt hos os. Lyden kommer med, hvor
+kan), **hente den** eller **kopiere linket** til varen til teksten. Videoen bliver ikke gemt hos os. Lyden kommer med, hvor
 browseren kan læse den. Koden ligger i `lib/shareClip.ts` og `components/ShareClipButton.tsx`.
 
 ## Show på engelsk og siden Relived in English
@@ -520,16 +533,16 @@ Kør `supabase/migrations/0019_videoannoncer.sql` i Supabase → SQL Editor (eft
 
 For sælgere, der ikke har lyst til at gå live:
 
-- **Mine shows → Sælg med video → Film nu:** telefonens bagkamera åbner, og sælgeren filmer tingen i 5-45 sekunder (uden selv
+- **Mine shows → Sælg med video → Film nu:** telefonens bagkamera åbner, og sælgeren filmer varen i 5-45 sekunder (uden selv
   at være med). Har sælgeren allerede filmet, kan hun trykke **Vælg en video**. Så bliver videoen lavet om på telefonen, så den
   kan ses på alle telefoner (det tager lige så lang tid som videoen).
 - **Billederne:** mens der filmes, tages der billeder. Claude vælger op til 4 (det bedste bliver forsidebilledet), og sælgeren
   kan vælge til og fra eller lægge sine egne billeder på. Uden `ANTHROPIC_API_KEY` vælger telefonen de skarpeste.
-- **Annoncen:** navn, kategori, str., pris, stand og beskrivelse. Tryk **Sæt til salg**, så kan tingen købes med det samme med
-  Køb nu. Videoen vises først på tingens side og i Klip. Betaling, fragt og ordrer virker som for ting fra et show.
+- **Annoncen:** navn, kategori, str., pris, stand og beskrivelse. Tryk **Sæt til salg**, så kan varen købes med det samme med
+  Køb nu. Videoen vises først på varens side og i Klip. Betaling, fragt og ordrer virker som for varer fra et show.
 - **Mærkevarer** skal stadig ægthedstjekkes, før de kan købes. Sælgeren sender billederne lige efter, eller under
   **Mine shows → Til salg → Send billeder**.
-- **Bag kulissen:** tingene ligger i et skjult "show" pr. sælger (`kind = 'video'`). Det vises aldrig som et show (ikke under
+- **Bag kulissen:** varerne ligger i et skjult "show" pr. sælger (`kind = 'video'`). Det vises aldrig som et show (ikke under
   Mine shows, ikke på sælgerens side og uden studie). I Backoffice → Shows står det som *Videoannoncer*.
 - **Lukker I en sælger** (Backoffice → Anmeldelser → fjern profilen), bliver alt, sælgeren har til salg, nu også taget af salg.
 - Højst 40 videoannoncer pr. sælger pr. døgn. Videoerne fylder ca. 5-9 MB stykket i Supabase Storage (mappen `clips`).
@@ -542,8 +555,8 @@ For sælgere, der ikke har lyst til at gå live:
 Kør `supabase/migrations/0021_nulstil_testsalg.sql` i Supabase → SQL Editor (efter 0020).
 
 **Backoffice → Indstillinger → Nulstil testsalg** sletter alle køb, ordrer, bud, sager, bedømmelser og fragtlabels, så
-omsætningen (og indberetningen til Skat) starter forfra. Solgte ting bliver *Ikke til salg* (sælgeren kan sætte dem til salg
-igen). Shows, ting, sælgere, købere og følgere bliver liggende. Man skal skrive NULSTIL for at bekræfte.
+omsætningen (og indberetningen til Skat) starter forfra. Solgte varer bliver *Ikke til salg* (sælgeren kan sætte dem til salg
+igen). Shows, varer, sælgere, købere og følgere bliver liggende. Man skal skrive NULSTIL for at bekræfte.
 
 Knappen findes kun, mens Stripe kører med testnøgler (`sk_test_…`). Med rigtige nøgler forsvinder den, og databasen nægter
 også, hvis der er en rigtig betaling. Fragtlabels, der er købt hos Shipmondo, bliver ikke annulleret der.
@@ -554,7 +567,7 @@ også, hvis der er en rigtig betaling. Fragtlabels, der er købt hos Shipmondo, 
 
 Første gang en sælger åbner et studie (før showet går live), spørger siden: *Vil du se, hvordan studiet virker?* med
 **Ja, vis mig** og **Nej tak**. Siger sælgeren ja, bliver én ting ad gangen fremhævet med en kort forklaring og **OK**:
-køen, hvordan man sætter en ting til salg, kameraet og knapperne på det, Vises nu og swipe, Vis næste / lynrunde /
+køen, hvordan man sætter en vare til salg, kameraet og knapperne på det, Vises nu og swipe, Vis næste / lynrunde /
 budsalg, tallene, chatten, gæster, deling og hvad der sker efter showet. Gæster i et show får deres egen, kortere udgave.
 
 - *Nej tak*, *Spring resten over* og *Færdig* gør, at den ikke kommer igen af sig selv (husket i browseren, se `/cookies`).
@@ -598,42 +611,42 @@ Kør `supabase/migrations/0020_gaester.sql` i Supabase → SQL Editor (efter 001
 - **Værten inviterer:** i studiet står boksen *Gæster i showet*. *Inviter en sælger* laver et link (`/gaest/…`), som værten
   sender. Op til 2 gæster. *Lav et nyt link* gør det gamle ugyldigt.
 - **Gæsten siger ja:** gæsten skal være sælger (og MitID-bekræftet, når det er slået til). Gæsten lander i værtens studie,
-  kan tænde sit kamera før showet og lægger sine egne ting i køen. Under Mine shows står *Du er gæst i*.
-- **Under showet:** værten og gæsterne ser og hører hinanden. Ved tingene står *fra @gæst* og *Sælges af @gæst*.
+  kan tænde sit kamera før showet og lægger sine egne varer i køen. Under Mine shows står *Du er gæst i*.
+- **Under showet:** værten og gæsterne ser og hører hinanden. Ved varerne står *fra @gæst* og *Sælges af @gæst*.
 - **Side om side eller fokus:** værten vælger i boksen *Gæster i showet*, hvordan seerne ser jer: *Side om side* (alle
-  kameraer lige store; den, hvis ting vises, får en rød kant og "Viser nu") eller *Fokus* (den, der viser, er stor, de
+  kameraer lige store; den, hvis vare vises, får en rød kant og "Viser nu") eller *Fokus* (den, der viser, er stor, de
   andre små). Det skifter med det samme hos alle. Kræver `supabase/migrations/0022_side_om_side.sql` (efter 0021); uden
   den er det altid side om side.
-- **Værten styrer** hvad der vises, budsalg, lynrunder og chatten. Gæsten kan ikke gå live, vise ting eller afslutte showet.
-- **Pengene** for en gæsts ting går til gæsten, og gæsten sender selv tingene (som altid går salget til den, der ejer tingen).
-  Billedet og klippet af en gæsts ting tages med gæstens kamera. Køberen får en pakke fra hver sælger.
+- **Værten styrer** hvad der vises, budsalg, lynrunder og chatten. Gæsten kan ikke gå live, vise varer eller afslutte showet.
+- **Pengene** for en gæsts varer går til gæsten, og gæsten sender selv varerne (som altid går salget til den, der ejer varen).
+  Billedet og klippet af en gæsts varer tages med gæstens kamera. Køberen får en pakke fra hver sælger.
 - **Besked:** når showet går live, får følgerne af gæsterne også besked ("@lise er live hos @maja").
 - **Tag en gæst ud:** *Fjern* i boksen. Gæsten forsvinder fra videoen med det samme og kan ikke komme med igen med samme
-  link. Gæsten kan selv trykke *Forlad showet*. Gæstens ting i køen kommer til salg, når showet slutter.
+  link. Gæsten kan selv trykke *Forlad showet*. Gæstens varer i køen kommer til salg, når showet slutter.
 - Er 0020 ikke kørt, er der ingen gæste-boks, og resten virker som før.
 
 ---
 
-## Studiet: swipe for at skifte ting
+## Studiet: swipe for at skifte vare
 
-Kortet nederst på kameraet i studiet ("Vises nu") kan swipes: **til venstre** viser den næste ting i køen, **til højre**
-den forrige ting, der ikke er solgt (fx hvis en seer spørger til den). Der er også pile i begge sider af kortet, og på
+Kortet nederst på kameraet i studiet ("Vises nu") kan swipes: **til venstre** viser den næste vare i køen, **til højre**
+den forrige vare, der ikke er solgt (fx hvis en seer spørger til den). Der er også pile i begge sider af kortet, og på
 computeren virker piletasterne venstre/højre (ikke mens man skriver). Knappen **Vis næste** under kameraet virker som før.
-Første gang står der "Swipe for at skifte ting" over kortet. Under et budsalg kan man ikke skifte.
+Første gang står der "Swipe for at skifte vare" over kortet. Under et budsalg kan man ikke skifte.
 
 ---
 
 ## Klip: "Swipe og køb"
 
-Siden `/klip` (menupunktet **Klip**) viser klippene af de usolgte ting som et feed i fuld skærm, ét klip ad gangen. Der skal
+Siden `/klip` (menupunktet **Klip**) viser klippene af de usolgte varer som et feed i fuld skærm, ét klip ad gangen. Der skal
 ikke køres noget nyt i Supabase (det bruger klippene fra 0015).
 
 - Swipe op/ned på telefonen (pil op/ned, rullehjul eller knapperne til højre på computeren). Klippet på skærmen afspilles
   uden lyd; lyden slås til én gang for alle klip. Tryk på videoen for pause.
-- Under hvert klip: sælgeren med **Følg**, navn, pris, **Køb nu** og **Se tingen**. Del-knappen deler tingens side.
+- Under hvert klip: sælgeren med **Følg**, navn, pris, **Køb nu** og **Se varen**. Del-knappen deler varens side.
 - De nyeste klip kommer først, og sælgerne blandes, så én sælger ikke fylder hele feedet. Feedet henter 12 ad gangen.
 - Kun de nærmeste klip hentes, så det ikke bruger unødig data. Har man slået *reducer bevægelse* til, starter intet af sig selv.
-- Et delt link kan starte med en bestemt ting: `/klip?ting=<id>`. Forsiden og *Til salg* har en knap *Swipe gennem klip*,
+- Et delt link kan starte med en bestemt vare: `/klip?ting=<id>`. Forsiden og *Til salg* har en knap *Swipe gennem klip*,
   når der er klip.
 
 ---
@@ -642,7 +655,7 @@ ikke køres noget nyt i Supabase (det bruger klippene fra 0015).
 
 Kør `supabase/migrations/0016_foelg.sql` i Supabase → SQL Editor (efter 0015). Der skal ikke nye nøgler i Vercel.
 
-- **Følg:** knappen står ved showet, på sælgerens side og ved hver ting. Er man ikke logget ind, kommer man til login og
+- **Følg:** knappen står ved showet, på sælgerens side og ved hver vare. Er man ikke logget ind, kommer man til login og
   følger sælgeren med det samme bagefter. Antallet af følgere står ved knappen. Sælgeren kan ikke se, hvem der følger.
   Mens showet er live, står der også en lille **Følg** på selve videoen ved sælgerens navn. Den forsvinder, når man
   følger sælgeren, og de to knapper følger hinanden.
@@ -659,17 +672,17 @@ Kør `supabase/migrations/0016_foelg.sql` i Supabase → SQL Editor (efter 0015)
 
 ---
 
-## Billedet af tingene (Claude vælger)
+## Billedet af varerne (Claude vælger)
 
 Når sælgeren trykker **Vis**, tager studiet 6 billeder i løbet af de næste 15 sekunder (efter 1, 3, 5, 7½, 10 og 13 sekunder).
-Viser sælgeren den næste ting før tid, bruges de billeder, der er nået. Bagefter sendes små udgaver til Claude (Haiku 5.5)
-sammen med tingens navn, og Claude vælger det billede, hvor tingen ses bedst. Ses tingen ikke på nogen af dem, gemmes der
-intet billede. Det koster ca. 0,2 øre pr. ting.
+Viser sælgeren den næste vare før tid, bruges de billeder, der er nået. Bagefter sendes små udgaver til Claude (Haiku 5.5)
+sammen med varens navn, og Claude vælger det billede, hvor varen ses bedst. Ses varen ikke på nogen af dem, gemmes der
+intet billede. Det koster ca. 0,2 øre pr. vare.
 
 **Sådan sætter du det op (du skal ikke sende nøglen til nogen):**
 1. Gå til **console.anthropic.com**, og opret en konto (samme e-mail som jeres Claude-konto er fin). API'et har sin egen
    regning, uafhængigt af et Pro-abonnement.
-2. **Billing:** køb kredit, fx 5 dollar (rækker til ca. 15.000 ting). Sæt gerne en månedlig grænse under *Limits*.
+2. **Billing:** køb kredit, fx 5 dollar (rækker til ca. 15.000 varer). Sæt gerne en månedlig grænse under *Limits*.
 3. **API Keys → Create Key:** kald den `relived-billeder`, og kopiér nøglen (den vises kun én gang).
 4. **Vercel → Settings → Environment Variables:** tilføj `ANTHROPIC_API_KEY` med nøglen (Production), og lav en **Redeploy**.
 
@@ -682,11 +695,11 @@ skifter model (standard `claude-haiku-5-5`).
 
 Ved kameraet i studiet er der to knapper under *Skift kamera*. Der skal ikke køres noget i Supabase eller sættes nøgler i Vercel.
 
-- **Solen (Lys op)** gør billedet lysere i dårligt lys uden at ændre farverne, så tingene ser ud, som de er.
+- **Solen (Lys op)** gør billedet lysere i dårligt lys uden at ændre farverne, så varerne ser ud, som de er.
 - **Personen (Slør baggrund)** slører alt bag sælgeren. Første gang henter browseren en model på ca. 10 MB fra
   `relived.dk/mediapipe`. Den kopieres fra `node_modules` ved hver build (`scripts/mediapipe.mjs`), så intet hentes fra
   fremmede servere.
-- Filtrene kører på sælgerens egen enhed. Seerne ser billedet med filter, og det kommer med på billedet og klippet af tingen.
+- Filtrene kører på sælgerens egen enhed. Seerne ser billedet med filter, og det kommer med på billedet og klippet af varen.
 - Valget huskes i browseren til næste show. Kan enheden ikke sløre baggrunden, får sælgeren besked, og knappen slår fra igen.
   Knapperne vises ikke i browsere, der slet ikke kan bruge filtre.
 
@@ -711,7 +724,7 @@ PGHOST=localhost PGPORT=5432 ./supabase/tests/run.sh
 ```
 
 Testene tjekker blandt andet, at kun sælgeren kan styre sit show, at ingen kan skrive i andres navn i chatten,
-at man ikke kan købe sine egne ting, at en lynrunde lukker til tiden, at kun én får tingen, når to trykker samtidig,
+at man ikke kan købe sine egne varer, at en lynrunde lukker til tiden, at kun én får varen, når to trykker samtidig,
 og at kun ét bud går igennem, når to byder det samme på samme tid.
 
 ## Sådan hænger det sammen
@@ -732,7 +745,7 @@ Browser ──► Vercel (Next.js 16)
   tryghed, backoffice, `0007_varer.sql` med `buy_now`, `items_feed` og påmindelser, og `0008_budsalg.sql` med
   `start_auction`, `place_bid` og `close_auction`).
 
-Al logik, der skal være til at stole på (hvem der fik tingen, om lynrunden er slut, hvem der må styre et show),
+Al logik, der skal være til at stole på (hvem der fik varen, om lynrunden er slut, hvem der må styre et show),
 ligger i databasen. Browseren kan ikke snyde sig udenom.
 
 ## Næste trin

@@ -113,7 +113,7 @@ export default function SwipeCard({
 
   return (
     <>
-      {hint && (canNext || canPrev) ? <div className="v-swipe-hint" aria-hidden="true">Swipe for at skifte ting</div> : null}
+      {hint && (canNext || canPrev) ? <div className="v-swipe-hint" aria-hidden="true">Swipe for at skifte vare</div> : null}
       {peek ? <div className={`v-swipe-peek ${dx < 0 ? "next" : "prev"}`} aria-hidden="true">{peek}</div> : null}
       <div
         className={`v-card v-swipe${dragging ? " dragging" : ""}`}
@@ -123,13 +123,13 @@ export default function SwipeCard({
         onPointerUp={up}
         onPointerCancel={cancel}
       >
-        <button className="v-arrow prev" type="button" onClick={() => go("prev")} disabled={!canPrev} aria-label={prevName ? `Vis forrige ting: ${prevName}` : "Ingen forrige ting"}>
+        <button className="v-arrow prev" type="button" onClick={() => go("prev")} disabled={!canPrev} aria-label={prevName ? `Vis forrige vare: ${prevName}` : "Ingen forrige vare"}>
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 5l-7 7 7 7" />
           </svg>
         </button>
         {children}
-        <button className="v-arrow next" type="button" onClick={() => go("next")} disabled={!canNext} aria-label={nextName ? `Vis næste ting: ${nextName}` : "Ingen næste ting"}>
+        <button className="v-arrow next" type="button" onClick={() => go("next")} disabled={!canNext} aria-label={nextName ? `Vis næste vare: ${nextName}` : "Ingen næste vare"}>
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 5l7 7-7 7" />
           </svg>

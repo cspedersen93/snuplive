@@ -22,17 +22,17 @@ function hostSteps(): Step[] {
       title: "Køen",
       body: (
         <p>
-          Her står de ting, du vil vise i showet, i den rækkefølge, du viser dem. Tryk <b>Ret</b> for at ændre en ting eller
-          <b> Fjern</b> for at tage den ud. Når du er live, viser du en bestemt ting med <b>Vis</b>.
+          Her står de varer, du vil vise i showet, i den rækkefølge, du viser dem. Tryk <b>Ret</b> for at ændre en vare eller
+          <b> Fjern</b> for at tage den ud. Når du er live, viser du en bestemt vare med <b>Vis</b>.
         </p>
       ),
     },
     {
       target: "item-form",
-      title: "Sæt en ting til salg",
+      title: "Sæt en vare til salg",
       body: (
         <>
-          <p>Sådan lægger du en ting i køen:</p>
+          <p>Sådan lægger du en vare i køen:</p>
           <ol>
             <li>Skriv, hvad det er, og sæt en pris.</li>
             <li>
@@ -67,9 +67,9 @@ function hostSteps(): Step[] {
       title: "Vises nu",
       body: (
         <p>
-          Når du er live, står den ting, du viser, nederst på kameraet med prisen. <b>Swipe til venstre</b> for næste ting og
-          <b> til højre</b> for den forrige. Seerne trykker Køb, og den første får tingen. Vi tager selv et billede og et kort
-          klip af tingen, mens du viser den.
+          Når du er live, står den vare, du viser, nederst på kameraet med prisen. <b>Swipe til venstre</b> for næste vare og
+          <b> til højre</b> for den forrige. Seerne trykker Køb, og den første får varen. Vi tager selv et billede og et kort
+          klip af varen, mens du viser den.
         </p>
       ),
     },
@@ -88,9 +88,9 @@ function hostSteps(): Step[] {
       title: "Styr showet",
       body: (
         <ul>
-          <li><b>Vis næste</b> viser den næste ting i køen.</li>
-          <li><b>Lynrunde 10 s</b> giver seerne 10 sekunder til at købe tingen. Godt, når mange vil have den.</li>
-          <li>Er tingen sat til budsalg, står der <b>Start budsalg</b> i stedet. Så har seerne 30 sekunder til at byde.</li>
+          <li><b>Vis næste</b> viser den næste vare i køen.</li>
+          <li><b>Lynrunde 10 s</b> giver seerne 10 sekunder til at købe varen. Godt, når mange vil have den.</li>
+          <li>Er varen sat til budsalg, står der <b>Start budsalg</b> i stedet. Så har seerne 30 sekunder til at byde.</li>
           <li><b>Afslut show</b> stopper videoen for alle.</li>
         </ul>
       ),
@@ -98,7 +98,7 @@ function hostSteps(): Step[] {
     {
       target: "ticker",
       title: "Dine tal",
-      body: <p>Her kan du se, hvor mange der ser med, hvor mange ting du har solgt, og hvor meget du har solgt for.</p>,
+      body: <p>Her kan du se, hvor mange der ser med, hvor mange varer du har solgt, og hvor meget du har solgt for.</p>,
     },
     {
       target: "chat",
@@ -116,7 +116,7 @@ function hostSteps(): Step[] {
       body: (
         <p>
           Tryk <b>Inviter en sælger</b>, og send linket. Op til 2 andre sælgere kan være med. I er på kameraet sammen, og hver
-          får pengene for sine egne ting. Du styrer, hvad der vises.
+          får pengene for sine egne varer. Du styrer, hvad der vises.
         </p>
       ),
     },
@@ -148,17 +148,17 @@ function guestSteps(host: string): Step[] {
       title: "Køen",
       body: (
         <p>
-          Her står både dine og @{host}s ting. Dine egne kan du rette og fjerne. Ved de andres står, hvem der sælger dem.
+          Her står både dine og @{host}s varer. Dine egne kan du rette og fjerne. Ved de andres står, hvem der sælger dem.
         </p>
       ),
     },
     {
       target: "item-form",
-      title: "Sæt en ting til salg",
+      title: "Sæt en vare til salg",
       body: (
         <>
           <p>Skriv, hvad det er, sæt en pris, og tryk <b>Læg i køen</b>. Vælg <b>Budsalg</b>, hvis det højeste bud skal vinde.</p>
-          <p>Pengene for dine ting går til dig, og du sender dem selv.</p>
+          <p>Pengene for dine varer går til dig, og du sender dem selv.</p>
         </>
       ),
     },
@@ -168,8 +168,8 @@ function guestSteps(host: string): Step[] {
       body: (
         <>
           <p>
-            Tryk <b>Tænd kameraet</b>, og tjek billede og lyd. Når en af dine ting bliver vist, er det dit kamera, seerne ser. Hold
-            tingen tæt på kameraet. Knapperne i højre side:
+            Tryk <b>Tænd kameraet</b>, og tjek billede og lyd. Når en af dine varer bliver vist, er det dit kamera, seerne ser. Hold
+            varen tæt på kameraet. Knapperne i højre side:
           </p>
           <ul className="tour-icons">
             <li><span><IconMic /></span>Slå mikrofonen fra og til</li>
@@ -183,7 +183,7 @@ function guestSteps(host: string): Step[] {
     {
       target: "ctrl",
       title: `@${host} styrer showet`,
-      body: <p>Værten går live, viser tingene frem og starter budsalg og lynrunder. Du kan se her, hvad du har solgt.</p>,
+      body: <p>Værten går live, viser varerne frem og starter budsalg og lynrunder. Du kan se her, hvad du har solgt.</p>,
     },
     {
       target: "chat",
@@ -195,7 +195,7 @@ function guestSteps(host: string): Step[] {
       title: "Hvem er med",
       body: (
         <p>
-          Her kan du se, hvem der er med i showet. Vil du gå, så tryk <b>Forlad showet</b>. Dine ting i køen kommer til salg,
+          Her kan du se, hvem der er med i showet. Vil du gå, så tryk <b>Forlad showet</b>. Dine varer i køen kommer til salg,
           når showet slutter.
         </p>
       ),
@@ -362,7 +362,7 @@ export default function StudioTour({
           <span className="label red">Rundvisning</span>
           <h2 id="tour-t">{role === "host" ? "Vil du se, hvordan studiet virker?" : `Du er gæst hos @${host}. Vil du se, hvordan det virker?`}</h2>
           <p>
-            Vi viser dig på et minut, hvad knapperne gør, og hvordan du sætter dine ting til salg. Du trykker bare OK for at gå
+            Vi viser dig på et minut, hvad knapperne gør, og hvordan du sætter dine varer til salg. Du trykker bare OK for at gå
             videre.
           </p>
           <div className="tour-btns">

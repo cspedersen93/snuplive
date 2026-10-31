@@ -3,9 +3,9 @@ import Link from "next/link";
 import { IconBolt, IconBox, IconCamera, IconCard, IconClip, IconList } from "@/components/Icons";
 
 export const metadata: Metadata = {
-  title: { absolute: "Sælg brugt tøj og ting live – gratis i beta | Relived" },
+  title: { absolute: "Sælg brugt tøj og andre varer live – gratis i beta | Relived" },
   description:
-    "Gå live fra telefonen, vis dine ting frem, og sælg en hel bunke på én aften. Navn og pris er nok, og det er gratis at sælge i beta.",
+    "Gå live fra telefonen, vis dine varer frem, og sælg en hel bunke på én aften. Navn og pris er nok, og det er gratis at sælge i beta.",
   alternates: { canonical: "/saelg" },
 };
 
@@ -19,9 +19,9 @@ export default function Saelg() {
             <span aria-hidden="true">/</span>
             <span>Sælg live</span>
           </nav>
-          <h1 className="h1" id="h-saelg">Sælg brugt tøj og ting live på video</h1>
+          <h1 className="h1" id="h-saelg">Sælg brugt tøj og andre varer live på video</h1>
           <p className="lede">
-            Glem at fotografere og skrive en annonce til hver eneste ting. Gå live fra telefonen, vis tingene frem én ad gangen, og
+            Glem at fotografere og skrive en annonce til hver eneste vare. Gå live fra telefonen, vis varerne frem én ad gangen, og
             sælg en hel bunke på én aften.
           </p>
           <div className="ctas">
@@ -52,8 +52,8 @@ export default function Saelg() {
             </div>
             <ol className="steps">
               <li><div><h3>Opret et show</h3><p>Giv det en titel, og vælg kategori og tidspunkt. Showet kommer i programmet under Live nu, og dine følgere får besked, når du går live.</p></div></li>
-              <li><div><h3>Læg dine ting i køen</h3><p>Navn, størrelse og pris er nok. Lægger du billeder og en beskrivelse på, kan køberne finde tingene og trykke Husk mig før showet.</p></div></li>
-              <li><div><h3>Gå live fra studiet</h3><p>Vis tingene frem én ad gangen. Køberne køber med ét tryk, og du kan starte lynrunder eller budsalg, når stemningen er god.</p></div></li>
+              <li><div><h3>Læg dine varer i køen</h3><p>Navn, størrelse og pris er nok. Lægger du billeder og en beskrivelse på, kan køberne finde varerne og trykke Husk mig før showet.</p></div></li>
+              <li><div><h3>Gå live fra studiet</h3><p>Vis varerne frem én ad gangen. Køberne køber med ét tryk, og du kan starte lynrunder eller budsalg, når stemningen er god.</p></div></li>
               <li><div><h3>Pak, send og få pengene</h3><p>Når køberen har betalt, printer du fragtlabelen og afleverer pakken. Når køberen har fået den, går pengene til din bankkonto.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
@@ -70,11 +70,11 @@ export default function Saelg() {
           </div>
           <div className="feat">
             <div><IconCamera /><h3>Studie i browseren</h3><p>Gå live fra telefonen eller computeren uden at installere noget. Skift mellem for- og bagkamera, lys billedet op, eller slør baggrunden.</p></div>
-            <div><IconList /><h3>Kø af varer</h3><p>Dine ting står klar i rækkefølge, og du viser den næste med ét tryk.</p></div>
+            <div><IconList /><h3>Kø af varer</h3><p>Dine varer står klar i rækkefølge, og du viser den næste med ét tryk.</p></div>
             <div><IconBolt /><h3>Lynrunder og budsalg</h3><p>Lynrunder på ti sekunder til fast pris, eller budsalg på 30 sekunder, hvor det højeste bud vinder. Det giver liv i showet.</p></div>
             <div><IconBox /><h3>Fragtlabels med ét tryk</h3><p>Køberen har valgt pakkeshop og betalt fragten. Du printer labelen og afleverer pakken hos DAO eller GLS. Alt, en køber har købt hos dig, sendes i én pakke.</p></div>
-            <div><IconCard /><h3>Udbetaling til din konto</h3><p>Tilknyt din bankkonto via Stripe. Pengene udbetales, når køberen har fået sine ting.</p></div>
-            <div><IconClip /><h3>Sælg også uden at være live</h3><p>Det, der ikke bliver solgt, kan købes bagefter til fast pris med et klip fra showet. Er du ikke til kamera, kan du filme tingen uden selv at være med og sætte den til salg med <b>Sælg med video</b>.</p></div>
+            <div><IconCard /><h3>Udbetaling til din konto</h3><p>Tilknyt din bankkonto via Stripe. Pengene udbetales, når køberen har fået sine varer.</p></div>
+            <div><IconClip /><h3>Sælg også uden at være live</h3><p>Det, der ikke bliver solgt, kan købes bagefter til fast pris med et klip fra showet. Er du ikke til kamera, kan du filme varen uden selv at være med og sætte den til salg med <b>Sælg med video</b>.</p></div>
           </div>
         </div>
       </section>
@@ -88,8 +88,8 @@ export default function Saelg() {
           <div className="faq-list">
             <details open><summary><h3>Hvad koster det at sælge?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det er gratis at oprette en konto, gå live og sælge i beta-perioden. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke. Hvis vi senere indfører et salgsgebyr, får du besked, før det gælder.</p></details>
             <details><summary><h3>Hvad skal jeg bruge for at gå live?</h3><span className="pm" aria-hidden="true">+</span></summary><p>En telefon eller computer med kamera og en stabil internetforbindelse. Et stativ og et ringlys gør billedet bedre, men det er ikke et krav.</p></details>
-            <details><summary><h3>Hvor længe skal et show vare?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det bestemmer du. Et godt første show er 20 minutter og 10 til 15 ting. I studiet er der en rundvisning, der viser dig, hvad hver knap gør.</p></details>
-            <details><summary><h3>Kan jeg sælge sammen med en veninde?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Ja. I studiet trykker du Inviter en sælger og sender linket. Op til 2 andre sælgere kan være med som gæster. I er på kameraet sammen, hver lægger sine egne ting i køen og får selv pengene for dem, og I tager hinandens følgere med. Du styrer, hvad der vises.</p></details>
+            <details><summary><h3>Hvor længe skal et show vare?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det bestemmer du. Et godt første show er 20 minutter og 10 til 15 varer. I studiet er der en rundvisning, der viser dig, hvad hver knap gør.</p></details>
+            <details><summary><h3>Kan jeg sælge sammen med en veninde?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Ja. I studiet trykker du Inviter en sælger og sender linket. Op til 2 andre sælgere kan være med som gæster. I er på kameraet sammen, hver lægger sine egne varer i køen og får selv pengene for dem, og I tager hinandens følgere med. Du styrer, hvad der vises.</p></details>
             <details><summary><h3>Kan en genbrugsbutik også sælge live?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Ja. Butikker kan oprette en konto og gå live fra butikken, fx med ugens nye varer.</p></details>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function Saelg() {
           <div className="cta-band">
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <h2 className="h2">Dit første show kan være i aften</h2>
-              <p className="lede" style={{ margin: 0 }}>Opret en gratis konto, læg 10 ting i køen, og gå live, når det passer dig.</p>
+              <p className="lede" style={{ margin: 0 }}>Opret en gratis konto, læg 10 varer i køen, og gå live, når det passer dig.</p>
             </div>
             <div className="ctas">
               <Link className="btn btn-red" href="/opret">Opret gratis konto</Link>
