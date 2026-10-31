@@ -83,7 +83,7 @@ export default function Saelg() {
         <div className="wrap faq">
           <div className="sec-head">
             <h2 className="h2" id="h-saelg-faq">Spørgsmål fra nye sælgere</h2>
-            <p className="lede">Flere svar finder du under <Link href="/faq">spørgsmål og svar</Link>.</p>
+            <p className="lede">Flere svar finder du under <Link href="/faq">spørgsmål og svar</Link> og i guiden <Link href="/guides/saelg-live-foerste-gang">sælg live første gang</Link>.</p>
           </div>
           <div className="faq-list">
             <details open><summary><h3>Hvad koster det at sælge?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det er gratis at oprette en konto, gå live og sælge i beta-perioden. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke. Hvis vi senere indfører et salgsgebyr, får du besked, før det gælder.</p></details>

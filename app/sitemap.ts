@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/env";
 import { CATEGORIES } from "@/lib/format";
+import { GUIDES, guideHref } from "@/lib/guides";
 import { itemHref } from "@/lib/items";
 import { fetchFeed } from "@/lib/queries";
 import { siteOpen } from "@/lib/siteAccess";
@@ -10,6 +11,16 @@ export const revalidate = 600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  // Guides er åbne for alle, også før lanceringen.
+  const guides: MetadataRoute.Sitemap = [
+    { url: `${SITE_URL}/guides`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
+    ...GUIDES.map((g) => ({
+      url: `${SITE_URL}${guideHref(g)}`,
+      lastModified: new Date(`${g.updated}T12:00:00Z`),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+  ];
   // Før lanceringen kan Google kun se "Kommer snart" og de faste sider om Relived.
   if (!(await siteOpen())) {
     return [
@@ -20,6 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "yearly" as const,
         priority: 0.2,
       })),
+      ...guides,
     ];
   }
   const pages: MetadataRoute.Sitemap = [
@@ -37,6 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/saelg`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/saadan-virker-det`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    ...guides,
     { url: `${SITE_URL}/en`, lastModified: now, changeFrequency: "daily", priority: 0.5 },
     { url: `${SITE_URL}/opret`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
     { url: `${SITE_URL}/privatliv`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },

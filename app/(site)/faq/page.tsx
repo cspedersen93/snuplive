@@ -88,6 +88,7 @@ export default function Faq() {
             <h2 className="h2">Se, hvordan det hele hænger sammen</h2>
             <div className="ctas">
               <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
+              <Link className="btn btn-line" href="/guides">Læs vores guides</Link>
               <Link className="btn btn-red" href="/opret">Opret gratis konto</Link>
             </div>
           </div>

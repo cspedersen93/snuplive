@@ -76,7 +76,7 @@ export default function Saadan() {
           <p className="fine" style={{ marginTop: 18 }}>
             Relived er i beta. MitID for sælgere bliver slået til inden lanceringen.
           </p>
-          <div className="ctas" style={{ marginTop: 24 }}><Link className="btn btn-line" href="/faq">Læs spørgsmål og svar</Link></div>
+          <div className="ctas" style={{ marginTop: 24 }}><Link className="btn btn-line" href="/faq">Læs spørgsmål og svar</Link><Link className="btn btn-line" href="/guides/koeb-brugt-toej-online">Sådan køber du brugt trygt</Link></div>
         </div>
       </section>
 

@@ -99,6 +99,12 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
         p: "Sælgeren får først pengene, når du har varen. Viser den sig at være en kopi, melder du det under Mine køb, og så får du alle pengene tilbage.",
       },
     ],
+    note: (
+      <>
+        Læs, hvad du selv kan tjekke på syninger, metal og papirer, i guiden{" "}
+        <Link href="/guides/er-designertasken-aegte">er designertasken ægte?</Link>
+      </>
+    ),
     sellH2: "Har du en designertaske eller et ur, der skal videre?",
   },
   skoenhed: {

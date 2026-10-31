@@ -95,6 +95,8 @@ export function alwaysOpen(path: string) {
     path === "/handelsbetingelser" ||
     path === "/vilkaar" ||
     path === "/om-relived" ||
+    path === "/guides" ||
+    path.startsWith("/guides/") ||
     path === "/robots.txt" ||
     path === "/sitemap.xml"
   );
