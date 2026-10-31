@@ -424,7 +424,7 @@ Siden siger **vare/varen/varer/varerne** om det, der bliver solgt (før stod der
   til "vare", når de vises (`vareTekst` i `lib/format.ts`, brugt i `errorText` og `fail`). Der skal ikke køres noget i
   Supabase.
 - **Antal:** "1 vare", "3 varer" (`vareOrd`).
-- **Vilkår, handelsbetingelser og privatlivspolitik** er ikke rettet. De ændres kun efter aftale.
+- **Vilkår, handelsbetingelser og privatlivspolitik** siger også vare (kun ordet er skiftet, indholdet er det samme).
 
 ---
 

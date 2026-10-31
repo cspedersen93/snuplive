@@ -8,7 +8,7 @@ import { RESERVATION_DAYS } from "@/lib/pricing";
 export const metadata: Metadata = {
   title: "Vilkår for brugere og sælgere",
   description:
-    "Vilkår for at bruge og sælge på Relived: konto, regler for ting og shows, anmeldelser, gebyrer, udbetaling og indberetning til Skattestyrelsen.",
+    "Vilkår for at bruge og sælge på Relived: konto, regler for varer og shows, anmeldelser, gebyrer, udbetaling og indberetning til Skattestyrelsen.",
   alternates: { canonical: "/vilkaar" },
 };
 
@@ -29,19 +29,19 @@ export default function Vilkaar() {
         der sker på din konto, og dit brugernavn må ikke udgive sig for at være en anden.
       </p>
 
-      <h3>2. Regler for ting, shows og chat</h3>
+      <h3>2. Regler for varer, shows og chat</h3>
       <p>Det er ikke tilladt at sælge eller vise:</p>
       <ul>
-        <li>ulovlige, stjålne eller forfalskede ting (kopivarer)</li>
+        <li>ulovlige, stjålne eller forfalskede varer (kopivarer)</li>
         <li>våben, medicin, tobak, alkohol, levende dyr og fødevarer</li>
-        <li>ting, der er farlige eller kaldt tilbage</li>
+        <li>varer, der er farlige eller kaldt tilbage</li>
         <li>nøgenhed, vold, chikane, trusler eller hadefulde udtalelser i shows og chat</li>
       </ul>
       <p>Køb og salg skal ske gennem Relived. Du må ikke bede andre om at betale uden om siden.</p>
 
       <h3>3. Anmeld noget, der ikke er i orden</h3>
       <p>
-        Alle kan anmelde en ting, et show eller en profil med knappen <b>Anmeld</b>, også uden at være logget ind. Vi læser alle
+        Alle kan anmelde en vare, et show eller en profil med knappen <b>Anmeld</b>, også uden at være logget ind. Vi læser alle
         anmeldelser og fjerner det, der er ulovligt eller strider mod vilkårene. Fjerner vi noget, får den, der lagde det op, besked
         om hvorfor. Er du uenig i en afgørelse, kan du skrive til {COMPANY.email}, så ser vi på den igen.
       </p>
@@ -54,7 +54,7 @@ export default function Vilkaar() {
         eller ikke handler om handlen.
       </p>
 
-      <h3>5. Sådan sorterer vi tingene</h3>
+      <h3>5. Sådan sorterer vi varerne</h3>
       <p>
         Ingen sælger kan betale sig til en bedre plads. Læs mere under{" "}
         <Link href="/saadan-virker-det#sortering">Sådan sorterer vi</Link>.
@@ -64,39 +64,39 @@ export default function Vilkaar() {
 
       <h3>6. Privat eller erhverv</h3>
       <p>
-        Når du bliver sælger, oplyser du, om du sælger som privatperson eller som virksomhed. Køberne kan se det ved dine ting og shows.
-        Sælger du ting, du har købt for at sælge dem videre, eller sælger du jævnligt for at tjene penge, er du erhvervsdrivende og
+        Når du bliver sælger, oplyser du, om du sælger som privatperson eller som virksomhed. Køberne kan se det ved dine varer og shows.
+        Sælger du varer, du har købt for at sælge dem videre, eller sælger du jævnligt for at tjene penge, er du erhvervsdrivende og
         skal vælge erhverv med firmanavn og CVR-nummer. Som erhvervssælger skal du overholde reglerne om fortrydelsesret og
         reklamation, og dine priser skal være med moms, hvis du er momsregistreret.
       </p>
       <p>
         Vi kan bede dig bekræfte, hvem du er, med MitID, før du går live. Du skal være fyldt 18 år, og det samme MitID må kun bruges
-        på én sælgerkonto. Køberne ser mærket MitID-bekræftet ved dine ting og shows.
+        på én sælgerkonto. Køberne ser mærket MitID-bekræftet ved dine varer og shows.
       </p>
 
-      <h3>7. Dine ting</h3>
+      <h3>7. Dine varer</h3>
       <ul>
-        <li>Du må kun sælge ting, du ejer, og som må sælges. Kopivarer og efterligninger af mærkevarer er forbudt.</li>
+        <li>Du må kun sælge varer, du ejer, og som må sælges. Kopivarer og efterligninger af mærkevarer er forbudt.</li>
         <li>
-          Mærkevarer (fx Louis Vuitton, Gucci, Chanel, Hermès, Prada, Dior og Rolex) og ting i kategorien Luksus til 1.000 kr eller
+          Mærkevarer (fx Louis Vuitton, Gucci, Chanel, Hermès, Prada, Dior og Rolex) og varer i kategorien Luksus til 1.000 kr eller
           mere skal ægthedstjekkes af Relived, før de kan vises live eller købes. Du sender nærbilleder af logo, koder og syninger fra
-          dit studie eller under Til salg, og vi godkender eller afviser. Er en ting falsk, får køberen alle pengene tilbage, og vi kan lukke din konto.
+          dit studie eller under Til salg, og vi godkender eller afviser. Er en vare falsk, får køberen alle pengene tilbage, og vi kan lukke din konto.
         </li>
         <li>Skønhedsprodukter (makeup, hudpleje og parfume) må kun sælges, hvis de er nye og uåbnede.</li>
-        <li>Beskriv tingen ærligt, og vis fejl og slid tydeligt på video.</li>
+        <li>Beskriv varen ærligt, og vis fejl og slid tydeligt på video.</li>
         <li>
-          Når du viser en ting frem i et show, gemmer vi det billede, hvor tingen ses bedst, og et klip på op til 15 sekunder med lyd. Bliver tingen ikke solgt,
-          vises klippet på tingens side, så køberne kan se den bagefter. Du giver os lov til at vise billedet og klippet på Relived,
-          så længe tingen ligger her. Du kan slette klippet under Til salg i dit studie.
+          Når du viser en vare frem i et show, gemmer vi det billede, hvor varen ses bedst, og et klip på op til 15 sekunder med lyd. Bliver varen ikke solgt,
+          vises klippet på varens side, så køberne kan se den bagefter. Du giver os lov til at vise billedet og klippet på Relived,
+          så længe varen ligger her. Du kan slette klippet under Til salg i dit studie.
         </li>
         <li>
-          Lægger du en videoannonce op (Sælg med video), kan tingen købes med det samme til den pris, du har sat. Videoen og de
-          billeder, du vælger, vises på tingens side og under Klip, så længe tingen ligger her. Videoen må kun vise tingen, ikke
+          Lægger du en videoannonce op (Sælg med video), kan varen købes med det samme til den pris, du har sat. Videoen og de
+          billeder, du vælger, vises på varens side og under Klip, så længe varen ligger her. Videoen må kun vise varen, ikke
           andre personer, der ikke har sagt ja til det.
         </li>
         <li>
-          Sælger I flere sammen i ét show (Gæst i showet), er hver sælger selv ansvarlig for sine egne ting: beskrivelsen,
-          ægtheden, at sende dem og at svare på klager. Værten er ikke ansvarlig for gæsternes ting, og gæsterne er ikke ansvarlige
+          Sælger I flere sammen i ét show (Gæst i showet), er hver sælger selv ansvarlig for sine egne varer: beskrivelsen,
+          ægtheden, at sende dem og at svare på klager. Værten er ikke ansvarlig for gæsternes varer, og gæsterne er ikke ansvarlige
           for værtens. Værten styrer showet og kan tage en gæst ud af det.
         </li>
         <li>Prisen, du sætter, og et vindende bud er bindende for dig.</li>
@@ -112,9 +112,9 @@ export default function Vilkaar() {
       <h3>9. Betaling og udbetaling</h3>
       <p>
         For at få penge for dine salg opretter du en konto hos Stripe, som tjekker din identitet og din bankkonto. Stripes egne
-        vilkår gælder for den konto. Pengene bliver sendt til din bankkonto, når køberen har fået tingene. Har køberen meldt et
+        vilkår gælder for den konto. Pengene bliver sendt til din bankkonto, når køberen har fået varerne. Har køberen meldt et
         problem, venter pengene, til sagen er afgjort. Betaler køberen ikke inden {RESERVATION_DAYS} dage, bliver købet annulleret, og
-        tingen kan sælges igen.
+        varen kan sælges igen.
       </p>
 
       <h3>10. Skat og indberetning til Skattestyrelsen</h3>
@@ -125,9 +125,9 @@ export default function Vilkaar() {
         skat, der skal betales af dine salg.
       </p>
 
-      <h3>11. Hvis vi lukker en konto eller fjerner en ting</h3>
+      <h3>11. Hvis vi lukker en konto eller fjerner en vare</h3>
       <p>
-        Vi kan fjerne en ting eller lukke en sælgerkonto, hvis vilkårene bliver brudt. Du får besked om hvorfor. Ordrer, der allerede
+        Vi kan fjerne en vare eller lukke en sælgerkonto, hvis vilkårene bliver brudt. Du får besked om hvorfor. Ordrer, der allerede
         er betalt, bliver gjort færdige eller refunderet.
       </p>
 
