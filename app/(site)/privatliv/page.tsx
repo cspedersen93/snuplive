@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function Privatliv() {
   return (
-    <LegalPage title="Privatlivspolitik" crumb="Privatlivspolitik" updated="oktober 2026">
+    <LegalPage title="Privatlivspolitik" crumb="Privatlivspolitik" updated="31. oktober 2026">
       <p className="lede">Her kan du læse, hvilke oplysninger Relived gemmer om dig, og hvad vi bruger dem til.</p>
 
       <h2>Hvem er ansvarlig?</h2>
@@ -56,7 +56,7 @@ export default function Privatliv() {
 
       <h2>Hvem hjælper os?</h2>
       <p>
-        Vi bruger databehandlere til drift: Supabase (database og login), LiveKit (video), Vercel (hosting), Stripe (betaling og
+        Vi bruger databehandlere til drift: Supabase (database og login), LiveKit (video), Vercel (hosting og statistik over besøg), Stripe (betaling og
         udbetaling), Shipmondo (fragtlabels og sporing), Resend (mails), Idura (MitID) og Anthropic (valg af billedet af tingene). De må kun bruge oplysningerne til at hjælpe os.
       </p>
 
@@ -64,7 +64,8 @@ export default function Privatliv() {
       <p>
         Vi bruger kun de cookies, der er nødvendige for, at du kan være logget ind, betale og fortsætte en samtale i supportchatten.
         Har du skrevet til os, husker din browser det, så du kan se, når vi har svaret. Vi bruger ikke cookies til reklame eller
-        sporing, og vores skrifttyper hentes fra vores egen server. Se hele listen under{" "}
+        sporing, og vores skrifttyper hentes fra vores egen server. Besøg tælles uden cookies med Vercel Web Analytics, så vi
+        kan se, hvilke sider der bliver brugt, men ikke hvem du er. Se hele listen under{" "}
         <Link href="/cookies">cookies</Link>.
       </p>
 

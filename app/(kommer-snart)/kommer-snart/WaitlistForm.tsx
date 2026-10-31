@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { errorText, toast } from "@/lib/toast";
+import { track } from "@/lib/track";
 
 type Role = "buyer" | "seller" | "both";
 const ROLES: { k: Role; label: string }[] = [
@@ -43,6 +44,7 @@ export default function WaitlistForm() {
       const j = (await r.json().catch(() => ({}))) as { error?: string };
       if (!r.ok) throw new Error(j.error || "Det lykkedes ikke at skrive dig op.");
       setSent(email.trim().toLowerCase());
+      track("Venteliste", { rolle: role });
     } catch (err) {
       toast(errorText(err));
     } finally {

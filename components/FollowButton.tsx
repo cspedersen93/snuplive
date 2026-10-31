@@ -6,6 +6,7 @@ import { PushOffer } from "@/components/PushOffer";
 import { hasSupabase } from "@/lib/env";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
+import { track } from "@/lib/track";
 
 /** Flere knapper for samme sælger på siden (fx på videoen og i boksen ved siden af) følger hinanden. */
 const SYNC = "relived:follow";
@@ -68,6 +69,7 @@ export default function FollowButton({
       setJust(true);
       if (!error) setCount((c) => (c ?? 0) + 1);
       tell(true, error ? 0 : 1);
+      if (!error) track("Følg", { hvor: compact ? "video" : "side" });
       toast(`Du følger nu @${handle}. Vi giver dig besked, når @${handle} går live.`);
       if (!compact) setOffer(true);
       onFollowedRef.current?.();

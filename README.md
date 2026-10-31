@@ -469,6 +469,28 @@ Indtil 0018 er kørt, kan man kun slette planlagte shows (afsluttede shows har i
 
 ---
 
+## Statistik over besøg (Vercel Web Analytics)
+
+Siden tæller besøg med Vercel Web Analytics. Det sker uden cookies, og der gemmes intet i browseren, så der skal ikke
+spørges om lov. Cookies-siden og privatlivspolitikken fortæller om det.
+
+- **Slå det til:** Vercel → projektet → **Analytics** → **Enable** (Web Analytics). Lav så en ny deployment. Statistikken
+  kommer kun med på Vercel, ikke lokalt eller i test.
+- **Det kan I se:** besøg pr. side, hvor de besøgende kommer fra (fx Google eller Facebook), land og type enhed.
+  Adressens ?-del bliver ikke sendt med, og sider med login, Min konto, Mine køb, studiet og backoffice tælles ikke.
+- **Hændelser:** Køb, Bud, Gik live, Følg, Venteliste og Delte klip bliver også talt (uden personlige oplysninger). De
+  vises først i Vercel med Pro-abonnementet.
+
+## Del klip på TikTok og Instagram
+
+Under **Mine shows → Til salg** står **Lav video til TikTok og Instagram** ved hver ting med et klip. Browseren laver en
+lodret video (720 × 1280) af klippet med Relived-logo, tingens navn og pris og "Køb den på relived.dk", og til sidst et
+slutbillede på 2 sekunder med logoet og relived.dk. Det tager lige så lang tid som klippet, og siden skal være åben imens.
+
+Bagefter kan sælgeren **dele videoen** direkte fra telefonen (TikTok, Instagram, Facebook og andre apps, hvor telefonen
+kan), **hente den** eller **kopiere linket** til tingen til teksten. Videoen bliver ikke gemt hos os. Lyden kommer med, hvor
+browseren kan læse den. Koden ligger i `lib/shareClip.ts` og `components/ShareClipButton.tsx`.
+
 ## Show på engelsk og siden Relived in English
 
 Kør `supabase/migrations/0023_engelsk.sql` i Supabase → SQL Editor (efter 0022). Der skal ikke nye nøgler i Vercel.

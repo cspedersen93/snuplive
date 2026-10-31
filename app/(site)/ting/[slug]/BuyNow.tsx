@@ -7,6 +7,7 @@ import { kr } from "@/lib/format";
 import { hasSupabase } from "@/lib/env";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
+import { track } from "@/lib/track";
 
 /** Køb nu: tingen reserveres til dig og lander i Mine køb, hvor du betaler. */
 export default function BuyNow({ itemId, price, next, sellerId }: { itemId: string; price: number; next: string; sellerId: string }) {
@@ -41,6 +42,7 @@ export default function BuyNow({ itemId, price, next, sellerId }: { itemId: stri
       return;
     }
     window.dispatchEvent(new Event("snup:changed"));
+    track("Køb", { hvor: "fast pris" });
     toast("Den er din! Betal under Mine køb.");
     router.push("/kurv");
   }

@@ -23,6 +23,7 @@ import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
+import { track } from "@/lib/track";
 import type { CamLayout, Item, Message, Profile, SellerFactsData, Show } from "@/lib/types";
 import type { Guest } from "@/lib/guests";
 import type { Room } from "livekit-client";
@@ -266,6 +267,7 @@ export default function ShowClient(props: Props) {
     const { error } = await getSupabase().rpc("place_bid", { p_item: auction.id, p_amount: bidAmount });
     setBusy(false);
     if (error) toast(errorText(error));
+    else track("Bud");
   }
 
   async function snup() {
@@ -283,6 +285,7 @@ export default function ShowClient(props: Props) {
     }
     setMine((s) => new Set(s).add(current.id));
     window.dispatchEvent(new Event("snup:changed"));
+    track("Køb", { hvor: "live" });
     toast(`Du købte ${current.name}!`, "/kurv", "Mine køb");
   }
 

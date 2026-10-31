@@ -7,7 +7,7 @@ import ForgetChoices from "./ForgetChoices";
 
 export const metadata: Metadata = {
   title: "Cookies: kun det, der skal til",
-  description: "Relived bruger kun nødvendige cookies, så du kan logge ind, købe og sælge. Ingen reklame, statistik eller sporing. Se listen her.",
+  description: "Relived bruger kun nødvendige cookies, så du kan logge ind, købe og sælge. Ingen cookies til reklame, statistik eller sporing. Se listen her.",
   alternates: { canonical: "/cookies" },
 };
 
@@ -41,7 +41,7 @@ function Table({ rows, caption }: { rows: StoredThing[]; caption: string }) {
 
 export default function Cookies() {
   return (
-    <LegalPage title="Cookies på Relived" crumb="Cookies" updated="25. oktober 2026">
+    <LegalPage title="Cookies på Relived" crumb="Cookies" updated="31. oktober 2026">
       <p className="lede">
         Kort fortalt: Relived bruger kun de cookies, der skal til, for at du kan logge ind, købe og sælge. Vi bruger ingen cookies
         til reklame, statistik eller sporing, og vi deler ikke noget med annoncører.
@@ -81,6 +81,11 @@ export default function Cookies() {
         </li>
         <li>
           <b>Skrifttyper og billeder</b> kommer fra vores egen server, så andre firmaer ikke kan se, at du er her.
+        </li>
+        <li>
+          <b>Statistik:</b> vi tæller besøg med Vercel Web Analytics. Det sker uden cookies, og der bliver ikke gemt noget i din
+          browser. Vi kan se, hvilke sider der bliver besøgt, hvilken side de besøgende kom fra (fx Google), og hvilken type enhed
+          og land det er, men ikke hvem du er. Sider med login, Min konto, Mine køb og studiet tæller vi ikke.
         </li>
       </ul>
 

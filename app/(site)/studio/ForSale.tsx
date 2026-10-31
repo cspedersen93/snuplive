@@ -1,6 +1,6 @@
 import { itemMeta } from "@/components/Screen";
 import { gradFor } from "@/lib/format";
-import { itemImage } from "@/lib/images";
+import { clipUrl, itemImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { createClient } from "@/lib/supabase/server";
 import { ITEM_COLS, type Item } from "@/lib/types";
@@ -21,12 +21,14 @@ export default async function ForSale({ uid }: { uid: string }) {
   // Klip hentes for sig, så listen virker, også før 0015_klip.sql er kørt.
   const { data: clipData, error: clipErr } = await supabase
     .from("items")
-    .select("id")
+    .select("id,clip_path,clip_at")
     .eq("seller_id", uid)
     .eq("status", "unsold")
     .not("clip_path", "is", null)
     .limit(200);
-  const withClip = new Set(clipErr ? [] : (clipData ?? []).map((c: { id: string }) => c.id));
+  const clips = new Map(
+    (clipErr ? [] : ((clipData ?? []) as { id: string; clip_path: string | null; clip_at: string | null }[])).map((c) => [c.id, clipUrl(c)]),
+  );
   const videoShow = await videoShowId(supabase, uid);
   // Mærkevarer, der skal ægthedstjekkes, før de kan købes (0017_aegthed.sql).
   const { data: authData, error: authErr } = await supabase
@@ -66,7 +68,7 @@ export default async function ForSale({ uid }: { uid: string }) {
                 <a href={itemHref(r)}>{r.name}</a>
               </strong>
               <span>{[itemMeta(r), videoShow && r.show_id === videoShow ? "Videoannonce" : r.show?.title].filter(Boolean).join(" · ")}</span>
-              {withClip.has(r.id) ? <ClipRow id={r.id} href={itemHref(r)} /> : null}
+              {clips.has(r.id) ? <ClipRow id={r.id} href={itemHref(r)} clip={clips.get(r.id)} name={r.name} price={r.price} /> : null}
               {needAuth.has(r.id) ? (
                 <ForSaleAuth
                   sellerId={uid}

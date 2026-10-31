@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
+import ShareClipButton from "@/components/ShareClipButton";
 
 export function ShipForm({ orderId }: { orderId: string }) {
   const router = useRouter();
@@ -325,7 +326,7 @@ export function ForSaleRow({ id, price, forSale }: { id: string; price: number; 
 }
 
 /** Videoen af en ting (fra live-showet eller en videoannonce): se den, eller slet den. */
-export function ClipRow({ id, href }: { id: string; href: string }) {
+export function ClipRow({ id, href, clip, name, price }: { id: string; href: string; clip?: string | null; name?: string; price?: number }) {
   const router = useRouter();
   const [ask, setAsk] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -352,6 +353,7 @@ export function ClipRow({ id, href }: { id: string; href: string }) {
       ) : (
         <button className="linkbtn" type="button" onClick={() => setAsk(true)}>Slet video</button>
       )}
+      {clip && name && price != null ? <ShareClipButton src={clip} name={name} price={price} href={href} /> : null}
     </span>
   );
 }

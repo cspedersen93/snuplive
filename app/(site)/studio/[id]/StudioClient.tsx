@@ -16,6 +16,7 @@ import { itemImage, showImage } from "@/lib/images";
 import { itemHref } from "@/lib/items";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
+import { track } from "@/lib/track";
 import type { CamLayout, Item, Message, Profile, Show, ShowLanguage } from "@/lib/types";
 import ItemForm from "./ItemForm";
 import SwipeCard from "./SwipeCard";
@@ -390,6 +391,7 @@ export default function StudioClient(props: Props) {
       void rpc("set_show_status", { p_show: show.id, p_status: "live" }, "Du er live!").then((ok) => {
         // Giv besked til dem, der har trykket "Husk mig".
         if (ok) void fetch(`/api/shows/${show.id}/notify`, { method: "POST" }).catch(() => undefined);
+        if (ok) track("Gik live", { gaester: guests.length });
       });
       return;
     }

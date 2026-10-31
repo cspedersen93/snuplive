@@ -3,6 +3,7 @@ import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import CookieNotice from "@/components/CookieNotice";
+import SiteAnalytics from "@/components/SiteAnalytics";
 import SupportChat from "@/components/SupportChat";
 import Toaster from "@/components/Toaster";
 import { SITE_URL } from "@/lib/env";
@@ -41,6 +42,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SupportChat />
         <CookieNotice />
         <Toaster />
+        {/* Statistik over besøg (uden cookies). Kun på Vercel, ikke lokalt eller i test. */}
+        {process.env.VERCEL ? <SiteAnalytics /> : null}
       </body>
     </html>
   );
