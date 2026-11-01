@@ -1078,6 +1078,441 @@ export const GUIDES: Guide[] = [
     related: ["saelg-brugt-toej", "pris-paa-brugt-toej", "hvad-er-live-shopping"],
     end: { h2: "Klar til dit første show?", text: "Opret en gratis konto, læg 10 varer i køen, og gå live, når det passer dig.", href: "/saelg", label: "Bliv sælger" },
   },
+
+  {
+    slug: "saelg-brugt-boernetoej",
+    audience: "Sælger",
+    keyword: "sælg brugt børnetøj",
+    title: "Sælg brugt børnetøj – tips til pris og pakker | Relived",
+    description:
+      "Sælg brugt børnetøj hurtigt: sorter efter størrelse, sælg i pakker, sæt den rigtige pris, og vis standen på video. Tips til flyverdragter, sko og strik.",
+    h1: "Sælg brugt børnetøj: sådan bliver du af med det hurtigt",
+    short: "Sælg brugt børnetøj",
+    lede: (
+      <>
+        Børn vokser ud af tøjet, længe før det er slidt op. Det gør brugt børnetøj til noget af det, der sælger bedst, hvis du gør
+        det nemt for andre forældre at finde den rigtige størrelse og se standen.
+      </>
+    ),
+    teaser: "Størrelser, pakker, pris og stand: sådan sælger du børnetøj, før det bliver for lille igen.",
+    image: { src: "/img/guides/boernetoej.jpg", alt: "Strik og trøjer til børn på et lille tøjstativ", width: 1200, height: 1600, position: "50% 40%" },
+    published: "2026-11-01",
+    updated: "2026-11-01",
+    sections: [
+      {
+        id: "hvad",
+        h2: "Hvilket børnetøj sælger bedst?",
+        body: (
+          <>
+            <p>
+              Overtøj sælger altid: flyverdragter, termotøj, regntøj og vinterstøvler. Det er dyrt nyt og bliver ofte kun brugt en
+              enkelt sæson. Strik i uld, pænt tøj til fest og kendte skandinaviske mærker sælger også godt.
+            </p>
+            <p>Bodyer, leggings og t-shirts fra billige kæder sælger bedst i pakker. Hver for sig er de næsten ikke fragten værd.</p>
+          </>
+        ),
+      },
+      {
+        id: "stoerrelser",
+        h2: "Hvordan skriver du størrelsen?",
+        body: (
+          <>
+            <p>
+              Børnetøj måles i centimeter efter barnets højde, fx str. 92. Skriv altid størrelsen, der står i tøjet, og gerne den
+              omtrentlige alder. Det er sådan, forældre søger.
+            </p>
+            <div className="guide-table" role="table" aria-label="Børnestørrelser og omtrentlig alder">
+              <div role="row" className="head">
+                <span role="columnheader">Størrelse</span>
+                <span role="columnheader">Ca. alder</span>
+              </div>
+              {[
+                ["56–62", "0–4 måneder"],
+                ["68–74", "4–9 måneder"],
+                ["80–86", "9–18 måneder"],
+                ["92–98", "2–3 år"],
+                ["104–110", "4–5 år"],
+                ["116–128", "6–8 år"],
+                ["134–152", "9–12 år"],
+              ].map(([s, a]) => (
+                <div role="row" key={s}>
+                  <span role="cell">Str. {s}</span>
+                  <span role="cell">{a}</span>
+                </div>
+              ))}
+            </div>
+            <p>Mål gerne længden på flyverdragter og jakker. Mærker er forskellige, og nogle er store i størrelsen.</p>
+          </>
+        ),
+      },
+      {
+        id: "pakker",
+        h2: "Skal du sælge i pakker?",
+        body: (
+          <>
+            <p>
+              Ja, når det er billigt tøj. En pakke med 10 dele i str. 80 sælger meget hurtigere end 10 annoncer hver for sig. Saml
+              efter størrelse og gerne efter køn eller farver, og skriv, hvor mange dele der er, og hvad pakken indeholder.
+            </p>
+            <p>Dyrere dele som flyverdragter, sko og mærketøj sælger du hver for sig. Så får du mest for dem.</p>
+          </>
+        ),
+      },
+      {
+        id: "stand",
+        h2: "Hvordan viser du standen?",
+        body: (
+          <ul>
+            <li><b>Knæ, albuer og numse:</b> det er her, børnetøj bliver slidt først. Vis dem tæt på.</li>
+            <li><b>Pletter:</b> vis dem, og skriv om dem. Mad og græs er det, forældre spørger om.</li>
+            <li><b>Lynlåse og trykknapper:</b> tjek, at de virker, især på flyverdragter.</li>
+            <li><b>Sko:</b> vis sålen og indersiden. Slidte sko formes efter foden.</li>
+          </ul>
+        ),
+        cta: { text: "Vis børnetøjet frem live, så forældrene kan spørge om stand og mål.", href: "/saelg", label: "Sælg det live" },
+      },
+      {
+        id: "pris",
+        h2: "Hvad skal børnetøj koste?",
+        body: (
+          <>
+            <p>
+              Som tommelfingerregel 20–40 % af nyprisen for tøj i pæn stand. Overtøj og kendte mærker ligger i den høje ende, billige
+              basisdele i den lave. Se flere tal i guiden <Link href="/guides/pris-paa-brugt-toej">pris på brugt tøj</Link>.
+            </p>
+            <p>
+              Køberen betaler 49 kr i fragt pr. sælger (op til 5 kg). Det betyder, at forældre gerne køber flere dele på én gang, så
+              det kan betale sig at vise mange dele i samme live-show.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "saeson",
+        h2: "Hvornår skal du sælge?",
+        body: (
+          <p>
+            Lige før sæsonen. Flyverdragter og vinterstøvler sælger bedst fra september til november, regntøj og sandaler i foråret.
+            Har du tøjet liggende uden for sæsonen, så sæt det til salg, når forældrene begynder at lede.
+          </p>
+        ),
+        cta: SAELG,
+      },
+    ],
+    faq: [
+      ["Hvad sælger bedst af brugt børnetøj?", "Flyverdragter, termotøj, regntøj, vinterstøvler, strik i uld og kendte mærker i pæn stand."],
+      ["Hvad er en god pris for brugt børnetøj?", "Omkring 20–40 % af nyprisen. Billige basisdele sælger bedst i pakker, fx 10 dele i samme størrelse."],
+      ["Skal jeg vaske tøjet, før jeg sælger det?", "Ja. Vask det, fjern fnug, og vis det rent og glat. Det sælger hurtigere og til en bedre pris."],
+      ["Kan jeg sælge brugte sutter og flasker?", "Nej, sælg kun det, der kan vaskes og bruges igen. Brugte sutter og flaskesutter bør ikke sælges af hensyn til hygiejnen."],
+    ],
+    related: ["saelg-brugt-toej", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
+    end: { h2: "Gør plads i børneskabet", text: "Opret en gratis konto, og sælg børnetøjet live eller med video.", href: "/saelg", label: "Bliv sælger" },
+  },
+
+  {
+    slug: "koeb-brugt-design",
+    audience: "Køber",
+    keyword: "brugt design",
+    title: "Køb brugt design og lamper: 7 tjek før du køber | Relived",
+    description:
+      "Køb brugt design trygt: sådan tjekker du stempler, skår, revner og ledninger på lamper, keramik og glas, og sådan undgår du kopier og dårlige køb.",
+    h1: "Køb brugt design: sådan tjekker du lamper, keramik og glas",
+    short: "Køb brugt design",
+    lede: (
+      <>
+        Brugt design er tit bedre lavet end nyt og koster en brøkdel. Men en lille revne, en forkert lampeskærm eller en kopi kan
+        gøre et godt køb til et dårligt. Her er det, du skal kigge efter.
+      </>
+    ),
+    teaser: "Stempler, skår, revner og ledninger: det skal du tjekke, før du køber brugt design.",
+    image: { src: "/img/guides/design.jpg", alt: "Bordlampe med stofskærm på et natbord", width: 1200, height: 1800, position: "50% 45%" },
+    published: "2026-11-01",
+    updated: "2026-11-01",
+    sections: [
+      {
+        id: "stempel",
+        h2: "Hvordan ser du, hvem der har lavet det?",
+        body: (
+          <>
+            <h3>1. Kig i bunden</h3>
+            <p>
+              Keramik, porcelæn og glas har ofte et stempel, en signatur eller et mærkat i bunden. Bed sælgeren vende varen og holde
+              bunden tæt på kameraet. Mange porcelænsfabrikker markerer også i bundstemplet, hvis det er 2. sortering, så spørg, om
+              det er 1. sortering.
+            </p>
+            <h3>2. Kend forskel på original og nyproduktion</h3>
+            <p>
+              Mange klassikere bliver stadig produceret. Det er ikke en fejl, men en ældre udgave kan være mere værd. Spørg, hvor gammel
+              varen er, og om der følger æske eller kvittering med.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "skaar",
+        h2: "Hvordan finder du skår og revner?",
+        body: (
+          <>
+            <h3>3. Følg kanten rundt</h3>
+            <p>
+              Små skår sidder tit på kanten, på låget og i bunden. Bed sælgeren dreje varen langsomt rundt i lyset. Hårfine revner i
+              glasuren ses bedst, når varen bevæger sig. Det er en af grundene til, at video er bedre end billeder.
+            </p>
+            <h3>4. Spørg om limning og reparationer</h3>
+            <p>En limet hank eller en slebet kant trækker prisen ned. Spørg direkte, og bed om at se det tæt på.</p>
+          </>
+        ),
+        cta: { text: "Se brugt design på video, og bed sælgeren vise bunden og kanterne.", href: "/kategori/bolig-og-design", label: "Se Bolig og design" },
+      },
+      {
+        id: "lamper",
+        h2: "Hvad skal du tjekke på en brugt lampe?",
+        body: (
+          <>
+            <h3>5. Ledning, stik og fatning</h3>
+            <p>
+              Bed sælgeren tænde lampen, mens du ser med. Se efter revner i ledningen og et løst stik. Gamle lamper kan have brug for
+              ny ledning, og det skal laves af en elektriker. Skriv det ind i prisen.
+            </p>
+            <h3>6. Skærmen</h3>
+            <p>Skærme bliver gule, får pletter eller revner med tiden. Spørg, om skærmen er den originale, og vis den med lyset tændt.</p>
+          </>
+        ),
+      },
+      {
+        id: "fragt",
+        h2: "Hvordan får du det sikkert hjem?",
+        body: (
+          <>
+            <h3>7. Tænk på fragten</h3>
+            <p>
+              Fragt til pakkeshop gælder op til 5 kg. Store og tunge varer som møbler og store lamper henter du gratis hos sælgeren.
+              Bed sælgeren pakke glas og keramik i bobleplast og en solid kasse, og tjek varen, før du bekræfter, at du har fået den.
+            </p>
+            <p>
+              Er den gået i stykker undervejs, trykker du <b>Meld et problem</b> på ordren. Sælgeren får først pengene, når du har
+              varen. Læs mere i <Link href="/guides/koeb-brugt-toej-online">sådan handler du trygt online</Link>.
+            </p>
+          </>
+        ),
+      },
+    ],
+    faq: [
+      ["Hvordan ser jeg, om keramik er 1. sortering?", "Kig på stemplet i bunden. Mange fabrikker markerer 2. og 3. sortering i bundstemplet. Bed sælgeren vise bunden tæt på."],
+      ["Er det farligt at købe en gammel lampe?", "Ikke hvis ledningen er hel. Er den gammel, revnet eller stiv, så få en elektriker til at skifte den, før lampen bruges."],
+      ["Hvad hvis varen går i stykker med posten?", "Tryk Meld et problem på ordren, før du bekræfter, at du har fået den. Så holder vi pengene tilbage og hjælper dig."],
+      ["Kan jeg hente varen selv?", "Ja, hvis sælgeren tilbyder afhentning. Det er gratis og det bedste til store og skrøbelige varer."],
+    ],
+    related: ["koeb-brugt-toej-online", "hvad-er-live-shopping", "pris-paa-brugt-toej"],
+    end: { h2: "Find dit næste designfund", text: "Se lamper, keramik og glas på video, og spørg sælgeren om alt.", href: "/kategori/bolig-og-design", label: "Se Bolig og design" },
+  },
+
+  {
+    slug: "saelg-samleobjekter",
+    audience: "Sælger",
+    keyword: "sælg samleobjekter",
+    title: "Sælg samleobjekter: LEGO, vinyl og samlekort | Relived",
+    description:
+      "Sælg samleobjekter til den rigtige pris: sådan beskriver du standen på LEGO, vinyl, samlekort og retrospil, og hvorfor det sælger godt live.",
+    h1: "Sælg samleobjekter: LEGO, vinyl, samlekort og retrospil",
+    short: "Sælg samleobjekter",
+    lede: (
+      <>
+        Samlere ved præcis, hvad de leder efter, og de betaler gerne for det. Til gengæld vil de vide alt om standen og om, hvad
+        der følger med. Sådan beskriver og viser du samleobjekter, så de bliver solgt til den rigtige pris.
+      </>
+    ),
+    teaser: "Stand, komplethed og pris for LEGO, vinyl, samlekort og retrospil.",
+    image: { src: "/img/guides/samleobjekter.jpg", alt: "En hånd lægger en vinylplade på en pladespiller", width: 1200, height: 1800, position: "50% 50%" },
+    published: "2026-11-01",
+    updated: "2026-11-01",
+    sections: [
+      {
+        id: "komplet",
+        h2: "Hvorfor er komplet så vigtigt?",
+        body: (
+          <p>
+            For samlere gør det en stor forskel, om alt er med. Et LEGO-sæt med alle dele, figurer og vejledning er mere værd end
+            de samme klodser i en pose. Et spil med æske og manual er mere værd end kassetten alene. Skriv altid præcist, hvad der
+            følger med, og hvad der mangler.
+          </p>
+        ),
+      },
+      {
+        id: "lego",
+        h2: "Hvordan sælger du LEGO?",
+        body: (
+          <ul>
+            <li><b>Sætnummeret:</b> skriv det i navnet. Det er det, samlerne søger på.</li>
+            <li><b>Komplet eller ej:</b> skriv, om alle dele og figurer er med, og om der er vejledning og æske.</li>
+            <li><b>Stand:</b> nævn misfarvede hvide klodser, ridser og klistermærker, der er sat skævt på.</li>
+            <li><b>Løse klodser:</b> sælg dem på vægt eller i store poser og skriv cirka, hvad der er i.</li>
+          </ul>
+        ),
+      },
+      {
+        id: "vinyl",
+        h2: "Hvordan beskriver du en vinylplade?",
+        body: (
+          <>
+            <p>
+              Beskriv pladen og omslaget hver for sig. Mange bruger korte betegnelser som NM (næsten som ny), VG+ (meget god) og VG
+              (god). Skriv også, hvilket år og land pressningen er fra, hvis det står på pladen. Første pressninger kan være mere værd.
+            </p>
+            <p>Vis pladen i lyset, så ridser kan ses, og vis hjørnerne og ryggen af omslaget.</p>
+          </>
+        ),
+        cta: { text: "Vis pladen og omslaget live, så samlerne kan se standen.", href: "/saelg", label: "Sælg det live" },
+      },
+      {
+        id: "kort",
+        h2: "Hvad med samlekort og retrospil?",
+        body: (
+          <>
+            <p>
+              <b>Samlekort:</b> hjørner, kanter og overflade bestemmer prisen. Vis kortet forfra og bagfra tæt på, helst i en lomme.
+              Graderede kort sælges med graderingen i navnet.
+            </p>
+            <p>
+              <b>Retrospil:</b> skriv, om det er spillet alene, med æske, eller med æske og manual. Vis, at spillet virker, hvis du kan.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "pris",
+        h2: "Hvordan finder du prisen?",
+        body: (
+          <>
+            <p>
+              Søg på sætnummer, titel eller kortnavn, og se, hvad det faktisk er blevet solgt for i samme stand. Samlerpriser svinger
+              meget, så hold dig til solgte priser, ikke det, der står til salg.
+            </p>
+            <p>
+              Er du usikker, så sæt det til <b>budsalg</b> i et live-show. Når flere samlere vil have det samme, finder de selv den
+              rigtige pris. Byder ingen, kan det købes bagefter til din startpris.
+            </p>
+          </>
+        ),
+        cta: SAELG,
+      },
+    ],
+    faq: [
+      ["Hvad er brugt LEGO værd?", "Det afhænger af sættet, og om det er komplet med figurer, vejledning og æske. Søg på sætnummeret, og se, hvad det er blevet solgt for."],
+      ["Hvad betyder NM og VG+ på vinyl?", "Det er korte betegnelser for standen: NM er næsten som ny, VG+ er meget god med lidt brug, og VG er god med tydelige spor."],
+      ["Skal jeg sælge samleobjekter på budsalg?", "Ja, hvis det er eftertragtet, og du er usikker på prisen. Så finder samlerne selv prisen."],
+      ["Hvordan sender jeg en vinylplade?", "I en papkasse til plader, med pladen uden for omslaget i sin inderlomme, så omslaget ikke flækker."],
+    ],
+    related: ["saelg-live-foerste-gang", "pris-paa-brugt-toej", "saelg-brugt-toej"],
+    end: { h2: "Har du noget, samlerne leder efter?", text: "Vis det frem live, eller sæt det på budsalg. Det er gratis i beta.", href: "/saelg", label: "Bliv sælger" },
+  },
+
+  {
+    slug: "saelg-designertaske",
+    audience: "Sælger",
+    keyword: "sælg din designertaske",
+    title: "Sælg din designertaske – sådan får du mest | Relived",
+    description:
+      "Sælg din designertaske trygt og til en god pris: papirer, nærbilleder, ægthedstjek og pris. Sådan sælger du en brugt designertaske live på Relived.",
+    h1: "Sælg din designertaske: sådan får du mest for den",
+    short: "Sælg designertaske",
+    lede: (
+      <>
+        En designertaske holder prisen godt, men køberne er forsigtige, fordi der findes mange kopier. Jo mere du kan vise og
+        dokumentere, jo hurtigere sælger den, og jo mere får du for den.
+      </>
+    ),
+    teaser: "Papirer, nærbilleder, ægthedstjek og pris: sådan sælger du en brugt designertaske.",
+    image: { src: "/img/guides/saelg-live.jpg", alt: "En sælger holder en frakke op foran ringlyset og telefonen", width: 1200, height: 1800, position: "50% 35%" },
+    published: "2026-11-01",
+    updated: "2026-11-01",
+    sections: [
+      {
+        id: "papirer",
+        h2: "Hvad skal du have klar?",
+        body: (
+          <ul>
+            <li><b>Kvitteringen:</b> det bedste bevis. Den viser, hvor og hvornår tasken er købt.</li>
+            <li><b>Æske, dustbag og kort:</b> følger de med, så skriv det. Det løfter prisen.</li>
+            <li><b>Remme og tilbehør:</b> skulderrem, nøgle, lås og pung skal med, hvis tasken blev solgt med dem.</li>
+          </ul>
+        ),
+      },
+      {
+        id: "naerbilleder",
+        h2: "Hvilke nærbilleder vil køberne se?",
+        body: (
+          <>
+            <p>Køberne vil se det samme, som en ekspert kigger på:</p>
+            <ul>
+              <li>Logo og prægning, tæt på.</li>
+              <li>Syninger, især ved hanker og hjørner.</li>
+              <li>Metal: spænder, lynlås og gravering.</li>
+              <li>Indersiden, mærkatet og koden.</li>
+              <li>Hjørner, hanker og kanter, hvor tasken bliver slidt.</li>
+            </ul>
+            <p>
+              Vis også slid og fejl. En ærlig beskrivelse af slidte hjørner sælger bedre end en overraskelse. Læs, hvad køberne
+              kigger efter, i <Link href="/guides/er-designertasken-aegte">er designertasken ægte?</Link>
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "aegthed",
+        h2: "Hvordan virker ægthedstjekket?",
+        body: (
+          <>
+            <p>
+              Mærkevarer som Louis Vuitton, Gucci, Chanel, Hermès, Prada, Dior og Rolex og alt i kategorien Luksus til 1.000 kr eller
+              mere bliver ægthedstjekket af Relived, før de kan købes. Når tasken er lagt op, trykker du <b>Send billeder</b> og lægger
+              nærbilleder af logo, kode, foer og syninger op. Vi godkender eller afviser.
+            </p>
+            <p>
+              Godkendte tasker får mærket <b>Ægthed tjekket</b>. Det gør køberne trygge, og trygge købere betaler mere. Send billederne i
+              god tid før dit show.
+            </p>
+          </>
+        ),
+        cta: { text: "Læg tasken op, og send billederne til ægthedstjek.", href: "/saelg", label: "Kom i gang" },
+      },
+      {
+        id: "pris",
+        h2: "Hvad kan du få for den?",
+        body: (
+          <>
+            <p>
+              Eftertragtede modeller fra de store mærker kan sælges tæt på nyprisen, og nogle få endda over. Mindre kendte modeller og
+              tasker med meget slid ligger lavere. Søg på mærke og model, og se, hvad lignende tasker faktisk er blevet solgt for.
+            </p>
+            <p>
+              Er tasken eftertragtet, kan du sætte den til <b>budsalg</b> i et live-show. Sæt startprisen til det laveste, du er glad
+              for at sælge til. Se flere råd i <Link href="/guides/pris-paa-brugt-toej">pris på brugt tøj</Link>.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "send",
+        h2: "Hvordan sender du den sikkert?",
+        body: (
+          <p>
+            Fyld tasken med silkepapir, så den holder formen, læg den i dustbaggen og derefter i en solid kasse. Køberen betaler
+            fragten, og du får pengene, når køberen har fået tasken.
+          </p>
+        ),
+        cta: SAELG,
+      },
+    ],
+    faq: [
+      ["Hvordan sælger jeg en designertaske trygt?", "Sælg gennem en markedsplads, hvor køberen betaler gennem siden, og hvor tasken bliver ægthedstjekket. Så slipper du for svindel og diskussioner."],
+      ["Skal jeg have kvitteringen for at sælge min taske?", "Nej, men den gør det nemmere og løfter prisen. Uden kvittering er nærbilleder og ægthedstjekket ekstra vigtige."],
+      ["Hvad koster ægthedstjekket?", "Det er gratis for sælgeren på Relived i beta-perioden."],
+      ["Hvad hvis tasken bliver afvist?", "Så kan den ikke sælges på Relived. Er du sikker på, at den er ægte, så send flere og tydeligere billeder, eller skriv til os."],
+    ],
+    related: ["er-designertasken-aegte", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
+    end: { h2: "Klar til at sælge din taske?", text: "Opret en gratis konto, læg tasken op, og få den ægthedstjekket.", href: "/saelg", label: "Bliv sælger" },
+  },
 ];
 
 export function guideBySlug(slug: string) {

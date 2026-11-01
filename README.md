@@ -420,15 +420,16 @@ og snuplive.dk sender videre. Gør det her i rækkefølge:
 Artikler om at købe og sælge brugt, så flere finder Relived, når de søger. De er åbne for alle, også før lanceringen,
 og står i sitemap.xml.
 
-- **Oversigt:** `/guides`. **Guides nu:** sælg brugt tøj, pris på brugt tøj, skat ved salg af brugt tøj, sælg live
-  første gang, er designertasken ægte, hvad er live shopping, og køb brugt tøj online.
+- **Oversigt:** `/guides`. **Guides nu (11):** sælg brugt tøj, pris på brugt tøj, skat ved salg af brugt tøj, sælg live
+  første gang, sælg brugt børnetøj, sælg samleobjekter, sælg din designertaske, er designertasken ægte, hvad er live
+  shopping, køb brugt tøj online og køb brugt design.
 - **Teksterne** står i `lib/guides.tsx`. Hver guide har ét søgeord, som står i titlen (højst 60 tegn), beskrivelsen
   (højst 155 tegn) og H1. H2'erne svarer på de spørgsmål, folk stiller. Siden laver selv indholdsfortegnelse, læsetid,
   "Læs også" og data til Google (Article, brødkrummer og spørgsmål og svar).
 - **Ny guide:** kopiér en af dem i `lib/guides.tsx`, giv den en ny `slug`, og skriv teksten. Den kommer automatisk med i
   oversigten og sitemap. Skriv "vare" om det, der sælges, og nævn ikke konkurrenter ved navn.
-- **Links ind til guiderne:** footeren (Hjælp → Guides), Spørgsmål og svar, /saelg, Sådan virker det og kategorierne
-  Luksus, Dametøj, Herretøj og Børnetøj.
+- **Links ind til guiderne:** footeren (Hjælp → Guides), Spørgsmål og svar, /saelg, Sådan virker det og
+  kategorisiderne (en guide til at sælge og en til at købe, hvor der findes en; se `SELL_GUIDE` og `BUY_GUIDE`).
 - **Skatteguiden** bygger på Skattestyrelsens sider (opdateret februar 2026). Tjek dem en gang om året, og ret `updated`.
 
 ---

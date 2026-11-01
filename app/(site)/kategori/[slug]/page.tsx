@@ -31,6 +31,21 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 const FOR_SALE = 20;
 
+// Guides (/guides) til kategorierne: til dem, der vil sælge, og til dem, der vil købe.
+const SELL_GUIDE: Record<string, { href: string; label: string }> = {
+  dametoej: { href: "/guides/saelg-brugt-toej", label: "Tips til at sælge tøj" },
+  herretoej: { href: "/guides/saelg-brugt-toej", label: "Tips til at sælge tøj" },
+  boernetoej: { href: "/guides/saelg-brugt-boernetoej", label: "Tips til at sælge børnetøj" },
+  luksus: { href: "/guides/saelg-designertaske", label: "Sådan sælger du en designertaske" },
+  samlerting: { href: "/guides/saelg-samleobjekter", label: "Tips til at sælge samleobjekter" },
+};
+const BUY_GUIDE: Record<string, { href: string; label: string }> = {
+  bolig: { href: "/guides/koeb-brugt-design", label: "Sådan tjekker du brugt design" },
+  dametoej: { href: "/guides/koeb-brugt-toej-online", label: "Sådan køber du brugt tøj trygt" },
+  herretoej: { href: "/guides/koeb-brugt-toej-online", label: "Sådan køber du brugt tøj trygt" },
+  boernetoej: { href: "/guides/koeb-brugt-toej-online", label: "Sådan køber du brugt tøj trygt" },
+};
+
 export default async function Kategori({ params }: Params) {
   const { slug } = await params;
   const cat = categoryBySlug(slug);
@@ -156,7 +171,11 @@ export default async function Kategori({ params }: Params) {
             {copy.note ? <div className="muted cat-note" style={{ marginTop: 18 }}>{copy.note}</div> : null}
             <div className="ctas" style={{ marginTop: 24 }}>
               <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
-              <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
+              {BUY_GUIDE[cat.key] ? (
+                <Link className="btn btn-line" href={BUY_GUIDE[cat.key].href}>{BUY_GUIDE[cat.key].label}</Link>
+              ) : (
+                <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
+              )}
             </div>
           </div>
         </div>
@@ -169,8 +188,8 @@ export default async function Kategori({ params }: Params) {
               <h2 className="h2" id="h-kat-saelg" style={{ maxWidth: 560 }}>{copy.sellH2}</h2>
               <div className="ctas">
                 <Link className="btn btn-red" href="/saelg">Sælg det live</Link>
-                {["dametoej", "herretoej", "boernetoej"].includes(cat.key) ? (
-                  <Link className="btn btn-line" href="/guides/saelg-brugt-toej">Tips til at sælge tøj</Link>
+                {SELL_GUIDE[cat.key] ? (
+                  <Link className="btn btn-line" href={SELL_GUIDE[cat.key].href}>{SELL_GUIDE[cat.key].label}</Link>
                 ) : null}
               </div>
             </div>
