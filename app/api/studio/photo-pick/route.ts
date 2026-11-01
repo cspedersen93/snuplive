@@ -1,5 +1,5 @@
 import { fail, json } from "@/lib/api";
-import { unquoteEnv } from "@/lib/env";
+import { askClaude, rateLimiter, validImages } from "@/lib/claude";
 import { category } from "@/lib/format";
 import { createClient, getUserId } from "@/lib/supabase/server";
 
@@ -9,18 +9,9 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_IMAGES = 8;
 // Små JPEG-billeder (512 × 640) fylder typisk 20-60 kB. Base64 gør dem en tredjedel større.
 const MAX_B64 = 300_000;
-const MODEL_DEFAULT = "claude-haiku-5-5";
 
-// Bremse mod mange kald fra samme sælger på kort tid (pr. server, nok til at stoppe et løbsk script).
-const recent = new Map<string, number[]>();
-function tooMany(uid: string) {
-  const now = Date.now();
-  const list = (recent.get(uid) ?? []).filter((t) => now - t < 60_000);
-  list.push(now);
-  recent.set(uid, list);
-  if (recent.size > 5000) recent.clear();
-  return list.length > 20;
-}
+// Bremse mod mange kald fra samme sælger på kort tid.
+const tooMany = rateLimiter(20, 60_000);
 
 /**
  * Claude vælger det billede, hvor tingen ses bedst.
@@ -36,9 +27,8 @@ export async function POST(req: Request) {
   const itemId = typeof body?.itemId === "string" ? body.itemId : "";
   const images = Array.isArray(body?.images) ? body.images : [];
   if (!images.length || images.length > MAX_IMAGES) return fail("Forkert antal billeder.", 400);
-  if (!images.every((b) => typeof b === "string" && b.length > 100 && b.length <= MAX_B64 && /^[A-Za-z0-9+/=]+$/.test(b)))
-    return fail("Billederne kunne ikke læses.", 400);
-  if (body?.mode === "video") return videoPick(supabase, uid, images as string[]);
+  if (!validImages(images, MAX_IMAGES, MAX_B64)) return fail("Billederne kunne ikke læses.", 400);
+  if (body?.mode === "video") return videoPick(supabase, uid, images);
   if (!UUID.test(itemId)) return fail("Ukendt vare.", 400);
 
   const { data: item } = await supabase
@@ -104,41 +94,4 @@ async function videoPick(supabase: Awaited<ReturnType<typeof createClient>>, uid
   }
   const picks = [...new Set(nums.filter((n) => n > 0))].slice(0, 4);
   return json({ picks });
-}
-
-/** Spørg Claude om billederne. Giver svarteksten, eller hvorfor der ikke kom et svar. */
-async function askClaude(images: string[], question: string): Promise<{ text: string } | { why: "off" | "error" }> {
-  const key = unquoteEnv(process.env.ANTHROPIC_API_KEY);
-  if (!key) return { why: "off" };
-  const content: unknown[] = [];
-  images.forEach((b, i) => {
-    content.push({ type: "text", text: `Billede ${i + 1}:` });
-    content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: b } });
-  });
-  content.push({ type: "text", text: question });
-
-  const base = (unquoteEnv(process.env.ANTHROPIC_API_BASE) || "https://api.anthropic.com").replace(/\/+$/, "");
-  const model = unquoteEnv(process.env.ANTHROPIC_MODEL) || MODEL_DEFAULT;
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 20_000);
-  try {
-    const r = await fetch(`${base}/v1/messages`, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
-      // Svaret er et par tal. max_tokens giver plads, hvis modellen tænker lidt først (kun tekstdelen bruges).
-      body: JSON.stringify({ model, max_tokens: 400, messages: [{ role: "user", content }] }),
-      signal: ctrl.signal,
-    });
-    const j = (await r.json().catch(() => null)) as { content?: { type: string; text?: string }[]; error?: { message?: string } } | null;
-    if (!r.ok) {
-      console.error("[relived] Claude svarede ikke på billedvalget:", r.status, j?.error?.message ?? "");
-      return { why: "error" };
-    }
-    return { text: (j?.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join(" ") };
-  } catch (e) {
-    console.error("[relived] Claude svarede ikke på billedvalget:", e instanceof Error ? e.message : e);
-    return { why: "error" };
-  } finally {
-    clearTimeout(timer);
-  }
 }

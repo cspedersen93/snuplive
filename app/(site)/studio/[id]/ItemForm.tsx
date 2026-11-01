@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import AiNote from "@/components/AiNote";
+import { IconSparkle } from "@/components/Icons";
+import type { AiListing } from "@/lib/aiListing";
+import { askAiListing } from "@/lib/aiListingClient";
 import { CATEGORIES, NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION } from "@/lib/format";
 import { needsAuth } from "@/lib/luxury";
 import { storageUrl } from "@/lib/images";
@@ -19,6 +23,8 @@ interface Props {
   /** Rediger en ting (ellers lægges en ny i køen). */
   item?: Item;
   nextPosition?: number;
+  /** Claude er sat op: vis "Udfyld med AI". */
+  aiReady?: boolean;
   onSaved: (item: Item) => void;
   onCancel?: () => void;
 }
@@ -26,7 +32,7 @@ interface Props {
 type Photo = { kind: "old"; path: string } | { kind: "new"; file: File; url: string };
 
 /** Formular til en ting i køen: navn, størrelse, pris, stand, kategori, beskrivelse og billeder. */
-export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, onSaved, onCancel }: Props) {
+export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, aiReady = false, onSaved, onCancel }: Props) {
   const sb = getSupabase();
   const editing = Boolean(item);
   const [name, setName] = useState(item?.name ?? "");
@@ -41,7 +47,10 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   const [newOk, setNewOk] = useState(item?.condition === NEW_ONLY_CONDITION);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiResult, setAiResult] = useState<AiListing | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const aiFileRef = useRef<HTMLInputElement>(null);
   const uid = item?.id ?? "new";
   // Skønhed må kun sælges ny og uåbnet. Mærkevarer skal ægthedstjekkes, før de kan sælges.
   const newOnly = NEW_ONLY_CATEGORIES.includes(cat);
@@ -53,14 +62,47 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
     [],
   );
 
-  function addFiles(files: FileList | null) {
-    if (!files?.length) return;
+  function addFiles(files: FileList | null): File[] {
+    if (!files?.length) return [];
     const own = photos.filter((p) => p.kind === "new" || !p.path.includes("/live-")).length;
     const room = Math.min(MAX_OWN - own, MAX_ALL - photos.length);
-    if (room <= 0) return toast(`Du kan lægge ${MAX_OWN} billeder på en vare.`);
+    if (room <= 0) {
+      toast(`Du kan lægge ${MAX_OWN} billeder på en vare.`);
+      return [];
+    }
     const picked = [...files].filter((f) => f.type.startsWith("image/")).slice(0, room);
     setPhotos((ps) => [...ps, ...picked.map((file) => ({ kind: "new" as const, file, url: URL.createObjectURL(file) }))]);
     if (fileRef.current) fileRef.current.value = "";
+    return picked;
+  }
+
+  /** "Udfyld med AI": Claude ser billederne og udfylder de tomme felter. Uden billeder åbnes kameraet/billedvalget først. */
+  async function fillWithAi(added: File[] = []) {
+    const blobs: Blob[] = [...added];
+    for (const ph of photos) {
+      if (ph.kind === "new") blobs.push(ph.file);
+      else {
+        const b = await fetch(storageUrl("items", ph.path)).then((r) => (r.ok ? r.blob() : null)).catch(() => null);
+        if (b) blobs.push(b);
+      }
+    }
+    if (!blobs.length) {
+      aiFileRef.current?.click();
+      return;
+    }
+    setAiBusy(true);
+    setErr(null);
+    const r = await askAiListing(blobs, name.trim() || undefined);
+    setAiBusy(false);
+    if ("error" in r) return toast(r.error);
+    const l = r.listing;
+    if (!name.trim()) setName(l.name);
+    if (!size.trim() && l.size) setSize(l.size);
+    if (l.category) setCat(l.category);
+    if (!NEW_ONLY_CATEGORIES.includes(l.category ?? cat) && !cond.trim() && l.condition) setCond(l.condition);
+    if (!desc.trim() && l.description) setDesc(l.description);
+    setMore(true);
+    setAiResult(l);
   }
 
   function removePhoto(i: number) {
@@ -122,6 +164,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         setPrice("");
         setDesc("");
         setPhotos([]);
+        setAiResult(null);
         document.getElementById("ni-name-new")?.focus();
       }
     } catch (e2) {
@@ -134,6 +177,34 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   return (
     <form className={editing ? "item-form editing" : "box item-form"} onSubmit={save} noValidate>
       {editing ? null : <h2>Læg en vare i køen</h2>}
+      {aiReady ? (
+        <div className="ai-fill">
+          <button className="btn btn-line btn-sm ai-btn" type="button" onClick={() => void fillWithAi()} disabled={aiBusy || busy}>
+            <IconSparkle />
+            {aiBusy ? "AI læser billederne …" : "Udfyld med AI"}
+          </button>
+          <span className="fine">
+            {photos.length
+              ? "AI udfylder de tomme felter ud fra billederne. Du retter bagefter."
+              : "Tag et billede af varen og et af mærkatet, så udfylder AI felterne. Du retter bagefter."}
+          </span>
+          <input
+            ref={aiFileRef}
+            className="file-input"
+            type="file"
+            accept="image/*"
+            multiple
+            tabIndex={-1}
+            aria-hidden="true"
+            onChange={(e) => {
+              const picked = addFiles(e.target.files);
+              e.target.value = "";
+              if (picked.length) void fillWithAi(picked);
+            }}
+          />
+        </div>
+      ) : null}
+      {aiResult ? <AiNote listing={aiResult} onUsePrice={(n) => setPrice(String(n))} onClose={() => setAiResult(null)} /> : null}
       <div className="field">
         <label htmlFor={`ni-name-${uid}`}>Hvad er det?</label>
         <input id={`ni-name-${uid}`} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Fx Uldfrakke, kamel" />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
+import { aiConfigured } from "@/lib/claude";
 import { Suspense } from "react";
 import MitIdResult from "@/components/MitIdResult";
 import { mitidState } from "@/lib/mitid";
@@ -70,6 +71,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
       guestsReady={!guestsQ.error}
       camLayout={layoutQ.error ? null : ((layoutQ.data as { cam_layout?: CamLayout } | null)?.cam_layout ?? "split")}
       language={langQ.error ? null : (langQ.data as { language?: ShowLanguage } | null)?.language === "en" ? "en" : "da"}
+      aiReady={aiConfigured()}
     />
     <Suspense fallback={null}>
       <MitIdResult />

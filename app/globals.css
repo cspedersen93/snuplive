@@ -1495,3 +1495,17 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 @media (max-width:900px){.guide-cards,.guide-cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.guide-cards,.guide-cards.four{grid-template-columns:1fr}.guide-hero{border-radius:14px}.guide-cta .btn{width:100%;justify-content:center}}
 @media (prefers-reduced-motion:reduce){.guide-card img{transition:none}.guide-card:hover img{transform:none}}
+
+/* AI skriver annoncen */
+.ai-fill{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 14px;border:1px dashed var(--line-2);border-radius:14px;background:rgba(255,255,255,.02)}
+.ai-fill .fine{flex:1 1 220px}
+.ai-btn{display:inline-flex;align-items:center;gap:8px}
+.ai-btn .ico{width:18px;height:18px;stroke:currentColor}
+.ai-note{position:relative;display:flex;gap:12px;align-items:flex-start;padding:14px 40px 14px 14px;border-radius:14px;border:1px solid rgba(185,217,198,.35);background:rgba(185,217,198,.07);font-size:.92rem;line-height:1.45}
+.ai-note>.ico{flex:none;width:20px;height:20px;stroke:var(--mint);margin-top:1px}
+.ai-note p{color:var(--muted)}
+.ai-note b{color:var(--text)}
+.ai-price{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:6px;color:var(--text)!important}
+.ai-price .linkbtn{font-size:.88rem;color:var(--mint)}
+.ai-note-x{position:absolute;top:8px;right:8px;width:28px;height:28px;border:0;background:none;color:var(--dim);font-size:1.2rem;cursor:pointer;border-radius:50%}
+.ai-note-x:hover{color:var(--text);background:rgba(255,255,255,.06)}

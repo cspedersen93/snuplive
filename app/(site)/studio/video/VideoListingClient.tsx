@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { IconCamera, IconPlay } from "@/components/Icons";
+import AiNote from "@/components/AiNote";
+import { IconCamera, IconPlay, IconSparkle } from "@/components/Icons";
+import type { AiListing } from "@/lib/aiListing";
+import { askAiListing } from "@/lib/aiListingClient";
 import { blobToBase64 } from "@/lib/bestPhoto";
 import type { Clip } from "@/lib/clipRecorder";
 import { CATEGORIES, NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION } from "@/lib/format";
@@ -38,7 +41,9 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
 const rand = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 /** Sælg med video: film tingen (eller vælg en video), vælg billeder, udfyld annoncen og sæt den til salg. */
-export default function VideoListingClient({ sellerId }: { sellerId: string }) {
+export default function VideoListingClient({ sellerId, aiReady = false }: { sellerId: string; aiReady?: boolean }) {
+  const [aiFill, setAiFill] = useState<"idle" | "busy">("idle");
+  const [aiResult, setAiResult] = useState<AiListing | null>(null);
   const [step, setStep] = useState<Step>("start");
   const [err, setErr] = useState<string | null>(null);
 
@@ -123,6 +128,33 @@ export default function VideoListingClient({ sellerId }: { sellerId: string }) {
     setClip(null);
     setClipUrl(null);
     setAi("idle");
+    setAiResult(null);
+  }
+
+  /**
+   * "AI skriver annoncen": Claude ser de valgte billeder og udfylder de tomme felter. Kører af sig selv, når billederne
+   * er valgt, og igen, hvis sælgeren trykker på knappen. Felter, sælgeren allerede har skrevet i, bliver ikke ændret.
+   */
+  async function fillWithAi(blobs: Blob[]) {
+    if (!aiReady || !blobs.length) return;
+    setAiFill("busy");
+    const r = await askAiListing(blobs);
+    setAiFill("idle");
+    if ("error" in r) {
+      toast(r.error);
+      return;
+    }
+    const l = r.listing;
+    setName((v) => (v.trim() ? v : l.name));
+    setSize((v) => (v.trim() || !l.size ? v : l.size));
+    setCat((v) => v || l.category || "");
+    setCond((v) => (v.trim() || !l.condition || NEW_ONLY_CATEGORIES.includes(l.category ?? "") ? v : l.condition));
+    setDesc((v) => (v.trim() || !l.description ? v : l.description));
+    setAiResult(l);
+  }
+
+  function chosenBlobs() {
+    return [...selected.map((i) => frames[i]?.small).filter((b): b is Blob => Boolean(b)), ...own.map((o) => o.file)];
   }
 
   async function startCamera() {
@@ -267,7 +299,11 @@ export default function VideoListingClient({ sellerId }: { sellerId: string }) {
         // Sælgeren kan have valgt selv i mellemtiden. Så bestemmer sælgeren.
         setSelected((cur) => (touched.current ? cur : picks.slice(0, MAX_PHOTOS)));
         setAi("claude");
-      } else setAi("local");
+        void fillWithAi(picks.slice(0, MAX_PHOTOS).map((i) => kept[i].small));
+      } else {
+        setAi("local");
+        void fillWithAi(localPicks(kept, MAX_PHOTOS).map((i) => kept[i].small));
+      }
     } catch {
       setAi("local");
     }
@@ -360,6 +396,7 @@ export default function VideoListingClient({ sellerId }: { sellerId: string }) {
       setCond("");
       setPrice("");
       setDesc("");
+      setAiResult(null);
       setNewOk(false);
       touched.current = false;
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -577,6 +614,21 @@ export default function VideoListingClient({ sellerId }: { sellerId: string }) {
             </div>
 
             <div className="box item-form">
+              {aiReady ? (
+                <div className="ai-fill">
+                  <button
+                    className="btn btn-line btn-sm ai-btn"
+                    type="button"
+                    onClick={() => void fillWithAi(chosenBlobs())}
+                    disabled={aiFill === "busy" || busy || !photoCount}
+                  >
+                    <IconSparkle />
+                    {aiFill === "busy" ? "AI skriver annoncen …" : "Udfyld med AI"}
+                  </button>
+                  <span className="fine">AI udfylder de tomme felter ud fra de valgte billeder. Du retter bagefter.</span>
+                </div>
+              ) : null}
+              {aiResult ? <AiNote listing={aiResult} onUsePrice={(n) => setPrice(String(n))} onClose={() => setAiResult(null)} /> : null}
               <div className="field">
                 <label htmlFor="vl-name">Hvad er det?</label>
                 <input id="vl-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Fx Strikkjole, grøn" />

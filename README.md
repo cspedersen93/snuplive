@@ -709,6 +709,25 @@ skifter model (standard `claude-haiku-5-5`).
 
 ---
 
+## AI skriver annoncen
+
+Bruger samme nøgle som billedvalget (`ANTHROPIC_API_KEY`). Der skal ikke køres noget i Supabase.
+
+- **I køen (studiet):** knappen **Udfyld med AI** øverst i "Læg en vare i køen". Uden billeder åbner den kameraet eller
+  billedvalget. Claude ser billederne (gjort små) og udfylder navn, størrelse, stand, kategori og beskrivelse (med mærke og
+  materiale, hvis de kan læses på mærkatet) og giver et prisforslag. Prisen sættes aldrig af sig selv: sælgeren trykker
+  **Brug 500 kr** eller skriver sin egen.
+- **Sælg med video:** når billederne fra videoen er valgt, udfylder Claude annoncen af sig selv. Knappen kan bruges igen.
+- **Kun forslag:** felter, sælgeren allerede har skrevet i, bliver ikke ændret. Beskeden siger, hvad sælgeren skal tjekke
+  (fx størrelse, mærke og altid mål). Claude må ikke gætte mærke, størrelse eller materiale, og sætninger om "ægte" eller
+  "original" bliver fjernet (det klarer ægthedstjekket).
+- **Fejl:** svarer Claude ikke, eller ser den ingen vare, får sælgeren en besked og udfylder selv. Uden nøglen er knappen væk.
+- **Bremse:** højst 30 forslag pr. sælger på 10 minutter. Kun sælgere kan bruge den. Det koster et par øre pr. vare.
+- Koden: `lib/aiListing.ts` (reglerne til Claude og tjek af svaret), `app/api/studio/ai-listing`, `lib/claude.ts` (fælles
+  med billedvalget).
+
+---
+
 ## Kamerafiltre i studiet
 
 Ved kameraet i studiet er der to knapper under *Skift kamera*. Der skal ikke køres noget i Supabase eller sættes nøgler i Vercel.

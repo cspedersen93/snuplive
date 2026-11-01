@@ -52,6 +52,8 @@ interface Props {
   guestsReady?: boolean;
   /** Hvordan seerne ser kameraerne (null: 0022_side_om_side.sql er ikke kørt, så er det altid side om side). */
   camLayout?: CamLayout | null;
+  /** Claude er sat op: "Udfyld med AI" i formularen. */
+  aiReady?: boolean;
   /** Sproget i showet (null: 0023_engelsk.sql er ikke kørt, så kan det ikke vælges). */
   language?: ShowLanguage | null;
 }
@@ -494,7 +496,7 @@ export default function StudioClient(props: Props) {
                   return (
                     editing === it.id ? (
                       <li key={it.id} className="lot-edit">
-                        <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} item={it} onSaved={saved} onCancel={() => setEditing(null)} />
+                        <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} item={it} aiReady={props.aiReady} onSaved={saved} onCancel={() => setEditing(null)} />
                       </li>
                     ) : authOpen === it.id ? (
                       <li key={it.id} className="lot-edit">
@@ -583,7 +585,7 @@ export default function StudioClient(props: Props) {
           </div>
           {!ended && !out ? (
             <div data-tour="item-form">
-              <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} onSaved={saved} />
+              <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} aiReady={props.aiReady} onSaved={saved} />
             </div>
           ) : null}
           {guestsReady && !out ? (
