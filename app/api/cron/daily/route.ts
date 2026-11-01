@@ -1,6 +1,7 @@
 import { fail, json } from "@/lib/api";
 import { unquoteEnv } from "@/lib/env";
 import { sendFollowDigest } from "@/lib/followDigest";
+import { sendSearchAlerts } from "@/lib/searchAlerts";
 import { dailyMaintenance } from "@/lib/orders";
 import { getStripe } from "@/lib/stripe";
 import { sweepSupportNotices } from "@/lib/support";
@@ -24,6 +25,8 @@ export async function GET(req: Request) {
   const clipsDeleted = await cleanClips(admin);
   // Morgenmail til følgere om dagens shows.
   const followDigest = await sendFollowDigest(admin);
+  // Søgeagenterne: nye varer, der passer til de gemte søgninger.
+  const searchAlerts = await sendSearchAlerts(admin);
   return json({
     ...(await dailyMaintenance(admin, stripe)),
     staleShowsEnded: stale.data ?? 0,
@@ -31,6 +34,7 @@ export async function GET(req: Request) {
     supportDeleted: supportDeleted.data ?? 0,
     clipsDeleted,
     followDigest,
+    searchAlerts,
   });
 }
 

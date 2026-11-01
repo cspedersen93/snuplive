@@ -55,6 +55,11 @@ export async function POST(req: Request) {
   if (canPublish ? show.status === "ended" : show.status !== "live") {
     return fail(show.status === "ended" ? "Showet er slut." : "Showet er ikke startet endnu.", 409);
   }
+  // Lukket show (0026_lukkede_shows.sql): kun de inviterede kan se videoen. Uden migrationen findes funktionen ikke.
+  if (!canPublish) {
+    const { data: ok, error: vErr } = await supabase.rpc("can_view_show", { p_show: show.id });
+    if (!vErr && ok === false) return fail("Showet er kun for inviterede.", 403);
+  }
 
   let name = "Gæst";
   if (uid) {

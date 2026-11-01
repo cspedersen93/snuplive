@@ -13,8 +13,13 @@ type Row = { user_id: string; email: string; show_id: string; title: string; sta
 export async function sendFollowDigest(admin: Admin) {
   const { data, error } = await admin.rpc("follow_digest");
   if (error) return 0; // 0016_foelg.sql er ikke kørt endnu
+  // Lukkede shows (0026_lukkede_shows.sql) kommer ikke med i morgenmailen.
+  const rows = (data ?? []) as Row[];
+  const ids = [...new Set(rows.map((r) => r.show_id))];
+  const closed = ids.length ? await admin.from("shows").select("id").in("id", ids).eq("visibility", "invite") : null;
+  const hide = new Set(closed && !closed.error ? (closed.data ?? []).map((r) => (r as { id: string }).id) : []);
   const byUser = new Map<string, { email: string; shows: Row[] }>();
-  for (const r of (data ?? []) as Row[]) {
+  for (const r of rows.filter((x) => !hide.has(x.show_id))) {
     if (!r.email) continue;
     const u = byUser.get(r.user_id) ?? { email: r.email, shows: [] };
     u.shows.push(r);

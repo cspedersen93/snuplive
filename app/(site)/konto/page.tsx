@@ -16,6 +16,7 @@ import MitIdResult from "@/components/MitIdResult";
 import { mitidState } from "@/lib/mitid";
 import BecomeSeller from "./BecomeSeller";
 import ProfileForm from "./ProfileForm";
+import SavedSearches, { type SavedSearch } from "./SavedSearches";
 import { SITE_HOST } from "@/lib/env";
 import { videoShowId } from "@/lib/videoShow";
 
@@ -46,6 +47,9 @@ export default async function Konto() {
   type Followed = { id: string; handle: string; display_name: string | null; area: string | null; avatar_path: string | null };
   const following = fol.error ? null : ((fol.data ?? []) as unknown as { seller: Followed | null }[]).map((r) => r.seller).filter((x): x is Followed => !!x);
   const followers = fc.error ? null : ((fc.data as { follower_count?: number } | null)?.follower_count ?? 0);
+  // Søgeagenter (findes først, når 0024_soegning.sql er kørt).
+  const ssq = await supabase.from("saved_searches").select("id,query,category,max_price,size").eq("user_id", uid).order("created_at", { ascending: false });
+  const savedSearches = ssq.error ? null : ((ssq.data ?? []) as SavedSearch[]);
   const snup = mine.data ?? [];
   const sold = sales.data ?? [];
   // Videoannoncerne ligger i et skjult "show" (0019_videoannoncer.sql). Det tæller ikke med som et show.
@@ -132,6 +136,8 @@ export default async function Konto() {
             <PushToggle />
           </div>
         ) : null}
+
+        {savedSearches ? <SavedSearches initial={savedSearches} /> : null}
 
         {profile.is_seller ? (
           <div className="box" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 14 }}>

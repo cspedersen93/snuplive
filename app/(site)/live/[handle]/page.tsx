@@ -9,6 +9,7 @@ import SetupNotice from "@/components/SetupNotice";
 import { when } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { createPublicClient } from "@/lib/supabase/public";
+import { createClient, getUserId } from "@/lib/supabase/server";
 import { ITEM_COLS, MESSAGE_COLS, SELLER_FACT_COLS, SHOW_COLS, type CamLayout, type Item, type Message, type Profile, type Show } from "@/lib/types";
 import SellerRatings, { type Rating } from "./SellerRatings";
 import { sweepStaleShows } from "@/lib/queries";
@@ -20,6 +21,7 @@ import { showGuests, type Guest } from "@/lib/guests";
 export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ handle: string }> };
+type PageProps = Params & { searchParams: Promise<{ invite?: string }> };
 
 const load = cache(async (rawHandle: string) => {
   const sb = createPublicClient();
@@ -69,6 +71,7 @@ const load = cache(async (rawHandle: string) => {
     if (liveShow?.host) guestAt = { host: liveShow.host.handle, title: liveShow.title };
   }
   let camLayout: CamLayout = "split";
+  let closed = false;
   if (show) {
     guests = await showGuests(sb, show.id);
     // Side om side eller fokus (0022_side_om_side.sql). Uden den er det side om side.
@@ -77,6 +80,9 @@ const load = cache(async (rawHandle: string) => {
     // Show på engelsk (0023_engelsk.sql). Uden den er alle shows på dansk.
     const sq = await sb.from("shows").select("language").eq("id", show.id).maybeSingle();
     if (!sq.error && (sq.data as { language?: string } | null)?.language === "en") (show as Show).language = "en";
+    // Lukket show (0026_lukkede_shows.sql): kun for inviterede, mens det ikke er slut.
+    const vq = await sb.from("shows").select("visibility").eq("id", show.id).maybeSingle();
+    closed = !vq.error && (vq.data as { visibility?: string } | null)?.visibility === "invite" && show.status !== "ended";
     const [i, m] = await Promise.all([
       sb.from("items").select(ITEM_COLS).eq("show_id", show.id).is("removed_at", null).order("position").order("created_at"),
       sb.from("messages").select(MESSAGE_COLS).eq("show_id", show.id).is("removed_at", null).order("id", { ascending: false }).limit(60),
@@ -94,7 +100,7 @@ const load = cache(async (rawHandle: string) => {
     .order("created_at", { ascending: false })
     .limit(10);
   const ratings = (r.data ?? []) as unknown as Rating[];
-  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt, camLayout };
+  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt, camLayout, closed };
 });
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -103,6 +109,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!d.setup || !d.seller) return { title: "Sælger ikke fundet", robots: { index: false } };
   const name = d.seller.display_name || d.seller.handle;
   const canonical = `/live/${d.seller.handle}`;
+  if (d.closed) {
+    return { title: `${d.seller.handle} – lukket show`, description: `${name} holder et show på Relived, der kun er for inviterede.`, robots: { index: false }, alternates: { canonical } };
+  }
   if (d.show?.status === "live") {
     return {
       title: { absolute: `${d.seller.handle} er live: ${d.show.title}`.slice(0, 60) },
@@ -120,11 +129,69 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-export default async function SellerPage({ params }: Params) {
+export default async function SellerPage({ params, searchParams }: PageProps) {
   const { handle } = await params;
   const d = await load(handle);
   if (!d.setup) return <SetupNotice />;
   if (!d.seller) notFound();
+
+  // Lukket show: kun sælgeren, gæsterne og de inviterede kommer ind. Et invitationslink (?invite=kode) giver adgang,
+  // når man er logget ind.
+  if (d.show && d.closed) {
+    const code = ((await searchParams).invite ?? "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 32);
+    const supabase = await createClient();
+    const uid = await getUserId(supabase);
+    let access = false;
+    let badLink = false;
+    if (uid) {
+      if (code) {
+        const j = await supabase.rpc("join_show", { p_code: code });
+        badLink = !j.error && !j.data;
+      }
+      const { data: ok } = await supabase.rpc("can_view_show", { p_show: d.show.id });
+      access = ok === true;
+    }
+    if (!access) {
+      const back = `/live/${d.seller.handle}${code ? `?invite=${code}` : ""}`;
+      return (
+        <div className="wrap" style={{ paddingBlock: "48px 96px", maxWidth: 720 }}>
+          <nav className="crumbs" aria-label="Brødkrummer">
+            <Link href="/">Forside</Link>
+            <span aria-hidden="true">/</span>
+            <span>{d.seller.handle}</span>
+          </nav>
+          <div className="seller-row" style={{ marginBlock: "28px 18px" }}>
+            <Avatar handle={d.seller.handle} path={d.seller.avatar_path} size={56} />
+            <div>
+              <h1 className="h2">{d.seller.handle}</h1>
+              <span className="muted">{[d.seller.display_name, d.seller.area].filter(Boolean).join(" · ")}</span>
+            </div>
+          </div>
+          <div className="closed-gate">
+            <span className="label red">Lukket show</span>
+            <h2 className="h3">Det her show er kun for inviterede</h2>
+            {badLink ? (
+              <p>Linket virker ikke længere. Bed {d.seller.handle} om et nyt link.</p>
+            ) : uid ? (
+              <p>Du er ikke inviteret endnu. Har du fået et link fra {d.seller.handle}, så åbn det, så kommer du ind.</p>
+            ) : code ? (
+              <p>Du har fået et link til showet. Log ind eller opret en gratis konto, så kommer du ind.</p>
+            ) : (
+              <p>Har du fået et link fra {d.seller.handle}, så åbn det, og log ind. Så kommer du ind.</p>
+            )}
+            <div className="ctas">
+              {!uid ? (
+                <Link className="btn btn-red" href={`/login?next=${encodeURIComponent(back)}`}>{code ? "Log ind og kom ind" : "Log ind"}</Link>
+              ) : null}
+              {d.seller.is_seller ? <FollowButton sellerId={d.seller.id} handle={d.seller.handle} next={back} className="btn btn-line" /> : null}
+            </div>
+            <p className="fine">Når showet er slut, kan alle købe det, der ikke blev solgt.</p>
+          </div>
+          <SellerRatings handle={d.seller.handle} ratings={d.ratings} avg={d.seller.rating_avg} count={d.seller.rating_count} />
+        </div>
+      );
+    }
+  }
 
   if (!d.show) {
     return (

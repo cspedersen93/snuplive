@@ -6,6 +6,7 @@ import AiNote from "@/components/AiNote";
 import { IconCamera, IconPlay, IconSparkle } from "@/components/Icons";
 import type { AiListing } from "@/lib/aiListing";
 import { askAiListing } from "@/lib/aiListingClient";
+import { pingSearchAlerts } from "@/lib/searchPing";
 import { blobToBase64 } from "@/lib/bestPhoto";
 import type { Clip } from "@/lib/clipRecorder";
 import { CATEGORIES, NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION } from "@/lib/format";
@@ -386,6 +387,7 @@ export default function VideoListingClient({ sellerId, aiReady = false }: { sell
       if (error) throw error;
       const row = (Array.isArray(data) ? data[0] : data) as { id: string; name: string; auth_required?: boolean } | null;
       setDone({ id, name: row?.name ?? n, authRequired: Boolean(row?.auth_required) });
+      pingSearchAlerts();
       setAuthOpen(true);
       setAuthSent(false);
       setStep("done");

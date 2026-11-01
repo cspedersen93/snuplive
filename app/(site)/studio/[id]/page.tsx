@@ -40,6 +40,8 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
     // Show på engelsk (0023_engelsk.sql).
     supabase.from("shows").select("language").eq("id", id).maybeSingle(),
   ]);
+  // Lukket show (0026_lukkede_shows.sql).
+  const visQ = await supabase.from("shows").select("visibility").eq("id", id).maybeSingle();
   const host = (role === "guest" ? hostQ.data : profile) as Pick<Profile, "id" | "handle" | "display_name" | "area" | "avatar_path"> | null;
   if (!host) notFound();
 
@@ -72,6 +74,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
       camLayout={layoutQ.error ? null : ((layoutQ.data as { cam_layout?: CamLayout } | null)?.cam_layout ?? "split")}
       language={langQ.error ? null : (langQ.data as { language?: ShowLanguage } | null)?.language === "en" ? "en" : "da"}
       aiReady={aiConfigured()}
+      visibility={visQ.error ? null : (visQ.data as { visibility?: string } | null)?.visibility === "invite" ? "invite" : "public"}
     />
     <Suspense fallback={null}>
       <MitIdResult />

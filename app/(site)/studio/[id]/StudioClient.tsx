@@ -18,6 +18,8 @@ import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import { track } from "@/lib/track";
 import type { CamLayout, Item, Message, Profile, Show, ShowLanguage } from "@/lib/types";
+import { pingSearchAlerts } from "@/lib/searchPing";
+import ClosedShowBox from "./ClosedShowBox";
 import ItemForm from "./ItemForm";
 import SwipeCard from "./SwipeCard";
 import AuthPanel from "./AuthPanel";
@@ -54,6 +56,8 @@ interface Props {
   camLayout?: CamLayout | null;
   /** Claude er sat op: "Udfyld med AI" i formularen. */
   aiReady?: boolean;
+  /** Lukket show (0026_lukkede_shows.sql): "invite" eller "public". null: ikke sat op. */
+  visibility?: "public" | "invite" | null;
   /** Sproget i showet (null: 0023_engelsk.sql er ikke kørt, så kan det ikke vælges). */
   language?: ShowLanguage | null;
 }
@@ -208,6 +212,20 @@ export default function StudioClient(props: Props) {
     if (error) return toast(errorText(error));
     setLang(next);
     toast(next === "en" ? "Showet står nu som English, så engelsktalende købere kan finde det." : "Showet står nu som dansk.");
+  }
+  // Lukket show: værten slår det til og fra, mens showet ikke er slut.
+  const visReady = props.visibility != null;
+  const [closed, setClosed] = useState(props.visibility === "invite");
+  const [visBusy, setVisBusy] = useState(false);
+  async function toggleClosed() {
+    const next = !closed;
+    if (next && !window.confirm("Gør showet lukket? Det forsvinder fra siden, og kun dem, du sender linket til, kan se med og købe.")) return;
+    setVisBusy(true);
+    const { error } = await sb.from("shows").update({ visibility: next ? "invite" : "public" }).eq("id", show.id);
+    setVisBusy(false);
+    if (error) return toast(errorText(error));
+    setClosed(next);
+    toast(next ? "Showet er lukket. Del linket med dem, der skal med." : "Showet er åbent for alle igen.");
   }
   async function changeLayout(next: CamLayout) {
     const before = layout;
@@ -405,6 +423,8 @@ export default function StudioClient(props: Props) {
   async function endShow() {
     setConfirmEnd(false);
     if (await rpc("set_show_status", { p_show: show.id, p_status: "ended" })) {
+      // Det usolgte er til salg nu: søgeagenterne giver besked.
+      pingSearchAlerts();
       setCameraOn(false);
       setSummary(true);
     }
@@ -478,6 +498,7 @@ export default function StudioClient(props: Props) {
       </div>
       <div className="studio">
         <aside className="show-side left" aria-label="Køen">
+          {closed && isHost && !ended ? <ClosedShowBox showId={show.id} handle={host.handle} /> : null}
           <div className="box" data-tour="queue">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
               <h2>Køen</h2>
@@ -638,6 +659,20 @@ export default function StudioClient(props: Props) {
               </span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {visReady && isHost && !ended ? (
+                <button
+                  className="vis-toggle"
+                  type="button"
+                  aria-pressed={closed}
+                  disabled={visBusy}
+                  onClick={toggleClosed}
+                  title={closed ? "Showet er kun for inviterede. Tryk for at åbne det for alle." : "Skal showet kun være for inviterede? Tryk, så får du et link."}
+                >
+                  Lukket{closed ? " ✓" : ""}
+                </button>
+              ) : closed ? (
+                <span className="b-closed">Lukket</span>
+              ) : null}
               {langReady && isHost && !ended ? (
                 <button
                   className="lang-toggle"

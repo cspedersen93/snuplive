@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Avatar from "@/components/Avatar";
-import { IconCart, IconMenu, IconUser } from "@/components/Icons";
+import { IconCart, IconMenu, IconSearch, IconUser } from "@/components/Icons";
 import { hasSupabase } from "@/lib/env";
 import { getSupabase } from "@/lib/supabase/client";
 
@@ -83,6 +83,9 @@ export default function Header() {
           ))}
         </nav>
         <div className="actions">
+          <Link className="icon-btn" href="/soeg" aria-label="Søg" aria-current={current("/soeg")}>
+            <IconSearch />
+          </Link>
           <Link className="icon-btn" href="/kurv" aria-label={count ? `Mine køb (${count})` : "Mine køb"}>
             <IconCart />
             <span className="badge" hidden={!count}>
@@ -113,6 +116,7 @@ export default function Header() {
               {n.label}
             </Link>
           ))}
+          <Link href="/soeg">Søg</Link>
           <Link href="/kurv">Mine køb</Link>
           <Link href={signedIn === false ? "/login" : "/konto"}>{signedIn === false ? "Log ind" : "Min konto"}</Link>
           <Link href={sellHref}>Sælg dine varer</Link>

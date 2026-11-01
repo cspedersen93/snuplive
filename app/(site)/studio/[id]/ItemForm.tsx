@@ -5,6 +5,7 @@ import AiNote from "@/components/AiNote";
 import { IconSparkle } from "@/components/Icons";
 import type { AiListing } from "@/lib/aiListing";
 import { askAiListing } from "@/lib/aiListingClient";
+import { pingSearchAlerts } from "@/lib/searchPing";
 import { CATEGORIES, NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION } from "@/lib/format";
 import { needsAuth } from "@/lib/luxury";
 import { storageUrl } from "@/lib/images";
@@ -157,6 +158,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
       if (removed.length) void sb.storage.from("items").remove(removed);
       onSaved(data as Item);
       if (!editing) {
+        pingSearchAlerts();
         setName("");
         setSize("");
         setCond("");

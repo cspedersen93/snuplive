@@ -174,6 +174,12 @@ export const IconClip = (p: P) => (
     <path d="M10 9.2v5.6l4.6-2.8L10 9.2Z" />
   </svg>
 );
+export const IconSearch = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="m16 16 4.5 4.5" />
+  </svg>
+);
 /** Gnister: AI udfylder noget. */
 export const IconSparkle = (p: P) => (
   <svg {...base} className="ico" {...p}>

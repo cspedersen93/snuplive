@@ -20,6 +20,7 @@ import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { ITEM_COLS, SELLER_FACT_COLS, type Item, type SellerFactsData } from "@/lib/types";
+import MaxBid from "@/components/MaxBid";
 import BuyNow from "./BuyNow";
 import FollowButton from "@/components/FollowButton";
 import { IconShieldCheck } from "@/components/Icons";
@@ -39,7 +40,7 @@ const load = cache(async (slug: string) => {
   if (!sb) return { setup: false as const };
   const id = idFromSlug(decodeURIComponent(slug));
   if (!id) return { setup: true as const, item: null };
-  const [{ data }, clipRes, authRes, kindRes] = await Promise.all([
+  const [{ data }, clipRes, authRes, kindRes, visRes] = await Promise.all([
     sb
       .from("items")
       .select(
@@ -54,6 +55,8 @@ const load = cache(async (slug: string) => {
     sb.from("items").select("auth_required,auth_status").eq("id", id).maybeSingle(),
     // Videoannonce (0019_videoannoncer.sql)?
     sb.from("items").select("show:shows!items_show_id_fkey(kind)").eq("id", id).maybeSingle(),
+    // Lukket show (0026_lukkede_shows.sql)?
+    sb.from("items").select("show:shows!items_show_id_fkey(visibility)").eq("id", id).maybeSingle(),
   ]);
   const item = data as unknown as Loaded | null;
   // En ting eller et show, der er fjernet efter en anmeldelse, findes ikke længere.
@@ -62,7 +65,9 @@ const load = cache(async (slug: string) => {
   const a = authRes.error ? null : (authRes.data as { auth_required: boolean; auth_status: string | null } | null);
   const auth = a?.auth_required ? (a.auth_status === "approved" ? ("approved" as const) : ("waiting" as const)) : null;
   const video = !kindRes.error && (kindRes.data as unknown as { show: { kind: string } | null } | null)?.show?.kind === "video";
-  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video };
+  // Varer i et lukket show er kun for de inviterede, indtil showet er slut.
+  const closed = !visRes.error && (visRes.data as unknown as { show: { visibility: string } | null } | null)?.show?.visibility === "invite" && item.show.status !== "ended";
+  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video, closed };
 });
 
 function stateOf(it: Loaded): ItemState {
@@ -95,7 +100,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: `${it.name}${meta ? ` (${meta})` : ""} ${bid ? "fra" : "til"} ${kr(it.price)} hos ${it.seller?.handle}. ${where}. Beskyttet betaling på Relived.`.slice(0, 155),
     alternates: { canonical: itemHref(it) },
     // Solgte og fjernede ting skal ikke ligge i Google.
-    robots: state === "sold" || state === "off" ? { index: false, follow: true } : undefined,
+    robots: state === "sold" || state === "off" || d.closed ? { index: false, follow: true } : undefined,
     openGraph: images.length ? { images: [{ url: images[0], width: 1080, height: 1350, alt: it.name }] } : undefined,
   };
 }
@@ -241,7 +246,15 @@ export default async function ItemPage({ params }: Params) {
             </div>
 
             <div className="box item-cta">
-              {d.auth === "waiting" && state !== "sold" ? (
+              {d.closed ? (
+                <>
+                  <p>
+                    <b>Varen er med i et lukket show</b>, som kun er for inviterede. Har du fået et link fra {seller.handle}, så åbn det for at se med.
+                  </p>
+                  <Link className="btn btn-line btn-block" href={liveHref}>Gå til {seller.handle}</Link>
+                  <p className="fine">Bliver den ikke solgt i showet, kan alle købe den bagefter.</p>
+                </>
+              ) : d.auth === "waiting" && state !== "sold" ? (
                 <p className="auth-wait">
                   <b>Venter på ægthedstjek.</b> Det er en mærkevare, så Relived tjekker, at den er ægte, før den kan købes. Følg sælgeren, så
                   får du besked, når den bliver vist live.
@@ -264,6 +277,7 @@ export default async function ItemPage({ params }: Params) {
                   </p>
                   <RemindButton showId={show.id} itemId={it.id} next={href} className="btn btn-red btn-block" />
                   <p className="fine">Du får en mail, når showet starter.</p>
+                  <MaxBid item={it} loginHref={`/login?next=${encodeURIComponent(href)}`} />
                 </>
               ) : state === "upcoming" ? (
                 <>
@@ -299,6 +313,7 @@ export default async function ItemPage({ params }: Params) {
                     <span className="live-dot white" aria-hidden="true" />
                     {bid ? "Se med og byd" : "Se med og køb"}
                   </Link>
+                  {bid && state !== "showing" ? <MaxBid item={it} loginHref={`/login?next=${encodeURIComponent(href)}`} /> : null}
                 </>
               ) : state === "sold" ? (
                 <>

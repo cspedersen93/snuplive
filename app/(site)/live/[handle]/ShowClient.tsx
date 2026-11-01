@@ -17,6 +17,7 @@ import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useMe } from "@/components/useMe";
 import { useShowRealtime } from "@/components/useShowRealtime";
 import { hasSupabase } from "@/lib/env";
+import MaxBid from "@/components/MaxBid";
 import { auctionLeft, isAuction, nextBid, soldPrice } from "@/lib/auction";
 import { gradFor, kr, vareOrd, when } from "@/lib/format";
 import { itemImage, showImage } from "@/lib/images";
@@ -590,6 +591,9 @@ export default function ShowClient(props: Props) {
             <div className="show-push">
               <PushOffer handle={handle} />
             </div>
+          ) : null}
+          {live && auction && auction.status !== "sold" && auction.status !== "unsold" && (bidLeft === null || bidLeft > 0) ? (
+            <MaxBid key={auction.id} item={auction} loginHref={loginHref} compact />
           ) : null}
           {live ? (
             <p className="fine" style={{ textAlign: "center" }}>

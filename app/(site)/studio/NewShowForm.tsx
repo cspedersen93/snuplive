@@ -13,7 +13,7 @@ function defaultStart() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export default function NewShowForm({ sellerId, englishReady = false }: { sellerId: string; englishReady?: boolean }) {
+export default function NewShowForm({ sellerId, englishReady = false, closedReady = false }: { sellerId: string; englishReady?: boolean; closedReady?: boolean }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [cat, setCat] = useState<string>("dametoej");
@@ -21,6 +21,7 @@ export default function NewShowForm({ sellerId, englishReady = false }: { seller
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [english, setEnglish] = useState(false);
+  const [closed, setClosed] = useState(false);
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +40,8 @@ export default function NewShowForm({ sellerId, englishReady = false }: { seller
         starts_at: when ? when.toISOString() : null,
         // Kun når 0023_engelsk.sql er kørt (ellers findes kolonnen ikke).
         ...(englishReady && english ? { language: "en" } : {}),
+        // Lukket show (0026_lukkede_shows.sql): kun for inviterede.
+        ...(closedReady && closed ? { visibility: "invite" } : {}),
       })
       .select("id")
       .single();
@@ -75,6 +78,16 @@ export default function NewShowForm({ sellerId, englishReady = false }: { seller
             <b>Showet er på engelsk</b>
             <br />
             Så får det mærket English, og engelsktalende købere kan finde det på siden Relived in English.
+          </span>
+        </label>
+      ) : null}
+      {closedReady ? (
+        <label className="ns-lang">
+          <input type="checkbox" checked={closed} onChange={(e) => setClosed(e.target.checked)} />
+          <span>
+            <b>Lukket show, kun for inviterede</b>
+            <br />
+            Showet står ikke på siden. Du får et link, som du deler med dem, der skal med, fx dine følgere på sociale medier.
           </span>
         </label>
       ) : null}

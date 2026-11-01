@@ -55,6 +55,7 @@ export async function fetchListing(limitLive = 30, limitUpcoming = 20, category?
       upcoming: (upcoming.data ?? []) as unknown as ShowWithSeller[],
     };
     await markEnglish(sb, [...out.live, ...out.upcoming]);
+    await dropClosed(sb, out);
     return out;
   } catch {
     return { ok: false, live: [], upcoming: [] };
@@ -77,6 +78,20 @@ export async function markEnglish(sb: NonNullable<ReturnType<typeof createPublic
   for (const s of shows) if (en.has(s.id)) s.language = "en";
 }
 
+/**
+ * Lukkede shows (kun for inviterede, 0026_lukkede_shows.sql) står ikke i listerne. Før migrationen er kørt, findes der
+ * ingen lukkede shows, og så sker der ingenting.
+ */
+export async function dropClosed(sb: NonNullable<ReturnType<typeof createPublicClient>>, out: { live: ShowWithSeller[]; upcoming: ShowWithSeller[] }) {
+  const ids = [...out.live, ...out.upcoming].map((s) => s.id);
+  if (!ids.length) return;
+  const { data, error } = await sb.from("shows").select("id").in("id", ids).eq("visibility", "invite");
+  if (error || !data?.length) return;
+  const hide = new Set((data as { id: string }[]).map((r) => r.id));
+  out.live = out.live.filter((s) => !hide.has(s.id));
+  out.upcoming = out.upcoming.filter((s) => !hide.has(s.id));
+}
+
 /** Shows på engelsk, der er live eller starter snart (siden /en). Tom liste, før 0023_engelsk.sql er kørt. */
 export async function fetchEnglishShows(limit = 12): Promise<ShowWithSeller[]> {
   try {
@@ -90,7 +105,9 @@ export async function fetchEnglishShows(limit = 12): Promise<ShowWithSeller[]> {
       base().eq("status", "planned").gte("starts_at", since).order("starts_at", { ascending: true }).limit(limit),
     ]);
     if (live.error || upcoming.error) return [];
-    const shows = [...(live.data ?? []), ...(upcoming.data ?? [])] as unknown as ShowWithSeller[];
+    const out = { live: (live.data ?? []) as unknown as ShowWithSeller[], upcoming: (upcoming.data ?? []) as unknown as ShowWithSeller[] };
+    await dropClosed(sb, out);
+    const shows = [...out.live, ...out.upcoming];
     for (const s of shows) s.language = "en";
     return shows.slice(0, limit);
   } catch {

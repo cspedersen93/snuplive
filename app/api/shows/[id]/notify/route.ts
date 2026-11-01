@@ -1,7 +1,9 @@
+import { after } from "next/server";
 import { fail, json } from "@/lib/api";
 import { SITE_URL } from "@/lib/env";
 import { sendMailBatch } from "@/lib/mail";
 import { sendPush } from "@/lib/push";
+import { sweepSearchAlerts } from "@/lib/searchAlerts";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserId } from "@/lib/supabase/server";
 
@@ -28,6 +30,8 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     .select("id,title,seller_id");
   const show = claimed?.[0] as { id: string; title: string; seller_id: string } | undefined;
   if (!show) return json({ sent: 0, pushed: 0 });
+  // Søgeagenterne: varer i showet, der passer til gemte søgninger, er live nu.
+  after(() => sweepSearchAlerts(0));
   const { data: prof } = await admin.from("profiles").select("handle").eq("id", show.seller_id).maybeSingle();
   const handle = (prof?.handle as string | undefined) ?? "saelger";
   const path = `/live/${handle}`;
@@ -68,6 +72,14 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       }
     }
     for (const g of guestIds) people.delete(g);
+  }
+  // Lukket show (0026_lukkede_shows.sql): kun de inviterede får besked, ikke alle følgere.
+  const vis = await admin.from("shows").select("visibility").eq("id", show.id).maybeSingle();
+  if (!vis.error && (vis.data as { visibility?: string } | null)?.visibility === "invite") {
+    const { data: mem } = await admin.rpc("show_member_recipients", { p_show: show.id });
+    const members = new Map(((mem ?? []) as { user_id: string; email: string }[]).map((m) => [m.user_id, m.email]));
+    for (const u of [...people.keys()]) if (!members.has(u)) people.delete(u);
+    for (const [u, email] of members) if (!people.has(u)) people.set(u, { email, items: [], reminded: false, follower: true });
   }
   people.delete(show.seller_id);
   if (!people.size) return json({ sent: 0, pushed: 0 });

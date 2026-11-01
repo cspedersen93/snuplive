@@ -710,6 +710,55 @@ skifter model (standard `claude-haiku-5-5`).
 
 ---
 
+## Søgning og søgeagenter
+
+**Kør `0024_soegning.sql` i Supabase → SQL Editor** (efter 0023). Indtil da viser /soeg "Søgningen er ved at blive sat
+op", og resten af siden virker som før.
+
+- **Søg (/soeg):** luppen i menuen og søgefeltet under Til salg. Søger i navn, beskrivelse, størrelse og stand på varer, der
+  er til salg nu, live nu eller i kommende shows (live først). Dele af ord tæller ("frakke" finder "uldfrakke"), og
+  "kjole str. M" søger på kjole i størrelse M. Kategori, størrelse og maks pris kan vælges. Søgesiden er ikke i Google.
+- **Søgeagent:** **Giv mig besked om nye** gemmer søgningen (højst 10 pr. bruger). Når en ny vare passer (sat til salg,
+  lagt i et kommende show, eller showet går live), får køberen besked på telefonen, hvis det er slået til, ellers en mail
+  med links. Hver vare giver kun besked én gang pr. søgning, og sælgerens egne varer og sælgere, der har blokeret
+  køberen, er ikke med.
+- **Hvornår:** når et show går live, med det samme. Når en sælger lægger en vare i køen, laver en videoannonce eller
+  afslutter et show, inden for få sekunder. Ellers efter sidevisninger (højst hvert 3. minut) og i det daglige job.
+- **Min konto → Dine søgeagenter:** se og slet dem. Mailen har et link dertil.
+
+---
+
+## Maks-bud på budsalg
+
+**Kør `0025_maksbud.sql` i Supabase → SQL Editor** (efter 0024). Indtil da vises maks-bud ikke.
+
+- **Køberen** trykker **Sæt maks-bud** på varesiden (før showet) eller under budsalget i showet og skriver sit højeste bud.
+  Når andre byder, byder siden automatisk i de faste trin, op til maks-buddet. Vinderen betaler ét trin over det
+  næsthøjeste bud (eller sit maks, hvis det er lavere). Ved samme maks-bud vinder den, der satte det først.
+- **Ingen kan se andres maks-bud.** Køberen kan rette eller fjerne sit eget. Bud, der allerede er givet, står ved magt.
+- **Når budsalget starter,** byder de maks-bud, der er sat på forhånd, med det samme. Hvert automatisk bud giver (som et
+  almindeligt bud) 10 sekunder ekstra, hvis tiden er ved at løbe ud.
+- Koden: `_apply_max_bids`, `set_max_bid` og `clear_max_bid` i databasen; `place_bid` og `start_auction` er de samme som før,
+  men lader maks-buddene byde bagefter. Siden: `components/MaxBid.tsx`.
+
+---
+
+## Lukkede shows (kun for inviterede)
+
+**Kør `0026_lukkede_shows.sql` i Supabase → SQL Editor** (efter 0025). Indtil da kan man ikke vælge et lukket show.
+
+- **Sælgeren** sætter flueben i **Lukket show, kun for inviterede**, når showet oprettes, eller trykker **Lukket** i studiet.
+  I studiet står invitationslinket med **Kopiér link**, **Del** og **Lav et nyt link** (det gamle holder op med at virke) og
+  hvor mange der er inviteret.
+- **Skjult:** showet og dets varer står ikke i listerne, på forsiden, i kategorierne, i søgningen, i søgeagenterne eller i
+  morgenmailen, og siderne er ikke i Google.
+- **Adgang:** kun sælgeren, gæsterne og dem, der har åbnet linket og er logget ind, kan se videoen, skrive i chatten, byde,
+  sætte maks-bud og købe. Det tjekker databasen selv. Alle andre ser "Det her show er kun for inviterede".
+- **Besked:** når showet går live, får kun de inviterede besked (ikke alle følgere).
+- **Når showet er slut,** kommer det usolgte til salg for alle som normalt.
+
+---
+
 ## AI skriver annoncen
 
 Bruger samme nøgle som billedvalget (`ANTHROPIC_API_KEY`). Der skal ikke køres noget i Supabase.

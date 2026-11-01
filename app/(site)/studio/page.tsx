@@ -78,6 +78,9 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
   // Show på engelsk (0023_engelsk.sql). Uden den kan man ikke vælge sprog.
   const langQ = await supabase.from("shows").select("language").limit(1);
   const englishReady = !langQ.error;
+  // Lukkede shows (0026_lukkede_shows.sql).
+  const visQ = await supabase.from("shows").select("visibility").limit(1);
+  const closedReady = !visQ.error;
   const hiddenShows = all.filter((s) => hiddenIds.has(s.id));
 
   return (
@@ -134,7 +137,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           </div>
         ) : null}
 
-        <NewShowForm sellerId={uid} englishReady={englishReady} />
+        <NewShowForm sellerId={uid} englishReady={englishReady} closedReady={closedReady} />
 
         {canVideo ? (
           <div className="box vl-entry">
