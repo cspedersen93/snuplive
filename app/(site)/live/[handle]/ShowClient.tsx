@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Avatar from "@/components/Avatar";
 import ReportButton from "@/components/ReportButton";
 import SellerFacts from "@/components/SellerFacts";
+import type { BundleTiers } from "@/lib/pricing";
 import Chat from "@/components/Chat";
 import { IconBox, IconShare, IconShieldCheck } from "@/components/Icons";
 import { ViewerVideo } from "@/components/LiveVideo";
@@ -41,6 +42,8 @@ interface Props {
   guests?: Guest[];
   /** Side om side eller fokus på den, der viser (værten vælger). */
   camLayout?: CamLayout;
+  /** Værtens samlerabat (0027_samlerabat.sql). */
+  bundle?: BundleTiers | null;
 }
 
 function useNow(ms: number) {
@@ -360,7 +363,7 @@ export default function ShowClient(props: Props) {
               </div>
             </div>
             <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} className="btn btn-red btn-sm" />
-            <SellerFacts seller={props.seller} />
+            <SellerFacts seller={props.seller} bundle={props.bundle} />
             {guests.length ? (
               <div className="show-guests">
                 <span className="label">Sælger sammen med</span>

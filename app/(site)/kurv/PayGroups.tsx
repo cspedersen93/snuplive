@@ -5,7 +5,7 @@ import Avatar from "@/components/Avatar";
 import { IconShield } from "@/components/Icons";
 import { CARRIER_CODES, CARRIERS, distanceText, type CarrierCode, type Pakkeshop } from "@/lib/carriers";
 import { kr } from "@/lib/format";
-import { DELIVERY, orderAmounts, type Delivery } from "@/lib/pricing";
+import { bundleDiscount, bundlePct, DELIVERY, nextBundle, orderAmounts, type BundleTiers, type Delivery } from "@/lib/pricing";
 import { errorText, toast } from "@/lib/toast";
 
 export interface PayGroup {
@@ -14,6 +14,8 @@ export interface PayGroup {
   showTitle: string;
   deadline: string;
   items: { id: string; name: string; meta: string; price: number }[];
+  /** Sælgerens samlerabat (0027_samlerabat.sql), hvis hun giver en. */
+  bundle?: BundleTiers | null;
 }
 
 const MEMORY = "snuplive:pakkeshop";
@@ -43,10 +45,20 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
   const [searchError, setSearchError] = useState("");
   const pickerRef = useRef<HTMLElement>(null);
 
-  const sums = groups.map((g) => orderAmounts(g.items.reduce((a, i) => a + i.price, 0), choice[g.key] ?? "ship"));
+  // Samme regnestykke som betalingen på serveren (app/api/checkout/route.ts), med samlerabat pr. sælger.
+  const sums = groups.map((g) => {
+    const gross = g.items.reduce((a, i) => a + i.price, 0);
+    return orderAmounts(gross, choice[g.key] ?? "ship", bundleDiscount(gross, g.items.length, g.bundle));
+  });
   const total = sums.reduce(
-    (a, s) => ({ items: a.items + s.items, shipping: a.shipping + s.shipping, fee: a.fee + s.fee, total: a.total + s.total }),
-    { items: 0, shipping: 0, fee: 0, total: 0 },
+    (a, s) => ({
+      gross: a.gross + s.gross,
+      discount: a.discount + s.discount,
+      shipping: a.shipping + s.shipping,
+      fee: a.fee + s.fee,
+      total: a.total + s.total,
+    }),
+    { gross: 0, discount: 0, shipping: 0, fee: 0, total: 0 },
   );
   const anyShip = groups.some((g) => (choice[g.key] ?? "ship") === "ship");
   const needShop = pakkeshop && anyShip;
@@ -152,6 +164,23 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
                 </div>
               </div>
             ))}
+            {sums[gi].discount > 0 ? (
+              <div className="citem bundle-row" style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
+                <div style={{ minWidth: 0 }}>
+                  <strong>Samlerabat {bundlePct(g.items.length, g.bundle)} %</strong>
+                  <span className="from">Du køber {g.items.length} varer hos {g.seller.handle}</span>
+                </div>
+                <div className="right">
+                  <span className="num" style={{ fontWeight: 600 }}>−{kr(sums[gi].discount)}</span>
+                </div>
+              </div>
+            ) : null}
+            {nextBundle(g.items.length, g.bundle) ? (
+              <p className="bundle-hint">
+                Køb {nextBundle(g.items.length, g.bundle)?.more === 1 ? "1 vare" : `${nextBundle(g.items.length, g.bundle)?.more} varer`} mere hos{" "}
+                <a href={`/live/${g.seller.handle}`}>{g.seller.handle}</a>, og få {nextBundle(g.items.length, g.bundle)?.pct} % i samlerabat.
+              </p>
+            ) : null}
             <fieldset className="deliv">
               <legend>Levering</legend>
               <div className="opts">
@@ -251,7 +280,10 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
       </div>
       <aside className="summary" aria-label="Oversigt">
         <h2 className="h3">Oversigt</h2>
-        <div className="sum-row"><span>Varer</span><span className="num">{kr(total.items)}</span></div>
+        <div className="sum-row"><span>Varer</span><span className="num">{kr(total.gross)}</span></div>
+        {total.discount > 0 ? (
+          <div className="sum-row discount"><span>Samlerabat</span><span className="num">−{kr(total.discount)}</span></div>
+        ) : null}
         <div className="sum-row"><span>Fragt</span><span className="num">{kr(total.shipping)}</span></div>
         <div className="sum-row"><span>Køberbeskyttelse</span><span className="num">{kr(total.fee)}</span></div>
         <div className="sum-row total"><span>I alt</span><span className="num">{kr(total.total)}</span></div>

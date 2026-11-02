@@ -9,6 +9,8 @@ import { requireProfile } from "@/lib/auth";
 import { CARRIERS, isCarrier, trackingText } from "@/lib/carriers";
 import { BUYER_RESOLUTION_TEXT, ISSUE_REASONS, isIssueReason } from "@/lib/issues";
 import { clock, dayLabel, kr } from "@/lib/format";
+import { fetchBundles } from "@/lib/bundles";
+import { itemHref } from "@/lib/items";
 import { markCheckoutPaid } from "@/lib/orders";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
 import { hasShipmondo } from "@/lib/shipmondo";
@@ -127,6 +129,24 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
       .limit(50),
   ]);
 
+  // Køberens åbne bud på varer til fast pris (0028_bud_paa_varer.sql). Uden filen er listen tom.
+  const offersQ = await supabase
+    .from("offers")
+    .select("id,amount,price,expires_at,item:items!offers_item_id_fkey(id,name),seller:profiles!offers_seller_id_fkey(handle)")
+    .eq("user_id", uid)
+    .eq("status", "pending")
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(20);
+  const myOffers = (offersQ.error ? [] : (offersQ.data ?? [])) as unknown as {
+    id: string;
+    amount: number;
+    price: number;
+    expires_at: string;
+    item: { id: string; name: string } | null;
+    seller: { handle: string } | null;
+  }[];
+
   const toPay = ((salesQ.data ?? []) as unknown as SaleRow[]).filter(
     (s) => !s.order || ["pending", "cancelled"].includes(s.order.status),
   );
@@ -151,6 +171,9 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
     showsOf.set(key, (showsOf.get(key) ?? new Set()).add(s.show_id));
   }
   for (const [key, g] of groupsMap) if ((showsOf.get(key)?.size ?? 0) > 1) g.showTitle = "Fra flere shows";
+  // Sælgernes samlerabat (0027_samlerabat.sql). Betalingen regner den ud igen på serveren.
+  const bundles = await fetchBundles(supabase, [...groupsMap.keys()]);
+  for (const [key, g] of groupsMap) g.bundle = bundles.get(key) ?? null;
   const groups = [...groupsMap.values()];
   const active = orders.filter((o) => o.status === "paid" || o.status === "shipped");
   const done = orders.filter((o) => o.status === "completed" || o.status === "refunded");
@@ -204,6 +227,28 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           </>
         ) : null}
 
+        {myOffers.length ? (
+          <div className="sec-mini" id="bud">
+            <h2 className="h3">Dine bud</h2>
+            <p className="muted" style={{ fontSize: ".92rem" }}>
+              Sælgeren har 48 timer til at svare. Siger sælgeren ja, kommer varen her under Til betaling.
+            </p>
+            <ul className="list offer-list">
+              {myOffers.map((o) => (
+                <li key={o.id} style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
+                  <div style={{ minWidth: 0 }}>
+                    <strong>{o.item ? <Link href={itemHref(o.item)}>{o.item.name}</Link> : "Vare"}</strong>
+                    <span>
+                      Hos @{o.seller?.handle ?? "sælger"} · prisen er {kr(o.price)} · gælder til {when(o.expires_at)}
+                    </span>
+                  </div>
+                  <span className="num offer-amount">{kr(o.amount)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
         {active.length ? (
           <div className="sec-mini">
             <h2 className="h3">På vej til dig</h2>
@@ -222,7 +267,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           </div>
         ) : null}
 
-        {!groups.length && !orders.length ? (
+        {!groups.length && !orders.length && !myOffers.length ? (
           <div className="empty">
             <p style={{ marginBottom: 14 }}>Du har ikke købt noget endnu.</p>
             <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
@@ -238,6 +283,8 @@ function OrderCard({ o }: { o: OrderRow }) {
   const issue = [...(o.issues ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
   const seller = o.seller;
   const rated = Array.isArray(o.ratings) ? o.ratings[0] : o.ratings;
+  // Samlerabat: forskellen mellem varernes priser og det, der blev betalt for varerne.
+  const discount = Math.max(0, o.sales.reduce((a, s) => a + s.price, 0) - o.items_amount);
   return (
     <section className="group" aria-label={`Ordre fra ${seller?.handle ?? "sælger"}`}>
       <div className="group-head">
@@ -261,6 +308,7 @@ function OrderCard({ o }: { o: OrderRow }) {
       ))}
       <div className="order-info">
         <div className="order-lines">
+          {discount > 0 ? <span className="discount-line">Samlerabat: −{kr(discount)}</span> : null}
           <span>{DELIVERY[o.delivery].label}: {kr(o.shipping_amount)}</span>
           <span>Køberbeskyttelse: {kr(o.fee_amount)}</span>
           <b>Betalt i alt: {kr(o.total_amount)}</b>

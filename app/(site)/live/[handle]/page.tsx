@@ -5,6 +5,7 @@ import { cache } from "react";
 import Avatar from "@/components/Avatar";
 import ReportButton from "@/components/ReportButton";
 import SellerFacts from "@/components/SellerFacts";
+import { fetchBundle } from "@/lib/bundles";
 import SetupNotice from "@/components/SetupNotice";
 import { when } from "@/lib/format";
 import { showImage } from "@/lib/images";
@@ -100,7 +101,9 @@ const load = cache(async (rawHandle: string) => {
     .order("created_at", { ascending: false })
     .limit(10);
   const ratings = (r.data ?? []) as unknown as Rating[];
-  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt, camLayout, closed };
+  // Samlerabat (0027_samlerabat.sql).
+  const bundle = await fetchBundle(sb, seller.id);
+  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt, camLayout, closed, bundle };
 });
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -212,7 +215,7 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
         </div>
         {d.guestAt ? <GuestAtBanner handle={d.seller.handle} at={d.guestAt} /> : null}
         {d.seller.is_seller ? <FollowButton sellerId={d.seller.id} handle={d.seller.handle} next={`/live/${d.seller.handle}`} className="btn btn-red btn-sm" /> : null}
-        {d.seller.is_seller ? <SellerFacts seller={d.seller} /> : null}
+        {d.seller.is_seller ? <SellerFacts seller={d.seller} bundle={d.bundle} /> : null}
         <div className="empty" style={{ marginTop: 18 }}>
           <p style={{ marginBottom: 14 }}>
             {d.seller.handle} har ikke planlagt et show endnu.{d.seller.is_seller ? " Følg sælgeren, så får du besked, når der kommer et." : ""}
@@ -254,6 +257,7 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
         authOk={d.authOk}
         guests={d.guests}
         camLayout={d.camLayout}
+        bundle={d.bundle}
       />
       {d.ratings.length ? (
         <div className="wrap" style={{ paddingBottom: 64 }}>

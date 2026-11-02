@@ -994,5 +994,101 @@ select t.ok((select language from shows where id = '10000000-0000-0000-0000-0000
 select t.ok((select count(*) from shows where language <> 'da' and id <> '10000000-0000-0000-0000-0000000000e1') = 0, 'shows er på dansk, medmindre sælgeren vælger andet');
 delete from shows where id = '10000000-0000-0000-0000-0000000000e1';
 
+
+-- ── Samlerabat (0027_samlerabat.sql) ──
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select set_bundle_discount(10, 15)$$, 'Kun sælgere');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.throws($$select set_bundle_discount(60, 60)$$, 'mellem 0 og 50');
+select t.ok((select pct2 = 10 and pct3 = 10 from set_bundle_discount(10, 5)), 'rabatten ved 3 varer er mindst den samme som ved 2');
+select t.ok((select pct2 = 10 and pct3 = 15 from set_bundle_discount(10, 15)), 'Maja giver 10 % ved 2 varer og 15 % ved 3');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$update bundle_discounts set pct2 = 50$$, 'permission denied');
+reset role;
+set role anon;
+select t.ok((select count(*) from bundle_discounts where seller_id = '00000000-0000-0000-0000-00000000000a') = 1, 'alle kan se sælgerens samlerabat');
+reset role;
+
+-- ── Bud på varer til fast pris (0028_bud_paa_varer.sql) ──
+insert into shows (id, seller_id, title, category, starts_at, status)
+  values ('10000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-00000000000a', 'Bud-test', 'dametoej', now() - interval '1 day', 'ended');
+insert into items (id, show_id, seller_id, name, price, status, for_sale, listed_at) values
+  ('20000000-0000-0000-0000-0000000000f1', '10000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-00000000000a', 'Strikket cardigan', 200, 'unsold', true, now()),
+  ('20000000-0000-0000-0000-0000000000f2', '10000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-00000000000a', 'Hørskjorte', 100, 'unsold', true, now()),
+  ('20000000-0000-0000-0000-0000000000f3', '10000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-00000000000a', 'Gucci bælte', 1500, 'unsold', true, now()),
+  ('20000000-0000-0000-0000-0000000000f4', '10000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-00000000000a', 'Uldfrakke', 300, 'unsold', true, now());
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$select make_offer('20000000-0000-0000-0000-0000000000f1', 100)$$, 'mindst 140 kr');
+select t.throws($$select make_offer('20000000-0000-0000-0000-0000000000f1', 200)$$, 'under prisen');
+select t.throws($$select make_offer('20000000-0000-0000-0000-0000000000f3', 1200)$$, 'ægthedstjek');
+select t.ok((select status = 'pending' and price = 200 and amount = 150 from make_offer('20000000-0000-0000-0000-0000000000f1', 150)), 'Liva byder 150 kr på en vare til 200 kr');
+select t.ok((select amount = 160 from make_offer('20000000-0000-0000-0000-0000000000f1', 160)), 'Liva hæver sit bud til 160 kr');
+select t.ok((select count(*) filter (where status = 'pending') = 1 and count(*) filter (where status = 'withdrawn') = 1 from offers
+             where item_id = '20000000-0000-0000-0000-0000000000f1'), 'det nye bud erstatter det gamle');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.throws($$select make_offer('20000000-0000-0000-0000-0000000000f1', 150)$$, 'egne varer');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.ok((select status = 'pending' from make_offer('20000000-0000-0000-0000-0000000000f1', 145)), 'Ole byder også');
+select t.ok((select count(*) from offers) = 1, 'Ole kan kun se sit eget bud');
+select t.throws($$select answer_offer((select id from offers limit 1), true)$$, 'findes ikke');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select count(*) from offers where item_id = '20000000-0000-0000-0000-0000000000f1' and status = 'pending') = 2, 'Maja kan se begge åbne bud');
+select t.ok((select status = 'declined' from answer_offer((select id from offers where user_id = '00000000-0000-0000-0000-00000000000c' and status = 'pending'), false)), 'Maja siger nej til Oles bud');
+select t.ok((select status = 'accepted' and sale_id is not null from answer_offer((select id from offers where user_id = '00000000-0000-0000-0000-00000000000b' and status = 'pending'), true)), 'Maja siger ja til Livas bud');
+select t.throws($$select answer_offer((select id from offers where status = 'accepted' limit 1), true)$$, 'ikke åbent');
+reset role;
+select t.ok((select status from items where id = '20000000-0000-0000-0000-0000000000f1') = 'sold', 'varen er solgt');
+select t.ok((select price = 160 and status = 'reserved' and buyer_id = '00000000-0000-0000-0000-00000000000b' from sales where item_id = '20000000-0000-0000-0000-0000000000f1'), 'varen ligger i Livas kurv til 160 kr');
+
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select make_offer('20000000-0000-0000-0000-0000000000f2', 70);
+select make_offer('20000000-0000-0000-0000-0000000000f2', 75);
+select make_offer('20000000-0000-0000-0000-0000000000f2', 80);
+select t.throws($$select make_offer('20000000-0000-0000-0000-0000000000f2', 85)$$, '3 gange');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select make_offer('20000000-0000-0000-0000-0000000000f2', 90);
+select status from buy_now('20000000-0000-0000-0000-0000000000f2');
+reset role;
+select t.ok((select count(*) from offers where item_id = '20000000-0000-0000-0000-0000000000f2' and status = 'pending') = 0
+            and (select count(*) from offers where item_id = '20000000-0000-0000-0000-0000000000f2' and status = 'closed') = 2, 'åbne bud lukker, når varen bliver købt');
+
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select make_offer('20000000-0000-0000-0000-0000000000f4', 250);
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+update items set price = 240 where id = '20000000-0000-0000-0000-0000000000f4';
+select t.ok((select status from offers where item_id = '20000000-0000-0000-0000-0000000000f4' order by created_at desc limit 1) = 'closed', 'buddet lukker, når prisen bliver sat ned under det');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select make_offer('20000000-0000-0000-0000-0000000000f4', 200);
+reset role;
+update offers set expires_at = now() - interval '1 minute' where item_id = '20000000-0000-0000-0000-0000000000f4' and status = 'pending';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.throws($$select answer_offer((select id from offers where item_id = '20000000-0000-0000-0000-0000000000f4' and status = 'pending'), true)$$, 'udløbet');
+select t.ok(not has_function_privilege('authenticated', 'public.expire_offers()', 'execute'), 'kun serveren kan lukke udløbne bud');
+reset role;
+set role service_role;
+select expire_offers();
+reset role;
+select t.ok((select count(*) from offers where status = 'expired') = 1, 'det daglige job lukker udløbne bud');
+insert into seller_blocks (seller_id, user_id) values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select make_offer('20000000-0000-0000-0000-0000000000f4', 200)$$, 'blokeret');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select status = 'withdrawn' from offers where id = (select id from make_offer('20000000-0000-0000-0000-0000000000f4', 200))) is not true, 'Liva byder på frakken');
+select withdraw_offer((select id from offers where user_id = auth.uid() and item_id = '20000000-0000-0000-0000-0000000000f4' and status = 'pending'));
+select t.ok((select status from offers where user_id = auth.uid() and item_id = '20000000-0000-0000-0000-0000000000f4' order by created_at desc limit 1) = 'withdrawn', 'Liva trækker sit bud tilbage');
+reset role;
+delete from seller_blocks where seller_id = '00000000-0000-0000-0000-00000000000a' and user_id = '00000000-0000-0000-0000-00000000000c';
+delete from offers;
+delete from sales where item_id in ('20000000-0000-0000-0000-0000000000f1', '20000000-0000-0000-0000-0000000000f2');
+delete from items where show_id = '10000000-0000-0000-0000-0000000000f1';
+delete from shows where id = '10000000-0000-0000-0000-0000000000f1';
+delete from bundle_discounts;
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

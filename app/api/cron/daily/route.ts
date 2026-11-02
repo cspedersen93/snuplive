@@ -27,6 +27,8 @@ export async function GET(req: Request) {
   const followDigest = await sendFollowDigest(admin);
   // Søgeagenterne: nye varer, der passer til de gemte søgninger.
   const searchAlerts = await sendSearchAlerts(admin);
+  // Bud på varer, som sælgeren ikke har svaret på inden 48 timer (0028_bud_paa_varer.sql).
+  const offersExpired = await admin.rpc("expire_offers");
   return json({
     ...(await dailyMaintenance(admin, stripe)),
     staleShowsEnded: stale.data ?? 0,
@@ -35,6 +37,7 @@ export async function GET(req: Request) {
     clipsDeleted,
     followDigest,
     searchAlerts,
+    offersExpired: offersExpired.error ? 0 : (offersExpired.data ?? 0),
   });
 }
 

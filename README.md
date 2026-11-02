@@ -21,6 +21,7 @@ Det, der ikke bliver solgt, kan købes bagefter til fast pris. Det hele kører i
 - En forside til købere, fem kategorier (`/kategori/...`) og en side for hver vare (`/ting/...`) med billeder, beskrivelse og pris
 - "Husk mig" på varer og shows før showet (mail, når showet starter) og "Køb nu" til fast pris for det, der ikke blev solgt
 - Budsalg live: 30 sekunder, faste budtrin og 10 sekunder ekstra ved sene bud. "Kommende budsalg" på forsiden
+- Samlerabat, som sælgeren selv vælger, og bud på varer til fast pris (se *Samlerabat* og *Bud på varer til fast pris*)
 
 MitID kommer senere (se nederst).
 
@@ -789,6 +790,42 @@ Ved kameraet i studiet er der to knapper under *Skift kamera*. Der skal ikke kø
 - Filtrene kører på sælgerens egen enhed. Seerne ser billedet med filter, og det kommer med på billedet og klippet af varen.
 - Valget huskes i browseren til næste show. Kan enheden ikke sløre baggrunden, får sælgeren besked, og knappen slår fra igen.
   Knapperne vises ikke i browsere, der slet ikke kan bruge filtre.
+
+---
+
+## Samlerabat
+
+**Kør `0027_samlerabat.sql` i Supabase → SQL Editor** (efter 0026). Indtil da er der ingen samlerabat, og kurven og
+betalingen virker som før.
+
+- **Sælgeren** vælger under **Mine shows → Samlerabat** en rabat ved 2 varer og ved 3 eller flere (0–30 %). Rabatten
+  ved 3 eller flere er mindst den samme som ved 2.
+- **Køberen** ser rabatten ved sælgerens oplysninger på varesiden, på sælgerens side og i showet. I kurven bliver den
+  trukket automatisk for alt, køberen betaler hos sælgeren på én gang (også fra flere shows), og der står fx
+  "Køb 1 vare mere hos …, og få 15 % i samlerabat".
+- **Betalingen** regner rabatten ud igen på serveren (`app/api/checkout/route.ts`) og fordeler den på varerne hos Stripe.
+  Ordrens `items_amount` er beløbet efter rabatten: det, sælgeren får, og det, der indberettes. Køberbeskyttelsen
+  (5 % + 5 kr) regnes af beløbet efter rabatten.
+- Koden: `bundleDiscount`, `bundlePct`, `nextBundle` og `spreadDiscount` i `lib/pricing.ts`, `lib/bundles.ts`,
+  `app/(site)/studio/BundleDiscount.tsx` og `set_bundle_discount` i databasen.
+
+---
+
+## Bud på varer til fast pris
+
+**Kør `0028_bud_paa_varer.sql` i Supabase → SQL Editor** (efter 0027). Indtil da vises knappen **Giv et bud** ikke.
+
+- **Køberen** trykker **Giv et bud** på en vare, der er til salg efter showet. Buddet skal være mindst 70 % af prisen og
+  under prisen. Der er forslag på 90 % og 80 %. Køberen kan skifte sit bud eller trække det tilbage, og højst byde 3
+  gange om dagen på samme vare (og have 20 åbne bud i alt). De åbne bud står også under **Mine køb → Dine bud**.
+- **Sælgeren** får besked på telefonen eller mail og svarer under **Mine shows → Bud på dine varer** med **Sig ja** eller
+  **Nej tak**. Ja: varen bliver reserveret til køberen til budet og lander i kurven, præcis som ved Køb nu (betal inden
+  3 dage). Køberen får besked om svaret.
+- **Et bud gælder i 48 timer.** Det lukker af sig selv, hvis varen bliver solgt, taget af salg, fjernet eller sat ned til
+  budet eller derunder. Det daglige job markerer de udløbne.
+- Ingen andre end køberen og sælgeren kan se buddet. Blokerede købere og varer, der venter på ægthedstjek, kan ikke få bud.
+- Koden: `make_offer`, `answer_offer`, `withdraw_offer` og `expire_offers` i databasen, `app/api/offers` (beskederne),
+  `lib/offers.ts`, `app/(site)/ting/[slug]/MakeOffer.tsx` og `app/(site)/studio/Offers.tsx`.
 
 ---
 

@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Stars from "@/components/Stars";
+import { bundleText, hasBundle, type BundleTiers } from "@/lib/pricing";
 import type { SellerFactsData } from "@/lib/types";
 
 /**
  * Det, køberen skal vide om sælgeren (forbrugeraftaleloven § 8 a):
  * om sælgeren er privat eller en virksomhed, og om fortrydelsesretten gælder.
  */
-export default function SellerFacts({ seller, stars = true }: { seller: SellerFactsData; stars?: boolean }) {
+export default function SellerFacts({ seller, stars = true, bundle = null }: { seller: SellerFactsData; stars?: boolean; bundle?: BundleTiers | null }) {
   const business = seller.seller_type === "business";
   return (
     <div className="seller-facts">
@@ -27,6 +28,11 @@ export default function SellerFacts({ seller, stars = true }: { seller: SellerFa
         ) : null}
         {stars ? <Stars avg={seller.rating_avg} count={seller.rating_count} /> : null}
       </span>
+      {hasBundle(bundle) ? (
+        <span className="bundle-fact">
+          <b>Samlerabat:</b> {bundleText(bundle)}
+        </span>
+      ) : null}
       <span className="muted">
         {business ? "Du har 14 dages fortrydelsesret. " : "Køb fra en privatperson er ikke omfattet af fortrydelsesret. "}
         <Link href="/handelsbetingelser#fortrydelsesret">Læs mere</Link>

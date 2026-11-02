@@ -176,6 +176,12 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                       <span className="num">{kr(s.price)}</span>
                     </li>
                   ))}
+                  {o.sales.reduce((a, s) => a + s.price, 0) > o.items_amount ? (
+                    <li className="so-discount">
+                      <span>Samlerabat</span>
+                      <span className="num">−{kr(o.sales.reduce((a, s) => a + s.price, 0) - o.items_amount)}</span>
+                    </li>
+                  ) : null}
                 </ul>
                 {o.delivery === "ship" && o.sp_id ? (
                   <>

@@ -4,7 +4,8 @@ import { fail, json } from "@/lib/api";
 import { CARRIERS, isCarrier, type Pakkeshop } from "@/lib/carriers";
 import { SITE_URL } from "@/lib/env";
 import { cancelCheckout, markCheckoutPaid } from "@/lib/orders";
-import { DELIVERY, isDelivery, orderAmounts, type Delivery } from "@/lib/pricing";
+import { fetchBundles } from "@/lib/bundles";
+import { bundleDiscount, bundlePct, DELIVERY, isDelivery, orderAmounts, spreadDiscount, type Delivery } from "@/lib/pricing";
 import { findPakkeshops, hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, ore } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -104,6 +105,9 @@ export async function POST(req: Request) {
     if (!shop) return fail("Pakkeshoppen blev ikke fundet. Vælg den igen.", 400);
   }
 
+  // Samlerabat (0027_samlerabat.sql): regnes her på serveren ud fra sælgerens rabat lige nu.
+  const bundles = await fetchBundles(admin, [...groups.keys()]);
+
   const checkoutId = randomUUID();
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
   let anyShip = false;
@@ -114,7 +118,16 @@ export async function POST(req: Request) {
     const delivery = deliveryOf(key);
     if (delivery === "ship") anyShip = true;
     const items = sales.reduce((a, s) => a + s.price, 0);
-    const amounts = orderAmounts(items, delivery);
+    const bundle = bundles.get(key);
+    // Priserne efter rabat, fordelt på varerne, så linjerne hos Stripe giver præcis ordrens beløb.
+    // (En vare kommer aldrig under 1 kr, så rabatten er det, der faktisk kunne trækkes fra.)
+    const linePrices = spreadDiscount(
+      sales.map((s) => s.price),
+      bundleDiscount(items, sales.length, bundle),
+    );
+    const discount = items - linePrices.reduce((a, p) => a + p, 0);
+    const pct = discount > 0 ? bundlePct(sales.length, bundle) : 0;
+    const amounts = orderAmounts(items, delivery, discount);
     feeTotal += amounts.fee;
     const handle = sales[0].seller?.handle ?? "sælger";
 
@@ -150,19 +163,26 @@ export async function POST(req: Request) {
     created.push(order.id as string);
     await admin.from("sales").update({ order_id: order.id }).in("id", sales.map((s) => s.id)).eq("status", "reserved");
 
-    for (const s of sales) {
+    sales.forEach((s, i) => {
       lineItems.push({
         quantity: 1,
         price_data: {
           currency: "dkk",
-          unit_amount: ore(s.price),
+          unit_amount: ore(linePrices[i]),
           product_data: {
             name: s.item?.name ?? "Vare",
-            description: [s.item?.size ? `Str. ${s.item.size}` : null, s.item?.condition, `fra @${handle}`].filter(Boolean).join(" · "),
+            description: [
+              s.item?.size ? `Str. ${s.item.size}` : null,
+              s.item?.condition,
+              `fra @${handle}`,
+              pct ? `${pct} % samlerabat (før ${s.price} kr)` : null,
+            ]
+              .filter(Boolean)
+              .join(" · "),
           },
         },
       });
-    }
+    });
     if (amounts.shipping > 0) {
       lineItems.push({
         quantity: 1,

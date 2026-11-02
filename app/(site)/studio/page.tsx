@@ -15,6 +15,8 @@ import { mitidState } from "@/lib/mitid";
 import BecomeSeller from "../konto/BecomeSeller";
 import NewShowForm from "./NewShowForm";
 import BlockedUsers from "./BlockedUsers";
+import BundleDiscount from "./BundleDiscount";
+import Offers from "./Offers";
 import ForSale from "./ForSale";
 import SellerPayments from "./SellerPayments";
 import ShowMenu from "./ShowMenu";
@@ -82,6 +84,10 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
   const visQ = await supabase.from("shows").select("visibility").limit(1);
   const closedReady = !visQ.error;
   const hiddenShows = all.filter((s) => hiddenIds.has(s.id));
+  // Samlerabat (0027_samlerabat.sql). Uden filen vises boksen ikke.
+  const bundleQ = await supabase.from("bundle_discounts").select("pct2,pct3").eq("seller_id", uid).maybeSingle();
+  const bundleReady = !bundleQ.error;
+  const bundle = { pct2: Number(bundleQ.data?.pct2 ?? 0), pct3: Number(bundleQ.data?.pct3 ?? 0) };
 
   return (
     <div className="wrap dash">
@@ -165,8 +171,10 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           </details>
         ) : null}
 
+        <Offers uid={uid} />
         <SellerPayments uid={uid} search={sp} displayName={profile.display_name ?? ""} />
         <ForSale uid={uid} />
+        {bundleReady ? <BundleDiscount initial={bundle} /> : null}
         <BlockedUsers uid={uid} />
       </div>
     </div>

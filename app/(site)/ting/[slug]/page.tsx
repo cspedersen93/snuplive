@@ -16,12 +16,14 @@ import { category, clock, dayLabel, kr, usedPhrase } from "@/lib/format";
 import { clipUrl, itemImages } from "@/lib/images";
 import { idFromSlug, itemHref, itemSlug, itemState, type ItemState } from "@/lib/items";
 import { isAuction, soldPrice } from "@/lib/auction";
-import { DELIVERY } from "@/lib/pricing";
+import { bundleText, DELIVERY, hasBundle } from "@/lib/pricing";
+import { fetchBundle } from "@/lib/bundles";
 import { fetchFeed } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { ITEM_COLS, SELLER_FACT_COLS, type Item, type SellerFactsData } from "@/lib/types";
 import MaxBid from "@/components/MaxBid";
 import BuyNow from "./BuyNow";
+import MakeOffer from "./MakeOffer";
 import FollowButton from "@/components/FollowButton";
 import { IconShieldCheck } from "@/components/Icons";
 import Gallery from "./Gallery";
@@ -67,7 +69,10 @@ const load = cache(async (slug: string) => {
   const video = !kindRes.error && (kindRes.data as unknown as { show: { kind: string } | null } | null)?.show?.kind === "video";
   // Varer i et lukket show er kun for de inviterede, indtil showet er slut.
   const closed = !visRes.error && (visRes.data as unknown as { show: { visibility: string } | null } | null)?.show?.visibility === "invite" && item.show.status !== "ended";
-  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video, closed };
+  // Sælgerens samlerabat (0027_samlerabat.sql) og bud på varer til fast pris (0028_bud_paa_varer.sql).
+  const [bundle, offerQ] = await Promise.all([fetchBundle(sb, item.seller_id), sb.rpc("offer_min", { p_price: 100 })]);
+  const offers = !offerQ.error;
+  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video, closed, bundle, offers };
 });
 
 function stateOf(it: Loaded): ItemState {
@@ -264,6 +269,7 @@ export default async function ItemPage({ params }: Params) {
                   {isAuction(it) ? <p>Ingen bød på den i showet, så nu kan du købe den til startprisen.</p> : null}
                   <BuyNow itemId={it.id} price={it.price} next={href} sellerId={it.seller_id} />
                   <p className="fine">Varen bliver reserveret til dig, og du betaler under Mine køb.</p>
+                  {d.offers ? <MakeOffer itemId={it.id} price={it.price} sellerId={it.seller_id} handle={seller.handle} next={href} /> : null}
                   {d.auth === "approved" ? (
                     <p className="fine">Ægthed tjekket af Relived. Viser den sig at være falsk, får du alle pengene tilbage.</p>
                   ) : null}
@@ -352,12 +358,15 @@ export default async function ItemPage({ params }: Params) {
               </span>
             </Link>
             <FollowButton sellerId={it.seller_id} handle={seller.handle} next={href} />
-            <SellerFacts seller={seller} />
+            <SellerFacts seller={seller} bundle={d.bundle} />
 
             <ul className="item-trust">
               <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har varen.</li>
               <li>Fragt {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>
-              <li>Køber du flere varer fra {seller.handle}, får du dem i én pakke.</li>
+              <li>
+                Køber du flere varer fra {seller.handle}, får du dem i én pakke
+                {hasBundle(d.bundle) ? <> og <b>samlerabat: {bundleText(d.bundle)}</b></> : null}.
+              </li>
             </ul>
             <ReportButton type="item" id={it.id} className="item-report" />
           </div>
