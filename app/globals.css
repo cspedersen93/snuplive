@@ -1771,6 +1771,21 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .ftile-big:has(.ftile-cta) .ftile-info{padding-right:150px}
 .ftile-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .ftile-welcome .ftile-info{gap:8px;align-items:flex-start}
+.ftile-big .ftile-title{text-shadow:0 2px 18px rgba(0,0,0,.45)}
+/* Få kort: det store kort fylder hele bredden som et banner */
+.feed-grid.sparse .ftile-big{grid-column:1/-1;grid-row:auto;min-height:0;aspect-ratio:16/7}
+@container (max-width:519px){.feed-grid.sparse .ftile-big{aspect-ratio:auto;min-height:440px}}
+/* Velkomstkortet (ingen live): mørkt i venstre side, så teksten kan læses oven på billedet */
+.ftile-welcome{justify-content:center}
+.ftile-welcome .ftile-img{object-position:70% 30%}
+.ftile-welcome .ftile-shade{background:linear-gradient(90deg,rgba(11,10,12,.95) 0%,rgba(11,10,12,.86) 40%,rgba(11,10,12,.35) 72%,rgba(11,10,12,.12) 100%)}
+.ftile-welcome .ftile-info{max-width:min(540px,100%);padding:clamp(22px,4cqw,40px)}
+.ftile-welcome .ftile-extra{color:#E4DBDF;font-size:.95rem}
+@container (max-width:519px){
+  .ftile-welcome{justify-content:flex-end}
+  .ftile-welcome .ftile-shade{background:linear-gradient(180deg,rgba(11,10,12,.15) 0%,rgba(11,10,12,.55) 38%,rgba(11,10,12,.96) 78%)}
+  .ftile-welcome .ftile-info{padding:20px}
+}
 .feed-more{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px}
 
 .feed-rail{display:flex;flex-direction:column;gap:14px;min-width:0}

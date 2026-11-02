@@ -81,7 +81,7 @@ export default async function Forside() {
         <div className="feed-main">
           <div className="feed-head">
             <span className="label red feed-eyebrow">
-              <span className="live-dot" aria-hidden="true" />
+              {live.length ? <span className="live-dot" aria-hidden="true" /> : null}
               {live.length ? `${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu` : "Live Sale. Second Hand."}
             </span>
             <h1 id="h-forside" className="feed-h1">
@@ -93,7 +93,7 @@ export default async function Forside() {
           <nav className="feed-tabs" aria-label="Vis">
             <Link href="/" aria-current="page">For dig</Link>
             <Link href="/live">
-              <span className="live-dot" aria-hidden="true" />
+              {live.length ? <span className="live-dot" aria-hidden="true" /> : null}
               Live nu
             </Link>
             {auctions.length ? <Link href="#budsalg">Budsalg</Link> : null}
@@ -122,7 +122,9 @@ export default async function Forside() {
 
           <section aria-labelledby="h-feed">
             <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
-            <div className="feed-grid">
+            {/* Med få kort (fx i starten, når ingen er live) bliver det store kort et banner i fuld bredde, så der ikke står
+                et tomt felt ved siden af det. */}
+            <div className={`feed-grid${tiles.length < 4 ? " sparse" : ""}`}>
               {big ? <BigShowTile show={big} /> : <WelcomeTile />}
               {tiles.map((t) =>
                 t.kind === "show" ? <ShowTile key={`s${t.show.id}`} show={t.show} /> : <ItemTile key={`i${t.item.id}`} item={t.item} />,
