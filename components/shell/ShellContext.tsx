@@ -46,7 +46,9 @@ export default function ShellProvider({ children }: { children: React.ReactNode 
     let alive = true;
     const loadLive = async () => {
       try {
-        const r = await fetch("/api/live-now");
+        // Uden browserens egen cache: svaret gemmes allerede 30 sekunder på serveren, og browserens "brug det gamle og
+        // hent nyt i baggrunden" gav en forespørgsel, der hang i baggrunden.
+        const r = await fetch("/api/live-now", { cache: "no-store" });
         if (!r.ok) return;
         const j = (await r.json()) as { count?: number; sellers?: string[] };
         if (alive) setState((s) => ({ ...s, liveCount: j.count ?? 0, liveSellers: j.sellers ?? [] }));

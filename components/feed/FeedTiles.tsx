@@ -35,7 +35,7 @@ export function BigShowTile({ show }: { show: ShowWithSeller }) {
             <span className="fbadge later">Går live {when(show.starts_at).toLowerCase()}</span>
           ) : null}
           {show.language === "en" ? (
-            <span className="fbadge" lang="en">
+            <span className="fbadge b-lang" lang="en">
               English
             </span>
           ) : null}
@@ -101,6 +101,11 @@ export function ShowTile({ show }: { show: ShowWithSeller }) {
           </span>
         ) : show.starts_at ? (
           <span className="fbadge later">{when(show.starts_at)}</span>
+        ) : null}
+        {show.language === "en" ? (
+          <span className="fbadge b-lang" lang="en">
+            English
+          </span>
         ) : null}
       </span>
       <span className="ftile-info">
