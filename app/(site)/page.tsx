@@ -1,14 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IconPlay } from "@/components/Icons";
+import Avatar from "@/components/Avatar";
 import CategoryCards from "@/components/CategoryCards";
+import { BigShowTile, ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
+import RailHello from "@/components/feed/RailHello";
+import RailMine from "@/components/feed/RailMine";
+import { IconPlay } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
-import PhoneMock from "@/components/PhoneMock";
-import ShowCard from "@/components/ShowCard";
-import type { FeedItem } from "@/lib/types";
+import RemindButton from "@/components/RemindButton";
+import type { FeedItem, ShowWithSeller } from "@/lib/types";
 import { SITE_URL } from "@/lib/env";
+import { clock, dayLabel } from "@/lib/format";
+import { showImage } from "@/lib/images";
 import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed, fetchListing } from "@/lib/queries";
+
+/** Små kort i feedet ud over det store (12 går op i både 2, 3 og 4 kolonner med det store kort på 2×2). */
+const FEED_TILES = 12;
+type Tile = { kind: "show"; show: ShowWithSeller } | { kind: "item"; item: FeedItem };
+
+/** Én sælger én gang i rækken med runde billeder (live først, så dem der starter snart). */
+function uniqueBySeller(shows: ShowWithSeller[]) {
+  const seen = new Set<string>();
+  return shows.filter((s) => (seen.has(s.seller_id) ? false : (seen.add(s.seller_id), true)));
+}
 
 export const revalidate = 30;
 
@@ -22,14 +37,34 @@ export const metadata: Metadata = {
 
 export default async function Forside() {
   const [{ live, upcoming }, upcomingItems, auctions, forSale] = await Promise.all([
-    fetchListing(10, 10),
+    fetchListing(12, 12),
     fetchFeed("upcoming", { limit: 20 }),
-    fetchFeed("auctions", { limit: 10 }),
-    fetchFeed("for_sale", { limit: 10 }),
+    fetchFeed("auctions", { limit: 12 }),
+    fetchFeed("for_sale", { limit: 24 }),
   ]);
-  // Ting på budsalg har deres egen række, så de ikke står to gange.
-  const soon = upcomingItems.filter((it) => it.sale_type !== "auction").slice(0, 10);
-  const shows = [...live, ...upcoming].slice(0, 10);
+  // Varer på budsalg har deres egen række, så de ikke står to gange.
+  const soon = upcomingItems.filter((it) => it.sale_type !== "auction");
+
+  // Feedet: det store kort (live nu, ellers det næste show), så shows og varer blandet.
+  const big = live[0] ?? upcoming[0] ?? null;
+  const tiles: Tile[] = [];
+  for (const s of live.slice(big?.status === "live" ? 1 : 0, 4)) tiles.push({ kind: "show", show: s });
+  const nextShow = upcoming.find((s) => s.id !== big?.id);
+  if (nextShow && tiles.length < 4) tiles.push({ kind: "show", show: nextShow });
+  const queues = [forSale, auctions, soon].map((q) => [...q]);
+  const usedSale = new Set<string>();
+  while (tiles.length < FEED_TILES && queues.some((q) => q.length)) {
+    for (const q of queues) {
+      const it = q.shift();
+      if (!it || tiles.length >= FEED_TILES) continue;
+      if (tiles.some((t) => t.kind === "item" && t.item.id === it.id)) continue;
+      tiles.push({ kind: "item", item: it });
+      if (q === queues[0]) usedSale.add(it.id);
+    }
+  }
+  const moreForSale = forSale.filter((it) => !usedSale.has(it.id)).slice(0, 10);
+  const soonShows = upcoming.filter((s) => s.id !== big?.id).slice(0, 4);
+  const stories = uniqueBySeller([...live, ...upcoming]).slice(0, 12);
 
   const ld = {
     "@context": "https://schema.org",
@@ -42,33 +77,114 @@ export default async function Forside() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
-      <section className="hero" aria-labelledby="h-forside">
-        <div className="wrap">
-          <div className="hero-copy">
-            <span className="eyebrow label">
+      <div className="wrap home-feed">
+        <div className="feed-main">
+          <div className="feed-head">
+            <span className="label red feed-eyebrow">
               <span className="live-dot" aria-hidden="true" />
               {live.length ? `${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu` : "Live Sale. Second Hand."}
             </span>
-            <h1 id="h-forside" className="hero-h1">
+            <h1 id="h-forside" className="feed-h1">
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
-            <p className="lede">
-              Sælgeren viser varen frem på video, du spørger løs i chatten, og den første, der trykker Køb, får den. Ingen slørede
-              billeder og ingen »Er den stadig til salg?«.
-            </p>
-            <div className="ctas">
-              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
-              <Link className="btn btn-line" href="/til-salg">Køb til fast pris</Link>
-            </div>
-            <ul className="points">
-              <li>Sælgeren får først pengene, når du har varen</li>
-              <li>Fragt {DELIVERY.ship.price} kr til pakkeshop</li>
-              <li>Ingen app at hente</li>
-            </ul>
+            <p className="feed-lede">Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
           </div>
-          <PhoneMock />
+
+          <nav className="feed-tabs" aria-label="Vis">
+            <Link href="/" aria-current="page">For dig</Link>
+            <Link href="/live">
+              <span className="live-dot" aria-hidden="true" />
+              Live nu
+            </Link>
+            {auctions.length ? <Link href="#budsalg">Budsalg</Link> : null}
+            <Link href="/til-salg">Til salg</Link>
+            <Link href="/klip">Klip</Link>
+          </nav>
+
+          {stories.length ? (
+            <div className="stories" role="list" aria-label="Sælgere, der er live eller går live snart">
+              {stories.map((s) => {
+                const handle = s.seller?.handle ?? "sælger";
+                const on = s.status === "live";
+                return (
+                  <Link key={s.id} role="listitem" className={`story${on ? " on" : ""}`} href={`/live/${handle}`}>
+                    <span className="story-ring">
+                      <Avatar handle={handle} path={s.seller?.avatar_path} />
+                      {on ? <span className="story-tag">Live</span> : null}
+                    </span>
+                    <span className="story-name">{handle}</span>
+                    {!on && s.starts_at ? <span className="story-time">{clock(s.starts_at)}</span> : null}
+                  </Link>
+                );
+              })}
+            </div>
+          ) : null}
+
+          <section aria-labelledby="h-feed">
+            <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
+            <div className="feed-grid">
+              {big ? <BigShowTile show={big} /> : <WelcomeTile />}
+              {tiles.map((t) =>
+                t.kind === "show" ? <ShowTile key={`s${t.show.id}`} show={t.show} /> : <ItemTile key={`i${t.item.id}`} item={t.item} />,
+              )}
+            </div>
+            <div className="feed-more">
+              <Link className="btn btn-line" href="/til-salg">Se alt til salg</Link>
+              <Link className="btn btn-line" href="/live">Se hvem der går live</Link>
+            </div>
+          </section>
         </div>
-      </section>
+
+        <aside className="feed-rail" aria-label="Til dig">
+          <RailMine />
+          {soonShows.length ? (
+            <section className="rail-box" aria-labelledby="h-rail-snart">
+              <div className="rail-top">
+                <h2 className="rail-h" id="h-rail-snart">Snart live</h2>
+                <Link className="rail-more" href="/live#h-sched">Program</Link>
+              </div>
+              <ul className="rail-list">
+                {soonShows.map((s) => {
+                  const handle = s.seller?.handle ?? "sælger";
+                  return (
+                    <li key={s.id}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={showImage(s)} alt="" loading="lazy" />
+                      <span className="rail-txt">
+                        {s.starts_at ? <span className="rail-when">{dayLabel(s.starts_at)} {clock(s.starts_at)}</span> : null}
+                        <strong>
+                          <Link href={`/live/${handle}`}>{s.title}</Link>
+                        </strong>
+                        <span>{handle}</span>
+                        <RemindButton showId={s.id} next="/" className="btn btn-line btn-sm rail-remind" />
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ) : null}
+          <RailHello />
+          <section className="rail-box" aria-labelledby="h-rail-tryg">
+            <h2 className="rail-h" id="h-rail-tryg">Tryg handel</h2>
+            <ul className="rail-checks">
+              <li>Sælgeren får først pengene, når du har varen.</li>
+              <li>Alt fra samme sælger i én pakke, {DELIVERY.ship.price} kr til pakkeshop.</li>
+              <li>14 dages fortrydelsesret, når du køber på afstand.</li>
+            </ul>
+            <Link className="rail-link" href="/saadan-virker-det#priser">Priser, fragt og rabat</Link>
+          </section>
+        </aside>
+      </div>
+
+      <ItemRow id="budsalg" title="Kommende budsalg – byd med live" items={auctions} link={{ href: "/live", label: "Se programmet" }} />
+      <ItemRow
+        id="h-til-salg"
+        title="Til salg nu – køb til fast pris"
+        items={moreForSale}
+        link={{ href: "/til-salg", label: "Se alt til salg" }}
+        extra={moreForSale.some((i) => i.clip_path) ? { href: "/klip", label: "Swipe gennem klip" } : undefined}
+      />
 
       <section className="sec tight" aria-labelledby="h-kategorier">
         <div className="wrap">
@@ -79,44 +195,6 @@ export default async function Forside() {
           <CategoryCards />
         </div>
       </section>
-
-      <section className="sec tight" aria-labelledby="h-live-now">
-        <div className="wrap">
-          <div className="row-head">
-            <h2 className="h2" id="h-live-now">
-              Hvem er <em className="s">live</em> lige nu?
-            </h2>
-            <Link className="btn btn-line" href="/live">Se alle shows</Link>
-          </div>
-          {shows.length ? (
-            <div className="cards-scroll">
-              <div className="cards">
-                {shows.map((s, i) => (
-                  <ShowCard key={s.id} show={s} priority={i < 2} />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="empty">
-              <p style={{ marginBottom: 14 }}>
-                Ingen er live lige nu. Tryk Husk mig på et show, der starter senere, eller køb noget af det, der allerede er vist frem
-                på video.
-              </p>
-              <Link className="btn btn-red" href="/til-salg">Se varer til salg</Link>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <ItemRow id="h-budsalg" title="Kommende budsalg – byd med live" items={auctions} link={{ href: "/live", label: "Se programmet" }} />
-      <ItemRow id="h-snart" title="Snart i et live-show" items={soon} link={{ href: "/live", label: "Se programmet" }} />
-      <ItemRow
-        id="h-til-salg"
-        title="Til salg nu – køb til fast pris"
-        items={forSale}
-        link={{ href: "/til-salg", label: "Se alt til salg" }}
-        extra={forSale.some((i) => i.clip_path) ? { href: "/klip", label: "Swipe gennem klip" } : undefined}
-      />
 
       <section className="sec band" aria-labelledby="h-how">
         <div className="wrap split">

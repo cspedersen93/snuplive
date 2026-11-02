@@ -847,6 +847,23 @@ show, en vare eller en videoannonce. Kategorisiden findes alligevel, men er tom.
   indtil filen er kørt), `PICKUP_CATEGORIES` i `lib/pricing.ts` og billedet `public/img/cover-cykler.jpg` (Pexels).
 - 0017 og 0024 kender også den nye kategori, så de stadig kan køres igen uden fejl.
 
+## App-rammen og forsiden som feed
+
+Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal ikke køres noget i Supabase.
+
+- **Computer:** menuen står i venstre side (For dig, Live nu, Budsalg, Til salg, Klip, Kategorier, dem man følger og
+  Sælg). Toppen har søgefeltet, kurven og kontoen. Under 1360 px bredde, og altid i live-shows og studiet, er menuen
+  smal med kun ikoner, så videoen får pladsen.
+- **Telefon:** toppen har logo, søg og en knap med hele menuen. I bunden er en fast menulinje: Forside, Live, Sælg, Kurv
+  og Mig. Den er skjult i live-shows, studiet, klip og gæstekameraet.
+- **Forsiden:** faner, runde billeder af dem, der er live eller går live snart, og et feed med det store live-kort og
+  blandede kort (shows, varer til salg, budsalg, varer i kommende shows). I højre side: dine bud, et skub når én vare mere
+  giver samlerabat, Snart live, "Ny på Relived?" (kun logget ud) og Tryg handel. Under feedet står budsalg, flere varer
+  til salg, kategorierne og teksterne om, hvordan det virker (de samme overskrifter som før, af hensyn til Google).
+- `/api/live-now` siger, hvor mange der er live (gemmes i 30 sekunder). Tallet står ved Live nu i menuen.
+- Koden: `components/shell/` (rammen, venstremenuen, bundmenuen og det, de skal vide om brugeren),
+  `components/Header.tsx`, `components/feed/` (kortene og højre side) og `app/(site)/page.tsx`.
+
 ---
 
 ## Udvikling på din egen computer

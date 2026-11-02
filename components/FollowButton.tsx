@@ -70,6 +70,8 @@ export default function FollowButton({
       if (!error) setCount((c) => (c ?? 0) + 1);
       tell(true, error ? 0 : 1);
       if (!error) track("Følg", { hvor: compact ? "video" : "side" });
+      // Menuen viser dem, man følger.
+      window.dispatchEvent(new Event("snup:changed"));
       toast(`Du følger nu @${handle}. Vi giver dig besked, når @${handle} går live.`);
       if (!compact) setOffer(true);
       onFollowedRef.current?.();
@@ -142,6 +144,7 @@ export default function FollowButton({
     setJust(false);
     setCount((c) => Math.max(0, (c ?? 1) - 1));
     tell(false, -1);
+    window.dispatchEvent(new Event("snup:changed"));
     toast(`Du følger ikke længere @${handle}.`);
   }
 

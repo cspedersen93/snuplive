@@ -243,3 +243,46 @@ export const IconShieldCheck = (p: P) => (
     <path d="m8.8 12.2 2.3 2.3 4.3-4.6" />
   </svg>
 );
+/* Menuen (app-rammen). */
+export const IconHome = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" {...p}>
+    <path d="M4 11 12 4l8 7v9h-5v-6H9v6H4Z" />
+  </svg>
+);
+export const IconLive = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" {...p}>
+    <circle cx="12" cy="12" r="2.6" />
+    <path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14" />
+  </svg>
+);
+export const IconGavel = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="m13.5 4.5 6 6M10.5 7.5l6 6M12 6l4.5 4.5M3.5 20.5 11 13" />
+    <path d="M4 21h8" />
+  </svg>
+);
+export const IconBag = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" {...p}>
+    <path d="M5 8h14l-1.3 12H6.3Z" />
+    <path d="M9 8a3 3 0 0 1 6 0" strokeLinecap="round" />
+  </svg>
+);
+export const IconGrid = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" {...p}>
+    <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+    <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+    <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+    <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+  </svg>
+);
+export const IconPlus = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" {...p}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+export const IconVideo = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" {...p}>
+    <rect x="5" y="3" width="14" height="18" rx="3" />
+    <path d="M10.5 9.5v5l4-2.5Z" fill="currentColor" />
+  </svg>
+);
