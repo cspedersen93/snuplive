@@ -16,6 +16,7 @@ import BecomeSeller from "../konto/BecomeSeller";
 import NewShowForm from "./NewShowForm";
 import BlockedUsers from "./BlockedUsers";
 import BundleDiscount from "./BundleDiscount";
+import { hiddenCategories } from "@/lib/categories";
 import Offers from "./Offers";
 import ForSale from "./ForSale";
 import SellerPayments from "./SellerPayments";
@@ -84,6 +85,8 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
   const visQ = await supabase.from("shows").select("visibility").limit(1);
   const closedReady = !visQ.error;
   const hiddenShows = all.filter((s) => hiddenIds.has(s.id));
+  // Cykler og barnevogne (0029_cykler.sql): kan først vælges, når filen er kørt.
+  const hideCats = await hiddenCategories(supabase);
   // Samlerabat (0027_samlerabat.sql). Uden filen vises boksen ikke.
   const bundleQ = await supabase.from("bundle_discounts").select("pct2,pct3").eq("seller_id", uid).maybeSingle();
   const bundleReady = !bundleQ.error;
@@ -143,7 +146,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           </div>
         ) : null}
 
-        <NewShowForm sellerId={uid} englishReady={englishReady} closedReady={closedReady} />
+        <NewShowForm sellerId={uid} englishReady={englishReady} closedReady={closedReady} hideCats={hideCats} />
 
         {canVideo ? (
           <div className="box vl-entry">

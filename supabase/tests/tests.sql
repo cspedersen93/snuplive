@@ -1090,5 +1090,21 @@ delete from items where show_id = '10000000-0000-0000-0000-0000000000f1';
 delete from shows where id = '10000000-0000-0000-0000-0000000000f1';
 delete from bundle_discounts;
 
+-- ── Cykler og barnevogne (0029_cykler.sql) ──
+select t.ok(category_ready('cykler') and not category_ready('biler'), 'kategorien cykler findes');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+insert into shows (id, seller_id, title, category, starts_at)
+  values ('10000000-0000-0000-0000-0000000000c1', auth.uid(), 'Børnecykler og barnevogne', 'cykler', now() + interval '3 hours');
+insert into items (id, show_id, seller_id, name, price) values ('20000000-0000-0000-0000-0000000000c1', '10000000-0000-0000-0000-0000000000c1', auth.uid(), 'Puky børnecykel 16"', 450);
+select t.ok((select category from shows where id = '10000000-0000-0000-0000-0000000000c1') = 'cykler', 'Maja opretter et show med cykler');
+select t.throws($$update shows set category = 'biler' where id = '10000000-0000-0000-0000-0000000000c1'$$, 'check constraint');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select category = 'cykler' from save_search('børnecykel', 'cykler')), 'Liva gemmer en søgning på cykler');
+reset role;
+delete from saved_searches where category = 'cykler';
+delete from items where id = '20000000-0000-0000-0000-0000000000c1';
+delete from shows where id = '10000000-0000-0000-0000-0000000000c1';
+
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

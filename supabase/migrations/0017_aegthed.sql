@@ -6,10 +6,10 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 alter table public.shows drop constraint if exists shows_category_check;
 alter table public.shows add constraint shows_category_check
-  check (category in ('dametoej', 'herretoej', 'luksus', 'skoenhed', 'boernetoej', 'bolig', 'samlerting', 'andet'));
+  check (category in ('dametoej', 'herretoej', 'luksus', 'skoenhed', 'boernetoej', 'cykler', 'bolig', 'samlerting', 'andet'));
 alter table public.items drop constraint if exists items_category_check;
 alter table public.items add constraint items_category_check
-  check (category in ('dametoej', 'herretoej', 'luksus', 'skoenhed', 'boernetoej', 'bolig', 'samlerting', 'andet'));
+  check (category in ('dametoej', 'herretoej', 'luksus', 'skoenhed', 'boernetoej', 'cykler', 'bolig', 'samlerting', 'andet'));
 
 -- "Meld et problem": køberen kan melde en falsk vare.
 alter table public.order_issues drop constraint if exists order_issues_reason_check;

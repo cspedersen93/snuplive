@@ -16,6 +16,8 @@ export interface PayGroup {
   items: { id: string; name: string; meta: string; price: number }[];
   /** Sælgerens samlerabat (0027_samlerabat.sql), hvis hun giver en. */
   bundle?: BundleTiers | null;
+  /** Der er en cykel eller barnevogn i pakken: afhentning er valgt på forhånd. */
+  pickup?: boolean;
 }
 
 const MEMORY = "snuplive:pakkeshop";
@@ -32,7 +34,7 @@ function hoursText(hours: string[]) {
 }
 
 export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGroup[]; ready: boolean; pakkeshop: boolean }) {
-  const [choice, setChoice] = useState<Record<string, Delivery>>(() => Object.fromEntries(groups.map((g) => [g.key, "ship"])));
+  const [choice, setChoice] = useState<Record<string, Delivery>>(() => Object.fromEntries(groups.map((g) => [g.key, g.pickup ? "pickup" : "ship"])));
   const [busy, setBusy] = useState(false);
 
   // Pakkeshop: fragtfirma, postnummer og valgt shop. Huskes i browseren til næste gang.
@@ -183,6 +185,9 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
             ) : null}
             <fieldset className="deliv">
               <legend>Levering</legend>
+              {g.pickup ? (
+                <p className="fine pickup-note">Cykler og barnevogne er for store til en pakkeshop, så de hentes hos sælgeren. Se varen efter, før du bekræfter, at du har fået den.</p>
+              ) : null}
               <div className="opts">
                 {(Object.keys(DELIVERY) as Delivery[]).map((d) => (
                   <label className="opt" key={d}>

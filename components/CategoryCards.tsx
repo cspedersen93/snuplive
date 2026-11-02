@@ -2,7 +2,7 @@ import Link from "next/link";
 import CategoryIcon from "@/components/CategoryIcon";
 import { CATEGORIES } from "@/lib/format";
 
-/** Alle kategorierne som kort med billede, ikon og en kort tekst (4 × 2 på computeren). */
+/** Alle kategorierne som kort med billede, ikon og en kort tekst (4 pr. række på computeren, den sidste i fuld bredde, hvis den står alene). */
 export default function CategoryCards({ headingLevel = 3 }: { headingLevel?: 2 | 3 }) {
   const H = headingLevel === 2 ? "h2" : "h3";
   return (

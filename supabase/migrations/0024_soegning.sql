@@ -95,7 +95,7 @@ create table if not exists public.saved_searches (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references public.profiles(id) on delete cascade,
   query      text not null default '' check (char_length(query) <= 60),
-  category   text check (category is null or category in ('dametoej', 'herretoej', 'luksus', 'skoenhed', 'boernetoej', 'bolig', 'samlerting', 'andet')),
+  category   text check (category is null or category in ('dametoej', 'herretoej', 'luksus', 'skoenhed', 'boernetoej', 'cykler', 'bolig', 'samlerting', 'andet')),
   max_price  int check (max_price is null or max_price between 1 and 100000),
   size       text check (size is null or char_length(size) between 1 and 20),
   created_at timestamptz not null default now(),
@@ -131,7 +131,7 @@ begin
   if char_length(v_q) < 2 and p_category is null then
     raise exception 'Skriv, hvad du leder efter, eller vælg en kategori';
   end if;
-  if p_category is not null and p_category not in ('dametoej', 'herretoej', 'luksus', 'skoenhed', 'boernetoej', 'bolig', 'samlerting', 'andet') then
+  if p_category is not null and p_category not in ('dametoej', 'herretoej', 'luksus', 'skoenhed', 'boernetoej', 'cykler', 'bolig', 'samlerting', 'andet') then
     raise exception 'Ukendt kategori';
   end if;
   if p_max_price is not null and (p_max_price < 1 or p_max_price > 100000) then

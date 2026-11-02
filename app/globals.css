@@ -798,6 +798,9 @@ img.v-thumb{object-fit:cover}
 .catcard-blurb{font-size:.84rem;line-height:1.4;color:rgba(255,255,255,.78)}
 .cat-label{display:inline-flex;align-items:center;gap:8px}
 @media (max-width:900px){.catcards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Går kategorierne ikke op i rækken, fylder den sidste (Andet) hele bredden. */
+@media (min-width:901px){.catcards li:last-child:nth-child(4n+1){grid-column:1/-1}.catcards li:last-child:nth-child(4n+1) .catcard{aspect-ratio:auto;min-height:190px}.catcards li:last-child:nth-child(4n+1) .catcard img{object-position:50% 40%}}
+@media (min-width:641px) and (max-width:900px){.catcards li:last-child:nth-child(odd){grid-column:1/-1}.catcards li:last-child:nth-child(odd) .catcard{aspect-ratio:16/9}}
 @media (max-width:640px){.catcards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.catcard{aspect-ratio:4/5}.catcard-blurb{display:none}.catcard-body{padding:12px}}
 .split-text{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(28px,6vw,88px);align-items:start}
 @media (max-width:860px){.split-text{grid-template-columns:minmax(0,1fr)}}
@@ -1588,3 +1591,4 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .offer-list li > div{display:flex;flex-direction:column;gap:2px}
 .offer-list li span{font-size:.88rem;color:var(--muted)}
 @media (max-width:560px){.offers-box .list li{grid-template-columns:44px minmax(0,1fr)!important}.offer-answer{grid-column:1 / -1;justify-content:flex-start;flex-wrap:wrap}}
+.pickup-note{margin:0 0 4px}

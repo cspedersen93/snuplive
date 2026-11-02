@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CATEGORIES } from "@/lib/format";
+import { pickCategories } from "@/lib/format";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText } from "@/lib/toast";
 
@@ -13,7 +13,18 @@ function defaultStart() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export default function NewShowForm({ sellerId, englishReady = false, closedReady = false }: { sellerId: string; englishReady?: boolean; closedReady?: boolean }) {
+export default function NewShowForm({
+  sellerId,
+  englishReady = false,
+  closedReady = false,
+  hideCats = [],
+}: {
+  sellerId: string;
+  englishReady?: boolean;
+  closedReady?: boolean;
+  /** Kategorier, hvis fil ikke er kørt endnu (lib/categories.ts). */
+  hideCats?: readonly string[];
+}) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [cat, setCat] = useState<string>("dametoej");
@@ -61,7 +72,7 @@ export default function NewShowForm({ sellerId, englishReady = false, closedRead
         <div className="field">
           <label htmlFor="ns-cat">Kategori</label>
           <select id="ns-cat" value={cat} onChange={(e) => setCat(e.target.value)}>
-            {CATEGORIES.map((c) => (
+            {pickCategories(hideCats).map((c) => (
               <option key={c.key} value={c.key}>{c.label}</option>
             ))}
           </select>

@@ -18,10 +18,11 @@ Det, der ikke bliver solgt, kan købes bagefter til fast pris. Det hele kører i
 - Fragt til DAO- og GLS-pakkeshops med fragtlabels og sporing via Shipmondo
 - Moderation i chatten (fjern beskeder, blokér brugere) og "Meld et problem" på ordrer med en admin-side til sager
 - Backoffice på /admin med tal, ordrer, medlemmer og shows
-- En forside til købere, fem kategorier (`/kategori/...`) og en side for hver vare (`/ting/...`) med billeder, beskrivelse og pris
+- En forside til købere, ni kategorier (`/kategori/...`) og en side for hver vare (`/ting/...`) med billeder, beskrivelse og pris
 - "Husk mig" på varer og shows før showet (mail, når showet starter) og "Køb nu" til fast pris for det, der ikke blev solgt
 - Budsalg live: 30 sekunder, faste budtrin og 10 sekunder ekstra ved sene bud. "Kommende budsalg" på forsiden
 - Samlerabat, som sælgeren selv vælger, og bud på varer til fast pris (se *Samlerabat* og *Bud på varer til fast pris*)
+- Kategorien Cykler og barnevogne med afhentning hos sælgeren (se *Kategorien Cykler og barnevogne*)
 
 MitID kommer senere (se nederst).
 
@@ -826,6 +827,24 @@ betalingen virker som før.
 - Ingen andre end køberen og sælgeren kan se buddet. Blokerede købere og varer, der venter på ægthedstjek, kan ikke få bud.
 - Koden: `make_offer`, `answer_offer`, `withdraw_offer` og `expire_offers` i databasen, `app/api/offers` (beskederne),
   `lib/offers.ts`, `app/(site)/ting/[slug]/MakeOffer.tsx` og `app/(site)/studio/Offers.tsx`.
+
+---
+
+## Kategorien Cykler og barnevogne
+
+**Kør `0029_cykler.sql` i Supabase → SQL Editor** (efter 0028). Indtil da kan kategorien ikke vælges, når man opretter et
+show, en vare eller en videoannonce. Kategorisiden findes alligevel, men er tom.
+
+- Adressen er `/kategori/cykler-og-barnevogne`, og nøglen i databasen er `cykler`. Den dækker cykler, børnecykler,
+  ladcykler, elcykler, løbehjul, barnevogne og klapvogne.
+- **Afhentning:** cykler og barnevogne er for store til en pakkeshop. I kurven er **Afhent hos sælgeren** valgt på
+  forhånd, og varesiden siger, at varen hentes gratis. Pengene går først til sælgeren, når køberen har bekræftet, at
+  varen er hentet.
+- **Stjålne cykler:** kategorisiden beder køberen tjekke stelnummeret i politiets cykelregister på politi.dk.
+- AI-annoncen kan foreslå kategorien. Søgning og søgeagenter kan bruge den.
+- Koden: `lib/format.ts` (kategorien), `lib/categoryPages.tsx` (teksterne), `lib/categories.ts` (skjuler kategorien,
+  indtil filen er kørt), `PICKUP_CATEGORIES` i `lib/pricing.ts` og billedet `public/img/cover-cykler.jpg` (Pexels).
+- 0017 og 0024 kender også den nye kategori, så de stadig kan køres igen uden fejl.
 
 ---
 

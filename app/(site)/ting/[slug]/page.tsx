@@ -16,7 +16,7 @@ import { category, clock, dayLabel, kr, usedPhrase } from "@/lib/format";
 import { clipUrl, itemImages } from "@/lib/images";
 import { idFromSlug, itemHref, itemSlug, itemState, type ItemState } from "@/lib/items";
 import { isAuction, soldPrice } from "@/lib/auction";
-import { bundleText, DELIVERY, hasBundle } from "@/lib/pricing";
+import { bundleText, DELIVERY, hasBundle, PICKUP_CATEGORIES } from "@/lib/pricing";
 import { fetchBundle } from "@/lib/bundles";
 import { fetchFeed } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
@@ -362,7 +362,11 @@ export default async function ItemPage({ params }: Params) {
 
             <ul className="item-trust">
               <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har varen.</li>
-              <li>Fragt {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>
+              {PICKUP_CATEGORIES.includes(cat.key) ? (
+                <li>Hentes gratis hos {seller.handle}. Pengene går først til sælgeren, når du har bekræftet, at du har fået varen.</li>
+              ) : (
+                <li>Fragt {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>
+              )}
               <li>
                 Køber du flere varer fra {seller.handle}, får du dem i én pakke
                 {hasBundle(d.bundle) ? <> og <b>samlerabat: {bundleText(d.bundle)}</b></> : null}.

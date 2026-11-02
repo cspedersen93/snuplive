@@ -4,7 +4,7 @@
 /** Standen, Claude vælger imellem (samme ord som i formularen). */
 export const AI_CONDITIONS = ["Ny med prismærke", "Som ny", "God stand", "Brugt, med lidt slid", "Slidt"] as const;
 
-const CATEGORY_KEYS = ["dametoej", "herretoej", "luksus", "skoenhed", "boernetoej", "bolig", "samlerting", "andet"] as const;
+const CATEGORY_KEYS = ["dametoej", "herretoej", "luksus", "skoenhed", "boernetoej", "cykler", "bolig", "samlerting", "andet"] as const;
 
 export interface AiListing {
   name: string;
@@ -31,7 +31,7 @@ export function aiListingPrompt(hint?: string) {
     "- size: størrelsen, kun hvis den kan læses på et mærkat, ellers null.",
     "- material: fra vaskemærket, kun hvis det kan læses, ellers null.",
     `- condition: én af ${AI_CONDITIONS.map((c) => `"${c}"`).join(", ")}, ud fra det, du kan se.`,
-    "- category: én af dametoej, herretoej, luksus (designertasker, ure og smykker fra luksusmærker), skoenhed (kun ny og uåbnet makeup, parfume og hudpleje), boernetoej, bolig (lamper, keramik, glas, møbler og design til hjemmet), samlerting (vinyl, LEGO, samlekort, retrospil) eller andet.",
+    "- category: én af dametoej, herretoej, luksus (designertasker, ure og smykker fra luksusmærker), skoenhed (kun ny og uåbnet makeup, parfume og hudpleje), boernetoej, cykler (cykler, børnecykler, ladcykler, elcykler, løbehjul, barnevogne og klapvogne), bolig (lamper, keramik, glas, møbler og design til hjemmet), samlerting (vinyl, LEGO, samlekort, retrospil) eller andet.",
     "- description: 2-4 korte, ærlige sætninger på dansk til køberen: mærke og materiale, hvis de kan læses, farve, stil og pasform, og synlige fejl eller slid. Ingen emojis og ingen overdrivelser. Skriv aldrig, at varen er ægte eller original.",
     "- price_low og price_high: et realistisk prisleje i hele kroner for varen brugt i Danmark ud fra type, mærke og stand. Er du usikker, så gør spændet bredt.",
     '- unsure: de ting, sælgeren skal tjekke ekstra, med korte danske ord, fx ["størrelse", "mærke", "fejl"]. Nævn altid "mål", da du ikke kan måle.',

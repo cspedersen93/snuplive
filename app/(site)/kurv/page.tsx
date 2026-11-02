@@ -12,7 +12,7 @@ import { clock, dayLabel, kr } from "@/lib/format";
 import { fetchBundles } from "@/lib/bundles";
 import { itemHref } from "@/lib/items";
 import { markCheckoutPaid } from "@/lib/orders";
-import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
+import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, PICKUP_CATEGORIES, RESERVATION_DAYS } from "@/lib/pricing";
 import { hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Mine køb", robots: { index: false } };
 
 type Seller = { handle: string; display_name: string | null; avatar_path: string | null; seller_type?: string | null };
-type ItemInfo = { name: string; size: string | null; condition: string | null };
+type ItemInfo = { name: string; size: string | null; condition: string | null; category?: string | null };
 
 interface SaleRow {
   id: string;
@@ -34,7 +34,7 @@ interface SaleRow {
   seller_id: string;
   show_id: string;
   item: ItemInfo | null;
-  show: { title: string } | null;
+  show: { title: string; category?: string | null } | null;
   seller: Seller | null;
   order: { status: string } | null;
 }
@@ -113,7 +113,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
     supabase
       .from("sales")
       .select(
-        "id,price,created_at,seller_id,show_id,item:items(name,size,condition),show:shows(title),seller:profiles!sales_seller_id_fkey(handle,display_name,avatar_path),order:orders!sales_order_id_fkey(status)",
+        "id,price,created_at,seller_id,show_id,item:items(name,size,condition,category),show:shows(title,category),seller:profiles!sales_seller_id_fkey(handle,display_name,avatar_path),order:orders!sales_order_id_fkey(status)",
       )
       .eq("buyer_id", uid)
       .eq("status", "reserved")
@@ -167,6 +167,8 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
         items: [],
       } satisfies PayGroup);
     g.items.push({ id: s.id, name: s.item?.name ?? "Vare", meta: s.item ? itemMeta(s.item) : "", price: s.price });
+    // Cykler og barnevogne kan ikke sendes til en pakkeshop, så afhentning er valgt på forhånd.
+    if (PICKUP_CATEGORIES.includes((s.item?.category ?? s.show?.category ?? "") as string)) g.pickup = true;
     groupsMap.set(key, g);
     showsOf.set(key, (showsOf.get(key) ?? new Set()).add(s.show_id));
   }

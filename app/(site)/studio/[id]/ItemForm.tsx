@@ -6,7 +6,7 @@ import { IconSparkle } from "@/components/Icons";
 import type { AiListing } from "@/lib/aiListing";
 import { askAiListing } from "@/lib/aiListingClient";
 import { pingSearchAlerts } from "@/lib/searchPing";
-import { CATEGORIES, NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION } from "@/lib/format";
+import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, pickCategories } from "@/lib/format";
 import { needsAuth } from "@/lib/luxury";
 import { storageUrl } from "@/lib/images";
 import { resizeImage } from "@/lib/resizeImage";
@@ -26,6 +26,8 @@ interface Props {
   nextPosition?: number;
   /** Claude er sat op: vis "Udfyld med AI". */
   aiReady?: boolean;
+  /** Kategorier, hvis fil ikke er kørt endnu (lib/categories.ts). */
+  hideCats?: readonly string[];
   onSaved: (item: Item) => void;
   onCancel?: () => void;
 }
@@ -33,7 +35,7 @@ interface Props {
 type Photo = { kind: "old"; path: string } | { kind: "new"; file: File; url: string };
 
 /** Formular til en ting i køen: navn, størrelse, pris, stand, kategori, beskrivelse og billeder. */
-export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, aiReady = false, onSaved, onCancel }: Props) {
+export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, aiReady = false, hideCats = [], onSaved, onCancel }: Props) {
   const sb = getSupabase();
   const editing = Boolean(item);
   const [name, setName] = useState(item?.name ?? "");
@@ -99,7 +101,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
     const l = r.listing;
     if (!name.trim()) setName(l.name);
     if (!size.trim() && l.size) setSize(l.size);
-    if (l.category) setCat(l.category);
+    if (l.category && !hideCats.includes(l.category)) setCat(l.category);
     if (!NEW_ONLY_CATEGORIES.includes(l.category ?? cat) && !cond.trim() && l.condition) setCond(l.condition);
     if (!desc.trim() && l.description) setDesc(l.description);
     setMore(true);
@@ -265,7 +267,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
           <div className="field">
             <label htmlFor={`ni-cat-${uid}`}>Kategori</label>
             <select id={`ni-cat-${uid}`} value={cat} onChange={(e) => setCat(e.target.value)}>
-              {CATEGORIES.map((c) => (
+              {pickCategories(hideCats).map((c) => (
                 <option key={c.key} value={c.key}>{c.label}</option>
               ))}
             </select>

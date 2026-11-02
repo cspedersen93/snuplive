@@ -168,6 +168,44 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     ),
     sellH2: "Har du selv børnetøj, der skal videre?",
   },
+  cykler: {
+    intro:
+      "Find brugte cykler, børnecykler, ladcykler, løbehjul og barnevogne. På video kan sælgeren vise gear, bremser og dæk, før du køber. De fleste henter du gratis hos sælgeren.",
+    who: "Hvem sælger brugte cykler live?",
+    soon: "Hvilke cykler og barnevogne bliver vist snart?",
+    sale: "Brugte cykler og barnevogne til salg nu",
+    saleAll: "Se alle cykler til salg",
+    tipsH2: "Hvad skal du kigge efter, når du køber en brugt cykel?",
+    tips: [
+      {
+        h: "Stelnummeret",
+        p: "Bed sælgeren vise stelnummeret, og tjek i politiets cykelregister på politi.dk, at cyklen ikke er meldt stjålet. Spørg også efter kvitteringen.",
+      },
+      {
+        h: "Gear og bremser",
+        p: "Bed sælgeren skifte gear og trykke bremserne i bund, mens kameraet kører. Lyde og slør fortæller meget.",
+      },
+      {
+        h: "Dæk, kæde og stel",
+        p: "Bed om at se dæk, kæde og tandhjul tæt på. En rusten kæde er billig at skifte. Et skævt eller revnet stel er ikke.",
+      },
+      {
+        h: "Batteriet på en elcykel",
+        p: "Spørg, hvor gammelt batteriet er, og hvor langt cyklen kører på en opladning. Et nyt batteri er dyrt.",
+      },
+      {
+        h: "Barnevogne og klapvogne",
+        p: "Bed sælgeren folde vognen sammen og ud igen og vise hjul, bremse og kaleche.",
+      },
+    ],
+    note: (
+      <>
+        Cykler og barnevogne er for store til en pakkeshop. Vælg <b>Afhent hos sælgeren</b>, når du betaler, så aftaler I tid og sted.
+        Pengene bliver først sendt til sælgeren, når du har bekræftet, at du har fået varen, så du kan se den efter, når du henter den.
+      </>
+    ),
+    sellH2: "Har du en cykel eller barnevogn, der skal videre?",
+  },
   bolig: {
     intro:
       "Find brugte lamper, keramik, glas og vintage til hjemmet. På video kan sælgeren vende varen, tænde lampen og vise stemplet i bunden.",

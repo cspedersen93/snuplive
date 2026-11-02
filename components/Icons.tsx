@@ -139,6 +139,13 @@ export const IconBear = (p: P) => (
     <path d="M9.5 11h.01M14.5 11h.01" strokeWidth={2.4} />
   </svg>
 );
+export const IconBike = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <circle cx="5.5" cy="16" r="3.5" />
+    <circle cx="18.5" cy="16" r="3.5" />
+    <path d="M5.5 16l3.5-7h7l2.5 7M9 9l3.5 7h6M15 6.5h2.5l-1.5 2.5M8 6.5h3" />
+  </svg>
+);
 export const IconLamp = (p: P) => (
   <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...p}>
     <path d="M8 3h8l3 8H5Z" />

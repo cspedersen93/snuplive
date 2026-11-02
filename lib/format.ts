@@ -69,6 +69,19 @@ export const CATEGORIES = [
     description: "Køb brugt børnetøj og legetøj live. Se hele poser i den rigtige størrelse på video, spørg om stand, og få det hele i én pakke.",
   },
   {
+    key: "cykler",
+    /** Ordet i en sætning, fx "brugte cykler". Ladcykler, løbehjul og barnevogne hører også til her. */
+    word: "cykler",
+    slug: "cykler-og-barnevogne",
+    label: "Cykler og barnevogne",
+    short: "Cykler",
+    cover: "/img/cover-cykler.jpg",
+    blurb: "Børnecykler, ladcykler, elcykler, løbehjul og barnevogne. Mange kan hentes hos sælgeren.",
+    h1: "Brugte cykler og barnevogne – køb dem live",
+    title: "Brugte cykler, ladcykler og barnevogne – køb live | Relived",
+    description: "Køb brugte cykler, ladcykler, elcykler og barnevogne live. Se gear, bremser og slid på video, tjek stelnummeret, og hent den hos sælgeren.",
+  },
+  {
     key: "bolig",
     /** Ordet i en sætning, fx "brugt design". */
     word: "design",
@@ -111,6 +124,9 @@ export const CATEGORIES = [
 
 export type CategoryKey = (typeof CATEGORIES)[number]["key"];
 
+/** Kategorierne, der kan vælges i formularerne (uden dem, hvis fil ikke er kørt endnu, se lib/categories.ts). */
+export const pickCategories = (hidden: readonly string[] = []) => CATEGORIES.filter((c) => !hidden.includes(c.key));
+
 /** Kategorierne i menuen og i bunden af siden (uden "Andet"). */
 export const MAIN_CATEGORIES = CATEGORIES.filter((c) => c.key !== "andet");
 
@@ -119,9 +135,10 @@ export const NEW_ONLY_CATEGORIES: readonly string[] = ["skoenhed"];
 /** Standen, som ting i de kategorier altid får. */
 export const NEW_ONLY_CONDITION = "Ny og uåbnet";
 
-/** "brugt dametøj", men "uåbnet skønhed" for skønhed. */
+/** "brugt dametøj", "brugte cykler" (flertal), men "uåbnet skønhed" for skønhed. */
 export function usedPhrase(c: { key: string; word: string }) {
-  return NEW_ONLY_CATEGORIES.includes(c.key) ? `uåbnet ${c.word}` : `brugt ${c.word}`;
+  if (NEW_ONLY_CATEGORIES.includes(c.key)) return `uåbnet ${c.word}`;
+  return /er$/.test(c.word) ? `brugte ${c.word}` : `brugt ${c.word}`;
 }
 
 export function category(key: string | null | undefined) {

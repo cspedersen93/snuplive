@@ -18,6 +18,9 @@ export const DELIVERY = {
 
 export type Delivery = keyof typeof DELIVERY;
 
+/** Kategorier, hvor varen normalt er for stor til en pakkeshop. I kurven er afhentning valgt på forhånd. */
+export const PICKUP_CATEGORIES: readonly string[] = ["cykler"];
+
 export const isDelivery = (v: unknown): v is Delivery => v === "ship" || v === "pickup";
 
 /** Køberbeskyttelse pr. pakke: 5 % af tingene + 5 kr. */

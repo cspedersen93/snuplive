@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
+import { hiddenCategories } from "@/lib/categories";
 import { aiConfigured } from "@/lib/claude";
 import { Suspense } from "react";
 import MitIdResult from "@/components/MitIdResult";
@@ -74,6 +75,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
       camLayout={layoutQ.error ? null : ((layoutQ.data as { cam_layout?: CamLayout } | null)?.cam_layout ?? "split")}
       language={langQ.error ? null : (langQ.data as { language?: ShowLanguage } | null)?.language === "en" ? "en" : "da"}
       aiReady={aiConfigured()}
+      hideCats={await hiddenCategories(supabase)}
       visibility={visQ.error ? null : (visQ.data as { visibility?: string } | null)?.visibility === "invite" ? "invite" : "public"}
     />
     <Suspense fallback={null}>

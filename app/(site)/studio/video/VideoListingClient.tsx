@@ -9,7 +9,7 @@ import { askAiListing } from "@/lib/aiListingClient";
 import { pingSearchAlerts } from "@/lib/searchPing";
 import { blobToBase64 } from "@/lib/bestPhoto";
 import type { Clip } from "@/lib/clipRecorder";
-import { CATEGORIES, NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION } from "@/lib/format";
+import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, pickCategories } from "@/lib/format";
 import { itemHref } from "@/lib/items";
 import { needsAuth } from "@/lib/luxury";
 import { resizeImage } from "@/lib/resizeImage";
@@ -42,7 +42,16 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
 const rand = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 /** Sælg med video: film tingen (eller vælg en video), vælg billeder, udfyld annoncen og sæt den til salg. */
-export default function VideoListingClient({ sellerId, aiReady = false }: { sellerId: string; aiReady?: boolean }) {
+export default function VideoListingClient({
+  sellerId,
+  aiReady = false,
+  hideCats = [],
+}: {
+  sellerId: string;
+  aiReady?: boolean;
+  /** Kategorier, hvis fil ikke er kørt endnu (lib/categories.ts). */
+  hideCats?: readonly string[];
+}) {
   const [aiFill, setAiFill] = useState<"idle" | "busy">("idle");
   const [aiResult, setAiResult] = useState<AiListing | null>(null);
   const [step, setStep] = useState<Step>("start");
@@ -148,7 +157,7 @@ export default function VideoListingClient({ sellerId, aiReady = false }: { sell
     const l = r.listing;
     setName((v) => (v.trim() ? v : l.name));
     setSize((v) => (v.trim() || !l.size ? v : l.size));
-    setCat((v) => v || l.category || "");
+    setCat((v) => v || (l.category && !hideCats.includes(l.category) ? l.category : ""));
     setCond((v) => (v.trim() || !l.condition || NEW_ONLY_CATEGORIES.includes(l.category ?? "") ? v : l.condition));
     setDesc((v) => (v.trim() || !l.description ? v : l.description));
     setAiResult(l);
@@ -639,7 +648,7 @@ export default function VideoListingClient({ sellerId, aiReady = false }: { sell
                 <label htmlFor="vl-cat">Kategori</label>
                 <select id="vl-cat" value={cat} onChange={(e) => setCat(e.target.value)}>
                   <option value="">Vælg kategori</option>
-                  {CATEGORIES.map((c) => (
+                  {pickCategories(hideCats).map((c) => (
                     <option key={c.key} value={c.key}>{c.label}</option>
                   ))}
                 </select>

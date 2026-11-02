@@ -5,7 +5,7 @@ import CategoryCards from "@/components/CategoryCards";
 export const metadata: Metadata = {
   title: { absolute: "Kategorier – brugt tøj, design og samleobjekter | Relived" },
   description:
-    "Køb brugt dametøj, herretøj, børnetøj, design og samleobjekter live. Vælg en kategori, se varerne på video, og køb dem med ét tryk.",
+    "Køb brugt dametøj, herretøj, børnetøj, cykler, design og samleobjekter live. Vælg en kategori, se varerne på video, og køb dem med ét tryk.",
   alternates: { canonical: "/kategori" },
 };
 

@@ -7,6 +7,7 @@ import MitIdButton from "@/components/MitIdButton";
 import MitIdResult from "@/components/MitIdResult";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
+import { hiddenCategories } from "@/lib/categories";
 import { aiConfigured } from "@/lib/claude";
 import { mitidState } from "@/lib/mitid";
 import { videoListingsReady } from "@/lib/videoShow";
@@ -61,7 +62,7 @@ export default async function VideoListingPage() {
                 </span>
               </div>
             ) : null}
-            <VideoListingClient sellerId={uid} aiReady={aiConfigured()} />
+            <VideoListingClient sellerId={uid} aiReady={aiConfigured()} hideCats={await hiddenCategories(supabase)} />
           </>
         )}
       </div>
