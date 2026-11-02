@@ -305,7 +305,10 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
         </p>
         <div className="protect">
           <IconShield />
-          <span>Pengene holdes tilbage hos Relived, indtil du har fået dine varer. Køberbeskyttelsen er 5 % + 5 kr pr. pakke.</span>
+          <span>
+            Pengene holdes tilbage hos Relived, indtil du har fået dine varer. Køberbeskyttelsen er 5 % + 5 kr pr. pakke.{" "}
+            <a href="/saadan-virker-det#priser">Sådan virker priser og fragt</a>
+          </span>
         </div>
       </aside>
     </div>

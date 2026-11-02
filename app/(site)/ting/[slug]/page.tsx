@@ -372,6 +372,7 @@ export default async function ItemPage({ params }: Params) {
                 {hasBundle(d.bundle) ? <> og <b>samlerabat: {bundleText(d.bundle)}</b></> : null}.
               </li>
             </ul>
+            <Link className="linkbtn item-howto" href="/saadan-virker-det#priser">Sådan virker priser, fragt og rabat</Link>
             <ReportButton type="item" id={it.id} className="item-report" />
           </div>
         </div>

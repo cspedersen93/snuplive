@@ -153,7 +153,7 @@ export default function MakeOffer({
       </div>
       <p className="fine">
         Mindst {kr(min)}. {handle} har {OFFER_HOURS} timer til at svare. Siger {handle} ja, bliver varen din til buddet, og du betaler under
-        Mine køb.
+        Mine køb. <Link href="/saadan-virker-det#bud">Sådan virker bud</Link>
       </p>
     </form>
   );

@@ -23,6 +23,7 @@ Det, der ikke bliver solgt, kan købes bagefter til fast pris. Det hele kører i
 - Budsalg live: 30 sekunder, faste budtrin og 10 sekunder ekstra ved sene bud. "Kommende budsalg" på forsiden
 - Samlerabat, som sælgeren selv vælger, og bud på varer til fast pris (se *Samlerabat* og *Bud på varer til fast pris*)
 - Kategorien Cykler og barnevogne med afhentning hos sælgeren (se *Kategorien Cykler og barnevogne*)
+- Én side med det hele for køberne: `/saadan-virker-det` (køb, priser med regneeksempel, fragt, rabat og bud, tryg handel, sælg og sortering). Tallene kommer fra `lib/pricing.ts`, og samlerabat og bud står der først, når 0027 og 0028 er kørt (siden opdateres hvert minut)
 
 MitID kommer senere (se nederst).
 

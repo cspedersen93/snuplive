@@ -1592,3 +1592,55 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .offer-list li span{font-size:.88rem;color:var(--muted)}
 @media (max-width:560px){.offers-box .list li{grid-template-columns:44px minmax(0,1fr)!important}.offer-answer{grid-column:1 / -1;justify-content:flex-start;flex-wrap:wrap}}
 .pickup-note{margin:0 0 4px}
+
+/* Sådan virker det: alt samlet på én side */
+.howto-jump{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.howto-jump a{font-size:.9rem;color:var(--text);text-decoration:none;border:1px solid var(--line-2);border-radius:99px;padding:.5em 1em;background:rgba(255,255,255,.02)}
+.howto-jump a:hover{border-color:var(--muted)}
+.howto-kort{padding-block:clamp(28px,4vw,44px)}
+.kort-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kort-grid li{display:flex;flex-direction:column;gap:6px;padding:18px;border:1px solid var(--line);border-radius:18px;background:var(--bg-2)}
+.kort-grid b{font-size:1.6rem;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.kort-grid span{color:var(--muted);font-size:.94rem;line-height:1.45}
+@media (max-width:900px){.kort-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.kort-grid{grid-template-columns:1fr}}
+.howto-ways{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.howto-ways.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.howto-ways>div{display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:22px;border:1px solid var(--line);border-radius:18px;background:var(--bg)}
+.howto-ways h3{font-size:1.15rem;letter-spacing:-.015em}
+.howto-ways p{color:var(--muted);font-size:.96rem}
+.howto-ways p a{color:var(--red-text)}
+@media (max-width:860px){.howto-ways,.howto-ways.two{grid-template-columns:1fr}}
+.howto-sub{font-size:1.15rem;margin:clamp(32px,4vw,48px) 0 6px}
+.howto-steps li{padding:18px 0}
+.howto-steps h3{font-size:1.1rem}
+.howto-two{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(24px,5vw,72px);align-items:start}
+.howto-two .sec-head{margin-bottom:0}
+@media (max-width:860px){.howto-two{grid-template-columns:minmax(0,1fr)}}
+.price-table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.price-table th,.price-table td{text-align:left;vertical-align:top;padding:14px 18px;border-bottom:1px solid var(--line);font-size:.96rem}
+.price-table tr:last-child th,.price-table tr:last-child td{border-bottom:0}
+.price-table th{font-weight:600;width:42%;background:var(--bg-2)}
+.price-table td{color:var(--muted)}
+@media (max-width:520px){.price-table th,.price-table td{display:block;width:auto;padding:10px 14px}.price-table th{border-bottom:0;padding-bottom:2px}}
+.calc{margin-top:14px;padding:18px;border-radius:18px;border:1px dashed var(--line-2)}
+.calc-head{margin:0 0 10px;font-size:.95rem;color:var(--muted)}
+.calc-head b{color:var(--text)}
+.calc dl{margin:0;display:flex;flex-direction:column;gap:6px}
+.calc dl>div{display:flex;justify-content:space-between;gap:12px;font-size:.96rem}
+.calc dt{color:var(--muted)}
+.calc dd{margin:0;font-variant-numeric:tabular-nums}
+.calc .minus dd{color:var(--mint)}
+.calc .total{padding-top:8px;margin-top:4px;border-top:1px solid var(--line);font-weight:700}
+.calc .total dt{color:var(--text)}
+.howto-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.howto-list li{display:flex;flex-direction:column;gap:4px;padding:16px 0;border-top:1px solid var(--line);scroll-margin-top:90px}
+.howto-list li:last-child{border-bottom:1px solid var(--line)}
+.howto-list b{font-size:1.05rem}
+.howto-list span{color:var(--muted)}
+.howto-note{margin-top:18px;font-size:.95rem;max-width:70ch}
+.howto-note a{color:inherit}
+#koeb,#priser,#fragt,#rabat,#tryg-handel,#saelg,#sortering{scroll-margin-top:70px}
+.item-howto{align-self:flex-start}
+.protect a{color:inherit}
+.offer-form .fine a{color:var(--muted)}
