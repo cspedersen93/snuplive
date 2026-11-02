@@ -70,7 +70,7 @@ export default function KommerSnart() {
         <div className="wrap">
           <article className="panel img sell-panel soon-sell">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/sell-phone.jpg" alt="Telefon på stativ med ringlys filmer en sælger, der viser en kjole" loading="lazy" />
+            <img src="/img/sell-phone.jpg" alt="En sælger viser en lædertaske frem til telefonen på stativet, med trøjer og et tøjstativ ved siden af" loading="lazy" />
             <span className="label red">Til sælgere</span>
             <h2 className="h2" id="h-soon-saelg" style={{ maxWidth: "16ch" }}>Vil du være en af de første sælgere?</h2>
             <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>

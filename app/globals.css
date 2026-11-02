@@ -123,7 +123,7 @@ em.s{font-style:normal;color:var(--red-text)}
   .side{display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:14px 12px 18px;border-right:1px solid var(--line);background:#0E0C0F;z-index:40}
 }
 .side-logo{display:flex;align-items:center;justify-content:center;height:46px;flex:none;text-decoration:none}
-.side-logo-full{display:none;height:32px;width:auto}
+.side-logo-full{display:none;height:36px;width:auto}
 .side-logo-mark{width:40px;height:40px;border-radius:11px}
 .side-nav{display:flex;flex-direction:column;gap:2px}
 .side-nav a{position:relative;display:flex;align-items:center;justify-content:center;gap:12px;height:48px;border-radius:12px;color:var(--muted);text-decoration:none;font-weight:500;font-size:.98rem}
@@ -1887,3 +1887,5 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
   .foot-grid a,.foot-grid .sup-link{font-size:.88rem}
   .foot-bottom{padding-block:14px 20px;font-size:.8rem}
 }
+/* Billedet ved siden af trinene står øverst og følger med, i stedet for at stå midt i et højt afsnit. */
+@media (min-width:901px){.split{align-items:start}.split>.photo{position:sticky;top:96px}}

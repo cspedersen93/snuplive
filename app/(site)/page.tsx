@@ -202,10 +202,10 @@ export default async function Forside() {
         <div className="wrap split">
           <figure className="photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/how-live.jpg" alt="En sælger holder en skjorte op foran ringlyset og telefonen" loading="lazy" width={1500} height={1000} />
+            <img src="/img/how-live.jpg" alt="En sælger viser en brun lædertaske frem til telefonen foran ringlyset" loading="lazy" width={1360} height={768} />
             <figcaption>
               <span className="live-dot" aria-hidden="true" />
-              Live fra soveværelset
+              Live fra stuen
             </figcaption>
           </figure>
           <div>
@@ -227,7 +227,7 @@ export default async function Forside() {
         <div className="wrap">
           <article className="panel img sell-panel">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/sell-phone.jpg" alt="Telefon på stativ med ringlys filmer en sælger, der viser en kjole" loading="lazy" />
+            <img src="/img/sell-phone.jpg" alt="En sælger viser en lædertaske frem til telefonen på stativet, med trøjer og et tøjstativ ved siden af" loading="lazy" />
             <span className="label red">Til sælgere</span>
             <h2 className="h2" id="h-saelg" style={{ maxWidth: "16ch" }}>Har du selv noget, der skal videre?</h2>
             <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>

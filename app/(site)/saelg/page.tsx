@@ -40,7 +40,7 @@ export default function Saelg() {
         <div className="wrap split">
           <figure className="photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/sell-phone.jpg" alt="Telefon på stativ med ringlys filmer en sælger, der viser en kjole" loading="lazy" width={2000} height={1333} />
+            <img src="/img/saelg-stue.jpg" alt="En sælger sidder i sofaen og viser en taske frem live, med trøjer og et tøjstativ ved siden af" loading="lazy" width={1360} height={768} />
             <figcaption>
               <span className="live-dot" aria-hidden="true" />
               Telefon, stativ og et godt lys

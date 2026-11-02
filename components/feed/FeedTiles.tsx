@@ -68,7 +68,7 @@ export function WelcomeTile() {
   return (
     <div className="ftile ftile-big ftile-welcome">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="ftile-img" src="/img/how-live.jpg" alt="" loading="eager" />
+      <img className="ftile-img" src="/img/welcome-live.jpg" alt="" loading="eager" />
       <span className="ftile-shade" />
       <div className="ftile-info">
         <span className="fbadge">Ingen er live lige nu</span>
