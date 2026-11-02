@@ -1894,4 +1894,10 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .ftile-vbtn:hover{background:rgba(11,10,12,.8)}
 .ftile-vbtn svg{width:16px;height:16px}
 /* Forsidens overskrift på én linje på computeren: skriften skaleres efter bredden, så den altid kan være der. */
-@container (min-width:560px){.feed-h1{max-width:none;white-space:nowrap;font-size:min(2.6rem,4.3cqw)}}
+@container (min-width:630px){.feed-h1{max-width:none;white-space:nowrap;font-size:min(2.6rem,4.3cqw)}}
+/* Forsiden: overskrifterne længere nede er altid mindre end den øverste. Den øverste skaleres efter pladsen (for at stå på
+   én linje), så trinene her følger sidens brudpunkter: højre kolonne kommer ved 1100, den brede venstremenu ved 1360. */
+.home-feed~.sec .h2{font-size:1.5rem}
+@media (min-width:900px) and (max-width:1099px){.home-feed~.sec .h2{font-size:1.75rem}}
+@media (min-width:1360px){.home-feed~.sec .h2{font-size:1.75rem}}
+@media (min-width:1600px){.home-feed~.sec .h2{font-size:2rem}}
