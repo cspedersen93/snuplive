@@ -37,9 +37,9 @@ export default function SideNav() {
     <aside className="side" aria-label="Menu">
       <Link className="side-logo" href="/" aria-label="Relived – forside">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="side-logo-full" src="/img/logo.svg" alt="" width={112} height={36} />
+        <img className="side-logo-full" src="/img/logo.svg" alt="" width={116} height={42} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="side-logo-mark" src="/icon-192.png" alt="" width={40} height={40} />
+        <img className="side-logo-mark" src="/img/logo-mark.svg" alt="" width={40} height={40} />
       </Link>
 
       <nav className="side-nav" aria-label="Hovedmenu">

@@ -37,7 +37,7 @@ export default function Header() {
       <div className="head-in">
         <Link className="logo head-logo" href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/img/logo.svg" alt="Relived – forside" width={118} height={38} />
+          <img src="/img/logo.svg" alt="Relived – forside" width={122} height={44} />
         </Link>
         <Form action="/soeg" className="head-search" role="search">
           <IconSearch aria-hidden="true" />
