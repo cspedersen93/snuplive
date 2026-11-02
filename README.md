@@ -861,6 +861,13 @@ Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal
   giver samlerabat, Snart live, "Ny på Relived?" (kun logget ud) og Tryg handel. Under feedet står budsalg, flere varer
   til salg, kategorierne og teksterne om, hvordan det virker (de samme overskrifter som før, af hensyn til Google).
 - `/api/live-now` siger, hvor mange der er live (gemmes i 30 sekunder). Tallet står ved Live nu i menuen.
+- **Når ingen er live**, viser det store kort på forsiden en video uden lyd i ring (`public/video/welcome-live.mp4` og
+  `.webm`, billedet før den starter: `public/img/welcome-live-poster.jpg`). Den hentes først, når kortet kan ses, har en
+  knap til at stoppe den og spiller ikke for folk, der har bedt om mindre bevægelse eller sparer data. Er der få shows og
+  varer, fylder kortet hele bredden. Koden: `components/feed/WelcomeVideo.tsx`.
+- **Logoet** (`public/img/logo.svg`) er tegnet som vektor ud fra Caspers logo-fil (hvidt relived på rød flade med pilen i e
+  og play-tegn). Ikonerne (`app/icon.png`, `app/apple-icon.png`, `public/icon-192.png`, `public/icon-512.png`) er "re".
+  Delingsbilledet er `public/img/og.jpg`.
 - Koden: `components/shell/` (rammen, venstremenuen, bundmenuen og det, de skal vide om brugeren),
   `components/Header.tsx`, `components/feed/` (kortene og højre side) og `app/(site)/page.tsx`.
 

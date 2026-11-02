@@ -3,6 +3,7 @@ import Avatar from "@/components/Avatar";
 import { IconPlay } from "@/components/Icons";
 import NoPhoto from "@/components/NoPhoto";
 import RemindButton from "@/components/RemindButton";
+import WelcomeVideo from "@/components/feed/WelcomeVideo";
 import { itemMeta } from "@/components/Screen";
 import { isAuction, soldPrice } from "@/lib/auction";
 import { category, clock, dayLabel, kr, vareOrd } from "@/lib/format";
@@ -68,7 +69,7 @@ export function WelcomeTile() {
   return (
     <div className="ftile ftile-big ftile-welcome">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="ftile-img" src="/img/welcome-live.jpg" alt="" loading="eager" />
+      <WelcomeVideo />
       <span className="ftile-shade" />
       <div className="ftile-info">
         <span className="fbadge">Ingen er live lige nu</span>
