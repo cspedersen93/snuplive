@@ -30,7 +30,7 @@ export interface Shell {
   follows: Followed[];
 }
 
-const empty: Shell = { signedIn: null, me: null, cartCount: 0, liveCount: 0, liveSellers: [], follows: [] };
+const empty: Shell ={ signedIn: null, me: null, cartCount: 0, liveCount: 0, liveSellers: [], follows: [] };
 const Ctx = createContext<Shell>(empty);
 
 export const useShell = () => useContext(Ctx);
@@ -88,20 +88,15 @@ export default function ShellProvider({ children }: { children: React.ReactNode 
       const follows = fol.error
         ? []
         : ((fol.data ?? []) as unknown as { seller: Followed | null }[]).map((r) => r.seller).filter((x): x is Followed => Boolean(x));
-      setState((s) => ({
-        ...s,
-        signedIn: true,
-        cartCount: sales.count ?? 0,
-        follows,
-        me: prof.data
-          ? {
-              id: uid,
-              handle: prof.data.handle as string,
-              avatar_path: (prof.data.avatar_path as string | null) ?? null,
-              is_seller: Boolean(prof.data.is_seller),
-            }
-          : null,
-      }));
+      const me: ShellMe | null = prof.data
+        ? {
+            id: uid,
+            handle: prof.data.handle as string,
+            avatar_path: (prof.data.avatar_path as string | null) ?? null,
+            is_seller: Boolean(prof.data.is_seller),
+          }
+        : null;
+      setState((s) => ({ ...s, signedIn: true, cartCount: sales.count ?? 0, follows, me }));
     };
     sb.auth.getSession().then(({ data }) => load(data.session?.user.id ?? null));
     const { data: sub } = sb.auth.onAuthStateChange((_e, session) => load(session?.user.id ?? null));

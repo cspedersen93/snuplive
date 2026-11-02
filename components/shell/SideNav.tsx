@@ -84,9 +84,6 @@ export default function SideNav() {
           <IconPlus />
           <span className="side-label">Sælg en vare</span>
         </Link>
-        <Link className="side-small side-wide" href="/saadan-virker-det">
-          Sådan virker det
-        </Link>
       </div>
     </aside>
   );

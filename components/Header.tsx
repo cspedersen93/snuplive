@@ -47,6 +47,9 @@ export default function Header() {
           <input id="head-q" name="q" type="search" placeholder="Søg i varer, shows og sælgere" autoComplete="off" />
         </Form>
         <div className="actions">
+          <Link className="head-link" href="/saadan-virker-det" aria-current={current("/saadan-virker-det")}>
+            Sådan virker det
+          </Link>
           <Link className="icon-btn head-m" href="/soeg" aria-label="Søg" aria-current={current("/soeg")}>
             <IconSearch />
           </Link>

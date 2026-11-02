@@ -1706,7 +1706,7 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .howto-list span{color:var(--muted)}
 .howto-note{margin-top:18px;font-size:.95rem;max-width:70ch}
 .howto-note a{color:inherit}
-#koeb,#priser,#fragt,#rabat,#tryg-handel,#saelg,#sortering{scroll-margin-top:70px}
+#koeb,#priser,#fragt,#rabat,#tryg-handel,#saelg,#sortering{scroll-margin-top:84px}
 .item-howto{align-self:flex-start}
 .protect a{color:inherit}
 .offer-form .fine a{color:var(--muted)}
@@ -1741,7 +1741,7 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .feed-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .feed-grid>:nth-child(n+14){display:none}
 @container (min-width:520px){.feed-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.feed-grid>:nth-child(13){display:none}}
-@container (min-width:820px){.feed-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.feed-grid>:nth-child(13){display:flex}}
+@container (min-width:780px){.feed-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.feed-grid>:nth-child(13){display:flex}}
 .ftile{position:relative;display:flex;flex-direction:column;justify-content:flex-end;aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:var(--surface);text-decoration:none;color:#fff;isolation:isolate}
 .ftile-big{grid-column:span 2;grid-row:span 2;aspect-ratio:auto;min-height:420px;border-radius:22px}
 @container (min-width:520px){.ftile-big{min-height:0}}
@@ -1816,3 +1816,74 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 #budsalg{scroll-margin-top:90px}
 @container (max-width:519px){.fbadge{letter-spacing:.04em;font-size:.62rem;padding:5px 7px}}
 .fbadge.b-lang{background:#fff;color:#0b0b0c}
+
+/* ── Strammere (nov. 2026): mindre luft, indhold i fuld bredde ved menuen, kontomenu som faner, lavere kategorikort,
+   kortere venstremenu, kort bund og cookiebeskeden ved siden af menuen ── */
+.sec{padding-block:clamp(40px,5.5vw,80px)}
+.sec.tight{padding-block:clamp(28px,3.5vw,48px)}
+.sec-head{margin-bottom:clamp(20px,3vw,36px)}
+.row-head{margin-bottom:clamp(16px,2.5vw,28px)}
+.phero .wrap{padding-block:clamp(28px,4vw,52px) clamp(24px,3vw,40px);gap:14px}
+.h1{font-size:clamp(2.1rem,3.8vw,3.4rem)}
+.h2{font-size:clamp(1.6rem,2.8vw,2.5rem)}
+.sell-panel{min-height:380px}
+.empty{padding:22px 24px}
+
+/* Computer: indholdet står ved menuen med samme kant som toppen (ikke i en smal kolonne midt på skærmen). */
+.head-link{display:none}
+@media (min-width:900px){
+  :root{--gut:clamp(20px,2.4vw,36px)}
+  .app-main .wrap{max-width:1560px;margin-inline:0;padding-left:var(--gut);padding-right:var(--gut)}
+  .head-in{padding:12px var(--gut)}
+  .head-link{display:inline-flex;align-items:center;height:44px;padding:0 10px;color:var(--muted);text-decoration:none;font-weight:500;font-size:.92rem;white-space:nowrap}
+  .head-link:hover,.head-link[aria-current=page]{color:var(--text)}
+}
+
+/* Kontomenuen er faner øverst (venstremenuen står der allerede). */
+@media (min-width:901px){
+  .dash{grid-template-columns:minmax(0,1fr);gap:18px;padding-block:20px 56px}
+  .dnav{position:static;flex-direction:row;align-items:center;flex-wrap:wrap;gap:4px;padding:6px;border-radius:14px}
+  .dnav .me{display:none}
+  .dtab{width:auto;white-space:nowrap;padding:9px 14px}
+  .dnav form{margin:0 0 0 auto}
+  .dnav form .btn{width:auto}
+}
+.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+
+/* Kategorikort: lave kort på to rækker, og det sidste (Andet) som en smal stribe. */
+@media (min-width:641px){
+  .catcard{aspect-ratio:16/10}
+  .catcard-body{padding:14px}
+  .catcard-ico{width:32px;height:32px;margin-bottom:2px}
+  .catcard-blurb{font-size:.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+}
+@media (min-width:901px){.catcards li:last-child:nth-child(4n+1) .catcard{min-height:110px}}
+@media (min-width:641px) and (max-width:900px){.catcards li:last-child:nth-child(odd) .catcard{aspect-ratio:24/7}}
+
+/* Venstremenuen: tættere, så den kan være på en laptop (Sådan virker det står i toppen). */
+@media (min-width:900px){
+  .side{gap:14px;padding-top:12px;padding-bottom:14px}
+  .side-logo{height:40px}
+  .side-group a{min-height:32px;font-size:.86rem}
+  .side-head{margin-bottom:4px}
+  .side-foot{padding:12px 0 14px}
+  .side-sell{height:44px}
+}
+@media (min-width:1360px){.app:not(.app-compact) .side-nav a{height:40px}}
+
+/* Cookiebeskeden står ved siden af menuen, ikke oven på Sælg-knappen. */
+@media (min-width:900px){body:has(.app) .cookie-note{left:calc(76px + 16px)}}
+@media (min-width:1360px){body:has(.app:not(.app-compact)) .cookie-note{left:calc(232px + 16px)}}
+
+/* Bunden: én linje pr. gruppe i stedet for fem høje kolonner (menuen står i venstre side). */
+@media (min-width:900px){
+  .foot-grid{grid-template-columns:minmax(0,1fr);gap:10px;padding-block:26px 16px}
+  .foot-grid>div{display:grid;grid-template-columns:110px minmax(0,1fr);align-items:baseline;gap:6px 12px}
+  .foot-grid>div:first-child{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin-bottom:6px}
+  .foot-grid>div:first-child .logo img{height:28px}
+  .foot-grid p{margin-top:0;max-width:none;font-size:.9rem}
+  .foot-grid h2{margin:0}
+  .foot-grid ul{flex-direction:row;flex-wrap:wrap;gap:6px 18px}
+  .foot-grid a,.foot-grid .sup-link{font-size:.88rem}
+  .foot-bottom{padding-block:14px 20px;font-size:.8rem}
+}
