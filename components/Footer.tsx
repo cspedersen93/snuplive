@@ -60,7 +60,6 @@ export default function Footer() {
         </div>
         <div className="foot-bottom">
           <span>© {new Date().getFullYear()} {companyLine()} · {COMPANY.email}</span>
-          <span>Fotos: Pexels</span>
         </div>
       </div>
     </footer>

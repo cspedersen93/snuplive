@@ -868,6 +868,10 @@ Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal
 - **Logoet** (`public/img/logo.svg`) er tegnet som vektor ud fra Caspers logo-fil (hvidt relived på rød flade med pilen i e
   og play-tegn). Ikonerne (`app/icon.png`, `app/apple-icon.png`, `public/icon-192.png`, `public/icon-512.png`) er "re".
   Delingsbilledet er `public/img/og.jpg`.
+- **Kategorikortene** bruger Caspers egne billeder, `public/img/kat-*.jpg` (feltet `card` i `lib/format.ts`). De er skåret
+  ud af ét samlet billede og forstørret 4 gange. `cover` (`public/img/cover-*.jpg`) bruges stadig til guiderne,
+  reservebilledet til shows uden profilbillede og kategorisidernes delingsbillede. Bunden af siden nævner ikke, hvor
+  billederne kommer fra.
 - Koden: `components/shell/` (rammen, venstremenuen, bundmenuen og det, de skal vide om brugeren),
   `components/Header.tsx`, `components/feed/` (kortene og højre side) og `app/(site)/page.tsx`.
 
