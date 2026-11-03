@@ -11,7 +11,7 @@ export default function CategoryCards({ headingLevel = 3 }: { headingLevel?: 2 |
         <li key={c.key}>
           <Link className="catcard" href={`/kategori/${c.slug}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={c.cover} alt="" loading="lazy" />
+            <img src={c.card} alt="" loading="lazy" />
             <span className="catcard-body">
               <span className="catcard-ico" aria-hidden="true">
                 <CategoryIcon k={c.key} />

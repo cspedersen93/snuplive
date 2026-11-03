@@ -11,6 +11,8 @@ export const CATEGORIES = [
     label: "Dametøj, sko og tasker",
     short: "Dametøj",
     cover: "/img/cover-dametoej.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-dametoej.jpg",
     blurb: "Kjoler, jakker, sneakers og tasker fra danske skabe, vist frem på video.",
     h1: "Brugt dametøj, sko og tasker – køb det live",
     title: "Brugt dametøj, sko og tasker – køb det live | Relived",
@@ -24,6 +26,8 @@ export const CATEGORIES = [
     label: "Herretøj og sneakers",
     short: "Herretøj",
     cover: "/img/cover-herretoej.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-herretoej.jpg",
     blurb: "Jakker, denim, strik og sneakers, hvor du kan se slid og mærker tæt på.",
     h1: "Brugt herretøj og sneakers – køb det live",
     title: "Brugt herretøj og sneakers – køb det live | Relived",
@@ -37,6 +41,8 @@ export const CATEGORIES = [
     label: "Luksus: tasker, ure og smykker",
     short: "Luksus",
     cover: "/img/cover-luksus.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-luksus.jpg",
     blurb: "Designertasker, ure og smykker. Mærkevarer bliver ægthedstjekket, før de kan købes.",
     h1: "Brugte designertasker, ure og smykker – ægthedstjekket",
     title: "Brugte designertasker og ure – ægthedstjekket | Relived",
@@ -50,6 +56,8 @@ export const CATEGORIES = [
     label: "Skønhed (ny og uåbnet)",
     short: "Skønhed",
     cover: "/img/cover-skoenhed.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-skoenhed.jpg",
     blurb: "Parfume, makeup og hudpleje, der aldrig er åbnet. Til en lavere pris end i butikken.",
     h1: "Uåbnet parfume, makeup og hudpleje – køb det live",
     title: "Uåbnet parfume, makeup og hudpleje – køb live | Relived",
@@ -63,6 +71,8 @@ export const CATEGORIES = [
     label: "Børnetøj og legetøj",
     short: "Børn",
     cover: "/img/cover-boernetoej.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-boernetoej.jpg",
     blurb: "Hele poser i den rigtige størrelse og legetøj, der har mere leg i sig.",
     h1: "Brugt børnetøj og legetøj – køb det live",
     title: "Brugt børnetøj og legetøj – køb det live | Relived",
@@ -76,6 +86,8 @@ export const CATEGORIES = [
     label: "Cykler og barnevogne",
     short: "Cykler",
     cover: "/img/cover-cykler.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-cykler.jpg",
     blurb: "Børnecykler, ladcykler, elcykler, løbehjul og barnevogne. Mange kan hentes hos sælgeren.",
     h1: "Brugte cykler og barnevogne – køb dem live",
     title: "Brugte cykler, ladcykler og barnevogne – køb live | Relived",
@@ -89,6 +101,8 @@ export const CATEGORIES = [
     label: "Bolig og design",
     short: "Bolig",
     cover: "/img/cover-bolig.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-bolig.jpg",
     blurb: "Lamper, keramik og vintage, som du kan se fra alle vinkler, før du køber.",
     h1: "Brugt design til hjemmet – lamper, keramik og vintage live",
     title: "Brugt design, lamper og keramik – køb det live | Relived",
@@ -102,6 +116,8 @@ export const CATEGORIES = [
     label: "Samleobjekter",
     short: "Samleobjekter",
     cover: "/img/cover-samleobjekter.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-samleobjekter.jpg",
     blurb: "Vinyl, LEGO, samlerkort og retrospil til samlere, der vil se standen live.",
     h1: "Brugt vinyl, LEGO og samlerkort – køb samleobjekter live",
     title: "Brugt vinyl, LEGO og samlerkort – køb det live | Relived",
@@ -115,6 +131,8 @@ export const CATEGORIES = [
     label: "Andet",
     short: "Andet",
     cover: "/img/cover-andet.jpg",
+    /** Billedet på kategorikortene. */
+    card: "/img/kat-andet.jpg",
     blurb: "Bøger, sport, værktøj og alt det, der ikke passer i de andre kategorier.",
     h1: "Andre brugte varer – køb dem live",
     title: "Andre brugte varer – køb dem live | Relived",
