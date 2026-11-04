@@ -1901,3 +1901,6 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 @media (min-width:900px) and (max-width:1099px){.home-feed~.sec .h2{font-size:1.75rem}}
 @media (min-width:1360px){.home-feed~.sec .h2{font-size:1.75rem}}
 @media (min-width:1600px){.home-feed~.sec .h2{font-size:2rem}}
+/* Forsiden: tomt program i højre kolonne. */
+.rail-empty{margin:0;font-size:.9rem;line-height:1.5;color:var(--muted)}
+.rail-box > .btn-sm{align-self:flex-start}

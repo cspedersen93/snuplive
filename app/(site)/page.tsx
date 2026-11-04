@@ -125,15 +125,18 @@ export default async function Forside() {
             {/* Med få kort (fx i starten, når ingen er live) bliver det store kort et banner i fuld bredde, så der ikke står
                 et tomt felt ved siden af det. */}
             <div className={`feed-grid${tiles.length < 4 ? " sparse" : ""}`}>
-              {big ? <BigShowTile show={big} /> : <WelcomeTile />}
+              {big ? <BigShowTile show={big} /> : <WelcomeTile hasItems={forSale.length > 0} />}
               {tiles.map((t) =>
                 t.kind === "show" ? <ShowTile key={`s${t.show.id}`} show={t.show} /> : <ItemTile key={`i${t.item.id}`} item={t.item} />,
               )}
             </div>
-            <div className="feed-more">
-              <Link className="btn btn-line" href="/til-salg">Se alt til salg</Link>
-              <Link className="btn btn-line" href="/live">Se hvem der går live</Link>
-            </div>
+            {/* Knapperne under kortene kun, når der er kort. Står det store kort alene, har det sine egne knapper. */}
+            {tiles.length ? (
+              <div className="feed-more">
+                <Link className="btn btn-line" href="/til-salg">Se alt til salg</Link>
+                <Link className="btn btn-line" href="/live">Se hvem der går live</Link>
+              </div>
+            ) : null}
           </section>
         </div>
 
@@ -165,7 +168,19 @@ export default async function Forside() {
                 })}
               </ul>
             </section>
-          ) : null}
+          ) : (
+            // Tomt program: forklar, hvad der kommer til at stå her, og giv sælgerne en vej ind.
+            <section className="rail-box" aria-labelledby="h-rail-snart">
+              <div className="rail-top">
+                <h2 className="rail-h" id="h-rail-snart">Snart live</h2>
+                <Link className="rail-more" href="/live#h-sched">Program</Link>
+              </div>
+              <p className="rail-empty">
+                Programmet er tomt lige nu. Når en sælger sætter et show i programmet, står det her, og du kan trykke Husk mig.
+              </p>
+              <Link className="btn btn-line btn-sm" href="/saelg">Sæt dit eget show i programmet</Link>
+            </section>
+          )}
           <RailHello />
           <section className="rail-box" aria-labelledby="h-rail-tryg">
             <h2 className="rail-h" id="h-rail-tryg">Tryg handel</h2>

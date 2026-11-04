@@ -65,7 +65,11 @@ export function BigShowTile({ show }: { show: ShowWithSeller }) {
 }
 
 /** Når ingen er live eller har planlagt et show. */
-export function WelcomeTile() {
+/**
+ * Det store kort, når ingen er live. Er der varer til salg, peger det på dem. Er der intet endnu (helt i starten),
+ * peger det på at gå live selv, så knappen ikke fører til en tom side.
+ */
+export function WelcomeTile({ hasItems = true }: { hasItems?: boolean }) {
   return (
     <div className="ftile ftile-big ftile-welcome">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -73,12 +77,27 @@ export function WelcomeTile() {
       <span className="ftile-shade" />
       <div className="ftile-info">
         <span className="fbadge">Ingen er live lige nu</span>
-        <strong className="ftile-title">Se varer, der allerede er vist frem på video</strong>
-        <span className="ftile-extra">Eller gå selv live og sælg en hel bunke på én aften.</span>
-        <span className="ftile-btns">
-          <Link className="btn btn-red" href="/til-salg">Se varer til salg</Link>
-          <Link className="btn btn-line" href="/saelg">Sælg selv live</Link>
-        </span>
+        {hasItems ? (
+          <>
+            <strong className="ftile-title">Se varer, der allerede er vist frem på video</strong>
+            <span className="ftile-extra">Eller gå selv live og sælg en hel bunke på én aften.</span>
+            <span className="ftile-btns">
+              <Link className="btn btn-red" href="/til-salg">Se varer til salg</Link>
+              <Link className="btn btn-line" href="/saelg">Sælg selv live</Link>
+            </span>
+          </>
+        ) : (
+          <>
+            <strong className="ftile-title">Vær med fra starten</strong>
+            <span className="ftile-extra">
+              Gå live fra stuen, og sælg en hel bunke på én aften. Det er gratis at sælge, mens vi er i beta.
+            </span>
+            <span className="ftile-btns">
+              <Link className="btn btn-red" href="/saelg">Sælg selv live</Link>
+              <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
+            </span>
+          </>
+        )}
       </div>
     </div>
   );
