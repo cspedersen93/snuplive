@@ -300,7 +300,9 @@ fejl, så en vare, der er blevet annulleret eller refunderet, kan købes igen.
    | `NEXT_PUBLIC_COMPANY_CVR` | CVR-nummeret (8 cifre) |
    | `NEXT_PUBLIC_COMPANY_ADDRESS` | Selskabets adresse |
 
-   Indtil da står der *Relived ApS (under stiftelse)* på siden og i vilkårene.
+   Relived ApS er stiftet (CVR 46902297). Navn og CVR-nummer står som standard i `lib/company.ts`, så de to variabler
+   kun skal sættes, hvis de skal ændres. Adressen mangler stadig: indtil `NEXT_PUBLIC_COMPANY_ADDRESS` er sat, står der
+   *kommer snart*.
 
 Det er nyt:
 
