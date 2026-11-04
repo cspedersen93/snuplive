@@ -7,7 +7,7 @@ const clean = (v?: string) => (v ?? "").trim().replace(/^["']|["']$/g, "") || nu
 export const COMPANY = {
   name: clean(process.env.NEXT_PUBLIC_COMPANY_NAME) ?? "Relived ApS",
   cvr: clean(process.env.NEXT_PUBLIC_COMPANY_CVR) ?? "46902297",
-  address: clean(process.env.NEXT_PUBLIC_COMPANY_ADDRESS),
+  address: clean(process.env.NEXT_PUBLIC_COMPANY_ADDRESS) ?? "Bymuren 107, 3. th., 2650 Hvidovre",
   email: "kontakt@relived.dk",
 };
 

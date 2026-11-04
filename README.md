@@ -300,9 +300,8 @@ fejl, så en vare, der er blevet annulleret eller refunderet, kan købes igen.
    | `NEXT_PUBLIC_COMPANY_CVR` | CVR-nummeret (8 cifre) |
    | `NEXT_PUBLIC_COMPANY_ADDRESS` | Selskabets adresse |
 
-   Relived ApS er stiftet (CVR 46902297). Navn og CVR-nummer står som standard i `lib/company.ts`, så de to variabler
-   kun skal sættes, hvis de skal ændres. Adressen mangler stadig: indtil `NEXT_PUBLIC_COMPANY_ADDRESS` er sat, står der
-   *kommer snart*.
+   Relived ApS er stiftet (CVR 46902297, Bymuren 107, 3. th., 2650 Hvidovre). Navn, CVR-nummer og adresse står som
+   standard i `lib/company.ts`, så variablerne kun skal sættes, hvis noget skal ændres.
 
 Det er nyt:
 
