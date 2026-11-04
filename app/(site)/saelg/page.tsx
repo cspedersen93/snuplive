@@ -21,7 +21,7 @@ export default function Saelg() {
           </nav>
           <h1 className="h1" id="h-saelg">Sælg brugt tøj og andre varer live på video</h1>
           <p className="lede">
-            Glem at fotografere og skrive en annonce til hver eneste vare. Gå live fra telefonen, vis varerne frem én ad gangen, og
+            <b>Sælg brugte fund, ubrugte fejlkøb og nye restpartier live.</b> Glem at fotografere og skrive en annonce til hver eneste vare. Gå live fra telefonen, vis varerne frem én ad gangen, og
             sælg en hel bunke på én aften.
           </p>
           <div className="ctas">
@@ -32,6 +32,7 @@ export default function Saelg() {
             <li>Gratis at sælge i beta</li>
             <li>Ingen app at installere</li>
             <li>Pengene direkte på din konto</li>
+            <li>Som privatperson eller virksomhed</li>
           </ul>
         </div>
       </section>
@@ -90,7 +91,8 @@ export default function Saelg() {
             <details><summary><h3>Hvad skal jeg bruge for at gå live?</h3><span className="pm" aria-hidden="true">+</span></summary><p>En telefon eller computer med kamera og en stabil internetforbindelse. Et stativ og et ringlys gør billedet bedre, men det er ikke et krav.</p></details>
             <details><summary><h3>Hvor længe skal et show vare?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det bestemmer du. Et godt første show er 20 minutter og 10 til 15 varer. I studiet er der en rundvisning, der viser dig, hvad hver knap gør.</p></details>
             <details><summary><h3>Kan jeg sælge sammen med en veninde?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Ja. I studiet trykker du Inviter en sælger og sender linket. Op til 2 andre sælgere kan være med som gæster. I er på kameraet sammen, hver lægger sine egne varer i køen og får selv pengene for dem, og I tager hinandens følgere med. Du styrer, hvad der vises.</p></details>
-            <details><summary><h3>Kan en genbrugsbutik også sælge live?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Ja. Butikker kan oprette en konto og gå live fra butikken, fx med ugens nye varer.</p></details>
+            <details><summary><h3>Kan en butik også sælge live?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Ja. Genbrugsbutikker og butikker med restpartier kan oprette en konto og gå live fra butikken, fx med ugens nye varer. Vælg <b>Virksomhed</b>, når du bliver sælger.</p></details>
+            <details><summary><h3>Jeg køber partier hjem og sælger dem videre. Hvad skal jeg vælge?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Køber du varer ind for at sælge dem videre med fortjeneste, er det erhverv, og så sælger du som virksomhed. Vælg <b>Virksomhed</b>, når du bliver sælger, og skriv firmanavn og CVR-nummer. Køberne kan se det ved dine varer, og når de køber af en virksomhed, har de 14 dages fortrydelsesret og 2 års reklamationsret.</p></details>
           </div>
         </div>
       </section>
