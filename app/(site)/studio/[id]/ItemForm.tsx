@@ -6,7 +6,7 @@ import { IconSparkle } from "@/components/Icons";
 import type { AiListing } from "@/lib/aiListing";
 import { askAiListing } from "@/lib/aiListingClient";
 import { pingSearchAlerts } from "@/lib/searchPing";
-import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, pickCategories } from "@/lib/format";
+import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, nameExample, pickCategories, sizeField } from "@/lib/format";
 import { needsAuth } from "@/lib/luxury";
 import { storageUrl } from "@/lib/images";
 import { resizeImage } from "@/lib/resizeImage";
@@ -34,7 +34,7 @@ interface Props {
 
 type Photo = { kind: "old"; path: string } | { kind: "new"; file: File; url: string };
 
-/** Formular til en ting i køen: navn, størrelse, pris, stand, kategori, beskrivelse og billeder. */
+/** Formular til en vare i køen: navn, pris, stand, størrelse eller mål (efter kategorien), kategori, beskrivelse og billeder. */
 export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, aiReady = false, hideCats = [], onSaved, onCancel }: Props) {
   const sb = getSupabase();
   const editing = Boolean(item);
@@ -57,6 +57,8 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   const uid = item?.id ?? "new";
   // Skønhed må kun sælges ny og uåbnet. Mærkevarer skal ægthedstjekkes, før de kan sælges.
   const newOnly = NEW_ONLY_CATEGORIES.includes(cat);
+  // Tøj har str., bolig og tasker har mål, skønhed har indhold, og samleobjekter har intet felt.
+  const sizeF = sizeField(cat);
   const authNeeded = needsAuth({ name, description: desc, category: cat, price: Number(price.replace(/[^\d]/g, "")) || 0 });
 
   useEffect(
@@ -100,8 +102,9 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
     if ("error" in r) return toast(r.error);
     const l = r.listing;
     if (!name.trim()) setName(l.name);
-    if (!size.trim() && l.size) setSize(l.size);
-    if (l.category && !hideCats.includes(l.category)) setCat(l.category);
+    const nextCat = l.category && !hideCats.includes(l.category) ? l.category : cat;
+    if (!size.trim() && l.size && sizeField(nextCat)) setSize(l.size);
+    if (nextCat !== cat) setCat(nextCat);
     if (!NEW_ONLY_CATEGORIES.includes(l.category ?? cat) && !cond.trim() && l.condition) setCond(l.condition);
     if (!desc.trim() && l.description) setDesc(l.description);
     setMore(true);
@@ -142,7 +145,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
       }
       const fields = {
         name: n,
-        size: size.trim() || null,
+        size: sizeF ? size.trim() || null : null,
         condition: newOnly ? NEW_ONLY_CONDITION : cond.trim() || null,
         price: p,
         sale_type: saleType,
@@ -211,7 +214,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
       {aiResult ? <AiNote listing={aiResult} onUsePrice={(n) => setPrice(String(n))} onClose={() => setAiResult(null)} /> : null}
       <div className="field">
         <label htmlFor={`ni-name-${uid}`}>Hvad er det?</label>
-        <input id={`ni-name-${uid}`} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Fx Uldfrakke, kamel" />
+        <input id={`ni-name-${uid}`} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder={nameExample(cat)} />
       </div>
       <span className="flabel" aria-hidden="true">Salgsform</span>
       <fieldset className="seg sale-seg">
@@ -226,15 +229,17 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         </label>
       </fieldset>
       <div className="fgrid" style={{ marginTop: 0 }}>
-        <div className="field">
-          <label htmlFor={`ni-size-${uid}`}>Str.</label>
-          <input id={`ni-size-${uid}`} value={size} onChange={(e) => setSize(e.target.value)} maxLength={20} placeholder="M" />
-        </div>
+        {sizeF ? (
+          <div className="field">
+            <label htmlFor={`ni-size-${uid}`}>{sizeF.label}</label>
+            <input id={`ni-size-${uid}`} value={size} onChange={(e) => setSize(e.target.value)} maxLength={20} placeholder={sizeF.placeholder} />
+          </div>
+        ) : null}
         <div className="field">
           <label htmlFor={`ni-price-${uid}`}>{saleType === "auction" ? "Startpris (kr)" : "Pris (kr)"}</label>
           <input id={`ni-price-${uid}`} value={price} onChange={(e) => setPrice(e.target.value)} inputMode="numeric" placeholder="150" />
         </div>
-        <div className="field full">
+        <div className={sizeF ? "field full" : "field"}>
           <label htmlFor={`ni-cond-${uid}`}>Stand</label>
           {newOnly ? (
             <input id={`ni-cond-${uid}`} value={NEW_ONLY_CONDITION} readOnly aria-readonly="true" />

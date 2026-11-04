@@ -52,7 +52,7 @@ export default function Saelg() {
             </div>
             <ol className="steps">
               <li><div><h3>Opret et show</h3><p>Giv det en titel, og vælg kategori og tidspunkt. Showet kommer i programmet under Live nu, og dine følgere får besked, når du går live.</p></div></li>
-              <li><div><h3>Læg dine varer i køen</h3><p>Navn, størrelse og pris er nok. Lægger du billeder og en beskrivelse på, kan køberne finde varerne og trykke Husk mig før showet.</p></div></li>
+              <li><div><h3>Læg dine varer i køen</h3><p>Navn og pris er nok. Lægger du billeder og en beskrivelse på, kan køberne finde varerne og trykke Husk mig før showet.</p></div></li>
               <li><div><h3>Gå live fra studiet</h3><p>Vis varerne frem én ad gangen. Køberne køber med ét tryk, og du kan starte lynrunder eller budsalg, når stemningen er god.</p></div></li>
               <li><div><h3>Pak, send og få pengene</h3><p>Når køberen har betalt, printer du fragtlabelen og afleverer pakken. Når køberen har fået den, går pengene til din bankkonto.</p></div></li>
             </ol>

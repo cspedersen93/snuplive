@@ -1,3 +1,4 @@
+import { sizeText } from "@/lib/format";
 import type { ReactNode } from "react";
 import Avatar from "@/components/Avatar";
 import { IconEye } from "@/components/Icons";
@@ -55,5 +56,5 @@ export function ScreenTop({
 }
 
 export function itemMeta(i: { size: string | null; condition: string | null }) {
-  return [i.size ? `Str. ${i.size}` : null, i.condition].filter(Boolean).join(" · ");
+  return [sizeText(i.size), i.condition].filter(Boolean).join(" · ");
 }

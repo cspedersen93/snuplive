@@ -28,7 +28,7 @@ export function aiListingPrompt(hint?: string) {
     "- Skriv kun det, du kan se på billederne. Gæt aldrig mærke, størrelse eller materiale.",
     '- name: højst 60 tegn: hvad varen er og farven, fx "Uldfrakke, kamel". Kan mærket læses på et mærkat eller logo, så skriv det først, fx "Ganni strikkjole, grøn".',
     "- brand: mærket, kun hvis det kan læses på billederne, ellers null.",
-    "- size: størrelsen, kun hvis den kan læses på et mærkat, ellers null.",
+    "- size: for tøj og sko størrelsen fra mærkatet (fx M, 38 eller 92). For skønhed indholdet fra pakken (fx 50 ml). Ellers null. Kun hvis det kan læses, aldrig et gæt.",
     "- material: fra vaskemærket, kun hvis det kan læses, ellers null.",
     `- condition: én af ${AI_CONDITIONS.map((c) => `"${c}"`).join(", ")}, ud fra det, du kan se.`,
     "- category: én af dametoej, herretoej, luksus (designertasker, ure og smykker fra luksusmærker), skoenhed (kun ny og uåbnet makeup, parfume og hudpleje), boernetoej, cykler (cykler, børnecykler, ladcykler, elcykler, løbehjul, barnevogne og klapvogne), bolig (lamper, keramik, glas, møbler og design til hjemmet), samlerting (vinyl, LEGO, samlekort, retrospil) eller andet.",

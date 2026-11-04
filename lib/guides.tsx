@@ -743,7 +743,7 @@ export const GUIDES: Guide[] = [
         body: (
           <ol>
             <li><b>Sælgeren går live.</b> Du får besked, hvis du følger sælgeren eller har trykket Husk mig.</li>
-            <li><b>Varen bliver vist.</b> Navn, størrelse og pris står nederst i billedet.</li>
+            <li><b>Varen bliver vist.</b> Navn, pris og eventuel størrelse står nederst i billedet.</li>
             <li><b>Du spørger.</b> Skriv i chatten, fx om mål, stand eller materiale, og sælgeren viser det.</li>
             <li><b>Du køber.</b> Den første, der trykker Køb, får varen. Ved budsalg byder du i 30 sekunder, og det højeste bud vinder.</li>
             <li><b>Du betaler bagefter.</b> Alt, du køber hos samme sælger, kommer i én pakke.</li>
@@ -995,7 +995,7 @@ export const GUIDES: Guide[] = [
         h2: "Hvad skal du gøre, før du går live?",
         body: (
           <ul>
-            <li><b>Læg varerne i køen.</b> Navn, størrelse og pris er nok. Med billeder og beskrivelse kan køberne finde dem og trykke Husk mig før showet.</li>
+            <li><b>Læg varerne i køen.</b> Navn og pris er nok. Med billeder og beskrivelse kan køberne finde dem og trykke Husk mig før showet.</li>
             <li><b>Gør tøjet klar.</b> Vask, damp og tag mål. Se alle tipsene i <Link href="/guides/saelg-brugt-toej">sælg brugt tøj</Link>.</li>
             <li><b>Sæt prisen.</b> Se tommelfingerreglen i <Link href="/guides/pris-paa-brugt-toej">pris på brugt tøj</Link>.</li>
             <li><b>Send mærkevarer til ægthedstjek</b> i god tid, så de kan købes i showet.</li>

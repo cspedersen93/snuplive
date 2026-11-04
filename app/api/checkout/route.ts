@@ -10,6 +10,7 @@ import { findPakkeshops, hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, ore } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserInfo } from "@/lib/supabase/server";
+import { sizeText } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -172,7 +173,7 @@ export async function POST(req: Request) {
           product_data: {
             name: s.item?.name ?? "Vare",
             description: [
-              s.item?.size ? `Str. ${s.item.size}` : null,
+              sizeText(s.item?.size),
               s.item?.condition,
               `fra @${handle}`,
               pct ? `${pct} % samlerabat (før ${s.price} kr)` : null,

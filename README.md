@@ -873,6 +873,10 @@ Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal
   ud af ét samlet billede og forstørret 4 gange. `cover` (`public/img/cover-*.jpg`) bruges stadig til guiderne,
   reservebilledet til shows uden profilbillede og kategorisidernes delingsbillede. Bunden af siden nævner ikke, hvor
   billederne kommer fra.
+- **Størrelse følger kategorien.** I studiet og under Sælg med video hedder feltet *Str.* for tøj, *Mål* for tasker, bolig og
+  andet, *Indhold* for skønhed og *Størrelse* for cykler. Samleobjekter har intet felt. Det gemmes i `items.size`.
+  Køberne ser "Str. M" for tøj og sko, mens mål og indhold står, som de er ("40 × 60 cm", "50 ml"). Koden: `sizeField`,
+  `nameExample` og `sizeText` i `lib/format.ts`.
 - Koden: `components/shell/` (rammen, venstremenuen, bundmenuen og det, de skal vide om brugeren),
   `components/Header.tsx`, `components/feed/` (kortene og højre side) og `app/(site)/page.tsx`.
 

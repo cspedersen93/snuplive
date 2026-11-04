@@ -34,7 +34,7 @@ export default function SearchForm({ s, compact = false, autoFocus = false }: { 
             </select>
           </div>
           <div className="field">
-            <label htmlFor="sf-str">Str.</label>
+            <label htmlFor="sf-str">Str. (tøj og sko)</label>
             <input id="sf-str" name="str" defaultValue={s?.size ?? ""} maxLength={20} placeholder="Fx M eller 92" />
           </div>
           <div className="field">

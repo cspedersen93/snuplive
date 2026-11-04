@@ -1,5 +1,5 @@
 import { SITE_URL } from "@/lib/env";
-import { kr, vareOrd, when } from "@/lib/format";
+import { kr, sizeText, vareOrd, when } from "@/lib/format";
 import { itemHref } from "@/lib/items";
 import { sendMailBatch } from "@/lib/mail";
 import { sendPush } from "@/lib/push";
@@ -25,7 +25,7 @@ type Hit = {
 const whereText = (h: Hit) =>
   h.kind === "live" ? `live nu hos @${h.handle}` : h.kind === "upcoming" ? `vises ${when(h.starts_at).replace(/^./, (c) => c.toLowerCase())} hos @${h.handle}` : `til salg hos @${h.handle}`;
 
-const line = (h: Hit) => [h.item_name, kr(h.price), h.size ? `str. ${h.size}` : ""].filter(Boolean).join(" · ");
+const line = (h: Hit) => [h.item_name, kr(h.price), sizeText(h.size)?.replace(/^Str\./, "str.") ?? ""].filter(Boolean).join(" · ");
 
 /** Hvor beskeden fører hen: live-showet, hvis varen er live nu, ellers varens side. */
 const hitPath = (h: Hit) => (h.kind === "live" ? `/live/${h.handle}` : itemHref({ id: h.item_id, name: h.item_name }));

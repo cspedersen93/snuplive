@@ -9,7 +9,7 @@ import { askAiListing } from "@/lib/aiListingClient";
 import { pingSearchAlerts } from "@/lib/searchPing";
 import { blobToBase64 } from "@/lib/bestPhoto";
 import type { Clip } from "@/lib/clipRecorder";
-import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, pickCategories } from "@/lib/format";
+import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, nameExample, pickCategories, sizeField } from "@/lib/format";
 import { itemHref } from "@/lib/items";
 import { needsAuth } from "@/lib/luxury";
 import { resizeImage } from "@/lib/resizeImage";
@@ -95,6 +95,8 @@ export default function VideoListingClient({
   const touched = useRef(false);
 
   const newOnly = NEW_ONLY_CATEGORIES.includes(cat);
+  // Tøj har str., bolig og tasker har mål, skønhed har indhold, og samleobjekter har intet felt.
+  const sizeF = sizeField(cat);
   const authNeeded = needsAuth({ name, description: desc, category: cat, price: Number(price.replace(/[^\d]/g, "")) || 0 });
   const photoCount = selected.length + own.length;
 
@@ -156,7 +158,7 @@ export default function VideoListingClient({
     }
     const l = r.listing;
     setName((v) => (v.trim() ? v : l.name));
-    setSize((v) => (v.trim() || !l.size ? v : l.size));
+    setSize((v) => (v.trim() || !l.size || !sizeField(cat || l.category) ? v : l.size));
     setCat((v) => v || (l.category && !hideCats.includes(l.category) ? l.category : ""));
     setCond((v) => (v.trim() || !l.condition || NEW_ONLY_CATEGORIES.includes(l.category ?? "") ? v : l.condition));
     setDesc((v) => (v.trim() || !l.description ? v : l.description));
@@ -385,7 +387,7 @@ export default function VideoListingClient({
       const { data, error } = await sb.rpc("create_video_listing", {
         p_id: id,
         p_name: n,
-        p_size: size.trim() || null,
+        p_size: sizeF ? size.trim() || null : null,
         p_condition: newOnly ? NEW_ONLY_CONDITION : cond.trim() || null,
         p_price: p,
         p_category: cat,
@@ -642,7 +644,7 @@ export default function VideoListingClient({
               {aiResult ? <AiNote listing={aiResult} onUsePrice={(n) => setPrice(String(n))} onClose={() => setAiResult(null)} /> : null}
               <div className="field">
                 <label htmlFor="vl-name">Hvad er det?</label>
-                <input id="vl-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Fx Strikkjole, grøn" />
+                <input id="vl-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder={cat ? nameExample(cat) : "Fx Strikkjole, grøn"} />
               </div>
               <div className="field">
                 <label htmlFor="vl-cat">Kategori</label>
@@ -654,15 +656,17 @@ export default function VideoListingClient({
                 </select>
               </div>
               <div className="fgrid" style={{ marginTop: 0 }}>
-                <div className="field">
-                  <label htmlFor="vl-size">Str.</label>
-                  <input id="vl-size" value={size} onChange={(e) => setSize(e.target.value)} maxLength={20} placeholder="M" />
-                </div>
+                {sizeF ? (
+                  <div className="field">
+                    <label htmlFor="vl-size">{sizeF.label}</label>
+                    <input id="vl-size" value={size} onChange={(e) => setSize(e.target.value)} maxLength={20} placeholder={sizeF.placeholder} />
+                  </div>
+                ) : null}
                 <div className="field">
                   <label htmlFor="vl-price">Pris (kr)</label>
                   <input id="vl-price" value={price} onChange={(e) => setPrice(e.target.value)} inputMode="numeric" placeholder="150" />
                 </div>
-                <div className="field full">
+                <div className={sizeF ? "field full" : "field"}>
                   <label htmlFor="vl-cond">Stand</label>
                   {newOnly ? (
                     <input id="vl-cond" value={NEW_ONLY_CONDITION} readOnly aria-readonly="true" />

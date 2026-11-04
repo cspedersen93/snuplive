@@ -153,6 +153,53 @@ export const NEW_ONLY_CATEGORIES: readonly string[] = ["skoenhed"];
 /** Standen, som ting i de kategorier altid får. */
 export const NEW_ONLY_CONDITION = "Ny og uåbnet";
 
+/**
+ * Feltet "size" følger kategorien: tøj og sko har str., tasker, bolig og andet har mål, skønhed har indhold,
+ * cykler har størrelse. Samleobjekter har intet felt. Alt gemmes i samme kolonne (items.size).
+ */
+const SIZE_FIELDS: Record<string, { label: string; placeholder: string } | null> = {
+  dametoej: { label: "Str.", placeholder: "M" },
+  herretoej: { label: "Str.", placeholder: "L" },
+  boernetoej: { label: "Str.", placeholder: "92" },
+  luksus: { label: "Mål (valgfri)", placeholder: "30 × 22 cm" },
+  skoenhed: { label: "Indhold (valgfri)", placeholder: "50 ml" },
+  cykler: { label: "Størrelse (valgfri)", placeholder: "26 tommer" },
+  bolig: { label: "Mål (valgfri)", placeholder: "40 × 60 cm" },
+  samlerting: null,
+  andet: { label: "Mål (valgfri)", placeholder: "30 × 40 cm" },
+};
+
+/** Feltet til størrelse, mål eller indhold for en kategori (null: intet felt). Uden kategori: et bredt felt. */
+export function sizeField(cat: string | null | undefined) {
+  if (cat && cat in SIZE_FIELDS) return SIZE_FIELDS[cat];
+  return { label: "Str. eller mål (valgfri)", placeholder: "M eller 40 × 60 cm" };
+}
+
+/** Eksemplet i feltet "Hvad er det?", så formularen ikke kun taler om tøj. */
+const NAME_EXAMPLES: Record<string, string> = {
+  dametoej: "Fx Uldfrakke, kamel",
+  herretoej: "Fx Læderjakke, sort",
+  boernetoej: "Fx Flyverdragt, blå",
+  luksus: "Fx Skuldertaske, læder",
+  skoenhed: "Fx Parfume, uåbnet",
+  cykler: "Fx Ladcykel med 3 hjul",
+  bolig: "Fx Bordlampe, messing",
+  samlerting: "Fx LEGO-sæt, komplet",
+  andet: "Fx Brætspil, komplet",
+};
+export const nameExample = (cat: string | null | undefined) => (cat && NAME_EXAMPLES[cat]) || "Fx Uldfrakke, kamel";
+
+// En tøj- eller skostørrelse (M, S/M, 38, 92, 38-40): vises som "Str. M". Mål og indhold (40 × 60 cm, 50 ml) vises, som de er.
+const CLOTH_SIZE = /^(?:xxs|xs|s|m|l|xl|xxl|xxxl|\d{1,3})(?:\s*[-–/]\s*(?:xxs|xs|s|m|l|xl|xxl|xxxl|\d{1,3}))?$/i;
+
+/** "Str. M" for tøj og sko, ellers værdien som den er (fx "40 × 60 cm" eller "50 ml"). */
+export function sizeText(size: string | null | undefined) {
+  const s = (size ?? "").trim();
+  if (!s) return null;
+  const bare = s.replace(/^str(?:\.|ørrelse)?\s*/i, "");
+  return CLOTH_SIZE.test(bare) ? `Str. ${bare}` : s;
+}
+
 /** "brugt dametøj", "brugte cykler" (flertal), men "uåbnet skønhed" for skønhed. */
 export function usedPhrase(c: { key: string; word: string }) {
   if (NEW_ONLY_CATEGORIES.includes(c.key)) return `uåbnet ${c.word}`;

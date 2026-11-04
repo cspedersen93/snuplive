@@ -38,7 +38,7 @@ function hostSteps(): Step[] {
             <li>
               Vælg <b>Fast pris</b> (den første, der trykker Køb, får den) eller <b>Budsalg</b> (det højeste bud vinder).
             </li>
-            <li>Skriv str. og stand. Under <b>+ Billeder, beskrivelse og kategori</b> kan du lægge billeder på, så købere kan finde den før showet.</li>
+            <li>Skriv stand og eventuelt størrelse eller mål. Under <b>+ Billeder, beskrivelse og kategori</b> kan du lægge billeder på, så købere kan finde den før showet.</li>
             <li>Tryk <b>Læg i køen</b>.</li>
           </ol>
         </>

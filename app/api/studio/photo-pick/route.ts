@@ -1,6 +1,6 @@
 import { fail, json } from "@/lib/api";
 import { askClaude, rateLimiter, validImages } from "@/lib/claude";
-import { category } from "@/lib/format";
+import { category, sizeText } from "@/lib/format";
 import { createClient, getUserId } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   if (tooMany(uid)) return fail("For mange billeder på kort tid.", 429);
 
   const cat = category(it.category ?? it.show.category);
-  const what = [it.name, it.size ? `str. ${it.size}` : "", it.condition ?? "", cat.word].filter(Boolean).join(", ");
+  const what = [it.name, sizeText(it.size)?.replace(/^Str\./, "str.") ?? "", it.condition ?? "", cat.word].filter(Boolean).join(", ");
   const r = await askClaude(
     images,
     `Billederne er taget fra et live-videoshow, hvor en sælger viser en brugt ting frem: "${what}". ` +
