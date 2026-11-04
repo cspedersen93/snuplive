@@ -7,6 +7,7 @@ import type { AiListing } from "@/lib/aiListing";
 import { askAiListing } from "@/lib/aiListingClient";
 import { pingSearchAlerts } from "@/lib/searchPing";
 import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, nameExample, pickCategories, sizeField } from "@/lib/format";
+import { isParcel, itemParcel, PARCELS, type Parcel } from "@/lib/pricing";
 import { needsAuth } from "@/lib/luxury";
 import { storageUrl } from "@/lib/images";
 import { resizeImage } from "@/lib/resizeImage";
@@ -28,6 +29,8 @@ interface Props {
   aiReady?: boolean;
   /** Kategorier, hvis fil ikke er kørt endnu (lib/categories.ts). */
   hideCats?: readonly string[];
+  /** Er 0030_pakkestoerrelse.sql kørt? Ellers bruges kategoriens pakkestørrelse, og feltet vises ikke. */
+  parcelReady?: boolean;
   onSaved: (item: Item) => void;
   onCancel?: () => void;
 }
@@ -35,7 +38,7 @@ interface Props {
 type Photo = { kind: "old"; path: string } | { kind: "new"; file: File; url: string };
 
 /** Formular til en vare i køen: navn, pris, stand, størrelse eller mål (efter kategorien), kategori, beskrivelse og billeder. */
-export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, aiReady = false, hideCats = [], onSaved, onCancel }: Props) {
+export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, aiReady = false, hideCats = [], parcelReady = false, onSaved, onCancel }: Props) {
   const sb = getSupabase();
   const editing = Boolean(item);
   const [name, setName] = useState(item?.name ?? "");
@@ -48,6 +51,8 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   const [photos, setPhotos] = useState<Photo[]>(() => (item?.images ?? []).map((path) => ({ kind: "old", path })));
   const [more, setMore] = useState(Boolean(item?.description || item?.images?.length));
   const [newOk, setNewOk] = useState(item?.condition === NEW_ONLY_CONDITION);
+  // Pakkestørrelsen: tom = kategoriens standard (bolig og cykler er store, resten små).
+  const [pkg, setPkg] = useState<Parcel | "">("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [aiBusy, setAiBusy] = useState(false);
@@ -60,6 +65,25 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   // Tøj har str., bolig og tasker har mål, skønhed har indhold, og samleobjekter har intet felt.
   const sizeF = sizeField(cat);
   const authNeeded = needsAuth({ name, description: desc, category: cat, price: Number(price.replace(/[^\d]/g, "")) || 0 });
+
+  // Når en vare rettes, hentes den pakkestørrelse, sælgeren har valgt (feltet er ikke med i ITEM_COLS, før filen er kørt).
+  useEffect(() => {
+    if (!parcelReady || !item?.id) return;
+    let alive = true;
+    void sb
+      .from("items")
+      .select("package_size")
+      .eq("id", item.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const v = (data as { package_size?: string | null } | null)?.package_size;
+        if (alive && isParcel(v)) setPkg(v);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [parcelReady, item?.id, sb]);
+  const parcel = pkg || itemParcel({ category: cat });
 
   useEffect(
     () => () => photos.forEach((p) => p.kind === "new" && URL.revokeObjectURL(p.url)),
@@ -152,6 +176,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         category: cat === showCategory ? null : cat,
         description: desc.trim() || null,
         images: paths,
+        ...(parcelReady ? { package_size: pkg || null } : {}),
       };
       const q = editing
         ? sb.from("items").update(fields).eq("id", id)
@@ -168,6 +193,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         setSize("");
         setCond("");
         setNewOk(false);
+        setPkg("");
         setPrice("");
         setDesc("");
         setPhotos([]);
@@ -253,6 +279,18 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
           <input type="checkbox" checked={newOk} onChange={(e) => setNewOk(e.target.checked)} />
           <span>Produktet er nyt og uåbnet (forseglingen er intakt). Brugt makeup og hudpleje må ikke sælges.</span>
         </label>
+      ) : null}
+      {parcelReady ? (
+        <div className="field">
+          <label htmlFor={`ni-pkg-${uid}`}>Pakke</label>
+          <select id={`ni-pkg-${uid}`} value={parcel} onChange={(e) => setPkg(isParcel(e.target.value) ? e.target.value : "")}>
+            {(Object.keys(PARCELS) as Parcel[]).map((p) => (
+              <option key={p} value={p}>
+                {PARCELS[p].label}, {PARCELS[p].weight} (køberen betaler {PARCELS[p].price} kr i fragt)
+              </option>
+            ))}
+          </select>
+        </div>
       ) : null}
       {authNeeded ? (
         <p className="notice auth-note" role="status">

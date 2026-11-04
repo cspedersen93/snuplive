@@ -5,7 +5,7 @@ import Avatar from "@/components/Avatar";
 import { IconShield } from "@/components/Icons";
 import { CARRIER_CODES, CARRIERS, distanceText, type CarrierCode, type Pakkeshop } from "@/lib/carriers";
 import { kr } from "@/lib/format";
-import { bundleDiscount, bundlePct, DELIVERY, nextBundle, orderAmounts, type BundleTiers, type Delivery } from "@/lib/pricing";
+import { bundleDiscount, bundlePct, DELIVERY, nextBundle, orderAmounts, PARCELS, type BundleTiers, type Delivery, type Parcel } from "@/lib/pricing";
 import { errorText, toast } from "@/lib/toast";
 
 export interface PayGroup {
@@ -18,6 +18,8 @@ export interface PayGroup {
   bundle?: BundleTiers | null;
   /** Der er en cykel eller barnevogn i pakken: afhentning er valgt på forhånd. */
   pickup?: boolean;
+  /** Pakkens størrelse ud fra varerne (lib/pricing.ts: parcelFor). Fragten følger den. */
+  parcel: Parcel;
 }
 
 const MEMORY = "snuplive:pakkeshop";
@@ -50,7 +52,7 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
   // Samme regnestykke som betalingen på serveren (app/api/checkout/route.ts), med samlerabat pr. sælger.
   const sums = groups.map((g) => {
     const gross = g.items.reduce((a, i) => a + i.price, 0);
-    return orderAmounts(gross, choice[g.key] ?? "ship", bundleDiscount(gross, g.items.length, g.bundle));
+    return orderAmounts(gross, choice[g.key] ?? "ship", bundleDiscount(gross, g.items.length, g.bundle), g.parcel);
   });
   const total = sums.reduce(
     (a, s) => ({
@@ -199,9 +201,13 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
                     />
                     <span>
                       <strong>{DELIVERY[d].label}</strong>
-                      <small>{d === "ship" && !pakkeshop ? "Sælgeren sender pakken til en pakkeshop nær din adresse." : DELIVERY[d].note}</small>
+                      <small>
+                        {d === "ship"
+                          ? `${PARCELS[g.parcel].label} (${PARCELS[g.parcel].weight}). ${pakkeshop ? DELIVERY.ship.note : "Sælgeren sender pakken til en pakkeshop nær din adresse."}`
+                          : DELIVERY[d].note}
+                      </small>
                     </span>
-                    <span className="num">{kr(DELIVERY[d].price)}</span>
+                    <span className="num">{kr(d === "ship" ? PARCELS[g.parcel].price : DELIVERY[d].price)}</span>
                   </label>
                 ))}
               </div>

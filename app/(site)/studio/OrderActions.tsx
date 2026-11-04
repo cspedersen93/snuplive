@@ -192,13 +192,19 @@ export function LabelMaker({
   orderId,
   weights,
   hasAddress,
+  paidGrams,
+  paidText,
 }: {
   orderId: string;
   weights: readonly { grams: number; label: string; hint: string }[];
   hasAddress: boolean;
+  /** Den vægtklasse, køberen har betalt fragt til (1000 eller 5000). Den er valgt på forhånd. */
+  paidGrams?: number;
+  /** Fx "Lille pakke, op til 1 kg (39 kr)". */
+  paidText?: string;
 }) {
   const router = useRouter();
-  const [weight, setWeight] = useState<number>(weights[0].grams);
+  const [weight, setWeight] = useState<number>(weights.some((w) => w.grams === paidGrams) ? (paidGrams as number) : weights[0].grams);
   const [busy, setBusy] = useState(false);
   async function make() {
     setBusy(true);
@@ -229,6 +235,7 @@ export function LabelMaker({
     <div className="label-box">
       <fieldset className="weights">
         <legend>Hvor meget vejer pakken?</legend>
+        {paidText ? <p className="fine" style={{ margin: "0 0 6px" }}>Køberen har betalt for: {paidText}.</p> : null}
         {weights.map((w) => (
           <label key={w.grams}>
             <input type="radio" name={`w-${orderId}`} checked={weight === w.grams} onChange={() => setWeight(w.grams)} />

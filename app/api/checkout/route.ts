@@ -5,7 +5,8 @@ import { CARRIERS, isCarrier, type Pakkeshop } from "@/lib/carriers";
 import { SITE_URL } from "@/lib/env";
 import { cancelCheckout, markCheckoutPaid } from "@/lib/orders";
 import { fetchBundles } from "@/lib/bundles";
-import { bundleDiscount, bundlePct, DELIVERY, isDelivery, orderAmounts, spreadDiscount, type Delivery } from "@/lib/pricing";
+import { fetchPackageSizes } from "@/lib/parcels";
+import { bundleDiscount, bundlePct, DELIVERY, isDelivery, itemParcel, orderAmounts, PARCELS, parcelFor, spreadDiscount, type Delivery } from "@/lib/pricing";
 import { findPakkeshops, hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, ore } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -21,8 +22,8 @@ interface SaleRow {
   seller_id: string;
   price: number;
   order_id: string | null;
-  item: { name: string; size: string | null; condition: string | null } | null;
-  show: { title: string } | null;
+  item: { name: string; size: string | null; condition: string | null; category: string | null } | null;
+  show: { title: string; category: string | null } | null;
   seller: { handle: string } | null;
   order: { id: string; status: string; checkout_id: string; stripe_session_id: string | null } | null;
 }
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
   const { data, error } = await admin
     .from("sales")
     .select(
-      "id,item_id,show_id,seller_id,price,order_id,item:items(name,size,condition),show:shows(title),seller:profiles!sales_seller_id_fkey(handle),order:orders!sales_order_id_fkey(id,status,checkout_id,stripe_session_id)",
+      "id,item_id,show_id,seller_id,price,order_id,item:items(name,size,condition,category),show:shows(title,category),seller:profiles!sales_seller_id_fkey(handle),order:orders!sales_order_id_fkey(id,status,checkout_id,stripe_session_id)",
     )
     .eq("buyer_id", user.id)
     .eq("status", "reserved");
@@ -108,6 +109,8 @@ export async function POST(req: Request) {
 
   // Samlerabat (0027_samlerabat.sql): regnes her på serveren ud fra sælgerens rabat lige nu.
   const bundles = await fetchBundles(admin, [...groups.keys()]);
+  // Pakkestørrelsen (0030_pakkestoerrelse.sql), ellers kategoriens standard. Samme regel som i kurven.
+  const sizes = await fetchPackageSizes(admin, payable.map((s) => s.item_id));
 
   const checkoutId = randomUUID();
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
@@ -128,7 +131,8 @@ export async function POST(req: Request) {
     );
     const discount = items - linePrices.reduce((a, p) => a + p, 0);
     const pct = discount > 0 ? bundlePct(sales.length, bundle) : 0;
-    const amounts = orderAmounts(items, delivery, discount);
+    const parcel = parcelFor(sales.map((s) => itemParcel({ package_size: sizes.get(s.item_id), category: s.item?.category }, s.show?.category)));
+    const amounts = orderAmounts(items, delivery, discount, parcel);
     feeTotal += amounts.fee;
     const handle = sales[0].seller?.handle ?? "sælger";
 
@@ -193,8 +197,8 @@ export async function POST(req: Request) {
           product_data: {
             name: `Fragt fra @${handle}`,
             description: shop
-              ? `${CARRIERS[shop.carrier].name}-pakkeshop: ${shop.name}, ${shop.address}, ${shop.zipcode} ${shop.city}`.slice(0, 300)
-              : DELIVERY[delivery].label,
+              ? `${PARCELS[parcel].label} (${PARCELS[parcel].weight}) til ${CARRIERS[shop.carrier].name}-pakkeshop: ${shop.name}, ${shop.address}, ${shop.zipcode} ${shop.city}`.slice(0, 300)
+              : `${DELIVERY[delivery].label}, ${PARCELS[parcel].label.toLowerCase()} (${PARCELS[parcel].weight})`,
           },
         },
       });

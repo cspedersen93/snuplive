@@ -365,7 +365,7 @@ export default async function ItemPage({ params }: Params) {
               {PICKUP_CATEGORIES.includes(cat.key) ? (
                 <li>Hentes gratis hos {seller.handle}. Pengene går først til sælgeren, når du har bekræftet, at du har fået varen.</li>
               ) : (
-                <li>Fragt {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>
+                <li>Fragt fra {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>
               )}
               <li>
                 Køber du flere varer fra {seller.handle}, får du dem i én pakke

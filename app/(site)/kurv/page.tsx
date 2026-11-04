@@ -12,7 +12,8 @@ import { clock, dayLabel, kr } from "@/lib/format";
 import { fetchBundles } from "@/lib/bundles";
 import { itemHref } from "@/lib/items";
 import { markCheckoutPaid } from "@/lib/orders";
-import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, PICKUP_CATEGORIES, RESERVATION_DAYS } from "@/lib/pricing";
+import { fetchPackageSizes } from "@/lib/parcels";
+import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, itemParcel, parcelFor, PICKUP_CATEGORIES, RESERVATION_DAYS, type Parcel } from "@/lib/pricing";
 import { hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -29,6 +30,7 @@ type ItemInfo = { name: string; size: string | null; condition: string | null; c
 
 interface SaleRow {
   id: string;
+  item_id: string;
   price: number;
   created_at: string;
   seller_id: string;
@@ -113,7 +115,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
     supabase
       .from("sales")
       .select(
-        "id,price,created_at,seller_id,show_id,item:items(name,size,condition,category),show:shows(title,category),seller:profiles!sales_seller_id_fkey(handle,display_name,avatar_path),order:orders!sales_order_id_fkey(status)",
+        "id,item_id,price,created_at,seller_id,show_id,item:items(name,size,condition,category),show:shows(title,category),seller:profiles!sales_seller_id_fkey(handle,display_name,avatar_path),order:orders!sales_order_id_fkey(status)",
       )
       .eq("buyer_id", uid)
       .eq("status", "reserved")
@@ -155,6 +157,9 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
   // Én pakke pr. sælger: alt, du har købt hos samme sælger, betales og sendes samlet, også fra flere shows.
   const groupsMap = new Map<string, PayGroup>();
   const showsOf = new Map<string, Set<string>>();
+  // Pakkestørrelsen pr. vare (0030_pakkestoerrelse.sql), ellers kategoriens standard. Fragten følger hele pakken.
+  const sizes = await fetchPackageSizes(supabase, toPay.map((s) => s.item_id));
+  const parcelsOf = new Map<string, Parcel[]>();
   for (const s of toPay) {
     const key = s.seller_id;
     const g =
@@ -165,13 +170,16 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
         showTitle: s.show?.title ?? "",
         deadline: deadline(s.created_at),
         items: [],
+        parcel: "small",
       } satisfies PayGroup);
     g.items.push({ id: s.id, name: s.item?.name ?? "Vare", meta: s.item ? itemMeta(s.item) : "", price: s.price });
     // Cykler og barnevogne kan ikke sendes til en pakkeshop, så afhentning er valgt på forhånd.
     if (PICKUP_CATEGORIES.includes((s.item?.category ?? s.show?.category ?? "") as string)) g.pickup = true;
     groupsMap.set(key, g);
     showsOf.set(key, (showsOf.get(key) ?? new Set()).add(s.show_id));
+    parcelsOf.set(key, [...(parcelsOf.get(key) ?? []), itemParcel({ package_size: sizes.get(s.item_id), category: s.item?.category }, s.show?.category)]);
   }
+  for (const [key, g] of groupsMap) g.parcel = parcelFor(parcelsOf.get(key) ?? []);
   for (const [key, g] of groupsMap) if ((showsOf.get(key)?.size ?? 0) > 1) g.showTitle = "Fra flere shows";
   // Sælgernes samlerabat (0027_samlerabat.sql). Betalingen regner den ud igen på serveren.
   const bundles = await fetchBundles(supabase, [...groupsMap.keys()]);

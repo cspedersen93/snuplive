@@ -58,6 +58,8 @@ interface Props {
   aiReady?: boolean;
   /** Kategorier, hvis fil ikke er kørt endnu (lib/categories.ts). */
   hideCats?: readonly string[];
+  /** Er 0030_pakkestoerrelse.sql kørt? Så kan sælgeren vælge pakkestørrelsen på varen. */
+  parcelReady?: boolean;
   /** Lukket show (0026_lukkede_shows.sql): "invite" eller "public". null: ikke sat op. */
   visibility?: "public" | "invite" | null;
   /** Sproget i showet (null: 0023_engelsk.sql er ikke kørt, så kan det ikke vælges). */
@@ -519,7 +521,7 @@ export default function StudioClient(props: Props) {
                   return (
                     editing === it.id ? (
                       <li key={it.id} className="lot-edit">
-                        <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} item={it} aiReady={props.aiReady} hideCats={props.hideCats} onSaved={saved} onCancel={() => setEditing(null)} />
+                        <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} item={it} aiReady={props.aiReady} hideCats={props.hideCats} parcelReady={props.parcelReady} onSaved={saved} onCancel={() => setEditing(null)} />
                       </li>
                     ) : authOpen === it.id ? (
                       <li key={it.id} className="lot-edit">
@@ -608,7 +610,7 @@ export default function StudioClient(props: Props) {
           </div>
           {!ended && !out ? (
             <div data-tour="item-form">
-              <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} aiReady={props.aiReady} hideCats={props.hideCats} onSaved={saved} />
+              <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} aiReady={props.aiReady} hideCats={props.hideCats} parcelReady={props.parcelReady} onSaved={saved} />
             </div>
           ) : null}
           {guestsReady && !out ? (

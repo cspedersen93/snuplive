@@ -11,6 +11,8 @@ import {
   RESERVATION_DAYS,
   bundleDiscount,
   orderAmounts,
+  PARCELS,
+  SHIP_PRICES_TEXT,
 } from "@/lib/pricing";
 import { createPublicClient } from "@/lib/supabase/public";
 
@@ -81,8 +83,8 @@ export default async function Saadan() {
               <span>at købe på: live, med Køb nu{offers ? " eller med et bud" : ""}.</span>
             </li>
             <li>
-              <b>{kr(ship)}</b>
-              <span>i fragt pr. pakke til pakkeshop. Afhentning er gratis.</span>
+              <b>Fra {kr(ship)}</b>
+              <span>i fragt pr. pakke til pakkeshop ({SHIP_PRICES_TEXT}). Afhentning er gratis.</span>
             </li>
             <li>
               <b>5 % + 5 kr</b>
@@ -179,7 +181,7 @@ export default async function Saadan() {
                 </tr>
                 <tr>
                   <th scope="row">Fragt til pakkeshop</th>
-                  <td>{kr(ship)} pr. pakke med DAO eller GLS, op til 5 kg</td>
+                  <td>{SHIP_PRICES_TEXT} pr. pakke med DAO eller GLS</td>
                 </tr>
                 <tr>
                   <th scope="row">Afhentning hos sælgeren</th>
@@ -226,8 +228,11 @@ export default async function Saadan() {
           </div>
           <ul className="howto-list">
             <li>
-              <b>Pakkeshop: {kr(ship)}</b>
-              <span>Vælg en DAO- eller GLS-pakkeshop, når du betaler. Samme pris op til 5 kg, og du kan følge pakken.</span>
+              <b>Pakkeshop: fra {kr(ship)}</b>
+              <span>
+                {kr(PARCELS.small.price)} for en lille pakke op til 1 kg, fx et par stykker tøj, og {kr(PARCELS.large.price)} for en stor pakke op til 5 kg,
+                fx sko, en lampe eller flere varer. Du ser prisen i kurven, vælger en DAO- eller GLS-pakkeshop og kan følge pakken.
+              </span>
             </li>
             <li>
               <b>Én pakke pr. sælger</b>

@@ -171,7 +171,7 @@ export default async function Forside() {
             <h2 className="rail-h" id="h-rail-tryg">Tryg handel</h2>
             <ul className="rail-checks">
               <li>Sælgeren får først pengene, når du har varen.</li>
-              <li>Alt fra samme sælger i én pakke, {DELIVERY.ship.price} kr til pakkeshop.</li>
+              <li>Alt fra samme sælger i én pakke, fra {DELIVERY.ship.price} kr til pakkeshop.</li>
               <li>14 dages fortrydelsesret, når du køber på afstand.</li>
             </ul>
             <Link className="rail-link" href="/saadan-virker-det#priser">Priser, fragt og rabat</Link>

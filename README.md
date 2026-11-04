@@ -187,7 +187,7 @@ Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der 
 
 ## Fragt med Shipmondo
 
-Køberen vælger en **DAO- eller GLS-pakkeshop** i kurven og betaler 49 kr i fragt pr. pakke (op til 5 kg). Sælgeren trykker
+Køberen vælger en **DAO- eller GLS-pakkeshop** i kurven og betaler fragt efter pakkens størrelse (se *Fragt efter vægt*). Sælgeren trykker
 **Lav fragtlabel** under Mine shows, printer labelen og afleverer pakken. Relived betaler labelen hos Shipmondo med de penge,
 køberen har betalt i fragt, og sælgeren får beløbet for varerne. Sporingen kommer fra Shipmondo, så ordren skifter selv til
 "Sendt", når pakken bliver scannet, og afsluttes 2 dage efter, at køberen har hentet den.
@@ -847,6 +847,21 @@ show, en vare eller en videoannonce. Kategorisiden findes alligevel, men er tom.
 - Koden: `lib/format.ts` (kategorien), `lib/categoryPages.tsx` (teksterne), `lib/categories.ts` (skjuler kategorien,
   indtil filen er kørt), `PICKUP_CATEGORIES` i `lib/pricing.ts` og billedet `public/img/cover-cykler.jpg` (Pexels).
 - 0017 og 0024 kender også den nye kategori, så de stadig kan køres igen uden fejl.
+
+## Fragt efter vægt
+
+**Kør `0030_pakkestoerrelse.sql` i Supabase → SQL Editor** (efter 0029). Indtil da bruger alle varer kategoriens
+pakkestørrelse, og feltet *Pakke* vises ikke i studiet. Alt andet virker.
+
+- **To priser:** 39 kr for en lille pakke op til 1 kg og 49 kr for en stor pakke på 1–5 kg (`PARCELS` i `lib/pricing.ts`).
+  Labelen koster ca. 34,80 kr og 39,80 kr uden moms hos Shipmondo (oktober 2026), så begge priser dækker labelen.
+- **Pakken på varen:** bolig og cykler er store pakker, resten små. Sælgeren kan ændre det under *Pakke*, når varen lægges
+  i køen eller rettes (`items.package_size`, tom = kategoriens standard).
+- **Pakken i kurven:** en lille vare tæller som et halvt kilo og en stor som to (`parcelFor`). To kjoler er altså stadig
+  39 kr, mens tre varer eller én stor vare er 49 kr. Kurven og betalingen på serveren bruger samme regel.
+- **Labelen:** den vægtklasse, køberen har betalt for, er valgt på forhånd, og sælgeren ser, hvad køberen har betalt.
+  Vælger sælgeren en tungere label, betaler Relived forskellen.
+- Test: `qa_vaegt.py` (med filen) og `qa_vaegt.py uden0030` (efter `SKIP=0030 bash restart_qa.sh`).
 
 ## App-rammen og forsiden som feed
 

@@ -23,7 +23,7 @@ export interface Pakkeshop {
   hours: string[];
 }
 
-/** Vægtklasser, sælgeren vælger imellem, når labelen laves. Køberen betaler det samme uanset vægt. */
+/** Vægtklasser, sælgeren vælger imellem, når labelen laves. De passer til fragten, køberen har betalt (PARCELS i lib/pricing.ts). */
 export const LABEL_WEIGHTS = [
   { grams: 1000, label: "Op til 1 kg", hint: "Fx tøj og vinyl" },
   { grams: 5000, label: "1–5 kg", hint: "Fx sko, jakker og flere varer" },

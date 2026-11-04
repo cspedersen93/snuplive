@@ -198,7 +198,7 @@ export const GUIDES: Guide[] = [
             <h3>11. Pak godt, og send hurtigt</h3>
             <p>
               Fold tøjet pænt, læg det i en pose, så det ikke bliver vådt, og derefter i en plastpose eller en kasse. På Relived
-              betaler køberen 49 kr i fragt til en pakkeshop, og du afleverer pakken i pakkeshoppen. Jo hurtigere du sender, jo
+              betaler køberen fragten til en pakkeshop (39 kr op til 1 kg, 49 kr op til 5 kg), og du afleverer pakken i pakkeshoppen. Jo hurtigere du sender, jo
               gladere er køberen.
             </p>
             <h3>12. Svar hurtigt og venligt</h3>
@@ -375,8 +375,8 @@ export const GUIDES: Guide[] = [
         h2: "Hvad med fragten?",
         body: (
           <p>
-            Køberen betaler fragten oven i prisen. På Relived koster det 49 kr til en pakkeshop, én gang pr. sælger, uanset hvor
-            mange varer køberen køber hos dig (op til 5 kg). Billige varer sælger derfor bedst, når køberen kan købe flere varer på
+            Køberen betaler fragten oven i prisen. På Relived koster det 39 kr til en pakkeshop for en lille pakke op til 1 kg og 49 kr
+            op til 5 kg, én gang pr. sælger, uanset hvor mange varer køberen køber hos dig. Billige varer sælger derfor bedst, når køberen kan købe flere varer på
             én gang, fx i et live-show.
           </p>
         ),
@@ -900,7 +900,7 @@ export const GUIDES: Guide[] = [
             </p>
             <h3>6. Kend den samlede pris</h3>
             <p>
-              Læg fragt og gebyrer til prisen. På Relived koster fragten 49 kr til en pakkeshop, én gang pr. sælger, og
+              Læg fragt og gebyrer til prisen. På Relived koster fragten 39 kr op til 1 kg og 49 kr op til 5 kg, én gang pr. sælger, og
               køberbeskyttelsen er 5 % + 5 kr pr. pakke. Køber du flere varer hos samme sælger, betaler du kun fragt én gang.
             </p>
           </>
@@ -948,7 +948,7 @@ export const GUIDES: Guide[] = [
         "Hvad gør jeg, hvis varen ikke er som beskrevet?",
         "Tryk Meld et problem på ordren, før du bekræfter, at du har fået den. Så holder vi pengene tilbage, sælgeren får besked, og vi hjælper jer med en løsning.",
       ],
-      ["Hvad koster fragten?", "På Relived koster fragten 49 kr til en pakkeshop, én gang pr. sælger, uanset hvor mange varer du køber hos sælgeren (op til 5 kg)."],
+      ["Hvad koster fragten?", "På Relived koster fragten til en pakkeshop 39 kr op til 1 kg og 49 kr op til 5 kg, én gang pr. sælger, uanset hvor mange varer du køber hos sælgeren."],
     ],
     related: ["er-designertasken-aegte", "hvad-er-live-shopping", "pris-paa-brugt-toej"],
     end: { h2: "Find dit næste fund", text: "Se brugt tøj og design på video, og køb med pengene holdt tilbage, til du har varen.", href: "/til-salg", label: "Se varer til salg" },
@@ -1181,7 +1181,7 @@ export const GUIDES: Guide[] = [
               basisdele i den lave. Se flere tal i guiden <Link href="/guides/pris-paa-brugt-toej">pris på brugt tøj</Link>.
             </p>
             <p>
-              Køberen betaler 49 kr i fragt pr. sælger (op til 5 kg). Det betyder, at forældre gerne køber flere dele på én gang, så
+              Køberen betaler fragt én gang pr. sælger (39 kr op til 1 kg, 49 kr op til 5 kg). Det betyder, at forældre gerne køber flere dele på én gang, så
               det kan betale sig at vise mange dele i samme live-show.
             </p>
           </>

@@ -4,7 +4,7 @@ import { itemMeta } from "@/components/Screen";
 import { CARRIERS, isCarrier, LABEL_WEIGHTS, trackingText } from "@/lib/carriers";
 import { ISSUE_REASONS, isIssueReason } from "@/lib/issues";
 import { clock, dayLabel, kr } from "@/lib/format";
-import { DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS, sellerPayout } from "@/lib/pricing";
+import { DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS, sellerPayout, PARCELS } from "@/lib/pricing";
 import { hasShipmondo, shipmondoSandbox } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -216,7 +216,13 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                         </div>
                       </div>
                     ) : labels ? (
-                      <LabelMaker orderId={o.id} weights={LABEL_WEIGHTS} hasAddress={Boolean(address)} />
+                      <LabelMaker
+                        orderId={o.id}
+                        weights={LABEL_WEIGHTS}
+                        hasAddress={Boolean(address)}
+                        paidGrams={o.shipping_amount >= PARCELS.large.price ? PARCELS.large.grams : PARCELS.small.grams}
+                        paidText={(() => { const p = o.shipping_amount >= PARCELS.large.price ? PARCELS.large : PARCELS.small; return `${p.label.toLowerCase()}, ${p.weight} (${o.shipping_amount} kr)`; })()}
+                      />
                     ) : (
                       <p className="fine">Fragtlabels er ikke slået til lige nu. Prøv igen senere.</p>
                     )}

@@ -3,7 +3,7 @@ import Link from "next/link";
 import CompanyInfo from "@/components/CompanyInfo";
 import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/company";
-import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS } from "@/lib/pricing";
+import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, RESERVATION_DAYS, PARCELS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Handelsbetingelser for købere",
@@ -41,7 +41,7 @@ export default function Handelsbetingelser() {
       <h2>3. Priser og gebyrer</h2>
       <ul>
         <li><b>Varen:</b> den pris, der står ved varen, eller dit vindende bud.</li>
-        <li><b>Fragt:</b> {DELIVERY.ship.price} kr pr. sælger til en DAO- eller GLS-pakkeshop, op til 5 kg. Alt, du køber hos samme sælger, kommer i én pakke. Afhentning hos sælgeren er gratis.</li>
+        <li><b>Fragt:</b> {PARCELS.small.price} kr for en lille pakke op til 1 kg og {PARCELS.large.price} kr for en stor pakke op til 5 kg, pr. sælger til en DAO- eller GLS-pakkeshop. Alt, du køber hos samme sælger, kommer i én pakke, og du ser fragten, før du betaler. Afhentning hos sælgeren er gratis.</li>
         <li><b>Køberbeskyttelse:</b> 5 % af varernes pris plus 5 kr pr. pakke. Den betaler for, at pengene bliver holdt tilbage, til du har fået dine varer.</li>
       </ul>
       <p>Alle priser er i danske kroner og med moms, hvor der skal betales moms. Du ser den samlede pris, før du betaler.</p>

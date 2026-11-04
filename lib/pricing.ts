@@ -1,12 +1,46 @@
 // Priser og regler for betaling. Bruges både i browseren og på serveren,
 // men serveren regner altid beløbene ud igen, før der bliver trukket penge.
 
+/**
+ * Fragten følger pakkens størrelse: lille op til 1 kg, stor op til 5 kg. Det er de samme to vægtklasser, sælgeren
+ * vælger imellem, når labelen laves (lib/carriers.ts). Labelen koster ca. 34,80 kr (op til 1 kg) og 39,80 kr (op til 5 kg)
+ * uden moms hos Shipmondo (oktober 2026).
+ */
+export const PARCELS = {
+  small: { label: "Lille pakke", weight: "op til 1 kg", price: 39, grams: 1000 },
+  large: { label: "Stor pakke", weight: "1–5 kg", price: 49, grams: 5000 },
+} as const;
+export type Parcel = keyof typeof PARCELS;
+export const isParcel = (v: unknown): v is Parcel => v === "small" || v === "large";
+
+/** Kategorier, hvor en vare som udgangspunkt er en stor pakke. Sælgeren kan ændre det på varen. */
+export const LARGE_CATEGORIES: readonly string[] = ["bolig", "cykler"];
+
+/** Pakkestørrelsen på én vare: sælgerens valg (items.package_size), ellers kategoriens standard. */
+export function itemParcel(i: { package_size?: string | null; category?: string | null }, showCategory?: string | null): Parcel {
+  if (isParcel(i.package_size)) return i.package_size;
+  return LARGE_CATEGORIES.includes(i.category ?? showCategory ?? "") ? "large" : "small";
+}
+
+/**
+ * Pakken for alt, køberen har købt hos én sælger. En lille vare tæller som et halvt kilo og en stor som to,
+ * så to kjoler er stadig en lille pakke, mens tre varer eller én stor vare giver en stor pakke.
+ */
+export function parcelFor(items: Parcel[]): Parcel {
+  const grams = items.reduce((a, p) => a + (p === "large" ? 2000 : 500), 0);
+  return grams <= PARCELS.small.grams ? "small" : "large";
+}
+
+/** "39 kr op til 1 kg og 49 kr op til 5 kg" */
+export const SHIP_PRICES_TEXT = `${PARCELS.small.price} kr op til 1 kg og ${PARCELS.large.price} kr op til 5 kg`;
+
 export const DELIVERY = {
   ship: {
     label: "Levering til pakkeshop",
     short: "Pakkeshop",
-    price: 49,
-    note: "Sendes med DAO eller GLS. Samme pris op til 5 kg.",
+    /** Den laveste fragt ("fra 39 kr"). Den rigtige pris følger pakken, se PARCELS. */
+    price: PARCELS.small.price,
+    note: "Sendes med DAO eller GLS.",
   },
   pickup: {
     label: "Afhent hos sælgeren",
@@ -29,12 +63,12 @@ export function buyerFee(items: number) {
 }
 
 /**
- * Beløbene for én pakke. `items` er varernes samlede pris, `discount` samlerabatten (se bundleDiscount).
+ * Beløbene for én pakke. `items` er varernes samlede pris, `discount` samlerabatten (se bundleDiscount), `parcel` pakkens størrelse.
  * I svaret er `items` beløbet efter rabatten: det, sælgeren får for varerne. Køberbeskyttelsen regnes af det.
  */
-export function orderAmounts(items: number, delivery: Delivery, discount = 0) {
+export function orderAmounts(items: number, delivery: Delivery, discount = 0, parcel: Parcel = "small") {
   const net = Math.max(0, items - Math.max(0, discount));
-  const shipping: number = DELIVERY[delivery].price;
+  const shipping: number = delivery === "ship" ? PARCELS[parcel].price : 0;
   const fee = buyerFee(net);
   return { gross: items, discount: items - net, items: net, shipping, fee, total: net + shipping + fee };
 }

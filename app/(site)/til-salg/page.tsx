@@ -32,7 +32,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title: { absolute: cat ? `${cat.label} til salg brugt | Relived`.slice(0, 60) : "Brugt til salg – køb nu til fast pris | Relived" },
     description:
-      "Køb brugt tøj, børnetøj, design og samleobjekter til fast pris. Alt er vist frem på video, så du ved, hvad du får. Fragt 49 kr til pakkeshop.",
+      "Køb brugt tøj, børnetøj, design og samleobjekter til fast pris. Alt er vist frem på video, så du ved, hvad du får. Fragt fra 39 kr til pakkeshop.",
     alternates: { canonical: href(cat?.slug ?? null, page) },
     // Filtrerede lister findes også som kategorisider, så kun den samlede liste skal i Google.
     robots: cat ? { index: false, follow: true } : undefined,

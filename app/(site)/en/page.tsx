@@ -4,7 +4,7 @@ import { IconCamera, IconChat, IconShield, IconShieldCheck, IconStar, IconUser }
 import ShowCard from "@/components/ShowCard";
 import SupportLink from "@/components/SupportLink";
 import { COMPANY } from "@/lib/company";
-import { DELIVERY } from "@/lib/pricing";
+import { DELIVERY, PARCELS } from "@/lib/pricing";
 import { fetchEnglishShows } from "@/lib/queries";
 import { paymentsAreTest } from "@/lib/stripe";
 
@@ -63,7 +63,7 @@ export default async function English() {
           </div>
           <ul className="points" style={{ marginTop: 22 }}>
             <li>The seller is paid only once you have the item</li>
-            <li>Delivery to a pickup point for {DELIVERY.ship.price} kr</li>
+            <li>Delivery to a pickup point from {DELIVERY.ship.price} kr</li>
             <li>No app needed</li>
           </ul>
           {test ? (
@@ -159,7 +159,7 @@ export default async function English() {
           </div>
           <ul className="sort-list">
             <li><b>Prices</b> are in Danish kroner (kr).</li>
-            <li><b>Delivery</b> is to DAO and GLS pickup points in Denmark, {DELIVERY.ship.price} kr per seller for up to 5 kg. Picking up from the seller is free.</li>
+            <li><b>Delivery</b> is to DAO and GLS pickup points in Denmark, {PARCELS.small.price} kr per seller for up to 1 kg and {PARCELS.large.price} kr for up to 5 kg. Picking up from the seller is free.</li>
             <li><b>Buyer protection</b> is 5 % of the items + 5 kr per parcel. You see the total before you pay.</li>
             <li><b>Our terms and privacy policy</b> are in Danish, and the Danish versions apply: <Link href="/handelsbetingelser" lang="da">Handelsbetingelser</Link>, <Link href="/vilkaar" lang="da">Vilkår</Link> and <Link href="/privatliv" lang="da">Privatlivspolitik</Link>.</li>
           </ul>
