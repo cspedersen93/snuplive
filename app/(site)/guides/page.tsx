@@ -5,7 +5,7 @@ import { SITE_URL } from "@/lib/env";
 import { GUIDES, guideHref } from "@/lib/guides";
 
 export const metadata: Metadata = {
-  title: { absolute: "Guides: køb og sælg brugt tøj og design | Relived" },
+  title: { absolute: "Guides: køb og sælg second hand | Relived" },
   description:
     "Gode råd til at købe og sælge brugt: sæt den rigtige pris, sælg live, tjek om en designertaske er ægte, og se reglerne for skat ved salg af brugt tøj.",
   alternates: { canonical: "/guides" },
@@ -45,7 +45,7 @@ export default function Guides() {
             <span>Guides</span>
           </nav>
           <span className="label red">Guides</span>
-          <h1 className="h1" id="h-guides">Guides til at købe og sælge brugt tøj og design</h1>
+          <h1 className="h1" id="h-guides">Guides til at købe og sælge second hand</h1>
           <p className="lede">
             Hvad skal brugt tøj koste? Er tasken ægte? Skal du betale skat? Her er svarene og de bedste råd til at købe og sælge
             brugt, skrevet så de er lige til at bruge.

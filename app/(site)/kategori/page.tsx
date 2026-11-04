@@ -3,9 +3,9 @@ import Link from "next/link";
 import CategoryCards from "@/components/CategoryCards";
 
 export const metadata: Metadata = {
-  title: { absolute: "Kategorier – brugt tøj, design og samleobjekter | Relived" },
+  title: { absolute: "Kategorier – køb second hand live på video | Relived" },
   description:
-    "Køb brugt dametøj, herretøj, børnetøj, cykler, design og samleobjekter live. Vælg en kategori, se varerne på video, og køb dem med ét tryk.",
+    "Find second hand i 9 kategorier: tøj, tasker, luksus, børn, cykler, bolig og samleobjekter. Se varerne live, og køb med ét tryk.",
   alternates: { canonical: "/kategori" },
 };
 
@@ -19,7 +19,7 @@ export default function Kategorier() {
             <span aria-hidden="true">/</span>
             <span>Kategorier</span>
           </nav>
-          <h1 className="h1" id="h-kategorier">Køb brugt tøj, design og samleobjekter – vælg en kategori</h1>
+          <h1 className="h1" id="h-kategorier">Køb second hand live – vælg en kategori</h1>
         </div>
       </section>
       <section className="sec tight" aria-label="Alle kategorier">

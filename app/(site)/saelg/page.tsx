@@ -3,9 +3,9 @@ import Link from "next/link";
 import { IconBolt, IconBox, IconCamera, IconCard, IconClip, IconList } from "@/components/Icons";
 
 export const metadata: Metadata = {
-  title: { absolute: "Sælg brugt tøj og andre varer live – gratis i beta | Relived" },
+  title: { absolute: "Sælg second hand live på video – gratis i beta | Relived" },
   description:
-    "Gå live fra telefonen, vis dine varer frem, og sælg en hel bunke på én aften. Navn og pris er nok, og det er gratis at sælge i beta.",
+    "Gå live fra telefonen, og sælg en hel bunke på én aften: brugte fund, ubrugte fejlkøb og nye restpartier. Gratis at sælge i beta.",
   alternates: { canonical: "/saelg" },
 };
 
@@ -19,7 +19,7 @@ export default function Saelg() {
             <span aria-hidden="true">/</span>
             <span>Sælg live</span>
           </nav>
-          <h1 className="h1" id="h-saelg">Sælg brugt tøj og andre varer live på video</h1>
+          <h1 className="h1" id="h-saelg">Sælg second hand live på video</h1>
           <p className="lede">
             <b>Sælg brugte fund, ubrugte fejlkøb og nye restpartier live.</b> Glem at fotografere og skrive en annonce til hver eneste vare. Gå live fra telefonen, vis varerne frem én ad gangen, og
             sælg en hel bunke på én aften.

@@ -87,7 +87,7 @@ export default async function Forside() {
             <h1 id="h-forside" className="feed-h1">
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
-            <p className="feed-lede">Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
+            <p className="feed-lede">Brugt, som ny eller med prismærket på. Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
           </div>
 
           <nav className="feed-tabs" aria-label="Vis">
