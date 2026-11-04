@@ -87,7 +87,7 @@ export default async function Forside() {
             <h1 id="h-forside" className="feed-h1">
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
-            <p className="feed-lede">Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
+            <p className="feed-lede">Brugt, som ny eller med prismærket på. Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
           </div>
 
           <nav className="feed-tabs" aria-label="Vis">
@@ -246,8 +246,8 @@ export default async function Forside() {
             <span className="label red">Til sælgere</span>
             <h2 className="h2" id="h-saelg" style={{ maxWidth: "16ch" }}>Har du selv noget, der skal videre?</h2>
             <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>
-              Gå live fra stuen, og sælg en hel bunke på én aften i stedet for at lægge annoncer op én ad gangen. Det er gratis at
-              sælge, mens vi er i beta.
+              Sælg brugte fund, ubrugte fejlkøb og nye restpartier live. Gå live fra stuen eller butikken, og sælg en hel bunke på
+              én aften i stedet for at lægge annoncer op én ad gangen. Det er gratis at sælge, mens vi er i beta.
             </p>
             <Link className="btn btn-red" href="/saelg">Sådan sælger du live</Link>
           </article>

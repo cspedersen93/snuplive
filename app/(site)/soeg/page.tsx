@@ -21,8 +21,8 @@ type Props = { searchParams: Promise<{ q?: string; kategori?: string; maks?: str
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const s = parseSearch(await searchParams);
   return {
-    title: searchable(s) ? `Søg: ${searchLabel(s)}`.slice(0, 50) : "Søg i brugt tøj og design",
-    description: "Søg i brugt tøj, design og samleobjekter, der er til salg nu, live nu eller bliver vist snart på Relived.",
+    title: searchable(s) ? `Søg: ${searchLabel(s)}`.slice(0, 50) : "Søg i varer, shows og sælgere",
+    description: "Søg i varer, shows og sælgere: second hand til salg nu, live nu eller snart på Relived.",
     // Søgeresultater skal ikke i Google (de skifter hele tiden). Linkene på siden må gerne følges.
     robots: { index: false, follow: true },
     alternates: { canonical: "/soeg" },
@@ -60,7 +60,7 @@ export default async function Soeg({ searchParams }: Props) {
             <span aria-hidden="true">/</span>
             <span>Søg</span>
           </nav>
-          <h1 className="h2" id="h-soeg">Søg i brugt tøj og design</h1>
+          <h1 className="h2" id="h-soeg">Søg i varer, shows og sælgere</h1>
           <p className="lede">Find det, der er til salg nu, live nu og bliver vist snart. Gem søgningen, så får du besked, når der kommer nyt.</p>
           <SearchForm s={s} autoFocus={!can} />
         </div>
