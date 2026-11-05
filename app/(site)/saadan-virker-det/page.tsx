@@ -299,7 +299,7 @@ export default async function Saadan() {
             <div><IconChat /><h3>Hjælp, hvis noget går galt</h3><p>Tryk Meld et problem på ordren, inden pengene bliver udbetalt. Så holder vi pengene tilbage og hjælper jer med at finde en løsning.</p></div>
             <div><IconShieldCheck className="ico" /><h3>Mærkevarer bliver tjekket</h3><p>Designertasker, ure og andre mærkevarer bliver ægthedstjekket, før de kan købes. Er en vare falsk, får du alle pengene tilbage.</p></div>
             <div><IconStar /><h3>Bedømmelser</h3><p>Efter hver handel kan køberen give sælgeren stjerner, så du kan se, hvem du handler med.</p></div>
-            <div><IconUser className="ico" /><h3>Sælgere med MitID</h3><p>Ved lanceringen bliver alle sælgere verificeret med MitID, før de kan sælge.</p></div>
+            <div><IconUser className="ico" /><h3>Sælgerne bliver tjekket</h3><p>Før en sælger kan få penge udbetalt, skal sælgeren bekræfte sin identitet hos vores betalingspartner Stripe.</p></div>
           </div>
           <p className="muted howto-note">
             Køber du hos en virksomhed, har du 14 dages fortrydelsesret. Køb fra privatpersoner er ikke omfattet. Det står ved sælgeren på

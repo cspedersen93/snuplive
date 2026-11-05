@@ -879,7 +879,7 @@ export const GUIDES: Guide[] = [
             <h3>4. Tjek bedømmelser og profil</h3>
             <p>
               Se, hvad tidligere købere har skrevet, og hvor længe sælgeren har været aktiv. På Relived kan du også se, om sælgeren
-              er privat eller virksomhed, og om sælgeren har bekræftet sig med MitID.
+              er privat eller virksomhed.
             </p>
             <p>
               Det har betydning for dine rettigheder: køber du af en virksomhed, har du 14 dages fortrydelsesret og 2 års

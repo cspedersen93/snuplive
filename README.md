@@ -25,7 +25,7 @@ Det, der ikke bliver solgt, kan købes bagefter til fast pris. Det hele kører i
 - Kategorien Cykler og barnevogne med afhentning hos sælgeren (se *Kategorien Cykler og barnevogne*)
 - Én side med det hele for køberne: `/saadan-virker-det` (køb, priser med regneeksempel, fragt, rabat og bud, tryg handel, sælg og sortering). Tallene kommer fra `lib/pricing.ts`, og samlerabat og bud står der først, når 0027 og 0028 er kørt (siden opdateres hvert minut)
 
-MitID kommer senere (se nederst).
+MitID er sat på pause, fordi Iduras abonnement er dyrt i starten. Koden er klar (se nederst), og siden lover det ikke længere: Sådan virker det, FAQ, guiden og den engelske side siger i stedet, at sælgerne bekræfter deres identitet hos Stripe, før de får penge udbetalt. Slår I MitID til igen, så ret de tekster tilbage.
 
 ## Det skal du bruge
 

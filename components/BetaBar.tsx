@@ -28,7 +28,7 @@ export default async function BetaBar() {
       <div className="wrap">
         <span className="live-dot" aria-hidden="true" />
         <span>
-          <b>Beta:</b> du kan gå live, købe og betale med MobilePay eller kort. MitID kommer inden lanceringen.
+          <b>Beta:</b> du kan gå live, købe og betale med MobilePay eller kort.
         </span>
       </div>
     </div>

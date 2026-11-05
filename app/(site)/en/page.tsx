@@ -147,7 +147,7 @@ export default async function English() {
             <div><IconStar /><h3>Seller ratings</h3><p>After every order the buyer can rate the seller, so you can see who you&apos;re buying from.</p></div>
             <div><IconShieldCheck className="ico" /><h3>Designer items are checked</h3><p>Designer bags, watches and other luxury brands are checked for authenticity by Relived before they can be bought. If an item turns out to be fake, you get all your money back.</p></div>
             <div><IconChat /><h3>Help if something goes wrong</h3><p>Tap Meld et problem (Report a problem) on your order before the seller is paid. We hold the money and help you find a solution.</p></div>
-            <div><IconUser className="ico" /><h3>Verified sellers</h3><p>At launch, every seller is verified with MitID, the Danish digital ID, before they can sell.</p></div>
+            <div><IconUser className="ico" /><h3>Verified sellers</h3><p>Before a seller can be paid out, they must confirm their identity with our payment partner Stripe.</p></div>
           </div>
         </div>
       </section>

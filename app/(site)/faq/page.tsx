@@ -53,7 +53,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
   {
     title: "Tryghed",
     qa: [
-      ["Hvordan ved jeg, at sælgeren er til at stole på?", "Du kan se sælgerens stjerner fra tidligere handler ved sælgerens navn, og om sælgeren er privat eller en virksomhed. Ved lanceringen bliver alle sælgere også verificeret med MitID."],
+      ["Hvordan ved jeg, at sælgeren er til at stole på?", "Du kan se sælgerens stjerner fra tidligere handler ved sælgerens navn, og om sælgeren er privat eller en virksomhed. Før en sælger kan få penge udbetalt, skal sælgeren også bekræfte sin identitet hos vores betalingspartner Stripe."],
       ["Hvad hvis varen ikke er som vist?", "Tryk Meld et problem på ordren under Mine køb, før du bekræfter, at du har fået varerne. Så holder vi pengene tilbage, sælgeren får besked, og vi hjælper jer med at finde en løsning."],
       ["Hvad gør jeg, hvis nogen skriver grimme ting i chatten?", "Sælgeren kan fjerne beskeder og blokere brugere i sine shows. En blokeret bruger kan hverken skrive eller købe hos sælgeren. Ser du noget, der ikke er i orden, så skriv til kontakt@relived.dk."],
     ],
