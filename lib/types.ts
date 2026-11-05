@@ -42,6 +42,8 @@ export interface Show {
   cam_layout?: CamLayout;
   /** Sproget i showet (0023_engelsk.sql). Ikke med i SHOW_COLS; lister sætter det med englishShows(). */
   language?: ShowLanguage;
+  /** Nedtælling til live (0034_nedtaelling.sql). Ikke med i SHOW_COLS; hentes for sig og kommer med i realtid. */
+  countdown_to?: string | null;
 }
 
 export type ShowLanguage = "da" | "en";

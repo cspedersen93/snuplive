@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
 import { isGuest } from "@/lib/guests";
+import { fetchCountdown } from "@/lib/countdown";
 import { ITEM_COLS, MESSAGE_COLS, SHOW_COLS, type Item, type Message, type Show } from "@/lib/types";
 import ChatScreen from "./ChatScreen";
 
@@ -30,7 +31,7 @@ export default async function ChatSkaerm({ params }: { params: Promise<{ id: str
   ]);
   return (
     <ChatScreen
-      show={show as Show}
+      show={{ ...(show as Show), countdown_to: (await fetchCountdown(supabase, id)).countdownTo }}
       items={(items.data ?? []) as Item[]}
       messages={((messages.data ?? []) as Message[]).reverse()}
       me={{ id: profile.id, handle: profile.handle }}

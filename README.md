@@ -1006,6 +1006,23 @@ Der skal ikke køres noget i Supabase.
   Siden har ingen menu og bund (`app/(skaerm)/`).
 - **I studiets almindelige chat** er spørgsmål også gule.
 
+## Nedtælling til live
+
+**Kør `0034_nedtaelling.sql` i Supabase → SQL Editor** (efter 0033). Indtil da er der kun *Gå live nu* i studiet.
+
+- **I studiet:** når kameraet er tændt, står der *Gå live nu* og *Start en nedtælling i stedet* med 1, 3, 5 eller 10
+  minutter. Under nedtællingen ser sælgeren *Live om 4:59* over sit eget billede (ingen seere kan se kameraet endnu)
+  og kan trykke *Gå live nu* eller *Stop nedtælling*. Når tiden er gået, kommer 3-2-1, og studiet går selv live. Det
+  kræver, at studiet er åbent, og kameraet virker.
+- **Seerne** ser *Live om 4:32* på showets side, og chatten er åben, mens der tælles ned (og et kvarter efter, hvis
+  sælgeren ikke når at gå live). Siden skifter selv til video. Chatskærmen (`/studio/[id]/chat`) viser også nedtællingen.
+- **Beskeden** til følgerne og dem, der har trykket *Husk mig*, kommer, når nedtællingen starter: "@maja går live om
+  5 minutter". Der kommer ikke en ekstra besked, når showet går live.
+- Showets starttidspunkt flyttes til nedtællingens slut, så showet står øverst under *Snart live*. Nedtællingen ryddes
+  af sig selv, når showet går live eller slutter.
+- Koden: `lib/countdown.ts`, studiet (`StudioClient.tsx`), showets side (`ShowClient.tsx`) og
+  `app/api/shows/[id]/notify/route.ts`.
+
 ## App-rammen og forsiden som feed
 
 Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal ikke køres noget i Supabase.

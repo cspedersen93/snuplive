@@ -6,6 +6,7 @@ import Chat from "@/components/Chat";
 import { useShowRealtime } from "@/components/useShowRealtime";
 import { useWakeLock } from "@/components/useWakeLock";
 import { isAuction } from "@/lib/auction";
+import { countingDown, mmss } from "@/lib/countdown";
 import { kr } from "@/lib/format";
 import type { Item, Message, Show } from "@/lib/types";
 
@@ -72,6 +73,8 @@ export default function ChatScreen(props: {
   }
 
   const live = show.status === "live";
+  const counting = countingDown(show, now);
+  const countLeft = counting && show.countdown_to ? Date.parse(show.countdown_to) - now : null;
   const current = items.find((i) => i.id === show.current_item_id) ?? null;
   return (
     <div className="cscreen" style={{ ["--cs" as string]: SCALES[scale] }}>
@@ -82,6 +85,8 @@ export default function ChatScreen(props: {
               <span className="live-dot white" />
               Live
             </span>
+          ) : countLeft !== null ? (
+            <span className="chip live">Live om {mmss(countLeft)}</span>
           ) : (
             <span className="chip">{show.status === "ended" ? "Slut" : "Ikke live"}</span>
           )}
@@ -115,7 +120,7 @@ export default function ChatScreen(props: {
         showId={show.id}
         messages={messages}
         me={props.me}
-        live={live}
+        live={live || counting}
         loginHref={`/login?next=/studio/${show.id}/chat`}
         canModerate={props.canModerate}
       />

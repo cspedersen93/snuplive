@@ -30,6 +30,7 @@ import type { CamLayout, Item, Message, Profile, SellerFactsData, Show } from "@
 import type { Guest } from "@/lib/guests";
 import type { Room } from "livekit-client";
 import { LevelChip } from "@/components/Level";
+import { countingDown, mmss } from "@/lib/countdown";
 import { useLevels } from "@/components/useLevels";
 import type { MemberLevel } from "@/lib/levels";
 
@@ -109,7 +110,8 @@ export default function ShowClient(props: Props) {
   const live = show.status === "live";
   const current = items.find((i) => i.id === show.current_item_id) ?? null;
   const rushing = Boolean(current?.rush_ends_at || (current?.auction_ends_at && current.status === "live"));
-  const now = useNow(rushing ? 250 : live ? 5000 : 30000);
+  const hasCountdown = show.status === "planned" && Boolean(show.countdown_to);
+  const now = useNow(rushing ? 250 : hasCountdown ? 1000 : live ? 5000 : 30000);
   const handle = props.seller.handle;
   const loginHref = `/login?next=${encodeURIComponent(`/live/${handle}`)}`;
   const meKey = me === undefined ? "wait" : (me?.id ?? "guest");
@@ -339,6 +341,9 @@ export default function ShowClient(props: Props) {
 
   const cover = showImage({ ...show, status: "planned", seller: props.seller });
   const startsIn = show.starts_at ? Date.parse(show.starts_at) - (now + offset) : null;
+  // Nedtælling til live (0034_nedtaelling.sql): stor nedtælling, og chatten er åben.
+  const counting = countingDown(show, now + offset);
+  const countLeft = counting && show.countdown_to ? Date.parse(show.countdown_to) - (now + offset) : null;
   const chatLines = messages.slice(-5);
   const levelOf = useLevels(chatLines.map((m) => (m.kind === "event" ? null : m.user_id)));
   const soldCount = items.filter((i) => i.status === "sold").length;
@@ -488,7 +493,21 @@ export default function ShowClient(props: Props) {
 
               {!live ? (
                 <div className="pre-live">
-                  {show.status === "planned" ? (
+                  {show.status === "planned" && countLeft !== null ? (
+                    <>
+                      <span className="label" style={{ color: "#fff" }}>
+                        <span className="live-dot white" aria-hidden="true" style={{ marginRight: 8 }} />
+                        Live om
+                      </span>
+                      <div className="cd-big" role="timer" aria-live="off">{countLeft > 0 ? mmss(countLeft) : "0:00"}</div>
+                      <span style={{ maxWidth: "30ch" }}>
+                        {countLeft > 0
+                          ? "@" + handle + " gør klar. Skriv hej i chatten, mens du venter."
+                          : "Går live om et øjeblik …"}
+                      </span>
+                      <span style={{ fontSize: ".85rem", opacity: 0.8 }}>Siden skifter selv til video, når showet starter.</span>
+                    </>
+                  ) : show.status === "planned" ? (
                     <>
                       <span className="label" style={{ color: "#fff" }}>Næste show</span>
                       <strong style={{ fontSize: "1.4rem", lineHeight: 1.2 }}>{when(show.starts_at)}</strong>
@@ -620,7 +639,7 @@ export default function ShowClient(props: Props) {
         </div>
 
         <aside className="show-side" aria-label="Chat">
-          <Chat showId={show.id} messages={messages} me={me} live={live} loginHref={loginHref} canModerate={Boolean(me && me.id === show.seller_id)} />
+          <Chat showId={show.id} messages={messages} me={me} live={live || counting} loginHref={loginHref} canModerate={Boolean(me && me.id === show.seller_id)} />
           <div style={{ display: "flex", gap: 8 }}>
             <Link className="btn btn-line btn-block" href="/kurv">Mine køb</Link>
             <button className="icon-btn" type="button" onClick={share} aria-label="Del showet">

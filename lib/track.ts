@@ -6,7 +6,7 @@ import { track as vaTrack } from "@vercel/analytics";
  * En hændelse til statistikken (Vercel Web Analytics), fx "Køb" eller "Gik live". Ingen personlige oplysninger.
  * Hændelser vises først i Vercel med Pro-abonnementet. Uden statistik (fx lokalt) sker der ingenting.
  */
-export function track(name: "Køb" | "Bud" | "Maks-bud" | "Gik live" | "Følg" | "Venteliste" | "Nyhedsbrev" | "Delte klip" | "Søgeagent" | "Søgning", props?: Record<string, string | number | boolean>) {
+export function track(name: "Køb" | "Bud" | "Maks-bud" | "Gik live" | "Nedtælling" | "Følg" | "Venteliste" | "Nyhedsbrev" | "Delte klip" | "Søgeagent" | "Søgning", props?: Record<string, string | number | boolean>) {
   try {
     vaTrack(name, props);
   } catch {

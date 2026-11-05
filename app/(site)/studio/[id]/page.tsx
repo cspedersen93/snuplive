@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import MitIdResult from "@/components/MitIdResult";
 import { mitidState } from "@/lib/mitid";
 import { videoShowId } from "@/lib/videoShow";
+import { fetchCountdown } from "@/lib/countdown";
 import { isGuest, showGuests } from "@/lib/guests";
 import { ITEM_COLS, MESSAGE_COLS, SHOW_COLS, type CamLayout, type Item, type Message, type Profile, type Show, type ShowLanguage } from "@/lib/types";
 import StudioClient, { type StudioSale } from "./StudioClient";
@@ -44,6 +45,8 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
   ]);
   // Lukket show (0026_lukkede_shows.sql).
   const visQ = await supabase.from("shows").select("visibility").eq("id", id).maybeSingle();
+  // Nedtælling til live (0034_nedtaelling.sql).
+  const cd = await fetchCountdown(supabase, id);
   const host = (role === "guest" ? hostQ.data : profile) as Pick<Profile, "id" | "handle" | "display_name" | "area" | "avatar_path"> | null;
   if (!host) notFound();
 
@@ -63,7 +66,8 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
     <>
     <StudioClient
       profile={profile}
-      show={show as Show}
+      show={{ ...(show as Show), countdown_to: cd.countdownTo }}
+      countdownReady={cd.ready}
       items={(items.data ?? []) as Item[]}
       messages={((messages.data ?? []) as Message[]).reverse()}
       sales={(sales.data ?? []) as unknown as StudioSale[]}

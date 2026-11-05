@@ -20,6 +20,7 @@ import { videoShowId } from "@/lib/videoShow";
 import { showGuests, type Guest } from "@/lib/guests";
 import { BadgeList, LevelChip } from "@/components/Level";
 import { fetchLevel, type MemberLevel } from "@/lib/levels";
+import { fetchCountdown } from "@/lib/countdown";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,9 @@ const load = cache(async (rawHandle: string) => {
     base().eq("status", "planned").order("starts_at", { ascending: true, nullsFirst: false }).limit(1).maybeSingle(),
     ended().order("ended_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
-  const show = (liveQ.data ?? nextQ.data ?? lastQ.data ?? null) as Show | null;
+  const picked = (liveQ.data ?? nextQ.data ?? lastQ.data ?? null) as Show | null;
+  // Nedtælling til live (0034_nedtaelling.sql): hentes for sig, så siden virker, før filen er kørt.
+  const show = picked && picked.status === "planned" ? { ...picked, countdown_to: (await fetchCountdown(sb, picked.id)).countdownTo } : picked;
 
   let items: Item[] = [];
   let messages: Message[] = [];

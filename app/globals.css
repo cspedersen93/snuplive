@@ -1078,6 +1078,12 @@ body:has(.app-banner) .sup-fab{display:none}
 .cscreen .cmsg.event{font-size:calc(.86rem * var(--cs))}
 .cscreen .chat-form input{font-size:1.05rem}
 body:has(.cscreen) .sup-fab{display:none}
+/* Nedtælling til live (0034_nedtaelling.sql) */
+.cd-big{font-family:var(--mono);font-weight:600;font-size:min(18cqw,96px);line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums;text-shadow:0 2px 18px rgba(0,0,0,.45)}
+.cd-pick{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin-top:2px}
+.cd-pick span{font-weight:600;margin-right:2px}
+.cd-pick .btn{min-width:64px}
+.pre-live .linkbtn{color:#fff;opacity:.85}
 .mitid-status{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:.92rem}
 .mitid-status p{margin:0;flex:1 1 260px}
 .setting-toggle{padding:14px 16px;border:1px solid var(--line);border-radius:14px}

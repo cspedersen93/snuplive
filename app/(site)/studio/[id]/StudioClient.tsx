@@ -30,6 +30,7 @@ import StudioTour from "./StudioTour";
 import Reactions from "@/components/Reactions";
 import BigChat, { CHAT_SIZES, CHAT_SIZE_KEY, readChatSize, type ChatSize } from "@/components/BigChat";
 import { useWakeLock } from "@/components/useWakeLock";
+import { COUNTDOWN_MINUTES, countingDown, mmss } from "@/lib/countdown";
 import type { Room } from "livekit-client";
 
 export interface StudioSale {
@@ -58,6 +59,8 @@ interface Props {
   camLayout?: CamLayout | null;
   /** Claude er sat op: "Udfyld med AI" i formularen. */
   aiReady?: boolean;
+  /** Nedtælling til live kan bruges (0034_nedtaelling.sql er kørt). */
+  countdownReady?: boolean;
   /** Kategorier, hvis fil ikke er kørt endnu (lib/categories.ts). */
   hideCats?: readonly string[];
   /** Er 0030_pakkestoerrelse.sql kørt? Så kan sælgeren vælge pakkestørrelsen på varen. */
@@ -141,6 +144,9 @@ export default function StudioClient(props: Props) {
 
   const live = show.status === "live";
   const ended = show.status === "ended";
+  // Nedtælling til live (0034_nedtaelling.sql). Studiet går selv live, når tiden er gået.
+  const counting = countingDown(show, now + offset);
+  const countLeft = counting && show.countdown_to ? Date.parse(show.countdown_to) - (now + offset) : null;
   const current = items.find((i) => i.id === show.current_item_id) ?? null;
   const sold = items.filter((i) => i.status === "sold");
   // Omsætningen er ens egen (gæsternes salg går til gæsterne).
@@ -440,6 +446,28 @@ export default function StudioClient(props: Props) {
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
+
+  // Nedtællingen er slut: 3-2-1 og live (kun værten, og kun når kameraet virker).
+  const autoLive = useRef(false);
+  useEffect(() => {
+    if (!isHost || countLeft === null || autoLive.current || count !== null || busy || !cameraReady) return;
+    if (countLeft <= 2400) {
+      autoLive.current = true;
+      setCount(3);
+    }
+  }, [isHost, countLeft, count, busy, cameraReady]);
+
+  const [pickCountdown, setPickCountdown] = useState(false);
+  async function startCountdown(minutes: number) {
+    setPickCountdown(false);
+    autoLive.current = false;
+    const ok = await rpc("start_countdown", { p_show: show.id, p_minutes: minutes }, `Nedtællingen er startet. Du går live om ${minutes} min.`);
+    // Følgerne og dem, der har trykket Husk mig, får besked nu, så de når at være klar.
+    if (ok) {
+      void fetch(`/api/shows/${show.id}/notify`, { method: "POST" }).catch(() => undefined);
+      track("Nedtælling", { minutter: minutes });
+    }
+  }
 
   async function endShow() {
     setConfirmEnd(false);
@@ -773,6 +801,27 @@ export default function StudioClient(props: Props) {
                 <div className="pre-live">
                   {count !== null ? (
                     <div className="count" aria-live="assertive">{count}</div>
+                  ) : counting && countLeft !== null ? (
+                    <>
+                      <span className="label" style={{ color: "#fff" }}>Live om</span>
+                      <div className="cd-big" role="timer" aria-live="off">{mmss(countLeft)}</div>
+                      <span style={{ maxWidth: "32ch" }}>
+                        {cameraOn && cameraReady
+                          ? "Seerne ser nedtællingen, og chatten er åben. Ingen kan se dit kamera endnu."
+                          : "Tænd kameraet, så du går live af dig selv, når tiden er gået."}
+                      </span>
+                      {!cameraOn ? (
+                        <button className="btn btn-red" type="button" onClick={() => setCameraOn(true)}>Tænd kameraet</button>
+                      ) : (
+                        <button className="btn btn-red" type="button" disabled={!cameraReady || busy} onClick={() => { autoLive.current = true; setCount(3); }}>
+                          <span className="live-dot white" aria-hidden="true" />
+                          Gå live nu
+                        </button>
+                      )}
+                      <button className="linkbtn" type="button" disabled={busy} onClick={() => rpc("stop_countdown", { p_show: show.id }, "Nedtællingen er stoppet.")}>
+                        Stop nedtælling
+                      </button>
+                    </>
                   ) : props.needsMitid ? (
                     <>
                       <strong style={{ fontSize: "1.3rem" }}>Bekræft, hvem du er</strong>
@@ -794,8 +843,24 @@ export default function StudioClient(props: Props) {
                       </ul>
                       <button className="btn btn-red" type="button" disabled={!cameraReady || busy} onClick={() => setCount(3)}>
                         <span className="live-dot white" aria-hidden="true" />
-                        Gå live
+                        Gå live nu
                       </button>
+                      {props.countdownReady ? (
+                        pickCountdown ? (
+                          <div className="cd-pick" role="group" aria-label="Start nedtælling">
+                            <span>Gå live om</span>
+                            {COUNTDOWN_MINUTES.map((m) => (
+                              <button key={m} className="btn btn-line btn-sm" type="button" disabled={busy} onClick={() => startCountdown(m)}>
+                                {m} min
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <button className="linkbtn cd-open" type="button" disabled={busy} onClick={() => setPickCountdown(true)}>
+                            Start en nedtælling i stedet
+                          </button>
+                        )
+                      ) : null}
                     </>
                   )}
                   {videoErr ? <span className="err-msg" role="alert">{videoErr}</span> : null}
@@ -984,7 +1049,7 @@ export default function StudioClient(props: Props) {
         </div>
 
         <aside className="show-side" aria-label="Styring og chat" data-tour="chat">
-          <Chat showId={show.id} messages={messages} me={me} live={live} loginHref="/login" hint="Seerne skriver her" canModerate={isHost} />
+          <Chat showId={show.id} messages={messages} me={me} live={live || counting} loginHref="/login" hint="Seerne skriver her" canModerate={isHost} />
         </aside>
       </div>
 

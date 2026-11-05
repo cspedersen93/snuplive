@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 /**
  * Sælgeren er gået live: besked til alle, der har trykket "Husk mig", til sælgerens følgere og til følgerne af gæsterne i showet.
  * Har man slået besked på telefonen til, får man den der. Ellers en mail. Sker kun én gang pr. show.
+ * Starter sælgeren en nedtælling (0034_nedtaelling.sql), kommer beskeden allerede da: "går live om 5 minutter".
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,16 +21,23 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const uid = await getUserId(await createClient());
   if (!uid) return fail("Log ind igen.", 401);
 
+  // Live, eller en nedtælling, der er i gang.
+  const cd = await admin.from("shows").select("status,countdown_to").eq("id", id).maybeSingle();
+  const row = cd.error ? null : (cd.data as { status: string; countdown_to: string | null } | null);
+  const soonMs = row?.status === "planned" && row.countdown_to ? Date.parse(row.countdown_to) - Date.now() : null;
+  const soon = soonMs !== null && soonMs > 0;
   const { data: claimed } = await admin
     .from("shows")
     .update({ notified_at: new Date().toISOString() })
     .eq("id", id)
     .eq("seller_id", uid)
-    .eq("status", "live")
+    .eq("status", soon ? "planned" : "live")
     .is("notified_at", null)
     .select("id,title,seller_id");
   const show = claimed?.[0] as { id: string; title: string; seller_id: string } | undefined;
   if (!show) return json({ sent: 0, pushed: 0 });
+  const mins = soon ? Math.max(1, Math.round((soonMs as number) / 60_000)) : 0;
+  const inText = mins === 1 ? "om 1 minut" : `om ${mins} minutter`;
   // Søgeagenterne: varer i showet, der passer til gemte søgninger, er live nu.
   after(() => sweepSearchAlerts(0));
   const { data: prof } = await admin.from("profiles").select("handle").eq("id", show.seller_id).maybeSingle();
@@ -86,7 +94,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   const direct = [...people.entries()].filter(([, p]) => !p.viaGuest).map(([u]) => u);
   const pushed = await sendPush(admin, direct, {
-    title: `@${handle} er live nu`,
+    title: soon ? `@${handle} går live ${inText}` : `@${handle} er live nu`,
     body: show.title,
     url: path,
     tag: `live-${show.id}`,
@@ -96,7 +104,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   for (const [u, p] of people) if (p.viaGuest) byGuest.set(p.viaGuest, [...(byGuest.get(p.viaGuest) ?? []), u]);
   for (const [g, users] of byGuest) {
     const got = await sendPush(admin, users, {
-      title: `@${g} er live hos @${handle}`,
+      title: soon ? `@${g} går live hos @${handle} ${inText}` : `@${g} er live hos @${handle}`,
       body: show.title,
       url: path,
       tag: `live-${show.id}`,
@@ -108,13 +116,23 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     .filter(([userId, p]) => !pushed.has(userId) && p.email)
     .map(([, p]) => ({
       to: p.email,
-      subject: p.viaGuest ? `@${p.viaGuest} er live hos @${handle}: ${show.title}` : `@${handle} er live nu: ${show.title}`,
+      subject: soon
+        ? p.viaGuest
+          ? `@${p.viaGuest} går live hos @${handle} ${inText}: ${show.title}`
+          : `@${handle} går live ${inText}: ${show.title}`
+        : p.viaGuest
+          ? `@${p.viaGuest} er live hos @${handle}: ${show.title}`
+          : `@${handle} er live nu: ${show.title}`,
       text: [
         "Hej",
         "",
-        p.viaGuest
-          ? `@${p.viaGuest} er med som gæst i @${handle}s show "${show.title}", som er live nu.`
-          : `@${handle} er gået live med showet "${show.title}".`,
+        soon
+          ? p.viaGuest
+            ? `@${p.viaGuest} er med som gæst i @${handle}s show "${show.title}", som går live ${inText}.`
+            : `@${handle} går live med showet "${show.title}" ${inText}. Chatten er allerede åben.`
+          : p.viaGuest
+            ? `@${p.viaGuest} er med som gæst i @${handle}s show "${show.title}", som er live nu.`
+            : `@${handle} er gået live med showet "${show.title}".`,
         p.items.length ? `Du bad os huske dig på: ${p.items.join(", ")}.` : "",
         "",
         `Se med og køb: ${link}`,
