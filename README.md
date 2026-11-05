@@ -961,6 +961,31 @@ af de nye filtre, står der, at de bliver sat op.
   Slidt) i stedet for at skrive selv, så filteret virker. Varer med en gammel, fritskrevet stand beholder den. Den tæller
   med i filteret, hvis den begynder med et af ordene (fx "God stand, lidt fnuller").
 
+## Appen på hjemmeskærmen
+
+Relived kan lægges på hjemmeskærmen som en app (en PWA). Der skal ikke køres noget i Supabase, og der er ingen
+App Store eller Google Play.
+
+- **`/app`** forklarer, hvordan man henter appen, med faner for iPhone og iPad, Android og computer (den, man bruger,
+  vises først). Kan browseren installere med ét tryk (Chrome og Edge), står knappen *Hent appen* øverst. Åbnet i appen
+  står der, at man allerede bruger den. Siden er linket fra menuen på telefonen, bunden af siden og beskeden om
+  iPhone-beskeder. Linkene er skjult i selve appen.
+- **Tilbuddet nederst på telefonen** ("Hent Relived som app"): kommer kun på telefoner, ikke i appen, først på side
+  nummer to, når cookiebeskeden er væk, og kun på sider, hvor man kigger rundt (ikke i shows, studiet, klip, kurven og
+  login). På Android installerer *Hent* med det samme, på iPhone fører *Se hvordan* til `/app`. Lukker man det, kommer
+  det ikke igen i 30 dage (`relived-app-banner` i browseren). Koden: `components/app/InstallBanner.tsx`.
+- **I appen** er der en tilbage-knap øverst til venstre på telefonen (der er ingen tilbage-knap fra browseren).
+  `<html>` får klassen `is-app`, og alt med klassen `only-web` er skjult.
+- **Genveje:** holder man fingeren på ikonet (Android og computer), står Live nu, Budsalg, Søg og Sælg (`app/manifest.ts`).
+- **iPhone og iPad:** navnet under ikonet er Relived, statuslinjen er sort, og der er en startskærm med logoet i stedet
+  for en hvid skærm (`public/splash/`, lavet ud fra `public/img/logo.svg`, listen står i `lib/splash.ts`).
+- **Uden net:** åbner man en side uden forbindelse, viser appen `public/offline.html` (alt i én fil) med *Prøv igen*.
+  Den prøver selv igen, når nettet kommer tilbage. Ellers gemmer service workeren (`public/sw.js`) intet, så siderne
+  er aldrig gamle.
+- **Tal på ikonet:** kommer der en besked på telefonen, står antallet af ulæste beskeder på app-ikonet (hvor telefonen
+  kan det). Det forsvinder, når appen åbnes.
+- Service workeren bliver nu registreret for alle (ikke kun dem, der slår beskeder til), lidt efter at siden er vist.
+
 ## App-rammen og forsiden som feed
 
 Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal ikke køres noget i Supabase.

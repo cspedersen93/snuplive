@@ -2,10 +2,10 @@
 
 import Form from "next/form";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Avatar from "@/components/Avatar";
-import { IconCart, IconMenu, IconSearch, IconUser } from "@/components/Icons";
+import { IconBack, IconCart, IconMenu, IconSearch, IconUser } from "@/components/Icons";
 import { useShell } from "@/components/shell/ShellContext";
 
 // Hele menuen til telefonen (under knappen øverst til højre). På computeren står den i venstre side.
@@ -24,6 +24,7 @@ const MNAV = [
  */
 export default function Header() {
   const path = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const { signedIn, me, cartCount: count } = useShell();
 
@@ -35,6 +36,17 @@ export default function Header() {
   return (
     <header className="head">
       <div className="head-in">
+        {/* I appen (åbnet fra hjemmeskærmen) er der ingen tilbage-knap fra browseren, så den står her. Kun på telefonen. */}
+        {path !== "/" ? (
+          <button
+            className="icon-btn head-back"
+            type="button"
+            aria-label="Tilbage"
+            onClick={() => (window.history.length > 1 ? router.back() : router.push("/"))}
+          >
+            <IconBack />
+          </button>
+        ) : null}
         <Link className="logo head-logo" href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/img/logo.svg" alt="Relived – forside" width={142} height={48} />
@@ -80,6 +92,7 @@ export default function Header() {
         <Link href="/kurv">Mine køb</Link>
         <Link href={signedIn === false ? "/login" : "/konto"}>{signedIn === false ? "Log ind" : "Min konto"}</Link>
         <Link href={sellHref}>Sælg dine varer</Link>
+        <Link className="only-web" href="/app">Hent appen</Link>
       </nav>
     </header>
   );

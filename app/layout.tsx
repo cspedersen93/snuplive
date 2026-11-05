@@ -6,7 +6,9 @@ import CookieNotice from "@/components/CookieNotice";
 import SiteAnalytics from "@/components/SiteAnalytics";
 import SupportChat from "@/components/SupportChat";
 import Toaster from "@/components/Toaster";
+import AppSetup from "@/components/app/AppSetup";
 import { SITE_URL } from "@/lib/env";
+import { APPLE_STARTUP } from "@/lib/splash";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -17,6 +19,9 @@ export const metadata: Metadata = {
   description:
     "Køb og sælg brugte varer, ubrugte fejlkøb og restpartier live på video. Se varen, før du køber, spørg sælgeren, og køb med ét tryk.",
   applicationName: "Relived",
+  // Når Relived er lagt på hjemmeskærmen på iPhone: navnet under ikonet, sort statuslinje og startskærm med logoet.
+  appleWebApp: { capable: true, title: "Relived", statusBarStyle: "black", startupImage: APPLE_STARTUP },
+  formatDetection: { telephone: false },
   openGraph: {
     type: "website",
     locale: "da_DK",
@@ -37,7 +42,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="da">
+      <head>
+        {/* Gemmer browserens tilbud om at installere appen, hvis det kommer, før siden er klar (lib/appInstall.ts). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__rlvPrompt=e;});",
+          }}
+        />
+      </head>
       <body>
+        <AppSetup />
         {children}
         <SupportChat />
         <CookieNotice />

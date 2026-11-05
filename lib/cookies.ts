@@ -44,7 +44,17 @@ export const LOCAL: StoredThing[] = [
   { name: "relived-swipe-ok", what: "Sælgere: at du har set tippet om at swipe i studiet.", how_long: "Til du sletter den", who: "Relived" },
   { name: "relived-rundvisning", what: "Sælgere: at du har set (eller sagt nej tak til) rundvisningen i studiet.", how_long: "Til du sletter den", who: "Relived" },
   { name: "relived-rundvisning-gaest", what: "Gæster i et show: det samme for rundvisningen som gæst.", how_long: "Til du sletter den", who: "Relived" },
+  { name: "relived-app-banner", what: "At du har lukket tilbuddet om at hente appen, så det ikke kommer igen foreløbig.", how_long: "30 dage", who: "Relived" },
+  {
+    name: "relived-offline-v1",
+    what: "Siden, der vises, hvis du åbner Relived uden net (gemt af appen, ikke en cookie).",
+    how_long: "Til du sletter den",
+    who: "Relived",
+  },
 ];
+
+/** Tilbuddet om at hente appen (components/app/InstallBanner.tsx). */
+export const APP_BANNER_KEY = "relived-app-banner";
 
 /** Rundvisningen i studiet (vært og gæst). */
 export const TOUR_KEYS = { host: "relived-rundvisning", guest: "relived-rundvisning-gaest" } as const;
@@ -59,4 +69,5 @@ export const FORGETTABLE = [
   "relived-swipe-ok",
   "relived-rundvisning",
   "relived-rundvisning-gaest",
+  "relived-app-banner",
 ];

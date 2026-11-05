@@ -286,3 +286,37 @@ export const IconVideo = (p: P) => (
     <path d="M10.5 9.5v5l4-2.5Z" fill="currentColor" />
   </svg>
 );
+export const IconBack = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M15 5l-7 7 7 7" />
+  </svg>
+);
+/** Del-knappen på iPhone (firkant med en pil op). */
+export const IconIosShare = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M12 3v12M8 7l4-4 4 4" />
+    <path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2" />
+  </svg>
+);
+/** "Føj til hjemmeskærm" (plus i en firkant). */
+export const IconAddSquare = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <rect x="4" y="4" width="16" height="16" rx="3" />
+    <path d="M12 8v8M8 12h8" />
+  </svg>
+);
+/** Menuen i Chrome på Android (tre prikker). */
+export const IconDots = (p: P) => (
+  <svg {...base} fill="currentColor" {...p}>
+    <circle cx="12" cy="5" r="1.8" />
+    <circle cx="12" cy="12" r="1.8" />
+    <circle cx="12" cy="19" r="1.8" />
+  </svg>
+);
+/** Hent appen (pil ned i en bakke). */
+export const IconInstall = (p: P) => (
+  <svg {...base} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M12 4v11M7 10l5 5 5-5" />
+    <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+  </svg>
+);

@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import SideNav from "@/components/shell/SideNav";
 import TabBar from "@/components/shell/TabBar";
+import InstallBanner from "@/components/app/InstallBanner";
 
 /** Live-shows og studiet får den smalle menu, så videoen og chatten har pladsen. */
 const COMPACT = /^\/(live\/[^/]+|studio|gaest)(\/|$)/;
@@ -20,6 +21,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="app-main">{children}</div>
       </div>
       <TabBar />
+      <InstallBanner />
     </>
   );
 }

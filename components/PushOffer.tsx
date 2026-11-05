@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IconBell } from "@/components/Icons";
 import { disablePush, enablePush, pushState, pushSupport, syncPush, type PushState, type PushSupport } from "@/lib/pushClient";
@@ -75,7 +76,7 @@ export function PushOffer({ handle }: { handle: string }) {
         <div>
           <p>
             Vil du have besked på din iPhone, når @{handle} går live? Tryk på <b>Del</b> og <b>Føj til hjemmeskærm</b>, og åbn Relived
-            derfra. Indtil da får du en mail.
+            derfra (<Link href="/app">se hvordan</Link>). Indtil da får du en mail.
           </p>
           <div className="push-offer-btns">
             <button className="linkbtn" type="button" onClick={no}>
@@ -125,8 +126,12 @@ export function PushToggle() {
       <div>
         <strong>Besked på telefonen</strong>
         <p className="muted">
-          {support === "ios-install"
-            ? "På iPhone og iPad: tryk på Del og Føj til hjemmeskærm, og åbn Relived derfra. Så kan du slå beskeder til her."
+          {support === "ios-install" ? (
+            <>
+              På iPhone og iPad: tryk på Del og Føj til hjemmeskærm, og åbn Relived derfra. Så kan du slå beskeder til her.{" "}
+              <Link href="/app">Se hvordan</Link>
+            </>
+          )
             : support === "no"
               ? "Din browser kan ikke vise beskeder. Du får en mail i stedet."
               : state === "denied"

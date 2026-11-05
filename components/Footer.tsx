@@ -47,6 +47,7 @@ export default function Footer() {
             <ul>
               <li><SupportLink>Skriv til os</SupportLink></li>
               <li><Link href="/faq">Spørgsmål og svar</Link></li>
+              <li className="only-web"><Link href="/app">Hent appen</Link></li>
               <li><Link href="/guides">Guides</Link></li>
               <li><Link href="/saadan-virker-det#tryg-handel">Tryg handel</Link></li>
               <li><Link href="/handelsbetingelser">Handelsbetingelser</Link></li>
