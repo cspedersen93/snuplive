@@ -111,7 +111,7 @@ export default async function Forside() {
               {live.length ? <span className="live-dot" aria-hidden="true" /> : null}
               Live nu
             </Link>
-            {auctions.length ? <Link href="#budsalg">Budsalg</Link> : null}
+            <Link href="/budsalg">Budsalg</Link>
             <Link href="/til-salg">Til salg</Link>
             <Link href="/klip">Klip</Link>
           </nav>
@@ -227,7 +227,7 @@ export default async function Forside() {
         ) : null}
       </div>
 
-      <ItemRow id="budsalg" title="Kommende budsalg – byd med live" items={auctions} link={{ href: "/live", label: "Se programmet" }} />
+      <ItemRow id="budsalg" title="Kommende budsalg – byd med live" items={auctions} link={{ href: "/budsalg", label: "Se alle budsalg" }} />
       <ItemRow
         id="h-til-salg"
         title="Til salg nu – køb til fast pris"

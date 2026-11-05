@@ -11,7 +11,7 @@ import { MAIN_CATEGORIES } from "@/lib/format";
 const MAIN = [
   { href: "/", label: "For dig", Icon: IconHome },
   { href: "/live", label: "Live nu", Icon: IconLive },
-  { href: "/#budsalg", label: "Budsalg", Icon: IconGavel },
+  { href: "/budsalg", label: "Budsalg", Icon: IconGavel },
   { href: "/til-salg", label: "Til salg", Icon: IconBag },
   { href: "/klip", label: "Klip", Icon: IconVideo },
   { href: "/kategori", label: "Kategorier", Icon: IconGrid },

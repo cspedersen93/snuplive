@@ -11,7 +11,7 @@ import { useShell } from "@/components/shell/ShellContext";
 // Hele menuen til telefonen (under knappen øverst til højre). På computeren står den i venstre side.
 const MNAV = [
   { href: "/live", label: "Live nu" },
-  { href: "/#budsalg", label: "Budsalg" },
+  { href: "/budsalg", label: "Budsalg" },
   { href: "/til-salg", label: "Til salg" },
   { href: "/klip", label: "Klip" },
   { href: "/kategori", label: "Kategorier" },
