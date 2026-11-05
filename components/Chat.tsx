@@ -88,7 +88,9 @@ function LineActions({ m, me, canModerate }: { m: Message; me: Me; canModerate: 
 export function ChatLine({ m, me, canModerate = false, level = null }: { m: Message; me?: Me | null; canModerate?: boolean; level?: Level | null }) {
   if (m.kind === "event") return <div className="cmsg event">{m.body}</div>;
   const meId = me?.id;
-  const cls = m.from_seller ? "cmsg seller" : m.user_id && m.user_id === meId ? "cmsg me" : "cmsg";
+  const base = m.from_seller ? "cmsg seller" : m.user_id && m.user_id === meId ? "cmsg me" : "cmsg";
+  // Spørgsmål fra seerne kan fremhæves (fx på chatskærmen, /studio/[id]/chat).
+  const cls = !m.from_seller && /\?\s*$/.test(m.body.trim()) ? `${base} q` : base;
   const actions = me && m.user_id && (canModerate || m.user_id === meId);
   return (
     <div className={actions ? `${cls} has-more` : cls}>

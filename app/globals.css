@@ -1036,6 +1036,48 @@ body:has(.app-banner) .sup-fab{display:none}
 .install-done{display:flex;gap:14px;align-items:flex-start;padding:18px;border:1px solid var(--line-2);border-radius:16px}
 .install-done svg{flex:none;color:var(--green,#5BD98B)}
 .install-done p{margin:4px 0 0}
+/* Chatten med stor skrift i studiet og på en anden skærm (components/BigChat.tsx, /studio/[id]/chat) */
+.bigchat{position:absolute;left:4%;right:4%;bottom:calc(4.2% + 31cqw);max-height:28%;z-index:6;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:1.3cqw;overflow:hidden;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%);mask-image:linear-gradient(to bottom,transparent 0,#000 16%)}
+.bigchat-normal{font-size:4.4cqw}
+.bigchat-stor{font-size:6cqw}
+.bigchat-xl{font-size:7.8cqw}
+.bigchat .bc{margin:0;max-width:100%;line-height:1.28;color:#fff;font-weight:500;transition:opacity .5s}
+.bigchat .bc span{background:rgba(0,0,0,.68);padding:.1em .42em;border-radius:.3em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.bigchat .bc b{font-weight:700;margin-right:.35em}
+.bigchat .bc em{font-style:normal;font-weight:800;color:#1E1600;background:var(--amber);border-radius:.25em;padding:0 .3em;margin-right:.35em}
+.bigchat .bc-event span{background:rgba(220,0,40,.86);font-weight:700}
+.bigchat .bc-old{opacity:.5}
+.bigchat .bc-new span{animation:bcFlash 1.6s ease-out}
+@keyframes bcFlash{0%,20%{background:rgba(255,255,255,.92);color:#111}100%{background:rgba(0,0,0,.68);color:#fff}}
+.bigchat .bc-event.bc-new span{animation:none}
+@media (prefers-reduced-motion:reduce){.bigchat .bc-new span{animation:none}}
+.bigchat-ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px auto 0;max-width:520px;font-size:.9rem}
+.bigchat-label{font-weight:600}
+.chatsize{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line-2);border-radius:99px;padding:3px;gap:2px}
+.chatsize button{font:inherit;font-size:.85rem;padding:6px 12px;border:0;border-radius:99px;background:none;color:var(--muted);cursor:pointer}
+.chatsize button.on{background:var(--text);color:var(--bg);font-weight:600}
+.bigchat-screen{font-size:.85rem;color:var(--muted)}
+.studio .cmsg.q,.cscreen .cmsg.q{background:rgba(242,196,107,.1);box-shadow:inset 3px 0 0 var(--amber);border-radius:8px;padding:6px 8px}
+.cscreen{--cs:1.75;display:flex;flex-direction:column;height:100vh;height:100dvh;background:var(--bg)}
+.cscreen-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding:max(10px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.cscreen-show{display:flex;align-items:center;gap:10px;min-width:0}
+.cscreen-show .timer{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.cscreen-title{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw}
+.cscreen-now{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;flex:1;min-width:min(100%,260px);font-size:calc(1rem * min(var(--cs),1.5))}
+.cscreen-now b{font-weight:700}
+.cscreen-k{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--red-text)}
+.cscreen-tools{display:flex;align-items:center;gap:8px;margin-left:auto}
+.cscreen-tools .icon-btn{font:700 .9rem/1 var(--sans,inherit)}
+.cscreen-tools .icon-btn:disabled{opacity:.35}
+.cscreen .chatbox{flex:1;height:auto;min-height:0;border:0;border-radius:0;background:none}
+.cscreen .chatbox-head{display:none}
+.cscreen .chat-log{gap:calc(12px * var(--cs));padding:calc(12px * var(--cs)) max(16px,calc(18px * var(--cs)))}
+.cscreen .cmsg{grid-template-columns:calc(26px * var(--cs)) minmax(0,1fr);gap:calc(10px * var(--cs));font-size:calc(.93rem * var(--cs))}
+.cscreen .cmsg i{width:calc(26px * var(--cs));height:calc(26px * var(--cs))}
+.cscreen .cmsg b{font-size:calc(.78rem * var(--cs))}
+.cscreen .cmsg.event{font-size:calc(.86rem * var(--cs))}
+.cscreen .chat-form input{font-size:1.05rem}
+body:has(.cscreen) .sup-fab{display:none}
 .mitid-status{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:.92rem}
 .mitid-status p{margin:0;flex:1 1 260px}
 .setting-toggle{padding:14px 16px;border:1px solid var(--line);border-radius:14px}

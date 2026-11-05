@@ -44,6 +44,8 @@ export const LOCAL: StoredThing[] = [
   { name: "relived-swipe-ok", what: "Sælgere: at du har set tippet om at swipe i studiet.", how_long: "Til du sletter den", who: "Relived" },
   { name: "relived-rundvisning", what: "Sælgere: at du har set (eller sagt nej tak til) rundvisningen i studiet.", how_long: "Til du sletter den", who: "Relived" },
   { name: "relived-rundvisning-gaest", what: "Gæster i et show: det samme for rundvisningen som gæst.", how_long: "Til du sletter den", who: "Relived" },
+  { name: "relived-studiechat", what: "Sælgere: hvor stor chatten skal være i videoen i studiet.", how_long: "Til du sletter den", who: "Relived" },
+  { name: "relived-chatskaerm", what: "Sælgere: skriftstørrelsen på chatten, når den vises på en anden skærm.", how_long: "Til du sletter den", who: "Relived" },
   { name: "relived-app-banner", what: "At du har lukket tilbuddet om at hente appen, så det ikke kommer igen foreløbig.", how_long: "30 dage", who: "Relived" },
   {
     name: "relived-offline-v1",
@@ -70,4 +72,6 @@ export const FORGETTABLE = [
   "relived-rundvisning",
   "relived-rundvisning-gaest",
   "relived-app-banner",
+  "relived-studiechat",
+  "relived-chatskaerm",
 ];

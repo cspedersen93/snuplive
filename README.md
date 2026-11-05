@@ -986,6 +986,26 @@ App Store eller Google Play.
   kan det). Det forsvinder, når appen åbnes.
 - Service workeren bliver nu registreret for alle (ikke kun dem, der slår beskeder til), lidt efter at siden er vist.
 
+## Chatten på afstand (sælgeren på en stander)
+
+Der skal ikke køres noget i Supabase.
+
+- **Chat i videoen:** mens sælgeren er live, står de nyeste beskeder med stor skrift oven på sælgerens eget billede i
+  studiet (seerne ser den ikke). Kun seernes beskeder og køb/bud, ikke sælgerens egne og ikke "Showet er startet",
+  lynrunder og budsalg, som sælgeren selv starter. Spørgsmål (der slutter med ?) får et gult mærke, køb står i rødt,
+  og den nyeste blinker kort. Under videoen vælges *Fra, Normal, Stor* eller *Ekstra stor* (4, 4 eller 3 beskeder).
+  Valget huskes (`relived-studiechat`). Som udgangspunkt *Stor* på telefonen og *Fra* på computeren, hvor chatten står
+  ved siden af. Koden: `components/BigChat.tsx`.
+- **Skærmen slukker ikke**, mens kameraet er tændt i studiet (`components/useWakeLock.ts`). Ellers kan telefonen gå i
+  dvale midt i showet, når ingen rører den.
+- **Chatten på en anden skærm:** `/studio/[id]/chat` (linket *Vis chatten på en anden skærm* under videoen) viser
+  chatten med stor skrift på fx en computer, tablet eller et fjernsyn ved siden af. Til sælgere, der filmer med
+  bagkameraet, så telefonens skærm vender væk. Øverst står live-tiden, showet og den vare, der vises nu, med pris eller
+  højeste bud. Skriften gøres større og mindre med A+ og A− (huskes, `relived-chatskaerm`), spørgsmål er gule, og man
+  kan svare i chatten. Skærmen slukker ikke. Kun værten og gæsterne i showet kan åbne siden (andre får 404).
+  Siden har ingen menu og bund (`app/(skaerm)/`).
+- **I studiets almindelige chat** er spørgsmål også gule.
+
 ## App-rammen og forsiden som feed
 
 Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal ikke køres noget i Supabase.

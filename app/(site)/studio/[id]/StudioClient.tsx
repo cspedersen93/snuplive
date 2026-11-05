@@ -28,6 +28,8 @@ import { MAX_GUESTS, type Guest } from "@/lib/guests";
 import GuestsBox from "./GuestsBox";
 import StudioTour from "./StudioTour";
 import Reactions from "@/components/Reactions";
+import BigChat, { CHAT_SIZES, CHAT_SIZE_KEY, readChatSize, type ChatSize } from "@/components/BigChat";
+import { useWakeLock } from "@/components/useWakeLock";
 import type { Room } from "livekit-client";
 
 export interface StudioSale {
@@ -108,6 +110,21 @@ export default function StudioClient(props: Props) {
   const [offset] = useState(() => props.serverNow - Date.now());
   const [now, setNow] = useState(() => Date.now());
   const [cameraOn, setCameraOn] = useState(props.show.status === "live");
+  // Skærmen slukker ikke, mens kameraet er tændt (telefonen står tit på en stander).
+  useWakeLock(cameraOn);
+  // Chatten med stor skrift i videoen. Som udgangspunkt Stor på telefonen og Fra på computeren (chatten står ved siden af).
+  const [chatSize, setChatSize] = useState<ChatSize>("fra");
+  useEffect(() => {
+    setChatSize(readChatSize(window.matchMedia("(max-width: 820px)").matches ? "stor" : "fra"));
+  }, []);
+  function pickChatSize(next: ChatSize) {
+    setChatSize(next);
+    try {
+      localStorage.setItem(CHAT_SIZE_KEY, next);
+    } catch {
+      // Valget bliver ikke husket. Det gør ikke noget.
+    }
+  }
   const [cameraReady, setCameraReady] = useState(false);
   const [video, setVideo] = useState<{ token: string; url: string } | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
@@ -824,6 +841,7 @@ export default function StudioClient(props: Props) {
                   {current && current.status !== "sold" && rushLeft !== null ? (
                     <div className="v-rush" role="timer">{rushLeft > 0 ? <>Lynrunde <span>{rushLeft}</span></> : "Lynrunden er slut"}</div>
                   ) : null}
+                  {!out ? <BigChat messages={messages} size={chatSize} /> : null}
                   <NowCard
                     swipe={isHost}
                     onNext={() => next && present(next.id)}
@@ -875,6 +893,28 @@ export default function StudioClient(props: Props) {
               ) : null}
             </div>
           </div>
+          {!ended && !out ? (
+            <div className="bigchat-ctrl">
+              <span className="bigchat-label" id="bc-label">Chat i videoen</span>
+              <div className="chatsize" role="radiogroup" aria-labelledby="bc-label">
+                {CHAT_SIZES.map((c) => (
+                  <button
+                    key={c.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={chatSize === c.key}
+                    className={chatSize === c.key ? "on" : undefined}
+                    onClick={() => pickChatSize(c.key)}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+              <Link className="bigchat-screen" href={`/studio/${show.id}/chat`} target="_blank" rel="noopener">
+                Vis chatten på en anden skærm ↗
+              </Link>
+            </div>
+          ) : null}
           <div className="studio-ctrl">
             <div className="box" data-tour="ticker">
               <div className="ticker">
