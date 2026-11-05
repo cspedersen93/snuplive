@@ -586,6 +586,19 @@ også, hvis der er en rigtig betaling. Fragtlabels, der er købt hos Shipmondo, 
 
 ---
 
+## Slet alle testshows (før lanceringen)
+
+Kør `supabase/migrations/0031_slet_testshows.sql` i Supabase → SQL Editor (efter 0030).
+
+**Backoffice → Indstillinger → Slet alle testshows** nulstiller testsalget og sletter alle shows med deres varer, chat,
+bud, påmindelser, gæster og invitationer, og anmeldelser af shows og varer. Sælgersiderne forsvinder fra sitemap.xml, fordi
+den kun tager sælgere med shows. Brugere, sælgerprofiler, følgere, nyhedsbrevet og indstillinger bliver liggende. Billeder
+og klip bliver liggende i Supabase Storage, men vises ingen steder. Man skal skrive SLET for at bekræfte.
+
+Knappen findes kun, mens Stripe kører med testnøgler, og databasen nægter, hvis der er en rigtig betaling.
+
+---
+
 ## Rundvisning i studiet
 
 Første gang en sælger åbner et studie (før showet går live), spørger siden: *Vil du se, hvordan studiet virker?* med

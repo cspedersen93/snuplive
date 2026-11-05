@@ -4,6 +4,7 @@ import { num, requireAdmin } from "@/lib/admin";
 import { mitidEnabled } from "@/lib/mitid";
 import SettingToggle from "./SettingToggle";
 import Testers, { type Tester } from "./Testers";
+import DeleteTestShows from "./DeleteTestShows";
 import ResetTestSales from "./ResetTestSales";
 import TestBanner from "./TestBanner";
 import { canResetTestSales, paymentsAreTest } from "@/lib/stripe";
@@ -18,7 +19,7 @@ export default async function Indstillinger() {
   if (!admin) return <SetupNotice />;
   const enabled = mitidEnabled();
   const testMode = canResetTestSales();
-  const [setting, open, testers, sellers, verified, orderCount, saleCount, banner] = await Promise.all([
+  const [setting, open, testers, sellers, verified, orderCount, saleCount, banner, showCount, itemCount] = await Promise.all([
     admin.from("settings").select("value").eq("key", "mitid_required").maybeSingle(),
     admin.from("settings").select("value").eq("key", "site_open").maybeSingle(),
     admin.from("beta_access").select("email,note").order("added_at", { ascending: true }),
@@ -27,6 +28,8 @@ export default async function Indstillinger() {
     admin.from("orders").select("id", { count: "exact", head: true }),
     admin.from("sales").select("id", { count: "exact", head: true }),
     admin.from("settings").select("value").eq("key", "test_banner").maybeSingle(),
+    admin.from("shows").select("id", { count: "exact", head: true }),
+    admin.from("items").select("id", { count: "exact", head: true }),
   ]);
   const bannerMode = banner.data?.value === true ? "on" : banner.data?.value === false ? "off" : "auto";
   const required = setting.data?.value === true;
@@ -90,6 +93,18 @@ export default async function Indstillinger() {
             rigtige Stripe-nøgler.
           </p>
           <ResetTestSales orders={orderCount.count ?? 0} sales={saleCount.count ?? 0} />
+        </section>
+      ) : null}
+
+      {testMode ? (
+        <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <h2 className="h3">Slet alle testshows</h2>
+          <p className="muted" style={{ fontSize: ".95rem" }}>
+            Før I åbner: slet alle shows fra testperioden med deres varer, chat, bud og testkøb, så de forsvinder fra siden og
+            fra Google. Brugere, sælgerprofiler, følgere og nyhedsbrevet bliver liggende. Knappen forsvinder, når I skifter til
+            rigtige Stripe-nøgler. Kræver, at 0031_slet_testshows.sql er kørt i Supabase.
+          </p>
+          <DeleteTestShows shows={showCount.count ?? 0} items={itemCount.count ?? 0} />
         </section>
       ) : null}
     </div>
