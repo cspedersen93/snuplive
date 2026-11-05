@@ -23,6 +23,7 @@ export default function Footer() {
               <li><Link href="/kategori">Kategorier</Link></li>
               <li><Link href="/saadan-virker-det">Sådan virker det</Link></li>
               <li><Link href="/kurv">Mine køb</Link></li>
+              <li><Link href="/nyhedsbrev">Nyhedsbrev</Link></li>
             </ul>
           </div>
           <div>

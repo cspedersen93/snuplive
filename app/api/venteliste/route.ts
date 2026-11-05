@@ -21,13 +21,13 @@ export async function POST(req: Request) {
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase().slice(0, 200) : "";
   if (!EMAIL.test(email)) return fail("Skriv en gyldig e-mail.", 400);
   if (!isWaitlistRole(body.role)) return fail("Vælg, om du vil købe, sælge eller begge dele.", 400);
-  if (body.consent !== true) return fail("Sæt flueben, så vi må sende dig en mail, når vi åbner.", 400);
+  if (body.consent !== true) return fail("Sæt flueben, så vi må sende dig mails.", 400);
   const source = typeof body.source === "string" ? body.source.slice(0, 100) : null;
   const now = new Date().toISOString();
 
   const { data: row } = await admin
     .from("waitlist")
-    .select("id,confirm_token,confirmed_at,unsubscribed_at,confirm_sent_at")
+    .select("id,role,confirm_token,confirmed_at,unsubscribed_at,confirm_sent_at")
     .eq("email", email)
     .maybeSingle();
 
@@ -41,21 +41,23 @@ export async function POST(req: Request) {
       console.error("[snuplive] venteliste", error?.message);
       return fail("Noget gik galt. Prøv igen om lidt.", 500);
     }
-    await sendConfirmMail(email, data.confirm_token);
+    await sendConfirmMail(email, data.confirm_token, source);
     return json({ ok: true });
   }
 
+  // Skriver en sælger sig op til nyhedsbrevet uden fluebenet "sælge", er hun stadig sælger.
+  const role = body.role === "buyer" && row.role !== "buyer" ? row.role : body.role;
   // Allerede bekræftet og ikke afmeldt: intet at gøre.
   if (row.confirmed_at && !row.unsubscribed_at) {
-    await admin.from("waitlist").update({ role: body.role }).eq("id", row.id);
+    await admin.from("waitlist").update({ role }).eq("id", row.id);
     return json({ ok: true });
   }
   // Afmeldt før eller ikke bekræftet endnu: ny bekræftelse, men højst én mail hvert 10. minut.
   const recent = row.confirm_sent_at && Date.now() - Date.parse(row.confirm_sent_at) < RESEND_AFTER_MS;
-  const patch: Record<string, unknown> = { role: body.role, consent_at: now };
+  const patch: Record<string, unknown> = { role, consent_at: now };
   if (row.unsubscribed_at) Object.assign(patch, { unsubscribed_at: null, confirmed_at: null });
   if (!recent) patch.confirm_sent_at = now;
   await admin.from("waitlist").update(patch).eq("id", row.id);
-  if (!recent) await sendConfirmMail(email, row.confirm_token);
+  if (!recent) await sendConfirmMail(email, row.confirm_token, source);
   return json({ ok: true });
 }

@@ -1,3 +1,4 @@
+import { campaignMailLines } from "@/lib/campaigns";
 import { SITE_URL } from "@/lib/env";
 import { sendMail } from "@/lib/mail";
 
@@ -10,8 +11,30 @@ export const isToken = (v: unknown): v is string => typeof v === "string" && UUI
 
 export const unsubscribeUrl = (token: string) => `${SITE_URL}/kommer-snart/afmeld?t=${token}`;
 
+/** Tilmeldt via nyhedsbrevet (forsiden eller /nyhedsbrev) i stedet for ventelisten før åbningen. */
+export const isNewsletterSource = (source: string | null | undefined) => !!source && source.startsWith("nyhedsbrev");
+
 /** Mailen med linket, man trykker på for at bekræfte sin tilmelding. */
-export function sendConfirmMail(email: string, token: string) {
+export function sendConfirmMail(email: string, token: string, source?: string | null) {
+  if (isNewsletterSource(source)) {
+    return sendMail({
+      to: [email],
+      subject: "Bekræft din tilmelding til nyhedsbrevet fra Relived",
+      text: [
+        "Hej",
+        "",
+        "Tak, fordi du vil have nyhedsbrevet fra Relived. Du får blandt andet besked om:",
+        ...campaignMailLines(),
+        "",
+        "Tryk på linket for at bekræfte din tilmelding:",
+        `${SITE_URL}/kommer-snart/bekraeft?t=${token}`,
+        "",
+        "Har du ikke skrevet dig op, kan du bare slette mailen.",
+        "",
+        "Hilsen Relived",
+      ].join("\n"),
+    });
+  }
   return sendMail({
     to: [email],
     subject: "Bekræft din tilmelding til Relived",
@@ -42,5 +65,5 @@ export function unsubHeaders(token: string) {
 
 /** Nederst i alle mails til ventelisten: link til afmelding. */
 export function unsubFooter(token: string) {
-  return `\n\n—\nDu får mailen, fordi du har skrevet dig op til Relived.\nAfmeld: ${unsubscribeUrl(token)}`;
+  return `\n\n—\nDu får mailen, fordi du har skrevet dig op til nyheder fra Relived.\nAfmeld: ${unsubscribeUrl(token)}`;
 }

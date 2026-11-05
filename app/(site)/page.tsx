@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
+import CampaignCards from "@/components/CampaignCards";
 import CategoryCards from "@/components/CategoryCards";
 import { BigShowTile, ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
 import RailHello from "@/components/feed/RailHello";
 import RailMine from "@/components/feed/RailMine";
 import { IconPlay } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
+import NewsletterForm from "@/components/NewsletterForm";
 import RemindButton from "@/components/RemindButton";
 import type { FeedItem, ShowWithSeller } from "@/lib/types";
+import { campaignState } from "@/lib/campaigns";
 import { SITE_URL } from "@/lib/env";
 import { clock, dayLabel } from "@/lib/format";
 import { showImage } from "@/lib/images";
@@ -65,6 +68,15 @@ export default async function Forside() {
   const moreForSale = forSale.filter((it) => !usedSale.has(it.id)).slice(0, 10);
   const soonShows = upcoming.filter((s) => s.id !== big?.id).slice(0, 4);
   const stories = uniqueBySeller([...live, ...upcoming]).slice(0, 12);
+  const camp = campaignState();
+  const campTitle =
+    camp.gf.phase !== "over" && camp.jk.phase !== "over"
+      ? "Vær med til Green Friday og julekalenderen"
+      : camp.jk.phase !== "over"
+        ? "Vær med til julekalenderen"
+        : camp.gf.phase !== "over"
+          ? "Vær med til Green Friday"
+          : "Få ugens shows i din indbakke";
 
   const ld = {
     "@context": "https://schema.org",
@@ -137,6 +149,21 @@ export default async function Forside() {
                 <Link className="btn btn-line" href="/live">Se hvem der går live</Link>
               </div>
             ) : null}
+          </section>
+
+          {/* Nyhedsbrev med reklame for de næste kampagner. Kortene forsvinder, når kampagnerne er slut. */}
+          <section className="camp" aria-labelledby="h-camp">
+            <div className="camp-head">
+              <span className="label red">Nyhedsbrev</span>
+              <h2 className="camp-h" id="h-camp">{campTitle}</h2>
+              <p>
+                {camp.active
+                  ? "Skriv dig op, så sender vi en mail, før showene starter."
+                  : "Skriv dig op, så sender vi ugens shows og de bedste fund."}
+              </p>
+            </div>
+            <CampaignCards sellerLink />
+            <NewsletterForm source="nyhedsbrev-forside" />
           </section>
         </div>
 

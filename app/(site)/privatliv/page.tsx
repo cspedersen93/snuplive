@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function Privatliv() {
   return (
-    <LegalPage title="Privatlivspolitik" crumb="Privatlivspolitik" updated="31. oktober 2026">
+    <LegalPage title="Privatlivspolitik" crumb="Privatlivspolitik" updated="5. november 2026">
       <p className="lede">Her kan du læse, hvilke oplysninger Relived gemmer om dig, og hvad vi bruger dem til.</p>
 
       <h2>Hvem er ansvarlig?</h2>
@@ -21,7 +21,7 @@ export default function Privatliv() {
 
       <h2>Hvad gemmer vi?</h2>
       <ul>
-        <li><b>Venteliste:</b> skriver du dig op, før Relived åbner, gemmer vi din e-mail, om du vil købe eller sælge, og hvornår du sagde ja til mails og bekræftede. Vi bruger den kun til at give dig besked, når vi åbner, og til nyheder om Relived. Hver mail har et link til afmelding. Afmelder du dig, sender vi ikke flere mails, og vi gemmer kun, at du er afmeldt.</li>
+        <li><b>Nyhedsbrev og venteliste:</b> skriver du dig op, gemmer vi din e-mail, om du også vil sælge, hvor på siden du skrev dig op, og hvornår du sagde ja til mails og bekræftede. Vi bruger det kun til at sende dig nyhedsbrevet med nyheder om Relived, fx nye shows og kampagner. Hver mail har et link til afmelding. Afmelder du dig, sender vi ikke flere mails, og vi gemmer kun, at du er afmeldt.</li>
         <li><b>Konto:</b> din e-mailadresse, dit brugernavn og eventuelt navn, område og profilbillede, hvis du selv lægger dem ind.</li>
         <li><b>Shows og varer:</b> de shows og varer, du lægger op som sælger, med billeder og beskrivelser. De kan ses af alle.</li>
         <li><b>Sælgeroplysninger:</b> om du sælger som privatperson eller virksomhed. Sælger du som virksomhed, vises firmanavn og CVR-nummer ved dine varer.</li>

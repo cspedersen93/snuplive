@@ -21,7 +21,7 @@ export default async function Afmeld({ searchParams }: { searchParams: Promise<{
           <>
             <span className="label red">Afmeld</span>
             <h1 className="h2">Vil du afmelde dig?</h1>
-            <p className="lede">Så får du ikke en mail, når Relived åbner, og heller ikke nyheder fra os.</p>
+            <p className="lede">Så får du ikke flere mails med nyheder fra os.</p>
             <form method="post" action="/api/venteliste/afmeld">
               <input type="hidden" name="t" value={sp.t} />
               <button className="btn btn-red" type="submit">Ja, afmeld mig</button>

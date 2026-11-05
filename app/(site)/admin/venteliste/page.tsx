@@ -7,7 +7,7 @@ import { isWaitlistRole, WAITLIST_ROLES } from "@/lib/waitlist";
 import WaitlistMail from "./WaitlistMail";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Venteliste" };
+export const metadata: Metadata = { title: "Nyhedsbrev og venteliste" };
 
 interface Row {
   email: string;
@@ -39,7 +39,7 @@ export default async function Venteliste() {
   return (
     <div className="adm-page">
       <div className="adm-head">
-        <h1>Venteliste</h1>
+        <h1>Nyhedsbrev og venteliste</h1>
         <span className="muted">{num(all)} har skrevet sig op</span>
       </div>
       <div className="stats">

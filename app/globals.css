@@ -1904,3 +1904,32 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 /* Forsiden: tomt program i højre kolonne. */
 .rail-empty{margin:0;font-size:.9rem;line-height:1.5;color:var(--muted)}
 .rail-box > .btn-sm{align-self:flex-start}
+
+/* Nyhedsbrev og kampagner: forsiden (under feedet) og /nyhedsbrev. */
+.camp{display:flex;flex-direction:column;gap:16px;margin-top:6px;padding:clamp(18px,3cqw,28px);border:1px solid var(--line);border-radius:22px;background:var(--bg-2)}
+.camp-head{display:flex;flex-direction:column;gap:6px}
+.camp-head p{margin:0;color:var(--muted)}
+.camp-h{margin:0;font-size:clamp(1.35rem,3.4cqw,1.75rem);line-height:1.1;letter-spacing:-.03em}
+.camp .soon-form{max-width:none}
+.camp-cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.camp-card{display:flex;flex-direction:column;gap:10px;padding:20px;border-radius:18px;background:var(--surface);border:1px solid var(--line-2)}
+.camp-card h3{margin:0;font-size:1.2rem;line-height:1.15;letter-spacing:-.02em}
+.camp-card p{margin:0;color:var(--muted);font-size:.95rem;line-height:1.5}
+.camp-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.camp-tag{font:500 .72rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:.45em .7em;border-radius:6px}
+.camp-when{font:500 .72rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.camp-card.gf{border-color:rgba(185,217,198,.32)}
+.gf .camp-tag{background:var(--mint);color:var(--mint-ink)}
+.camp-date{display:flex;align-items:baseline;gap:10px;margin:2px 0 0!important;font:600 clamp(2.6rem,7cqw,3.4rem)/1 var(--mono)!important;letter-spacing:-.04em;color:var(--mint)!important}
+.camp-date span{font-size:.9rem;font-weight:500;letter-spacing:.04em;color:var(--muted)}
+.camp-card.jk{border-color:rgba(235,0,41,.42)}
+.jk .camp-tag{background:var(--red);color:#fff}
+.camp-doors{list-style:none;margin:2px 0 0;padding:0;max-width:380px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+.door{display:grid;place-items:center;aspect-ratio:1;border-radius:6px;border:1px solid var(--line-2);font:500 .72rem/1 var(--mono);color:var(--muted)}
+.door.open{opacity:.35}
+.door.next{background:var(--red);border-color:var(--red);color:#fff}
+.camp-link{margin-top:auto;font-size:.9rem;color:var(--mint)}
+.news-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;max-width:640px}
+.news-list li{display:flex;gap:12px}
+.news-list li::before{content:"";flex:none;width:16px;height:2px;margin-top:.8em;background:var(--red)}
+.phero .news-form{margin-top:6px}

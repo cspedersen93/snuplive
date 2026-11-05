@@ -863,6 +863,21 @@ pakkestørrelse, og feltet *Pakke* vises ikke i studiet. Alt andet virker.
   Vælger sælgeren en tungere label, betaler Relived forskellen.
 - Test: `qa_vaegt.py` (med filen) og `qa_vaegt.py uden0030` (efter `SKIP=0030 bash restart_qa.sh`).
 
+## Nyhedsbrev, Green Friday og julekalender
+
+Der skal ikke køres noget i Supabase. Tilmeldingerne bruger samme liste som ventelisten (tabellen `waitlist`).
+
+- **Forsiden** har et felt under feedet med kort for Green Friday (27. november kl. 20) og julekalenderen (1.–24. december
+  kl. 20) og tilmelding til nyhedsbrevet. Der er en nedtælling på kortene. I december lyser dagens låge rødt, og de
+  åbnede låger er nedtonede. Kortene forsvinder af sig selv, når kampagnen er slut, og så står der kun "Få ugens shows i
+  din indbakke".
+- **`/nyhedsbrev`** er en side til at dele på sociale medier og i annoncer. Den står i bunden af siden og i sitemap.xml.
+- **Tilmelding:** e-mail, flueben for samtykke og et frivilligt flueben "Jeg vil også gerne sælge". Man får en mail og
+  bekræfter (dobbelt tilmelding). Mailen nævner kun de kampagner, der ikke er overstået.
+- **Backoffice → Nyhedsbrev** (før Venteliste) viser alle tilmeldte. Kolonnen *Kilde* er `nyhedsbrev-forside` eller
+  `nyhedsbrev-side`, og *Vil sælge* tæller dem med fluebenet. Herfra sendes nyhedsbrevet med *Send en mail til listen*.
+- **Datoerne** står i `lib/campaigns.ts`.
+
 ## App-rammen og forsiden som feed
 
 Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal ikke køres noget i Supabase.
