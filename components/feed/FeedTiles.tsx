@@ -14,7 +14,7 @@ import type { FeedItem, ShowWithSeller } from "@/lib/types";
 
 const when = (iso: string) => `${dayLabel(iso)} ${clock(iso)}`;
 
-/** Det store kort øverst i feedet: showet, der er live (eller det næste, der starter). */
+/** Et stort kort med et show (live eller det næste). Bruges ikke på forsiden længere: der står velkomstvideoen altid. */
 export function BigShowTile({ show }: { show: ShowWithSeller }) {
   const handle = show.seller?.handle ?? "sælger";
   const live = show.status === "live";
@@ -68,15 +68,30 @@ export function BigShowTile({ show }: { show: ShowWithSeller }) {
  * Det store kort, når ingen er live eller har planlagt et show. Er der varer til salg, peger det på dem. Er der intet
  * endnu, taler det til sælgerne indtil lanceringen og til køberne bagefter (tilmelding til nyhedsbrevet).
  */
-export function WelcomeTile({ hasItems = true, launched = false }: { hasItems?: boolean; launched?: boolean }) {
+export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }: { hasItems?: boolean; launched?: boolean; liveCount?: number }) {
   return (
     <div className="ftile ftile-big ftile-welcome">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <WelcomeVideo />
       <span className="ftile-shade" />
       <div className="ftile-info">
-        <span className="fbadge">Ingen er live lige nu</span>
-        {hasItems ? (
+        {liveCount ? (
+          // Nogen er live: kortet viser stadig videoen, men fortæller det og sender videre til Live nu.
+          <>
+            <span className="fbadge live">
+              <span className="live-dot white" />
+              {liveCount === 1 ? "1 sælger er live nu" : `${liveCount} sælgere er live nu`}
+            </span>
+            <strong className="ftile-title">Se med, mens varerne bliver vist frem</strong>
+            <span className="ftile-extra">Spørg sælgeren i chatten, og køb med ét tryk, eller byd med på budsalg.</span>
+            <span className="ftile-btns">
+              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+              <Link className="btn btn-line" href="/til-salg">Se varer til salg</Link>
+            </span>
+          </>
+        ) : null}
+        {liveCount ? null : <span className="fbadge">Ingen er live lige nu</span>}
+        {liveCount ? null : hasItems ? (
           <>
             <strong className="ftile-title">Se varer, der allerede er vist frem på video</strong>
             <span className="ftile-extra">Eller gå selv live og sælg en hel bunke på én aften.</span>

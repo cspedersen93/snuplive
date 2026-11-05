@@ -3,7 +3,7 @@ import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import CampaignCards from "@/components/CampaignCards";
 import CategoryCards from "@/components/CategoryCards";
-import { BigShowTile, ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
+import { ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
 import RailHello from "@/components/feed/RailHello";
 import RailMine from "@/components/feed/RailMine";
 import { IconPlay } from "@/components/Icons";
@@ -51,11 +51,11 @@ export default async function Forside() {
   // Varer på budsalg har deres egen række, så de ikke står to gange.
   const soon = upcomingItems.filter((it) => it.sale_type !== "auction");
 
-  // Feedet: det store kort (live nu, ellers det næste show), så shows og varer blandet.
-  const big = live[0] ?? upcoming[0] ?? null;
+  // Feedet: det store kort med videoen (altid, også når nogen er live), så shows og varer blandet.
+  // Hvem der er live, står i de runde billeder øverst og i de små kort.
   const tiles: Tile[] = [];
-  for (const s of live.slice(big?.status === "live" ? 1 : 0, 4)) tiles.push({ kind: "show", show: s });
-  const nextShow = upcoming.find((s) => s.id !== big?.id);
+  for (const s of live.slice(0, 4)) tiles.push({ kind: "show", show: s });
+  const nextShow = upcoming[0];
   if (nextShow && tiles.length < 4) tiles.push({ kind: "show", show: nextShow });
   const queues = [forSale, auctions, soon].map((q) => [...q]);
   const usedSale = new Set<string>();
@@ -69,7 +69,7 @@ export default async function Forside() {
     }
   }
   const moreForSale = forSale.filter((it) => !usedSale.has(it.id)).slice(0, 10);
-  const soonShows = upcoming.filter((s) => s.id !== big?.id).slice(0, 4);
+  const soonShows = upcoming.slice(0, 4);
   const stories = uniqueBySeller([...live, ...upcoming]).slice(0, 12);
   const camp = campaignState(new Date(), flags);
   const campTitle =
@@ -139,7 +139,9 @@ export default async function Forside() {
 
         <section className="feed-hero" aria-labelledby="h-feed">
           <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
-          <div className="feed-grid sparse">{big ? <BigShowTile show={big} /> : <WelcomeTile hasItems={forSale.length > 0} launched={launched()} />}</div>
+          <div className="feed-grid sparse">
+            <WelcomeTile hasItems={forSale.length > 0} launched={launched()} liveCount={live.length} />
+          </div>
         </section>
 
         <aside className="feed-rail" aria-label="Til dig">
