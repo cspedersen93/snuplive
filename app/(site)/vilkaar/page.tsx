@@ -3,6 +3,7 @@ import Link from "next/link";
 import CompanyInfo from "@/components/CompanyInfo";
 import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/company";
+import { inBeta } from "@/lib/launch";
 import { RESERVATION_DAYS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -105,7 +106,7 @@ export default function Vilkaar() {
 
       <h3>8. Gebyrer</h3>
       <p>
-        Det er gratis at sælge, mens Relived er i beta. Køberen betaler køberbeskyttelsen. Indfører vi et salgsgebyr, får du besked,
+        {inBeta() ? "Det er gratis at sælge, mens Relived er i beta." : "Det er gratis at sælge."} Køberen betaler køberbeskyttelsen. Indfører vi et salgsgebyr, får du besked,
         før det gælder.
       </p>
 

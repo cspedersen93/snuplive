@@ -592,7 +592,7 @@ Relived regnes for åbnet, når Stripe kører med rigtige nøgler (`lib/launch.t
 der er trykket **Redeploy**, skifter siden af sig selv:
 
 - "Gratis at sælge i beta" og lignende bliver til "Gratis at sælge" på forsiden, Sælg, Sådan virker det, FAQ, guiderne,
-  studiet og den engelske side. **Vilkår** er ikke med (juridisk side) og skal rettes for sig.
+  studiet, den engelske side og Vilkår.
 - Det store kort på forsiden taler til sælgerne indtil da ("Vær med fra starten") og til køberne bagefter ("Vi går snart
   live" med tilmelding til nyhedsbrevet). Kassen "Snart live" gør det samme.
 - TESTFASE-bjælken forsvinder, og der kommer ingen beta-bjælke i stedet.
