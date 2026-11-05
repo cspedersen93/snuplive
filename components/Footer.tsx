@@ -11,7 +11,7 @@ export default function Footer() {
           <div>
             <Link className="logo" href="/">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/img/logo.svg" alt="Relived" width={118} height={38} loading="lazy" />
+              <img src="/img/logo.svg" alt="Relived" width={122} height={44} loading="lazy" />
             </Link>
             <p>Second hand, du kan se live, før du køber. Spørg sælgeren i chatten, og køb med ét tryk.</p>
           </div>
