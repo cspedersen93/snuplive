@@ -55,7 +55,8 @@ const load = cache(async (rawHandle: string) => {
   ]);
   const picked = (liveQ.data ?? nextQ.data ?? lastQ.data ?? null) as Show | null;
   // Nedtælling til live (0034_nedtaelling.sql): hentes for sig, så siden virker, før filen er kørt.
-  const show = picked && picked.status === "planned" ? { ...picked, countdown_to: (await fetchCountdown(sb, picked.id)).countdownTo } : picked;
+  const cd = picked && picked.status === "planned" ? await fetchCountdown(sb, picked.id) : null;
+  const show = picked && cd ? { ...picked, countdown_to: cd.countdownTo, countdown_music: cd.music } : picked;
 
   let items: Item[] = [];
   let messages: Message[] = [];

@@ -1,13 +1,17 @@
 -- Relived · nedtælling til live. Sælgeren kan starte en nedtælling på 1, 3, 5 eller 10 minutter i stedet for at gå
 -- live med det samme. Seerne ser "Live om 4:32" på showets side, følgerne får besked, når nedtællingen starter,
 -- og chatten er åben, mens der tælles ned. Når tiden er gået, går studiet selv live (3-2-1).
+-- Sælgeren kan vælge ventemusik (et af numrene i public/musik/), som seerne kan høre, mens de venter.
 -- Kør hele filen i Supabase → SQL Editor → New query → Run (efter 0033). Filen kan køres flere gange uden fejl.
 
 alter table public.shows add column if not exists countdown_to timestamptz;
+-- Nøglen på ventemusikken (lib/music.ts). Null = ingen musik.
+alter table public.shows add column if not exists countdown_music text;
 
 -- Start nedtællingen. Kun værten, og kun før showet er gået live. Starttidspunktet flyttes til nedtællingens slut,
 -- så showet står øverst under "Snart live".
-create or replace function public.start_countdown(p_show uuid, p_minutes int)
+drop function if exists public.start_countdown(uuid, int);
+create or replace function public.start_countdown(p_show uuid, p_minutes int, p_music text default null)
 returns timestamptz
 language plpgsql
 security definer
@@ -19,9 +23,12 @@ begin
   if p_minutes not in (1, 3, 5, 10) then
     raise exception 'Vælg 1, 3, 5 eller 10 minutter';
   end if;
+  if p_music is not null and p_music !~ '^[a-z0-9-]{1,40}$' then
+    raise exception 'Ukendt ventemusik';
+  end if;
   v_to := now() + make_interval(mins => p_minutes);
   update public.shows s
-     set countdown_to = v_to, starts_at = v_to
+     set countdown_to = v_to, starts_at = v_to, countdown_music = p_music
    where s.id = p_show and s.seller_id = auth.uid() and s.status = 'planned' and s.removed_at is null;
   if not found then
     raise exception 'Nedtællingen kan kun startes af værten, før showet er live';
@@ -29,8 +36,8 @@ begin
   return v_to;
 end;
 $$;
-revoke execute on function public.start_countdown(uuid, int) from public, anon;
-grant  execute on function public.start_countdown(uuid, int) to authenticated;
+revoke execute on function public.start_countdown(uuid, int, text) from public, anon;
+grant  execute on function public.start_countdown(uuid, int, text) to authenticated;
 
 -- Stop nedtællingen (showet bliver ved med at være planlagt).
 create or replace function public.stop_countdown(p_show uuid)
@@ -40,7 +47,7 @@ security definer
 set search_path = ''
 as $$
 begin
-  update public.shows s set countdown_to = null
+  update public.shows s set countdown_to = null, countdown_music = null
    where s.id = p_show and s.seller_id = auth.uid() and s.status = 'planned';
 end;
 $$;
@@ -56,6 +63,7 @@ as $$
 begin
   if new.status <> 'planned' then
     new.countdown_to := null;
+    new.countdown_music := null;
   end if;
   return new;
 end;

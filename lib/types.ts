@@ -44,6 +44,8 @@ export interface Show {
   language?: ShowLanguage;
   /** Nedtælling til live (0034_nedtaelling.sql). Ikke med i SHOW_COLS; hentes for sig og kommer med i realtid. */
   countdown_to?: string | null;
+  /** Ventemusik under nedtællingen (lib/music.ts), kun med 0034. */
+  countdown_music?: string | null;
 }
 
 export type ShowLanguage = "da" | "en";

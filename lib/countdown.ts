@@ -17,9 +17,14 @@ export function mmss(ms: number) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-/** Henter nedtællingen for et show. Er 0034 ikke kørt, er den null, og ready er false. */
+/** Henter nedtællingen og ventemusikken for et show. Er 0034 ikke kørt, er de null, og ready er false. */
 export async function fetchCountdown(sb: SupabaseClient, showId: string) {
-  const { data, error } = await sb.from("shows").select("countdown_to").eq("id", showId).maybeSingle();
-  if (error) return { ready: false, countdownTo: null as string | null };
-  return { ready: true, countdownTo: ((data as { countdown_to?: string | null } | null)?.countdown_to ?? null) as string | null };
+  type Row = { countdown_to?: string | null; countdown_music?: string | null } | null;
+  const none = { ready: false, countdownTo: null as string | null, music: null as string | null };
+  let res = await sb.from("shows").select("countdown_to, countdown_music").eq("id", showId).maybeSingle();
+  // En ældre udgave af 0034 uden ventemusik: nedtællingen virker stadig.
+  if (res.error) res = await sb.from("shows").select("countdown_to").eq("id", showId).maybeSingle();
+  if (res.error) return none;
+  const row = res.data as Row;
+  return { ready: true, countdownTo: row?.countdown_to ?? null, music: row?.countdown_music ?? null };
 }

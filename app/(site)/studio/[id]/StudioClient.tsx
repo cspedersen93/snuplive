@@ -31,6 +31,8 @@ import Reactions from "@/components/Reactions";
 import BigChat, { CHAT_SIZES, CHAT_SIZE_KEY, readChatSize, type ChatSize } from "@/components/BigChat";
 import { useWakeLock } from "@/components/useWakeLock";
 import { COUNTDOWN_MINUTES, countingDown, mmss } from "@/lib/countdown";
+import { trackByKey } from "@/lib/music";
+import { MusicPick, useMusicPick } from "@/components/WaitMusic";
 import type { Room } from "livekit-client";
 
 export interface StudioSale {
@@ -458,14 +460,20 @@ export default function StudioClient(props: Props) {
   }, [isHost, countLeft, count, busy, cameraReady]);
 
   const [pickCountdown, setPickCountdown] = useState(false);
+  const [music, setMusic] = useMusicPick();
+  const waitTrack = trackByKey(show.countdown_music);
   async function startCountdown(minutes: number) {
     setPickCountdown(false);
     autoLive.current = false;
-    const ok = await rpc("start_countdown", { p_show: show.id, p_minutes: minutes }, `Nedtællingen er startet. Du går live om ${minutes} min.`);
+    const ok = await rpc(
+      "start_countdown",
+      { p_show: show.id, p_minutes: minutes, p_music: music || null },
+      `Nedtællingen er startet. Du går live om ${minutes} min.`,
+    );
     // Følgerne og dem, der har trykket Husk mig, får besked nu, så de når at være klar.
     if (ok) {
       void fetch(`/api/shows/${show.id}/notify`, { method: "POST" }).catch(() => undefined);
-      track("Nedtælling", { minutter: minutes });
+      track("Nedtælling", { minutter: minutes, musik: music || "ingen" });
     }
   }
 
@@ -810,6 +818,12 @@ export default function StudioClient(props: Props) {
                           ? "Seerne ser nedtællingen, og chatten er åben. Ingen kan se dit kamera endnu."
                           : "Tænd kameraet, så du går live af dig selv, når tiden er gået."}
                       </span>
+                      {waitTrack ? (
+                        <span className="wm-now">
+                          <span className="wm-bars" aria-hidden="true"><i /><i /><i /></span>
+                          Seerne kan høre {waitTrack.title} · {waitTrack.artist}
+                        </span>
+                      ) : null}
                       {!cameraOn ? (
                         <button className="btn btn-red" type="button" onClick={() => setCameraOn(true)}>Tænd kameraet</button>
                       ) : (
@@ -847,13 +861,16 @@ export default function StudioClient(props: Props) {
                       </button>
                       {props.countdownReady ? (
                         pickCountdown ? (
-                          <div className="cd-pick" role="group" aria-label="Start nedtælling">
-                            <span>Gå live om</span>
-                            {COUNTDOWN_MINUTES.map((m) => (
-                              <button key={m} className="btn btn-line btn-sm" type="button" disabled={busy} onClick={() => startCountdown(m)}>
-                                {m} min
-                              </button>
-                            ))}
+                          <div className="cd-setup">
+                            <MusicPick value={music} onChange={setMusic} disabled={busy} />
+                            <div className="cd-pick" role="group" aria-label="Start nedtælling">
+                              <span>Gå live om</span>
+                              {COUNTDOWN_MINUTES.map((m) => (
+                                <button key={m} className="btn btn-line btn-sm" type="button" disabled={busy} onClick={() => startCountdown(m)}>
+                                  {m} min
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         ) : (
                           <button className="linkbtn cd-open" type="button" disabled={busy} onClick={() => setPickCountdown(true)}>

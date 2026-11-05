@@ -66,7 +66,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
     <>
     <StudioClient
       profile={profile}
-      show={{ ...(show as Show), countdown_to: cd.countdownTo }}
+      show={{ ...(show as Show), countdown_to: cd.countdownTo, countdown_music: cd.music }}
       countdownReady={cd.ready}
       items={(items.data ?? []) as Item[]}
       messages={((messages.data ?? []) as Message[]).reverse()}

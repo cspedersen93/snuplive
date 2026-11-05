@@ -31,6 +31,7 @@ import type { Guest } from "@/lib/guests";
 import type { Room } from "livekit-client";
 import { LevelChip } from "@/components/Level";
 import { countingDown, mmss } from "@/lib/countdown";
+import { WaitMusic } from "@/components/WaitMusic";
 import { useLevels } from "@/components/useLevels";
 import type { MemberLevel } from "@/lib/levels";
 
@@ -505,6 +506,7 @@ export default function ShowClient(props: Props) {
                           ? "@" + handle + " gør klar. Skriv hej i chatten, mens du venter."
                           : "Går live om et øjeblik …"}
                       </span>
+                      {show.countdown_music ? <WaitMusic trackKey={show.countdown_music} /> : null}
                       <span style={{ fontSize: ".85rem", opacity: 0.8 }}>Siden skifter selv til video, når showet starter.</span>
                     </>
                   ) : show.status === "planned" ? (

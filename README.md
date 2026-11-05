@@ -1020,8 +1020,15 @@ Der skal ikke køres noget i Supabase.
   5 minutter". Der kommer ikke en ekstra besked, når showet går live.
 - Showets starttidspunkt flyttes til nedtællingens slut, så showet står øverst under *Snart live*. Nedtællingen ryddes
   af sig selv, når showet går live eller slutter.
-- Koden: `lib/countdown.ts`, studiet (`StudioClient.tsx`), showets side (`ShowClient.tsx`) og
-  `app/api/shows/[id]/notify/route.ts`.
+- **Ventemusik:** sælgeren vælger et nummer (eller *Ingen musik*), før minutterne vælges, og kan trykke *Lyt* for at
+  høre 20 sekunder fra den mest livlige del. Valget huskes til næste gang. Seerne får knappen *Tryk for ventemusik*
+  (browsere spiller ikke lyd, før man har trykket) og hører nummeret fra starten og i ring. Musikken tones ud, når showet
+  går live, eller nedtællingen stoppes. Har seeren slået musikken til før, prøver siden selv næste gang. Studiet spiller
+  ikke musikken, mens der tælles ned.
+- **Numrene** er Svanekjærs egne og ligger i `public/musik/` (mp3, 128 kbit/s, lige høje, 3-4 MB). Et nyt nummer: læg
+  filen der, og skriv det på listen i `lib/music.ts` med titel og hvor smagsprøven starter.
+- Koden: `lib/countdown.ts`, `lib/music.ts`, `components/WaitMusic.tsx`, studiet (`StudioClient.tsx`), showets side
+  (`ShowClient.tsx`) og `app/api/shows/[id]/notify/route.ts`.
 
 ## App-rammen og forsiden som feed
 
