@@ -917,6 +917,30 @@ Der skal ikke køres noget i Supabase. Tilmeldingerne bruger samme liste som ven
   med `ANTHROPIC_WRITER_MODEL`. Højst 20 udkast pr. admin på 10 minutter.
 - **Datoerne** står i `lib/campaigns.ts`.
 
+## Niveauer og mærker
+
+**Kør `0032_niveauer.sql` i Supabase → SQL Editor** (efter 0031). Indtil da vises der ingen niveauer, og resten af siden
+virker som før.
+
+- **Niveauerne** regnes ud fra handler, der er helt afsluttet (betalt, sendt og modtaget). Intet gemmes som tal, så de
+  passer altid med ordrerne. Annullerede og refunderede køb tæller ikke.
+  - Sælger: Ny → Bronze (5 solgte varer) → Sølv (25 og mindst 4,5 stjerner) → Guld (100, mindst 4,7 stjerner og 9 ud
+    af 10 pakker sendt senest 5 dage efter betalingen) → VIP (250 og kravene til Guld).
+  - Køber: Ny → Bronze (3 købte varer) → Sølv (10) → Guld (25) → VIP (50).
+  - Stjernekravet gælder kun, når sælgeren har fået bedømmelser. Afhentninger tæller ikke med i forsendelserne.
+- **Mærker:** Stiftende sælger (de første 100 sælgere med et salg), Stiftende køber (de første 250 købere), Første køb,
+  Første show, Budkonge (10 vundne budsalg), Lynafsender (10 pakker sendt inden for et døgn), Stamkunde (3 ordrer hos samme
+  sælger) og Natteravn (show startet efter kl. 22).
+- **Hvor de vises:** ved navnet i chatten (sælgerens niveau på sælgerens beskeder, ellers køberniveauet), i
+  sælgeroplysningerne ved showet, på sælgerens side og ved varerne, og på købernes side. "Ny" vises kun på Min konto.
+- **Min konto → Dit niveau** viser, hvor langt man er til næste niveau, og hvilke mærker man mangler. Køberen kan skjule
+  sit køberniveau og sine købermærker. Andre ser aldrig antal køb eller salg, kun niveauet.
+- **VIP udvalgt af jer:** Backoffice → Medlemmer → medlemmet → *VIP-sælger* / *VIP-køber*. Det virker med det samme.
+- **`/niveauer`** forklarer det hele for brugerne og står i sitemap.xml. Kravene står i `lib/levels.ts` og i
+  `0032_niveauer.sql` (begge steder skal rettes, hvis kravene ændres).
+- Der er ingen fordele knyttet til niveauerne endnu. Skal VIP fx give bedre placering i listerne, skal siden *Sådan
+  sorterer vi* og vilkårene opdateres først.
+
 ## App-rammen og forsiden som feed
 
 Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal ikke køres noget i Supabase.

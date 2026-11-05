@@ -29,6 +29,9 @@ import { track } from "@/lib/track";
 import type { CamLayout, Item, Message, Profile, SellerFactsData, Show } from "@/lib/types";
 import type { Guest } from "@/lib/guests";
 import type { Room } from "livekit-client";
+import { LevelChip } from "@/components/Level";
+import { useLevels } from "@/components/useLevels";
+import type { MemberLevel } from "@/lib/levels";
 
 interface Props {
   seller: Pick<Profile, "id" | "handle" | "display_name" | "area" | "avatar_path"> & SellerFactsData;
@@ -44,6 +47,8 @@ interface Props {
   camLayout?: CamLayout;
   /** Værtens samlerabat (0027_samlerabat.sql). */
   bundle?: BundleTiers | null;
+  /** Værtens niveau og mærker (0032_niveauer.sql). */
+  sellerLevel?: MemberLevel | null;
 }
 
 function useNow(ms: number) {
@@ -335,6 +340,7 @@ export default function ShowClient(props: Props) {
   const cover = showImage({ ...show, status: "planned", seller: props.seller });
   const startsIn = show.starts_at ? Date.parse(show.starts_at) - (now + offset) : null;
   const chatLines = messages.slice(-5);
+  const levelOf = useLevels(chatLines.map((m) => (m.kind === "event" ? null : m.user_id)));
   const soldCount = items.filter((i) => i.status === "sold").length;
   const isMineItem = (it: Item) => mine.has(it.id) || Boolean(me && it.status === "sold" && it.high_bidder === me.id);
   const ended = show.status === "ended";
@@ -363,7 +369,7 @@ export default function ShowClient(props: Props) {
               </div>
             </div>
             <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} className="btn btn-red btn-sm" />
-            <SellerFacts seller={props.seller} bundle={props.bundle} />
+            <SellerFacts seller={props.seller} bundle={props.bundle} level={props.sellerLevel} />
             {guests.length ? (
               <div className="show-guests">
                 <span className="label">Sælger sammen med</span>
@@ -522,7 +528,13 @@ export default function ShowClient(props: Props) {
                         <div key={m.id} className={`msg${m.from_seller ? " seller" : ""}`} style={{ ["--c" as string]: gradFor(m.handle) }}>
                           <i />
                           <div>
-                            <b>{m.handle}</b>
+                            <b>
+                              {m.handle}
+                              <LevelChip
+                                level={m.from_seller ? levelOf(m.user_id)?.seller_level : levelOf(m.user_id)?.buyer_level}
+                                role={m.from_seller ? "seller" : "buyer"}
+                              />
+                            </b>
                             {m.body}
                           </div>
                         </div>

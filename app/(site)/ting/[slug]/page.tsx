@@ -10,6 +10,7 @@ import RemindButton from "@/components/RemindButton";
 import ReportButton from "@/components/ReportButton";
 import { itemMeta } from "@/components/Screen";
 import SellerFacts from "@/components/SellerFacts";
+import { fetchLevel } from "@/lib/levels";
 import SetupNotice from "@/components/SetupNotice";
 import { SITE_URL } from "@/lib/env";
 import { category, clock, dayLabel, kr, usedPhrase } from "@/lib/format";
@@ -70,9 +71,14 @@ const load = cache(async (slug: string) => {
   // Varer i et lukket show er kun for de inviterede, indtil showet er slut.
   const closed = !visRes.error && (visRes.data as unknown as { show: { visibility: string } | null } | null)?.show?.visibility === "invite" && item.show.status !== "ended";
   // Sælgerens samlerabat (0027_samlerabat.sql) og bud på varer til fast pris (0028_bud_paa_varer.sql).
-  const [bundle, offerQ] = await Promise.all([fetchBundle(sb, item.seller_id), sb.rpc("offer_min", { p_price: 100 })]);
+  // Sælgerens niveau og mærker (0032_niveauer.sql).
+  const [bundle, offerQ, level] = await Promise.all([
+    fetchBundle(sb, item.seller_id),
+    sb.rpc("offer_min", { p_price: 100 }),
+    fetchLevel(sb, item.seller_id),
+  ]);
   const offers = !offerQ.error;
-  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video, closed, bundle, offers };
+  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video, closed, bundle, offers, level };
 });
 
 function stateOf(it: Loaded): ItemState {
@@ -372,7 +378,7 @@ export default async function ItemPage({ params }: Params) {
                 {hasBundle(d.bundle) ? <> og <b>samlerabat: {bundleText(d.bundle)}</b></> : null}.
               </li>
             </ul>
-            <SellerFacts seller={seller} bundle={d.bundle} />
+            <SellerFacts seller={seller} bundle={d.bundle} level={d.level} />
             <Link className="linkbtn item-howto" href="/saadan-virker-det#priser">Sådan virker priser, fragt og rabat</Link>
             <ReportButton type="item" id={it.id} className="item-report" />
           </div>

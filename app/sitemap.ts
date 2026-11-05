@@ -49,6 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/saelg`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/saadan-virker-det`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/niveauer`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE_URL}/budsalg`, lastModified: now, changeFrequency: "hourly", priority: 0.7 },
     { url: `${SITE_URL}/nyhedsbrev`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
     ...guides,

@@ -7,6 +7,9 @@ import { clock, dayLabel, kr, vareOrd } from "@/lib/format";
 import OrdersTable, { ORDER_SELECT, type AdminOrder } from "../../OrdersTable";
 import ShowsTable, { type ShowRow } from "../../ShowsTable";
 import type { MemberRow } from "../../types";
+import { BadgeList, LevelChip } from "@/components/Level";
+import { toProgress } from "@/lib/levels";
+import VipToggle from "./VipToggle";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Medlem" };
@@ -33,6 +36,9 @@ export default async function Medlem({ params }: { params: Promise<{ id: string 
   const sold = (soldQ.data ?? []) as unknown as AdminOrder[];
   const shows = (showsQ.data ?? []) as ShowRow[];
   const unpaid = (unpaidQ.data ?? []) as { price: number }[];
+  // Niveau og mærker (findes først, når 0032_niveauer.sql er kørt).
+  const lq = await admin.rpc("member_progress", { p_id: id });
+  const lv = lq.error ? null : toProgress(lq.data);
   const addr = addrQ.data as { name: string; address1: string; address2: string | null; zipcode: string; city: string; phone: string | null } | null;
 
   return (
@@ -67,6 +73,38 @@ export default async function Medlem({ params }: { params: Promise<{ id: string 
           <div><dt>Blokeret af sælgere</dt><dd>{Number(m.blocked_by) ? num(m.blocked_by) : "Ingen"}</dd></div>
         </dl>
       </div>
+
+      {lv ? (
+        <div className="box">
+          <h2 className="h3" style={{ marginBottom: 8 }}>Niveau og mærker</h2>
+          <dl className="adm-facts">
+            {lv.seller_level ? (
+              <div>
+                <dt>Som sælger</dt>
+                <dd>
+                  <LevelChip level={lv.seller_level} role="seller" full showNew /> · {num(lv.sold)} solgte {vareOrd(lv.sold)}
+                  {lv.shipped ? ` · ${num(lv.on_time)} af ${num(lv.shipped)} pakker sendt til tiden` : ""}
+                </dd>
+              </div>
+            ) : null}
+            <div>
+              <dt>Som køber</dt>
+              <dd>
+                <LevelChip level={lv.buyer_level} role="buyer" full showNew /> · {num(lv.bought)} købte {vareOrd(lv.bought)}
+                {lv.hide_buyer_level ? " · skjult for andre" : ""}
+              </dd>
+            </div>
+            <div>
+              <dt>Mærker</dt>
+              <dd>{lv.badges.length ? <BadgeList badges={lv.badges} /> : "Ingen endnu"}</dd>
+            </div>
+          </dl>
+          <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+            {m.is_seller ? <VipToggle user={id} role="seller" value={lv.vip_seller} label="VIP-sælger" /> : null}
+            <VipToggle user={id} role="buyer" value={lv.vip_buyer} label="VIP-køber" />
+          </div>
+        </div>
+      ) : null}
 
       {m.is_seller ? (
         <>

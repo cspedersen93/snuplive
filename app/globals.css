@@ -970,6 +970,36 @@ img.v-thumb{object-fit:cover}
 .nophoto.lg i{width:88px;height:88px}
 .nophoto.lg span{font-size:.74rem}
 .mitid-ok{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:.66rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:.3em .6em;border-radius:6px;background:rgba(150,220,180,.12);color:var(--mint);white-space:nowrap}
+/* Niveauer og mærker (0032_niveauer.sql) */
+.lvl{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.2em .5em;border-radius:5px;border:1px solid var(--line-2);color:var(--muted);white-space:nowrap;line-height:1.25;vertical-align:.12em}
+.lvl svg{width:1em;height:1em}
+.lvl-bronze{color:#E2AC86;background:rgba(226,172,134,.10);border-color:rgba(226,172,134,.45)}
+.lvl-soelv{color:#DCE3EA;background:rgba(220,227,234,.08);border-color:rgba(220,227,234,.42)}
+.lvl-guld{color:var(--amber);background:rgba(242,196,107,.10);border-color:rgba(242,196,107,.55)}
+.lvl-vip{color:#241703;background:linear-gradient(135deg,#FFE7B0,#F2C46B 55%,#DDA03A);border-color:transparent}
+.cmsg b .lvl{margin-left:6px}
+.msg b .lvl{margin-left:1.2cqw;font-size:2.1cqw;padding:.15cqw .9cqw;border-radius:.8cqw;text-shadow:none;opacity:1}
+.h-lvl{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px}
+.h-lvl .lvl{font-size:.66rem}
+.mrks{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.mrk{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;line-height:1.2;padding:.32em .7em;border-radius:99px;border:1px solid var(--line-2);color:var(--text);background:rgba(255,236,228,.04);white-space:nowrap}
+.mrk svg{color:var(--amber);flex:none}
+.mrk.locked{color:var(--dim);border-style:dashed;background:none}
+.mrk.locked svg{color:var(--dim)}
+.mrk small{font-family:var(--mono);font-size:.68rem;color:var(--dim)}
+.seller-facts .mrks{margin-top:4px}
+.lvl-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0 16px}
+.lvl-card{padding:14px 16px;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;gap:6px}
+.lvl-card .k{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.lvl-card strong{display:flex;align-items:center;gap:8px;font-size:1.05rem}
+.lvl-card p{margin:0;font-size:.88rem;color:var(--muted)}
+.lvl-bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.lvl-bar span{display:block;height:100%;min-width:4px;border-radius:inherit;background:linear-gradient(90deg,var(--red),var(--amber))}
+.lvl-table{width:100%;border-collapse:collapse;font-size:.92rem}
+.lvl-table th,.lvl-table td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.lvl-table th{font-family:var(--mono);font-size:.66rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.lvl-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;list-style:none;margin:0;padding:0}
+.lvl-badges li{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:.9rem;color:var(--muted)}
 .mitid-status{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:.92rem}
 .mitid-status p{margin:0;flex:1 1 260px}
 .setting-toggle{padding:14px 16px;border:1px solid var(--line);border-radius:14px}

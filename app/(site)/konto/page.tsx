@@ -19,6 +19,8 @@ import ProfileForm from "./ProfileForm";
 import SavedSearches, { type SavedSearch } from "./SavedSearches";
 import { SITE_HOST } from "@/lib/env";
 import { videoShowId } from "@/lib/videoShow";
+import { toProgress } from "@/lib/levels";
+import LevelBox from "./LevelBox";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Min konto", robots: { index: false } };
@@ -50,6 +52,9 @@ export default async function Konto() {
   // Søgeagenter (findes først, når 0024_soegning.sql er kørt).
   const ssq = await supabase.from("saved_searches").select("id,query,category,max_price,size").eq("user_id", uid).order("created_at", { ascending: false });
   const savedSearches = ssq.error ? null : ((ssq.data ?? []) as SavedSearch[]);
+  // Niveau og mærker (findes først, når 0032_niveauer.sql er kørt).
+  const lq = await supabase.rpc("my_level_progress");
+  const levels = lq.error ? null : toProgress(lq.data);
   const snup = mine.data ?? [];
   const sold = sales.data ?? [];
   // Videoannoncerne ligger i et skjult "show" (0019_videoannoncer.sql). Det tæller ikke med som et show.
@@ -107,6 +112,8 @@ export default async function Konto() {
             </>
           ) : null}
         </div>
+
+        {levels ? <LevelBox p={levels} uid={uid} /> : null}
 
         <ProfileForm profile={profile} />
 

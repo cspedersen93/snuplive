@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Stars from "@/components/Stars";
+import { BadgeList, LevelChip } from "@/components/Level";
+import type { MemberLevel } from "@/lib/levels";
 import { bundleText, hasBundle, type BundleTiers } from "@/lib/pricing";
 import type { SellerFactsData } from "@/lib/types";
 
@@ -7,7 +9,18 @@ import type { SellerFactsData } from "@/lib/types";
  * Det, køberen skal vide om sælgeren (forbrugeraftaleloven § 8 a):
  * om sælgeren er privat eller en virksomhed, og om fortrydelsesretten gælder.
  */
-export default function SellerFacts({ seller, stars = true, bundle = null }: { seller: SellerFactsData; stars?: boolean; bundle?: BundleTiers | null }) {
+export default function SellerFacts({
+  seller,
+  stars = true,
+  bundle = null,
+  level = null,
+}: {
+  seller: SellerFactsData;
+  stars?: boolean;
+  bundle?: BundleTiers | null;
+  /** Sælgerens niveau og mærker (0032_niveauer.sql). */
+  level?: MemberLevel | null;
+}) {
   const business = seller.seller_type === "business";
   return (
     <div className="seller-facts">
@@ -26,8 +39,10 @@ export default function SellerFacts({ seller, stars = true, bundle = null }: { s
             MitID-bekræftet
           </span>
         ) : null}
+        <LevelChip level={level?.seller_level} role="seller" full />
         {stars ? <Stars avg={seller.rating_avg} count={seller.rating_count} /> : null}
       </span>
+      <BadgeList badges={level?.badges} role="seller" />
       {hasBundle(bundle) ? (
         <span className="bundle-fact">
           <b>Samlerabat:</b> {bundleText(bundle)}

@@ -18,6 +18,8 @@ import ShowClient from "./ShowClient";
 import FollowButton from "@/components/FollowButton";
 import { videoShowId } from "@/lib/videoShow";
 import { showGuests, type Guest } from "@/lib/guests";
+import { BadgeList, LevelChip } from "@/components/Level";
+import { fetchLevel, type MemberLevel } from "@/lib/levels";
 
 export const dynamic = "force-dynamic";
 
@@ -103,7 +105,9 @@ const load = cache(async (rawHandle: string) => {
   const ratings = (r.data ?? []) as unknown as Rating[];
   // Samlerabat (0027_samlerabat.sql).
   const bundle = await fetchBundle(sb, seller.id);
-  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt, camLayout, closed, bundle };
+  // Niveau og mærker (0032_niveauer.sql). Uden den er level null.
+  const level = await fetchLevel(sb, seller.id);
+  return { setup: true as const, seller: seller as Profile, show, items, messages, ratings, authOk, guests, guestAt, camLayout, closed, bundle, level };
 });
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -173,6 +177,7 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
             <div>
               <h1 className="h2">{d.seller.handle}</h1>
               <span className="muted">{[d.seller.display_name, d.seller.area].filter(Boolean).join(" · ")}</span>
+              <ProfileLevel seller={d.seller.is_seller} level={d.level} />
             </div>
           </div>
           <div className="closed-gate">
@@ -216,11 +221,13 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
           <div>
             <h1 className="h2">{d.seller.handle}</h1>
             <span className="muted">{[d.seller.display_name, d.seller.area].filter(Boolean).join(" · ")}</span>
+            <ProfileLevel seller={d.seller.is_seller} level={d.level} />
           </div>
         </div>
         {d.guestAt ? <GuestAtBanner handle={d.seller.handle} at={d.guestAt} /> : null}
         {d.seller.is_seller ? <FollowButton sellerId={d.seller.id} handle={d.seller.handle} next={`/live/${d.seller.handle}`} className="btn btn-red btn-sm" /> : null}
-        {d.seller.is_seller ? <SellerFacts seller={d.seller} bundle={d.bundle} /> : null}
+        {d.seller.is_seller ? <SellerFacts seller={d.seller} bundle={d.bundle} level={d.level} /> : null}
+        {!d.seller.is_seller ? <BadgeList badges={d.level?.badges} role="buyer" className="profile-badges" /> : null}
         <div className="empty" style={{ marginTop: 18 }}>
           <p style={{ marginBottom: 14 }}>
             {d.seller.handle} har ikke planlagt et show endnu.{d.seller.is_seller ? " Følg sælgeren, så får du besked, når der kommer et." : ""}
@@ -263,6 +270,7 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
         guests={d.guests}
         camLayout={d.camLayout}
         bundle={d.bundle}
+        sellerLevel={d.level}
       />
       {d.ratings.length ? (
         <div className="wrap" style={{ paddingBottom: 64 }}>
@@ -270,6 +278,21 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
         </div>
       ) : null}
     </>
+  );
+}
+
+/**
+ * Køberniveauet under navnet på en købers side (hvis køberen ikke har skjult det).
+ * Hos sælgere står sælgerniveauet i sælgeroplysningerne lige nedenunder.
+ */
+function ProfileLevel({ seller, level }: { seller: boolean; level: MemberLevel | null }) {
+  const l = level?.buyer_level;
+  if (seller || !l || l === "ny") return null;
+  return (
+    <span className="h-lvl" style={{ marginTop: 6 }}>
+      <LevelChip level={l} role="buyer" full />
+      <Link className="muted" href="/niveauer" style={{ fontSize: ".82rem" }}>Hvad betyder det?</Link>
+    </span>
   );
 }
 

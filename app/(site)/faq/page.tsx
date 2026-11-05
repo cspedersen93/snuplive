@@ -30,7 +30,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
       ["Er mit bud bindende?", "Ja. Vinder du budsalget, lander varen under Mine køb til dit bud, og du betaler inden 3 dage, ligesom når du køber med det samme. Byder ingen, kan varen købes bagefter til startprisen."],
       ["Hvad er en lynrunde?", "I en lynrunde har du ti sekunder til at købe varen. Sælgeren starter lynrunder, når mange vil have den samme vare."],
       ["Kan jeg sende hjerter i et live-show?", "Ja. Tryk på hjertet i højre side af videoen, eller tryk to gange på videoen. Under smileyen finder du flere emojis og store effekter som konfetti, hjerteregn og stjerneskud. Hjerter og emojis kan alle sende. Store effekter kræver, at du er logget ind, for dit brugernavn bliver vist, og du kan sende én hvert 30. sekund."],
-      ["Kan andre se, hvad jeg køber?", "Når du køber noget, bliver dit brugernavn vist i chatten i showet, ligesom på et loppemarked. Din liste over køb kan kun du og sælgeren se."],
+      ["Kan andre se, hvad jeg køber?", "Når du køber noget, bliver dit brugernavn vist i chatten i showet, ligesom på et loppemarked. Din liste over køb kan kun du og sælgeren se. Ved dit navn kan andre se dit køberniveau, fx Sølv, men aldrig hvad eller hvor meget du har købt. Du kan skjule niveauet under Min konto."],
     ],
   },
   {
@@ -58,7 +58,8 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
   {
     title: "Tryghed",
     qa: [
-      ["Hvordan ved jeg, at sælgeren er til at stole på?", "Du kan se sælgerens stjerner fra tidligere handler ved sælgerens navn, og om sælgeren er privat eller en virksomhed. Før en sælger kan få penge udbetalt, skal sælgeren også bekræfte sin identitet hos vores betalingspartner Stripe."],
+      ["Hvordan ved jeg, at sælgeren er til at stole på?", "Du kan se sælgerens stjerner fra tidligere handler og sælgerens niveau ved sælgerens navn, og om sælgeren er privat eller en virksomhed. Før en sælger kan få penge udbetalt, skal sælgeren også bekræfte sin identitet hos vores betalingspartner Stripe."],
+      ["Hvad betyder Bronze, Sølv, Guld og VIP?", "Det er niveauer for sælgere og købere. Niveauet stiger med hver handel, der er gennemført: en sælger bliver fx Bronze efter 5 solgte varer og Guld efter 100 solgte varer med gode bedømmelser og hurtig forsendelse. Du kan også få mærker som Lynafsender og Stamkunde. Se alle krav på siden Niveauer og mærker."],
       ["Hvad hvis varen ikke er som vist?", "Tryk Meld et problem på ordren under Mine køb, før du bekræfter, at du har fået varerne. Så holder vi pengene tilbage, sælgeren får besked, og vi hjælper jer med at finde en løsning."],
       ["Hvad gør jeg, hvis nogen skriver grimme ting i chatten?", "Sælgeren kan fjerne beskeder og blokere brugere i sine shows. En blokeret bruger kan hverken skrive eller købe hos sælgeren. Ser du noget, der ikke er i orden, så skriv til kontakt@relived.dk."],
     ],

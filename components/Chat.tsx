@@ -7,6 +7,9 @@ import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { Message } from "@/lib/types";
 import type { Me } from "@/components/useMe";
+import { LevelChip } from "@/components/Level";
+import { useLevels } from "@/components/useLevels";
+import type { Level } from "@/lib/levels";
 
 interface Props {
   showId: string;
@@ -82,7 +85,7 @@ function LineActions({ m, me, canModerate }: { m: Message; me: Me; canModerate: 
   );
 }
 
-export function ChatLine({ m, me, canModerate = false }: { m: Message; me?: Me | null; canModerate?: boolean }) {
+export function ChatLine({ m, me, canModerate = false, level = null }: { m: Message; me?: Me | null; canModerate?: boolean; level?: Level | null }) {
   if (m.kind === "event") return <div className="cmsg event">{m.body}</div>;
   const meId = me?.id;
   const cls = m.from_seller ? "cmsg seller" : m.user_id && m.user_id === meId ? "cmsg me" : "cmsg";
@@ -91,7 +94,10 @@ export function ChatLine({ m, me, canModerate = false }: { m: Message; me?: Me |
     <div className={actions ? `${cls} has-more` : cls}>
       <i style={{ ["--c" as string]: gradFor(m.handle) }} />
       <div>
-        <b>{m.handle}</b>
+        <b>
+          {m.handle}
+          <LevelChip level={level} role={m.from_seller ? "seller" : "buyer"} />
+        </b>
         {m.body}
         {actions ? <LineActions m={m} me={me} canModerate={canModerate} /> : null}
       </div>
@@ -104,6 +110,8 @@ export default function Chat({ showId, messages, me, live, loginHref, title = "C
   const stick = useRef(true);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  // Niveauet ved navnet: sælgerens niveau på sælgerens beskeder, ellers køberniveauet (0032_niveauer.sql).
+  const levelOf = useLevels(messages.map((m) => (m.kind === "event" ? null : m.user_id)));
 
   useEffect(() => {
     const el = log.current;
@@ -145,7 +153,10 @@ export default function Chat({ showId, messages, me, live, loginHref, title = "C
         }}
       >
         {messages.length ? (
-          messages.map((m) => <ChatLine key={m.id} m={m} me={me} canModerate={canModerate} />)
+          messages.map((m) => {
+            const l = levelOf(m.user_id);
+            return <ChatLine key={m.id} m={m} me={me} canModerate={canModerate} level={m.from_seller ? l?.seller_level : l?.buyer_level} />;
+          })
         ) : (
           <p className="muted" style={{ fontSize: ".9rem" }}>{live ? "Skriv den første besked." : "Chatten åbner, når showet går live."}</p>
         )}
