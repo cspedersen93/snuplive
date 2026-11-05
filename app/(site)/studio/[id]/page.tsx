@@ -5,6 +5,7 @@ import { requireProfile } from "@/lib/auth";
 import { hiddenCategories } from "@/lib/categories";
 import { packageSizesReady } from "@/lib/parcels";
 import { aiConfigured } from "@/lib/claude";
+import { subtitlesOn } from "@/lib/subtitles";
 import { Suspense } from "react";
 import MitIdResult from "@/components/MitIdResult";
 import { mitidState } from "@/lib/mitid";
@@ -76,6 +77,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
       camLayout={layoutQ.error ? null : ((layoutQ.data as { cam_layout?: CamLayout } | null)?.cam_layout ?? "split")}
       language={langQ.error ? null : (langQ.data as { language?: ShowLanguage } | null)?.language === "en" ? "en" : "da"}
       aiReady={aiConfigured()}
+      subtitles={await subtitlesOn()}
       hideCats={await hiddenCategories(supabase)}
       parcelReady={await packageSizesReady(supabase)}
       visibility={visQ.error ? null : (visQ.data as { visibility?: string } | null)?.visibility === "invite" ? "invite" : "public"}

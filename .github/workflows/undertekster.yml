@@ -1,0 +1,72 @@
+# Relived · lægger programmet med de automatiske undertekster (agent/) op hos LiveKit Cloud.
+# Kører, når der bliver ændret noget i agent/ på main, eller når du trykker "Run workflow" under Actions.
+# Kræver tre hemmeligheder i GitHub (Settings → Secrets and variables → Actions): LIVEKIT_URL, LIVEKIT_API_KEY og
+# LIVEKIT_API_SECRET, de samme værdier som i Vercel. Første gang bliver programmet oprettet, og agent/livekit.toml
+# bliver gemt i repoet. Bagefter bliver det bare opdateret. Se README → "Automatiske undertekster".
+name: Undertekster (LiveKit)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["agent/**"]
+
+concurrency:
+  group: undertekster
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+      LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+      LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tjek opsætningen
+        id: cfg
+        run: |
+          if [ -z "$LIVEKIT_URL" ] || [ -z "$LIVEKIT_API_KEY" ] || [ -z "$LIVEKIT_API_SECRET" ]; then
+            echo "::warning::Læg LIVEKIT_URL, LIVEKIT_API_KEY og LIVEKIT_API_SECRET ind under Settings → Secrets and variables → Actions, og kør igen."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          if [ -f agent/livekit.toml ]; then echo "op=deploy" >> "$GITHUB_OUTPUT"; else echo "op=create" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Læg programmet op hos LiveKit
+        if: steps.cfg.outputs.ready == 'true'
+        uses: livekit/deploy-action@v2.12.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          OPERATION: ${{ steps.cfg.outputs.op }}
+          WORKING_DIRECTORY: agent
+          REGION: eu-central
+
+      - name: Gem agent/livekit.toml (første gang)
+        if: steps.cfg.outputs.ready == 'true' && steps.cfg.outputs.op == 'create'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f agent/livekit.toml ] && [ -n "$(git status --porcelain agent/livekit.toml)" ]; then
+            git add agent/livekit.toml
+            git commit -m "Undertekster: agent/livekit.toml fra LiveKit Cloud [skip ci]"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          else
+            echo "livekit.toml er allerede gemt (eller blev ikke lavet)."
+          fi
+
+      - name: Tjek, at programmet kører
+        if: steps.cfg.outputs.ready == 'true'
+        uses: livekit/deploy-action@v2.12.1
+        with:
+          OPERATION: status-retry
+          WORKING_DIRECTORY: agent
+          TIMEOUT: 10m

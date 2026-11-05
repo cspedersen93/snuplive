@@ -122,12 +122,13 @@ const isCrew = (identity: string) => identity.startsWith("seller:") || identity.
 const crewId = (identity: string) => identity.slice(identity.indexOf(":") + 1);
 
 /**
- * Seerne: alle undtagen værten og gæsterne. I studiet tælles kun de andre (ens egen forbindelse har ikke noget navn,
+ * Seerne: alle undtagen værten, gæsterne og programmet med underteksterne. I studiet tælles kun de andre (ens egen forbindelse har ikke noget navn,
  * før den er forbundet). På seersiden tælles man selv med, som før.
  */
 function useViewerCount(onViewers: (n: number) => void, studio = false) {
   const participants = useParticipants();
-  const n = participants.filter((p) => !isCrew(p.identity) && !(studio && p.isLocal)).length;
+  // Programmet med underteksterne (agent/main.py) er ikke en seer.
+  const n = participants.filter((p) => !isCrew(p.identity) && !p.isAgent && !p.identity.startsWith("agent-") && !(studio && p.isLocal)).length;
   useEffect(() => onViewers(n), [n, onViewers]);
 }
 

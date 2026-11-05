@@ -970,6 +970,24 @@ img.v-thumb{object-fit:cover}
 .nophoto.lg i{width:88px;height:88px}
 .nophoto.lg span{font-size:.74rem}
 .mitid-ok{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:.66rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:.3em .6em;border-radius:6px;background:rgba(150,220,180,.12);color:var(--mint);white-space:nowrap}
+/* Automatiske undertekster (agent/main.py, components/LiveSubtitles.tsx) */
+.v-cc{position:absolute;top:5%;right:4.5%;z-index:7;display:inline-flex;align-items:center;justify-content:center;min-width:max(36px,9cqw);height:max(28px,7cqw);padding:0 max(8px,2cqw);border-radius:max(7px,1.8cqw);border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.42);color:rgba(255,255,255,.75);font:700 max(11px,2.7cqw)/1 var(--mono);letter-spacing:.06em;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);-webkit-tap-highlight-color:transparent}
+.v-cc.on{background:#fff;border-color:#fff;color:#111}
+.v-cc:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.v-sub{position:absolute;left:4.5%;right:calc(4% + max(40px,10cqw) + 3cqw);bottom:calc(4.2% + 31cqw);z-index:5;display:flex;flex-direction:column;align-items:center;gap:.8cqw;pointer-events:none;text-align:center}
+.v-sub p{margin:0;max-width:100%;font-size:max(13px,3.5cqw);font-weight:600;line-height:1.38;color:#fff}
+.v-sub p span{background:rgba(0,0,0,.66);padding:.12em .45em;border-radius:.3em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.v-sub p b{color:var(--amber);font-weight:700}
+/* I studiet står hjælpeteksten "Swipe for at skifte vare" lige over varekortet, så teksten står lidt højere. */
+.v-sub-studio{bottom:calc(4.2% + 42cqw)}
+.v-sub small{font-family:var(--mono);font-size:max(9px,2cqw);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.subs-ctrl{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-top:12px;border:1px solid var(--line);border-radius:14px;font-size:.9rem}
+.subs-ctrl>span:nth-child(2){display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.subs-ctrl .muted{font-size:.85rem}
+.subs-ctrl .btn{flex:none}
+.subs-cc{flex:none;display:grid;place-items:center;width:38px;height:28px;border-radius:7px;border:1px solid var(--line-2);font:700 .72rem/1 var(--mono);letter-spacing:.06em;color:var(--muted)}
+.subs-ctrl[data-state=on] .subs-cc{background:#fff;border-color:#fff;color:#111}
+.subs-ctrl[data-state=failed] .subs-cc{border-color:rgba(242,196,107,.6);color:var(--amber)}
 .mitid-status{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:.92rem}
 .mitid-status p{margin:0;flex:1 1 260px}
 .setting-toggle{padding:14px 16px;border:1px solid var(--line);border-radius:14px}

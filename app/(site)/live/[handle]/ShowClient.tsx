@@ -12,6 +12,7 @@ import { IconBox, IconShare, IconShieldCheck } from "@/components/Icons";
 import { ViewerVideo } from "@/components/LiveVideo";
 import FollowButton from "@/components/FollowButton";
 import Reactions from "@/components/Reactions";
+import LiveSubtitles from "@/components/LiveSubtitles";
 import RemindButton from "@/components/RemindButton";
 import { PushOffer } from "@/components/PushOffer";
 import { ScreenTop, itemMeta } from "@/components/Screen";
@@ -584,7 +585,10 @@ export default function ShowClient(props: Props) {
                     ) : null}
                   </div>
                   {video ? (
-                    <Reactions room={room} role="viewer" hostIdentity={`seller:${props.seller.id}`} loggedIn={Boolean(me)} loginHref={loginHref} />
+                    <>
+                      <Reactions room={room} role="viewer" hostIdentity={`seller:${props.seller.id}`} loggedIn={Boolean(me)} loginHref={loginHref} />
+                      <LiveSubtitles room={room} mode="viewer" multi={guests.length > 0} />
+                    </>
                   ) : null}
                 </>
               ) : null}

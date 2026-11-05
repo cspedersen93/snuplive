@@ -9,6 +9,7 @@ import ResetTestSales from "./ResetTestSales";
 import TestBanner from "./TestBanner";
 import { canResetTestSales, paymentsAreTest } from "@/lib/stripe";
 import { SITE_HOST } from "@/lib/env";
+import { SUBTITLE_SETTING } from "@/lib/subtitles";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Indstillinger" };
@@ -31,6 +32,9 @@ export default async function Indstillinger() {
     admin.from("shows").select("id", { count: "exact", head: true }),
     admin.from("items").select("id", { count: "exact", head: true }),
   ]);
+  const subs = await admin.from("settings").select("value").eq("key", SUBTITLE_SETTING).maybeSingle();
+  const subsOn = subs.data?.value === true;
+  const livekitReady = Boolean(process.env.LIVEKIT_URL && process.env.LIVEKIT_API_KEY && process.env.LIVEKIT_API_SECRET);
   const bannerMode = banner.data?.value === true ? "on" : banner.data?.value === false ? "off" : "auto";
   const required = setting.data?.value === true;
   const siteIsOpen = open.data ? open.data.value !== false : true;
@@ -80,6 +84,26 @@ export default async function Indstillinger() {
           disabled={!enabled && !required}
           label="Sælgere skal bekræfte sig med MitID, før de kan gå live"
           help="Shows, der allerede er live, kører videre. Sælgere, der ikke har bekræftet sig, får en knap til MitID i studiet."
+        />
+      </section>
+
+      <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }} id="undertekster">
+        <h2 className="h3">Automatiske undertekster</h2>
+        <p className="muted" style={{ fontSize: ".95rem" }}>
+          Et program hos LiveKit lytter med i live-showene og viser det, sælgeren siger, som tekst i videoen. Seerne kan slå
+          teksten fra, og sælgeren kan slå den fra i studiet. Teksten bliver ikke gemt. Det koster ca. 6 kr. pr. times show,
+          uanset hvor mange der ser med. Programmet skal være lagt op hos LiveKit først (se README → Automatiske undertekster).
+        </p>
+        <SettingToggle
+          settingKey={SUBTITLE_SETTING}
+          value={subsOn}
+          disabled={!livekitReady && !subsOn}
+          label="Vis automatiske undertekster i live-shows"
+          help={
+            livekitReady
+              ? "Gælder shows, der går live, efter du har slået det til. Slår du det fra, beholder de shows, der allerede kører med undertekster, dem til showet slutter."
+              : "Video er ikke sat op endnu. Læg LIVEKIT_URL, LIVEKIT_API_KEY og LIVEKIT_API_SECRET ind i Vercel først."
+          }
         />
       </section>
 

@@ -6,6 +6,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Chat from "@/components/Chat";
 import { IconBulb } from "@/components/Icons";
 import { StudioVideo } from "@/components/LiveVideo";
+import LiveSubtitles from "@/components/LiveSubtitles";
+import StudioSubtitles from "./StudioSubtitles";
 import MitIdButton from "@/components/MitIdButton";
 import { ScreenTop, itemMeta } from "@/components/Screen";
 import { useShowRealtime, sortItems } from "@/components/useShowRealtime";
@@ -64,6 +66,8 @@ interface Props {
   visibility?: "public" | "invite" | null;
   /** Sproget i showet (null: 0023_engelsk.sql er ikke kørt, så kan det ikke vælges). */
   language?: ShowLanguage | null;
+  /** Automatiske undertekster er slået til i Backoffice (lib/subtitles.ts). */
+  subtitles?: boolean;
 }
 
 /** Kortet nederst på kameraet. Værten kan swipe for at skifte ting; gæsten ser bare, hvad der vises. */
@@ -427,6 +431,8 @@ export default function StudioClient(props: Props) {
   async function endShow() {
     setConfirmEnd(false);
     if (await rpc("set_show_status", { p_show: show.id, p_status: "ended" })) {
+      // Underteksterne stopper med det samme (ellers går programmet selv efter 2 minutter).
+      if (props.subtitles) void fetch(`/api/shows/${show.id}/undertekster`, { method: "DELETE" }).catch(() => undefined);
       // Det usolgte er til salg nu: søgeagenterne giver besked.
       pingSearchAlerts();
       setCameraOn(false);
@@ -871,10 +877,14 @@ export default function StudioClient(props: Props) {
                   {cameraOn && video && !out ? (
                     <Reactions room={room} role={isHost ? "host" : "guest"} hostIdentity={`seller:${host.id}`} />
                   ) : null}
+                  {props.subtitles && cameraOn && video && !out ? <LiveSubtitles room={room} mode="studio" multi={guests.length > 0} /> : null}
                 </>
               ) : null}
             </div>
           </div>
+          {props.subtitles && !ended && !out ? (
+            <StudioSubtitles room={room} showId={show.id} live={live} cameraOn={cameraOn} isHost={isHost} />
+          ) : null}
           <div className="studio-ctrl">
             <div className="box" data-tour="ticker">
               <div className="ticker">
