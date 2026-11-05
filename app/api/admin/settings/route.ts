@@ -1,13 +1,15 @@
 import { fail, json } from "@/lib/api";
 import { isAdminEmail } from "@/lib/mail";
 import { mitidEnabled } from "@/lib/mitid";
+import { clearCampaignFlags } from "@/lib/campaignFlags";
+import { CAMPAIGN_SETTINGS } from "@/lib/campaigns";
 import { clearSiteCache } from "@/lib/siteAccess";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserInfo } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-const KEYS = new Set(["mitid_required", "site_open", "test_banner"]);
+const KEYS = new Set(["mitid_required", "site_open", "test_banner", ...Object.values(CAMPAIGN_SETTINGS)]);
 
 /** Admin slår en indstilling til eller fra: { key, value }. */
 export async function POST(req: Request) {
@@ -28,6 +30,7 @@ export async function POST(req: Request) {
   const { error } = await admin.from("settings").upsert({ key: body.key, value, updated_at: new Date().toISOString() });
   if (error) return fail(error.message, 500);
   clearSiteCache();
+  clearCampaignFlags();
   console.info("[snuplive] admin", user.email, "indstilling", body.key, body.value);
   return json({ ok: true });
 }

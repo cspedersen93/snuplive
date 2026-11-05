@@ -1,3 +1,4 @@
+import { campaignFlags } from "@/lib/campaignFlags";
 import { campaignMailLines } from "@/lib/campaigns";
 import { SITE_URL } from "@/lib/env";
 import { sendMail } from "@/lib/mail";
@@ -15,8 +16,9 @@ export const unsubscribeUrl = (token: string) => `${SITE_URL}/kommer-snart/afmel
 export const isNewsletterSource = (source: string | null | undefined) => !!source && source.startsWith("nyhedsbrev");
 
 /** Mailen med linket, man trykker på for at bekræfte sin tilmelding. */
-export function sendConfirmMail(email: string, token: string, source?: string | null) {
+export async function sendConfirmMail(email: string, token: string, source?: string | null) {
   if (isNewsletterSource(source)) {
+    const flags = await campaignFlags();
     return sendMail({
       to: [email],
       subject: "Bekræft din tilmelding til nyhedsbrevet fra Relived",
@@ -24,7 +26,7 @@ export function sendConfirmMail(email: string, token: string, source?: string | 
         "Hej",
         "",
         "Tak, fordi du vil have nyhedsbrevet fra Relived. Du får blandt andet besked om:",
-        ...campaignMailLines(),
+        ...campaignMailLines(new Date(), flags),
         "",
         "Tryk på linket for at bekræfte din tilmelding:",
         `${SITE_URL}/kommer-snart/bekraeft?t=${token}`,

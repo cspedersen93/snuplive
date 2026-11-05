@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import CampaignCards from "@/components/CampaignCards";
 import NewsletterForm from "@/components/NewsletterForm";
+import { campaignFlags } from "@/lib/campaignFlags";
 import { campaignState } from "@/lib/campaigns";
 
 // Teksten følger datoen (nedtælling og dagens låge), så siden bygges igen hvert 5. minut.
@@ -14,8 +15,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/nyhedsbrev" },
 };
 
-export default function Nyhedsbrev() {
-  const { gf, jk, active } = campaignState();
+export default async function Nyhedsbrev() {
+  const flags = await campaignFlags();
+  const { gf, jk, active } = campaignState(new Date(), flags);
   const title =
     gf.phase !== "over" && jk.phase !== "over"
       ? "Få besked om Green Friday og julekalenderen"
@@ -47,7 +49,7 @@ export default function Nyhedsbrev() {
         <section className="sec" aria-labelledby="h-nyhedsbrev-kampagner">
           <div className="wrap">
             <h2 className="h2" id="h-nyhedsbrev-kampagner" style={{ marginBottom: 24 }}>Det sker på Relived</h2>
-            <CampaignCards sellerLink />
+            <CampaignCards flags={flags} sellerLink />
           </div>
         </section>
       ) : null}

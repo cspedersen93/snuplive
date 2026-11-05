@@ -1933,3 +1933,7 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .news-list li{display:flex;gap:12px}
 .news-list li::before{content:"";flex:none;width:16px;height:2px;margin-top:.8em;background:var(--red)}
 .phero .news-form{margin-top:6px}
+/* Backoffice → Nyhedsbrev: Skriv med Claude. */
+.ai-writer{display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line-2);border-radius:14px;background:var(--surface)}
+.ai-writer-head{display:flex;align-items:center;gap:10px}
+.ai-badge{font:500 .68rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.45em .65em;border-radius:6px;background:#D97757;color:#1A1210}

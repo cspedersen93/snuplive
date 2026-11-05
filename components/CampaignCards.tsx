@@ -1,12 +1,21 @@
 import Link from "next/link";
-import { GREEN_FRIDAY, JULEKALENDER, campaignState, inDays } from "@/lib/campaigns";
+import { GREEN_FRIDAY, JULEKALENDER, campaignState, inDays, type CampaignFlags } from "@/lib/campaigns";
 
 /**
  * Kortene til Green Friday og julekalenderen. Teksten følger datoen (nedtælling, "i aften", dagens låge),
  * og et kort forsvinder, når kampagnen er slut. Intet at vise → null.
  */
-export default function CampaignCards({ now = new Date(), sellerLink = false }: { now?: Date; sellerLink?: boolean }) {
-  const { gf, jk } = campaignState(now);
+export default function CampaignCards({
+  now = new Date(),
+  flags,
+  sellerLink = false,
+}: {
+  now?: Date;
+  /** Kontakterne i Backoffice → Nyhedsbrev. Uden dem vises begge (bruges kun i test). */
+  flags?: CampaignFlags;
+  sellerLink?: boolean;
+}) {
+  const { gf, jk } = campaignState(now, flags);
   if (gf.phase === "over" && jk.phase === "over") return null;
 
   return (

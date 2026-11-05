@@ -1,6 +1,6 @@
 import { unquoteEnv } from "@/lib/env";
 
-// Kald til Claude (Anthropic) fra serveren: billedvalget og "AI skriver annoncen".
+// Kald til Claude (Anthropic) fra serveren: billedvalget, "AI skriver annoncen" og nyhedsbrevet i Backoffice.
 // Uden ANTHROPIC_API_KEY er Claude slået fra, og siden virker som før (sælgeren vælger og skriver selv).
 
 const MODEL_DEFAULT = "claude-haiku-5-5";
@@ -37,7 +37,7 @@ export function validImages(images: unknown, max: number, maxB64 = 300_000): ima
 export async function askClaude(
   images: string[],
   question: string,
-  opts: { maxTokens?: number; label?: string; timeoutMs?: number } = {},
+  opts: { maxTokens?: number; label?: string; timeoutMs?: number; model?: string } = {},
 ): Promise<{ text: string } | { why: "off" | "error" }> {
   const key = unquoteEnv(process.env.ANTHROPIC_API_KEY);
   if (!key) return { why: "off" };
@@ -50,7 +50,7 @@ export async function askClaude(
   content.push({ type: "text", text: question });
 
   const base = (unquoteEnv(process.env.ANTHROPIC_API_BASE) || "https://api.anthropic.com").replace(/\/+$/, "");
-  const model = unquoteEnv(process.env.ANTHROPIC_MODEL) || MODEL_DEFAULT;
+  const model = opts.model || unquoteEnv(process.env.ANTHROPIC_MODEL) || MODEL_DEFAULT;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? 20_000);
   try {

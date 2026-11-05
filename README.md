@@ -874,8 +874,16 @@ Der skal ikke køres noget i Supabase. Tilmeldingerne bruger samme liste som ven
 - **`/nyhedsbrev`** er en side til at dele på sociale medier og i annoncer. Den står i bunden af siden og i sitemap.xml.
 - **Tilmelding:** e-mail, flueben for samtykke og et frivilligt flueben "Jeg vil også gerne sælge". Man får en mail og
   bekræfter (dobbelt tilmelding). Mailen nævner kun de kampagner, der ikke er overstået.
-- **Backoffice → Nyhedsbrev** (før Venteliste) viser alle tilmeldte. Kolonnen *Kilde* er `nyhedsbrev-forside` eller
-  `nyhedsbrev-side`, og *Vil sælge* tæller dem med fluebenet. Herfra sendes nyhedsbrevet med *Send en mail til listen*.
+- **Backoffice → Nyhedsbrev** (før Venteliste) viser alle tilmeldte. Kolonnen *Hvor* viser, hvor de skrev sig op, og
+  *Vil sælge* tæller dem med fluebenet.
+- **Kontakterne under *På siden*** (Backoffice → Nyhedsbrev) er slået fra, til I slår dem til: tilmeldingen på forsiden,
+  Green Friday og julekalenderen. De gemmes i `settings` og virker inden for et minut. `/nyhedsbrev` virker altid, men
+  viser kun de kampagner, der er slået til. Bekræftelsesmailen nævner også kun dem.
+- **Skriv med Claude:** skriv et par stikord, vælg længde, og tryk *Skriv udkast*. Claude kender dagens dato, kampagnerne,
+  der er slået til, og de næste 8 offentlige shows i programmet. *Ret udkastet* retter det nuværende udkast efter nye
+  stikord, fx "gør den kortere". Det er kun et udkast: læs det, ret det, og send en test til dig selv først. Kræver
+  `ANTHROPIC_API_KEY` i Vercel (den samme som til billedvalget). Skrivningen bruger `claude-sonnet-5-5`, som kan ændres
+  med `ANTHROPIC_WRITER_MODEL`. Højst 20 udkast pr. admin på 10 minutter.
 - **Datoerne** står i `lib/campaigns.ts`.
 
 ## App-rammen og forsiden som feed

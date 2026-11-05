@@ -1,7 +1,17 @@
 /**
  * Kampagner på forsiden, på /nyhedsbrev og i bekræftelsesmailen: Green Friday og julekalenderen.
  * Datoerne står her ét sted. Kortene forsvinder af sig selv, når kampagnen er slut (dansk tid).
+ * Hver kampagne skal også være slået til i Backoffice → Nyhedsbrev (se lib/campaignFlags.ts).
  */
+
+/** Indstillingerne i Backoffice → Nyhedsbrev. Alle er slået fra, til de bliver slået til. */
+export const CAMPAIGN_SETTINGS = {
+  home: "newsletter_home",
+  gf: "campaign_green_friday",
+  jk: "campaign_julekalender",
+} as const;
+export type CampaignFlags = { home: boolean; gf: boolean; jk: boolean };
+const ALL_ON: CampaignFlags = { home: true, gf: true, jk: true };
 
 const TZ = "Europe/Copenhagen";
 
@@ -30,16 +40,18 @@ function cph(now: Date) {
 
 const daysBetween = (a: string, b: string) => Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 864e5);
 
-export function campaignState(now: Date = new Date()) {
+export function campaignState(now: Date = new Date(), flags: CampaignFlags = ALL_ON) {
   const { day, hour } = cph(now);
 
   let gf: GreenFridayState;
-  if (day < GREEN_FRIDAY.date) gf = { phase: "before", days: daysBetween(day, GREEN_FRIDAY.date) };
+  if (!flags.gf) gf = { phase: "over" };
+  else if (day < GREEN_FRIDAY.date) gf = { phase: "before", days: daysBetween(day, GREEN_FRIDAY.date) };
   else if (day === GREEN_FRIDAY.date && hour < SHOW_OVER_HOUR) gf = { phase: "today" };
   else gf = { phase: "over" };
 
   let jk: JulekalenderState;
-  if (day < JULEKALENDER.start) jk = { phase: "before", days: daysBetween(day, JULEKALENDER.start) };
+  if (!flags.jk) jk = { phase: "over" };
+  else if (day < JULEKALENDER.start) jk = { phase: "before", days: daysBetween(day, JULEKALENDER.start) };
   else if (day <= JULEKALENDER.end) {
     const door = Number(day.slice(8));
     if (hour < SHOW_OVER_HOUR) jk = { phase: "running", door, tonight: true };
@@ -54,8 +66,8 @@ export function campaignState(now: Date = new Date()) {
 export const inDays = (n: number) => (n <= 1 ? "i morgen" : `om ${n} dage`);
 
 /** Linjer til bekræftelsesmailen, så den kun nævner det, der ikke er overstået. */
-export function campaignMailLines(now: Date = new Date()) {
-  const { gf, jk } = campaignState(now);
+export function campaignMailLines(now: Date = new Date(), flags: CampaignFlags = ALL_ON) {
+  const { gf, jk } = campaignState(now, flags);
   const lines: string[] = [];
   if (gf.phase !== "over") lines.push(`- Green Friday: et stort live-show ${GREEN_FRIDAY.label} kl. ${GREEN_FRIDAY.hour}`);
   if (jk.phase !== "over") lines.push(`- Julekalenderen: et live-show hver aften kl. ${JULEKALENDER.hour} fra 1. til 24. december`);

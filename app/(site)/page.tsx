@@ -11,6 +11,7 @@ import ItemCard from "@/components/ItemCard";
 import NewsletterForm from "@/components/NewsletterForm";
 import RemindButton from "@/components/RemindButton";
 import type { FeedItem, ShowWithSeller } from "@/lib/types";
+import { campaignFlags } from "@/lib/campaignFlags";
 import { campaignState } from "@/lib/campaigns";
 import { SITE_URL } from "@/lib/env";
 import { clock, dayLabel } from "@/lib/format";
@@ -39,11 +40,12 @@ export const metadata: Metadata = {
 };
 
 export default async function Forside() {
-  const [{ live, upcoming }, upcomingItems, auctions, forSale] = await Promise.all([
+  const [{ live, upcoming }, upcomingItems, auctions, forSale, flags] = await Promise.all([
     fetchListing(12, 12),
     fetchFeed("upcoming", { limit: 20 }),
     fetchFeed("auctions", { limit: 12 }),
     fetchFeed("for_sale", { limit: 24 }),
+    campaignFlags(),
   ]);
   // Varer på budsalg har deres egen række, så de ikke står to gange.
   const soon = upcomingItems.filter((it) => it.sale_type !== "auction");
@@ -68,7 +70,7 @@ export default async function Forside() {
   const moreForSale = forSale.filter((it) => !usedSale.has(it.id)).slice(0, 10);
   const soonShows = upcoming.filter((s) => s.id !== big?.id).slice(0, 4);
   const stories = uniqueBySeller([...live, ...upcoming]).slice(0, 12);
-  const camp = campaignState();
+  const camp = campaignState(new Date(), flags);
   const campTitle =
     camp.gf.phase !== "over" && camp.jk.phase !== "over"
       ? "Vær med til Green Friday og julekalenderen"
@@ -151,20 +153,23 @@ export default async function Forside() {
             ) : null}
           </section>
 
-          {/* Nyhedsbrev med reklame for de næste kampagner. Kortene forsvinder, når kampagnerne er slut. */}
-          <section className="camp" aria-labelledby="h-camp">
-            <div className="camp-head">
-              <span className="label red">Nyhedsbrev</span>
-              <h2 className="camp-h" id="h-camp">{campTitle}</h2>
-              <p>
-                {camp.active
-                  ? "Skriv dig op, så sender vi en mail, før showene starter."
-                  : "Skriv dig op, så sender vi ugens shows og de bedste fund."}
-              </p>
-            </div>
-            <CampaignCards sellerLink />
-            <NewsletterForm source="nyhedsbrev-forside" />
-          </section>
+          {/* Nyhedsbrev med reklame for de næste kampagner (slås til i Backoffice → Nyhedsbrev). Kortene forsvinder,
+              når kampagnerne er slut. */}
+          {flags.home ? (
+            <section className="camp" aria-labelledby="h-camp">
+              <div className="camp-head">
+                <span className="label red">Nyhedsbrev</span>
+                <h2 className="camp-h" id="h-camp">{campTitle}</h2>
+                <p>
+                  {camp.active
+                    ? "Skriv dig op, så sender vi en mail, før showene starter."
+                    : "Skriv dig op, så sender vi ugens shows og de bedste fund."}
+                </p>
+              </div>
+              <CampaignCards flags={flags} sellerLink />
+              <NewsletterForm source="nyhedsbrev-forside" />
+            </section>
+          ) : null}
         </div>
 
         <aside className="feed-rail" aria-label="Til dig">

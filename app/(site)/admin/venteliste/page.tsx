@@ -3,7 +3,10 @@ import SetupNotice from "@/components/SetupNotice";
 import { num, requireAdmin } from "@/lib/admin";
 import { clock, dayLabel } from "@/lib/format";
 import { unquoteEnv } from "@/lib/env";
+import { CAMPAIGN_SETTINGS, GREEN_FRIDAY, JULEKALENDER } from "@/lib/campaigns";
+import { aiConfigured } from "@/lib/claude";
 import { isWaitlistRole, WAITLIST_ROLES } from "@/lib/waitlist";
+import SettingToggle from "../indstillinger/SettingToggle";
 import WaitlistMail from "./WaitlistMail";
 
 export const dynamic = "force-dynamic";
@@ -20,19 +23,29 @@ interface Row {
 
 const at = (iso: string) => `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}`;
 
-/** Ventelisten fra Kommer snart: hvem der har skrevet sig op, og mail til dem. */
+/** Hvor på siden man skrev sig op. */
+const SOURCES: Record<string, string> = {
+  forside: "Kommer snart",
+  "saelger-knap": "Kommer snart (sælger)",
+  "nyhedsbrev-forside": "Forsiden",
+  "nyhedsbrev-side": "Nyhedsbrev-siden",
+};
+
+/** Nyhedsbrevet (og ventelisten fra Kommer snart): hvad der vises på siden, hvem der har skrevet sig op, og mail til dem. */
 export default async function Venteliste() {
   const { admin, user } = await requireAdmin("/admin/venteliste");
   if (!admin) return <SetupNotice />;
   const count = (q: ReturnType<typeof base>) => q.then((r) => r.count ?? 0);
   const base = () => admin.from("waitlist").select("id", { count: "exact", head: true });
-  const [all, confirmed, sellers, unsub, rowsQ] = await Promise.all([
+  const [all, confirmed, sellers, unsub, rowsQ, settingsQ] = await Promise.all([
     count(base()),
     count(base().not("confirmed_at", "is", null).is("unsubscribed_at", null)),
     count(base().not("confirmed_at", "is", null).is("unsubscribed_at", null).in("role", ["seller", "both"])),
     count(base().not("unsubscribed_at", "is", null)),
     admin.from("waitlist").select("email,role,created_at,confirmed_at,unsubscribed_at,source").order("created_at", { ascending: false }).limit(200),
+    admin.from("settings").select("key,value").in("key", Object.values(CAMPAIGN_SETTINGS)),
   ]);
+  const isOn = (k: string) => (settingsQ.data ?? []).some((r) => r.key === k && r.value === true);
   const rows = (rowsQ.data ?? []) as Row[];
   const mailReady = Boolean(unquoteEnv(process.env.RESEND_API_KEY));
 
@@ -58,7 +71,36 @@ export default async function Venteliste() {
         <a className="btn btn-line btn-sm" href="/api/admin/venteliste?alle=1" download>Hent alle</a>
       </div>
 
-      <WaitlistMail recipients={confirmed} sellers={sellers} me={user.email ?? ""} />
+      <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h2 className="h3">På siden</h2>
+        <p className="muted" style={{ fontSize: ".9rem" }}>
+          Slå nyhedsbrevet og kampagnerne til, når I er klar. Det virker på siden inden for et minut. Siden{" "}
+          <a href="/nyhedsbrev" target="_blank" rel="noopener">relived.dk/nyhedsbrev</a> virker altid, og kortene forsvinder af sig selv,
+          når en kampagne er slut.
+        </p>
+        <SettingToggle
+          settingKey={CAMPAIGN_SETTINGS.home}
+          value={isOn(CAMPAIGN_SETTINGS.home)}
+          label="Vis tilmelding til nyhedsbrevet på forsiden"
+          help="Feltet står under feedet med de kampagner, der er slået til herunder."
+        />
+        <SettingToggle
+          settingKey={CAMPAIGN_SETTINGS.gf}
+          value={isOn(CAMPAIGN_SETTINGS.gf)}
+          label={`Vis Green Friday (${GREEN_FRIDAY.label} kl. ${GREEN_FRIDAY.hour})`}
+          help="Kortet lover et stort live-show med alle stiftende sælgere efter hinanden. Det forsvinder efter showet."
+          confirmOn="Vis Green Friday på siden? Kortet lover et stort live-show fredag 27. november kl. 20 med alle stiftende sælgere."
+        />
+        <SettingToggle
+          settingKey={CAMPAIGN_SETTINGS.jk}
+          value={isOn(CAMPAIGN_SETTINGS.jk)}
+          label={`Vis julekalenderen (1.–24. december kl. ${JULEKALENDER.hour})`}
+          help="Kortet lover et live-show hver aften med én særlig vare på budsalg fra 1 kr. Det forsvinder efter 24. december."
+          confirmOn="Vis julekalenderen på siden? Kortet lover et live-show hver aften kl. 20 fra 1. til 24. december med én vare på budsalg fra 1 kr."
+        />
+      </section>
+
+      <WaitlistMail recipients={confirmed} sellers={sellers} me={user.email ?? ""} aiReady={aiConfigured()} />
 
       {rows.length ? (
         <div className="table-wrap">
@@ -68,6 +110,7 @@ export default async function Venteliste() {
                 <th scope="col">E-mail</th>
                 <th scope="col">Vil gerne</th>
                 <th scope="col">Skrev sig op</th>
+                <th scope="col">Hvor</th>
                 <th scope="col">Status</th>
               </tr>
             </thead>
@@ -77,6 +120,7 @@ export default async function Venteliste() {
                   <td>{r.email}</td>
                   <td>{isWaitlistRole(r.role) ? WAITLIST_ROLES[r.role] : r.role}</td>
                   <td className="muted">{at(r.created_at)}</td>
+                  <td className="muted">{r.source ? (SOURCES[r.source] ?? r.source) : ""}</td>
                   <td>
                     {r.unsubscribed_at ? (
                       <span className="muted">Afmeldt</span>
