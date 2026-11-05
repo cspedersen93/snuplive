@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { IconBell } from "@/components/Icons";
-import { searchHref, type Search } from "@/lib/search";
+import { filtersJson, searchHref, type Search } from "@/lib/search";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import { track } from "@/lib/track";
@@ -32,13 +32,15 @@ export default function SaveSearchButton({ s, signedIn, saved: savedInit = false
 
   async function save() {
     setBusy(true);
-    const { error } = await getSupabase().rpc("save_search", {
-      p_query: s.q,
-      p_category: s.category,
-      p_max_price: s.maxPrice,
-      p_size: s.size,
-    });
+    const base = { p_query: s.q, p_category: s.category, p_max_price: s.maxPrice, p_size: s.size };
+    const filters = filtersJson(s);
+    let { error } = await getSupabase().rpc("save_search", { ...base, p_filters: filters });
+    // Før 0033_filtre.sql er kørt: gem uden filtre, hvis der ikke er valgt nogen.
+    if (error && !Object.keys(filters).length) ({ error } = await getSupabase().rpc("save_search", base));
     setBusy(false);
+    if (error && Object.keys(filters).length && /save_search|function|schema cache/i.test(error.message)) {
+      return toast("Søgeagenter med de nye filtre virker om lidt. Prøv igen senere.");
+    }
     if (error) {
       // Før 0024_soegning.sql er kørt i Supabase.
       if (/save_search|function|schema cache/i.test(error.message)) return toast("Søgeagenter er ikke sat op endnu. Prøv igen senere.");

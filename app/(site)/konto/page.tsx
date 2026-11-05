@@ -50,8 +50,11 @@ export default async function Konto() {
   const following = fol.error ? null : ((fol.data ?? []) as unknown as { seller: Followed | null }[]).map((r) => r.seller).filter((x): x is Followed => !!x);
   const followers = fc.error ? null : ((fc.data as { follower_count?: number } | null)?.follower_count ?? 0);
   // Søgeagenter (findes først, når 0024_soegning.sql er kørt).
-  const ssq = await supabase.from("saved_searches").select("id,query,category,max_price,size").eq("user_id", uid).order("created_at", { ascending: false });
-  const savedSearches = ssq.error ? null : ((ssq.data ?? []) as SavedSearch[]);
+  // Med filtrene (0033_filtre.sql), ellers uden.
+  const savedQ = (cols: string) => supabase.from("saved_searches").select(cols).eq("user_id", uid).order("created_at", { ascending: false });
+  let ssq = await savedQ("id,query,category,max_price,size,filters");
+  if (ssq.error) ssq = await savedQ("id,query,category,max_price,size");
+  const savedSearches = ssq.error ? null : ((ssq.data ?? []) as unknown as SavedSearch[]);
   // Niveau og mærker (findes først, når 0032_niveauer.sql er kørt).
   const lq = await supabase.rpc("my_level_progress");
   const levels = lq.error ? null : toProgress(lq.data);

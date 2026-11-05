@@ -6,7 +6,7 @@ import SaveSearchButton from "@/components/SaveSearchButton";
 import SearchForm from "@/components/SearchForm";
 import { vareOrd } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
-import { parseSearch, searchable, searchHref, searchLabel } from "@/lib/search";
+import { filtersJson, parseSearch, searchable, searchHref, searchLabel } from "@/lib/search";
 import { createPublicClient } from "@/lib/supabase/public";
 import { createClient, getUserId } from "@/lib/supabase/server";
 import type { FeedItem } from "@/lib/types";
@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 const PER_PAGE = 30;
 const POPULAR = ["Uldfrakke", "Kjole", "Jeans", "Sneakers", "Designertaske", "Flyverdragt", "Barnevogn", "Cykel", "Lampe", "LEGO", "Vinyl"];
 
-type Props = { searchParams: Promise<{ q?: string; kategori?: string; maks?: string; str?: string; side?: string }> };
+type Props = { searchParams: Promise<Record<string, string | undefined>> };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const s = parseSearch(await searchParams);
@@ -34,18 +34,25 @@ export default async function Soeg({ searchParams }: Props) {
   const can = searchable(s);
   let items: FeedItem[] = [];
   let ready = true;
+  // Er 0033_filtre.sql ikke kørt endnu, søges der uden de nye filtre, og siden siger det.
+  let filtersReady = true;
   const sb = createPublicClient();
   if (can && sb) {
-    const { data, error } = await sb.rpc("search_items", {
+    const base = {
       p_q: s.q || null,
       p_category: s.category,
       p_max_price: s.maxPrice,
       p_size: s.size,
       p_limit: PER_PAGE,
       p_offset: (s.page - 1) * PER_PAGE,
-    });
-    if (error) ready = false; // 0024_soegning.sql er ikke kørt endnu
-    else items = (data ?? []) as FeedItem[];
+    };
+    let res = await sb.rpc("search_items", { ...base, p_filters: filtersJson(s), p_sort: s.sort });
+    if (res.error) {
+      filtersReady = false;
+      res = await sb.rpc("search_items", base);
+    }
+    if (res.error) ready = false; // 0024_soegning.sql er ikke kørt endnu
+    else items = (res.data ?? []) as FeedItem[];
   }
   const total = feedTotal(items);
   const pages = Math.max(1, Math.ceil(total / PER_PAGE));
@@ -62,7 +69,8 @@ export default async function Soeg({ searchParams }: Props) {
           </nav>
           <h1 className="h2" id="h-soeg">Søg i varer, shows og sælgere</h1>
           <p className="lede">Find det, der er til salg nu, live nu og bliver vist snart. Gem søgningen, så får du besked, når der kommer nyt.</p>
-          <SearchForm s={s} autoFocus={!can} />
+          {/* Ny nøgle, når søgningen skifter, så felterne viser den nye søgning (også efter "Nulstil filtre"). */}
+          <SearchForm key={searchHref(s)} s={s} autoFocus={!can} />
         </div>
       </section>
 
@@ -83,6 +91,11 @@ export default async function Soeg({ searchParams }: Props) {
             </div>
           ) : (
             <>
+              {!filtersReady && (Object.keys(filtersJson(s)).length || s.sort !== "anbefalet") ? (
+                <div className="notice" role="status" style={{ marginBottom: 16 }}>
+                  <span>De nye filtre bliver sat op lige nu. Indtil da søger vi uden dem.</span>
+                </div>
+              ) : null}
               <div className="row-head search-head">
                 <h2 className="h3" id="h-soeg-res">
                   {total ? `${total} ${vareOrd(total)}` : "Ingen varer lige nu"}

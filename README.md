@@ -941,6 +941,26 @@ virker som før.
 - Der er ingen fordele knyttet til niveauerne endnu. Skal VIP fx give bedre placering i listerne, skal siden *Sådan
   sorterer vi* og vilkårene opdateres først.
 
+## Filtre i søgningen
+
+**Kør `0033_filtre.sql` i Supabase → SQL Editor** (efter 0032). Indtil da virker søgningen som før, og vælger man et
+af de nye filtre, står der, at de bliver sat op.
+
+- **Filtrene på `/soeg`:** kategori, størrelse (kun ved tøj og sko), pris fra–til, stand (ny, som ny eller bedre, god
+  stand eller bedre, ikke slidt), hvornår (til salg nu, live nu, kommer snart), købsform (Køb nu eller budsalg), sælger
+  (privat eller virksomhed), ægthed tjekket, med video og sortering (anbefalet, nyeste, billigste, dyreste, live og snart
+  live). Lister og afkrydsninger søger med det samme. Pris og størrelse søger, når man trykker Enter eller *Vis varer*.
+  På mobilen ligger filtrene bag knappen *Filtre*, som viser, hvor mange der er valgt.
+- **Adressen** har kun de valgte filtre med, fx `/soeg?q=kjole&stand=god&type=budsalg&sorter=billigst`, så en søgning
+  kan deles.
+- **Budsalg** er varer på budsalg i shows, der er live eller kommer snart. Får en vare ingen bud, kan den bagefter købes
+  til startprisen og tæller så som *Køb nu*.
+- **Søgeagenter** ("Giv mig besked om nye") gemmer filtrene med (sorteringen tæller ikke), og beskederne følger dem.
+  Min konto viser filtrene ved hver søgeagent.
+- **Stand:** sælgerne vælger nu mellem fem faste muligheder (Ny med prismærke, Som ny, God stand, Brugt, med lidt slid,
+  Slidt) i stedet for at skrive selv, så filteret virker. Varer med en gammel, fritskrevet stand beholder den. Den tæller
+  med i filteret, hvis den begynder med et af ordene (fx "God stand, lidt fnuller").
+
 ## App-rammen og forsiden som feed
 
 Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal ikke køres noget i Supabase.

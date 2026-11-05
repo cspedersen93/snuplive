@@ -1,5 +1,6 @@
 "use client";
 
+import ConditionSelect from "@/components/ConditionSelect";
 import { useEffect, useRef, useState } from "react";
 import AiNote from "@/components/AiNote";
 import { IconSparkle } from "@/components/Icons";
@@ -270,7 +271,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
           {newOnly ? (
             <input id={`ni-cond-${uid}`} value={NEW_ONLY_CONDITION} readOnly aria-readonly="true" />
           ) : (
-            <input id={`ni-cond-${uid}`} value={cond} onChange={(e) => setCond(e.target.value)} maxLength={40} placeholder="Fx Som ny" />
+            <ConditionSelect id={`ni-cond-${uid}`} value={cond} onChange={setCond} />
           )}
         </div>
       </div>

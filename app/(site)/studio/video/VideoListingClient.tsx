@@ -1,5 +1,6 @@
 "use client";
 
+import ConditionSelect from "@/components/ConditionSelect";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import AiNote from "@/components/AiNote";
@@ -671,7 +672,7 @@ export default function VideoListingClient({
                   {newOnly ? (
                     <input id="vl-cond" value={NEW_ONLY_CONDITION} readOnly aria-readonly="true" />
                   ) : (
-                    <input id="vl-cond" value={cond} onChange={(e) => setCond(e.target.value)} maxLength={40} placeholder="Fx Som ny" />
+                    <ConditionSelect id="vl-cond" value={cond} onChange={setCond} />
                   )}
                 </div>
               </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { searchHref, searchLabel } from "@/lib/search";
+import { filtersFrom, searchHref, searchLabel } from "@/lib/search";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 
@@ -12,6 +12,8 @@ export interface SavedSearch {
   category: string | null;
   max_price: number | null;
   size: string | null;
+  /** Filtrene (0033_filtre.sql). Mangler, før filen er kørt. */
+  filters?: unknown;
 }
 
 /** Min konto → Dine søgeagenter: se og slet de gemte søgninger. */
@@ -36,7 +38,7 @@ export default function SavedSearches({ initial }: { initial: SavedSearch[] }) {
           <ul className="saved-list">
             {list.map((s) => (
               <li key={s.id}>
-                <Link href={searchHref({ q: s.query, category: s.category, maxPrice: s.max_price, size: s.size })}>{searchLabel(s)}</Link>
+                <Link href={searchHref({ q: s.query, category: s.category, maxPrice: s.max_price, size: s.size, ...filtersFrom(s.filters) })}>{searchLabel(s)}</Link>
                 <button className="linkbtn" type="button" onClick={() => remove(s.id)} aria-label={`Slet søgeagenten ${searchLabel(s)}`}>
                   Slet
                 </button>
