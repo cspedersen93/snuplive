@@ -10,7 +10,7 @@ export default function SoonLayout({ children }: { children: React.ReactNode }) 
         <div className="wrap">
           <Link className="logo" href="/" aria-label="Relived">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/logo.svg" alt="Relived" width={122} height={44} />
+            <img src="/img/logo.svg" alt="Relived" width={142} height={48} />
           </Link>
         </div>
       </header>
