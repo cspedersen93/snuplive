@@ -100,7 +100,7 @@ export default async function Forside() {
               {live.length ? <span className="live-dot" aria-hidden="true" /> : null}
               {live.length ? `${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu` : "Live Sale. Second Hand."}
             </span>
-            <h1 id="h-forside" className="feed-h1">
+            <h1 id="h-forside" className="h1 feed-h1">
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
             <p className="feed-lede">Brugt, som ny eller med prismærket på. Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
