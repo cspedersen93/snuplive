@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ItemCard from "@/components/ItemCard";
 import Pager from "@/components/Pager";
+import EmptyNext from "@/components/EmptyNext";
 import { AUCTION_SECONDS, EXTEND_SECONDS } from "@/lib/auction";
 import { vareOrd } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
@@ -60,18 +61,20 @@ export default async function Budsalg({ searchParams }: Props) {
               </div>
               <Pager page={page} pages={pages} href={href} />
             </>
-          ) : (
+          ) : page > 1 ? (
             <div className="empty">
-              <p style={{ marginBottom: 14 }}>
-                {page > 1
-                  ? "Der er ikke flere budsalg på den her side."
-                  : "Der er ingen varer på budsalg lige nu. Når en sælger sætter varer på budsalg i et show, står de her."}
-              </p>
-              <div className="ctas" style={{ justifyContent: "center" }}>
-                <Link className="btn btn-red" href="/live">Se programmet</Link>
-                <Link className="btn btn-line" href="/saelg">Sæt dine varer på budsalg</Link>
-              </div>
+              <p style={{ marginBottom: 14 }}>Der er ikke flere budsalg på den her side.</p>
+              <Link className="btn btn-line" href="/budsalg">Til første side</Link>
             </div>
+          ) : (
+            <EmptyNext
+              text="Der er ingen varer på budsalg lige nu. Skriv dig op, så får du besked, når de næste budsalg starter."
+              source="nyhedsbrev-tom-budsalg"
+            >
+              <div className="empty-more">
+                <Link className="btn btn-line btn-sm" href="/saelg">Sæt dine varer på budsalg</Link>
+              </div>
+            </EmptyNext>
           )}
         </div>
       </section>

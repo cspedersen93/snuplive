@@ -13,6 +13,7 @@ import RemindButton from "@/components/RemindButton";
 import type { FeedItem, ShowWithSeller } from "@/lib/types";
 import { campaignFlags } from "@/lib/campaignFlags";
 import { campaignState } from "@/lib/campaigns";
+import { inBeta, launched } from "@/lib/launch";
 import { SITE_URL } from "@/lib/env";
 import { clock, dayLabel } from "@/lib/format";
 import { showImage } from "@/lib/images";
@@ -138,7 +139,7 @@ export default async function Forside() {
 
         <section className="feed-hero" aria-labelledby="h-feed">
           <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
-          <div className="feed-grid sparse">{big ? <BigShowTile show={big} /> : <WelcomeTile hasItems={forSale.length > 0} />}</div>
+          <div className="feed-grid sparse">{big ? <BigShowTile show={big} /> : <WelcomeTile hasItems={forSale.length > 0} launched={launched()} />}</div>
         </section>
 
         <aside className="feed-rail" aria-label="Til dig">
@@ -179,7 +180,12 @@ export default async function Forside() {
               <p className="rail-empty">
                 Programmet er tomt lige nu. Når en sælger sætter et show i programmet, står det her, og du kan trykke Husk mig.
               </p>
-              <Link className="btn btn-line btn-sm" href="/saelg">Sæt dit eget show i programmet</Link>
+              {/* Til sælgerne indtil lanceringen, til køberne bagefter. */}
+              {launched() ? (
+                <Link className="btn btn-line btn-sm" href="/nyhedsbrev">Få besked om nye shows</Link>
+              ) : (
+                <Link className="btn btn-line btn-sm" href="/saelg">Sæt dit eget show i programmet</Link>
+              )}
             </section>
           )}
           <RailHello />
@@ -280,7 +286,7 @@ export default async function Forside() {
             <h2 className="h2" id="h-saelg" style={{ maxWidth: "16ch" }}>Har du selv noget, der skal videre?</h2>
             <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>
               Sælg brugte fund, ubrugte fejlkøb og nye restpartier live. Gå live fra stuen eller butikken, og sælg en hel bunke på
-              én aften i stedet for at lægge annoncer op én ad gangen. Det er gratis at sælge, mens vi er i beta.
+              én aften i stedet for at lægge annoncer op én ad gangen. {inBeta() ? "Det er gratis at sælge, mens vi er i beta." : "Det er gratis at sælge."}
             </p>
             <Link className="btn btn-red" href="/saelg">Sådan sælger du live</Link>
           </article>

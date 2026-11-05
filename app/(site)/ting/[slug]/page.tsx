@@ -358,8 +358,8 @@ export default async function ItemPage({ params }: Params) {
               </span>
             </Link>
             <FollowButton sellerId={it.seller_id} handle={seller.handle} next={href} />
-            <SellerFacts seller={seller} bundle={d.bundle} />
 
+            {/* Det trygge først, så det, køberen skal vide om sælgeren (privat eller erhverv og fortrydelsesret). */}
             <ul className="item-trust">
               <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har varen.</li>
               {PICKUP_CATEGORIES.includes(cat.key) ? (
@@ -372,6 +372,7 @@ export default async function ItemPage({ params }: Params) {
                 {hasBundle(d.bundle) ? <> og <b>samlerabat: {bundleText(d.bundle)}</b></> : null}.
               </li>
             </ul>
+            <SellerFacts seller={seller} bundle={d.bundle} />
             <Link className="linkbtn item-howto" href="/saadan-virker-det#priser">Sådan virker priser, fragt og rabat</Link>
             <ReportButton type="item" id={it.id} className="item-report" />
           </div>

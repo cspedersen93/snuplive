@@ -5,6 +5,7 @@ import ShowCard from "@/components/ShowCard";
 import SupportLink from "@/components/SupportLink";
 import { COMPANY } from "@/lib/company";
 import { DELIVERY, PARCELS } from "@/lib/pricing";
+import { inBeta } from "@/lib/launch";
 import { fetchEnglishShows } from "@/lib/queries";
 import { paymentsAreTest } from "@/lib/stripe";
 
@@ -174,7 +175,7 @@ export default async function English() {
               <p className="lede" style={{ margin: 0, maxWidth: 620 }}>
                 Go live from your phone, show your things one by one, and sell a whole pile in one evening. Tick <b>Showet er på
                 engelsk</b> (The show is in English) when you create your show, and it gets the English badge and shows up on this
-                page. Selling is free during the beta.
+                page. {inBeta() ? "Selling is free during the beta." : "Selling is free."}
               </p>
             </div>
             <div className="ctas">

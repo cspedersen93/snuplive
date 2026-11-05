@@ -14,7 +14,7 @@ import type { FeedItem } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 const PER_PAGE = 30;
-const POPULAR = ["Uldfrakke", "Strik", "Kjole", "Jeans", "Sneakers", "Flyverdragt", "Lampe", "Keramik", "LEGO", "Vinyl"];
+const POPULAR = ["Uldfrakke", "Kjole", "Jeans", "Sneakers", "Designertaske", "Flyverdragt", "Barnevogn", "Cykel", "Lampe", "LEGO", "Vinyl"];
 
 type Props = { searchParams: Promise<{ q?: string; kategori?: string; maks?: string; str?: string; side?: string }> };
 

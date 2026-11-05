@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { inBeta } from "@/lib/launch";
 
 export const metadata: Metadata = {
   title: { absolute: "Spørgsmål og svar om live shopping | Relived" },
@@ -8,11 +9,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/faq" },
 };
 
+/** "Betaling og fragt" → "betaling-og-fragt", til knapperne øverst. */
+const groupId = (t: string) =>
+  t.toLowerCase().replace(/æ/g, "ae").replace(/ø/g, "oe").replace(/å/g, "aa").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 const GROUPS: { title: string; qa: [string, string][] }[] = [
   {
     title: "Køb",
     qa: [
-      ["Hvad er Relived?", "Relived er en dansk markedsplads for brugt tøj og andre varer, hvor sælgerne viser varerne frem live på video. Du kan spørge sælgeren i chatten, købe med ét tryk eller byde på budsalg, og det, der ikke bliver solgt, kan købes bagefter til fast pris."],
+      ["Hvad er Relived?", "Relived er en dansk markedsplads, hvor sælgerne viser varerne frem live på video: brugt, som ny eller med prismærket på. Du kan spørge sælgeren i chatten, købe med ét tryk eller byde på budsalg, og det, der ikke bliver solgt, kan købes bagefter til fast pris."],
       ["Skal jeg hente en app for at købe?", "Nej. Du ser shows, chatter og køber direkte her på siden, både på telefonen og computeren."],
       ["Hvordan køber jeg i et live-show?", "Når sælgeren viser en vare frem, kan du trykke Køb. Den første, der trykker, får varen, og den lander med det samme under Mine køb."],
       ["Hvad betyder Husk mig?", "Sælgerne kan lægge deres varer på Relived før showet. Trykker du Husk mig på en vare eller et show, giver vi dig besked, når showet starter. Du kan købe varen, mens den bliver vist live."],
@@ -42,7 +47,7 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
   {
     title: "Salg",
     qa: [
-      ["Hvad koster det at sælge?", "Det er gratis at oprette en konto, gå live og sælge i beta-perioden. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke."],
+      ["Hvad koster det at sælge?", `Det er gratis at oprette en konto, gå live og sælge${inBeta() ? " i beta-perioden" : ""}. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke.`],
       ["Hvad skal jeg bruge for at gå live?", "En telefon eller computer med kamera og en stabil internetforbindelse. Du går live direkte i browseren."],
       ["Skal jeg være god til at stå foran et kamera?", "Nej. De bedste shows minder om en snak ved et bord på loppemarkedet. Start med et kort show og få varer."],
       ["Kan vi være flere sælgere i samme show?", "Ja. I studiet trykker du Inviter en sælger og sender linket til en anden sælger. Op til 2 gæster kan være med. I er på kameraet sammen, og gæsterne lægger deres egne varer i køen. Pengene for en gæsts varer går til gæsten, og gæsten sender selv sine varer. Du styrer showet: hvad der vises, budsalg, lynrunder og chatten. Følgerne af gæsterne får også besked, når showet går live."],
@@ -79,11 +84,17 @@ export default function Faq() {
             <span>Spørgsmål og svar</span>
           </nav>
           <h1 className="h1" id="h-faq">Spørgsmål og svar om Relived</h1>
+          <nav className="howto-jump" aria-label="Spring til">
+            {GROUPS.map((g) => (
+              <a key={g.title} href={`#${groupId(g.title)}`}>{g.title}</a>
+            ))}
+          </nav>
         </div>
       </section>
       <section className="sec tight">
         <div className="wrap faq">
-          <div className="sec-head">
+          {/* På mobil står den her efter spørgsmålene (CSS). */}
+          <div className="sec-head faq-help">
             <span className="label">Kan du ikke finde svaret?</span>
             <h2 className="h2">Se, hvordan det hele hænger sammen</h2>
             <div className="ctas">
@@ -94,7 +105,7 @@ export default function Faq() {
           </div>
           <div>
             {GROUPS.map((g, gi) => (
-              <div className="faq-group" key={g.title}>
+              <div className="faq-group" key={g.title} id={groupId(g.title)}>
                 <h2>{g.title}</h2>
                 <div className="faq-list">
                   {g.qa.map(([q, a], i) => (

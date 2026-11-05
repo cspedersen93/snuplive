@@ -132,7 +132,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
       ) : null}
 
       {ready ? (
-        <div className="box payout">
+        <div className="box payout" id="udbetaling">
           <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
             <IconCard />
             <div>

@@ -29,6 +29,11 @@ const SOURCES: Record<string, string> = {
   "saelger-knap": "Kommer snart (sælger)",
   "nyhedsbrev-forside": "Forsiden",
   "nyhedsbrev-side": "Nyhedsbrev-siden",
+  "nyhedsbrev-tom-live": "Tom side: Live nu",
+  "nyhedsbrev-tom-til-salg": "Tom side: Til salg",
+  "nyhedsbrev-tom-budsalg": "Tom side: Budsalg",
+  "nyhedsbrev-tom-klip": "Tom side: Klip",
+  "nyhedsbrev-tom-kategori": "Tom side: kategori",
 };
 
 /** Nyhedsbrevet (og ventelisten fra Kommer snart): hvad der vises på siden, hvem der har skrevet sig op, og mail til dem. */

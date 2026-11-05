@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IconPlay } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import Pager from "@/components/Pager";
+import EmptyNext from "@/components/EmptyNext";
 import SearchForm from "@/components/SearchForm";
 import SortNote from "@/components/SortNote";
 import { CATEGORIES, categoryBySlug, vareOrd } from "@/lib/format";
@@ -96,17 +97,20 @@ export default async function TilSalg({ searchParams }: Props) {
               <Pager page={page} pages={pages} href={(n) => href(cat?.slug ?? null, n)} />
               <SortNote />
             </>
-          ) : (
+          ) : page > 1 ? (
             <div className="empty">
-              <p style={{ marginBottom: 14 }}>
-                {page > 1
-                  ? "Der er ikke flere varer på den her side."
-                  : cat
-                    ? `Der er intet til salg i ${cat.label.toLowerCase()} lige nu. Kig forbi igen efter næste show.`
-                    : "Der er ingen varer til salg lige nu. Varer fra live-shows og videoannoncer lander her."}
-              </p>
-              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+              <p style={{ marginBottom: 14 }}>Der er ikke flere varer på den her side.</p>
+              <Link className="btn btn-line" href={href(cat?.slug ?? null, 1)}>Til første side</Link>
             </div>
+          ) : (
+            <EmptyNext
+              text={
+                cat
+                  ? `Der er intet til salg i ${cat.label.toLowerCase()} lige nu. Skriv dig op, så får du besked, når der kommer nyt.`
+                  : "Der er ingen varer til salg lige nu. Varer fra live-shows og videoannoncer lander her. Skriv dig op, så får du besked, når der kommer nyt."
+              }
+              source="nyhedsbrev-tom-til-salg"
+            />
           )}
         </div>
       </section>

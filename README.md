@@ -586,6 +586,23 @@ også, hvis der er en rigtig betaling. Fragtlabels, der er købt hos Shipmondo, 
 
 ---
 
+## Lanceringsdagen: teksterne skifter af sig selv
+
+Relived regnes for åbnet, når Stripe kører med rigtige nøgler (`lib/launch.ts`). Når de rigtige nøgler ligger i Vercel, og
+der er trykket **Redeploy**, skifter siden af sig selv:
+
+- "Gratis at sælge i beta" og lignende bliver til "Gratis at sælge" på forsiden, Sælg, Sådan virker det, FAQ, guiderne,
+  studiet og den engelske side. **Vilkår** er ikke med (juridisk side) og skal rettes for sig.
+- Det store kort på forsiden taler til sælgerne indtil da ("Vær med fra starten") og til køberne bagefter ("Vi går snart
+  live" med tilmelding til nyhedsbrevet). Kassen "Snart live" gør det samme.
+- TESTFASE-bjælken forsvinder, og der kommer ingen beta-bjælke i stedet.
+
+Tomme sider (Live nu, Til salg, Budsalg, Klip og kategorierne) har en lille tilmelding til nyhedsbrevet
+(`components/EmptyNext.tsx`). Kilden står i Backoffice → Nyhedsbrev som "Tom side: …". Studiet har en tjekliste for nye
+sælgere (`app/(site)/studio/SellerChecklist.tsx`), som forsvinder, når alt er gjort.
+
+---
+
 ## Slet alle testshows (før lanceringen)
 
 Kør `supabase/migrations/0031_slet_testshows.sql` i Supabase → SQL Editor (efter 0030).
@@ -620,6 +637,7 @@ købes og sælges her, er en test …". Under **Backoffice → Indstillinger →
 
 - **Automatisk** (standard): bjælken vises, så længe Stripe kører med testnøgler, og forsvinder, når I skifter til rigtige.
 - **Vis** eller **Skjul**: uanset betalingen. Vælger I Vis, mens betalingen er rigtig, får I en advarsel.
+- Når betalingen er rigtig, og bjælken ikke er tvunget frem, er der ingen bjælke.
 
 Det slår igennem på siden inden for et minut. Der skal ikke køres noget i Supabase (det gemmes i `settings`).
 

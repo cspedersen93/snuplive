@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IconBolt, IconBox, IconCamera, IconCard, IconClip, IconList } from "@/components/Icons";
+import { inBeta } from "@/lib/launch";
 
 export const metadata: Metadata = {
-  title: { absolute: "Sælg second hand live på video – gratis i beta | Relived" },
+  title: { absolute: `Sælg second hand live på video – ${inBeta() ? "gratis i beta" : "gratis"} | Relived` },
   description:
-    "Gå live fra telefonen, og sælg en hel bunke på én aften: brugte fund, ubrugte fejlkøb og nye restpartier. Gratis at sælge i beta.",
+    `Gå live fra telefonen, og sælg en hel bunke på én aften: brugte fund, ubrugte fejlkøb og nye restpartier. ${inBeta() ? "Gratis at sælge i beta." : "Gratis at sælge."}`,
   alternates: { canonical: "/saelg" },
 };
 
@@ -29,7 +30,7 @@ export default function Saelg() {
             <Link className="btn btn-line" href="/studio">Gå til studiet</Link>
           </div>
           <ul className="points" style={{ marginTop: 22 }}>
-            <li>Gratis at sælge i beta</li>
+            <li>{inBeta() ? "Gratis at sælge i beta" : "Gratis at sælge"}</li>
             <li>Ingen app at installere</li>
             <li>Pengene direkte på din konto</li>
             <li>Som privatperson eller virksomhed</li>
@@ -57,6 +58,14 @@ export default function Saelg() {
               <li><div><h3>Gå live fra studiet</h3><p>Vis varerne frem én ad gangen. Køberne køber med ét tryk, og du kan starte lynrunder eller budsalg, når stemningen er god.</p></div></li>
               <li><div><h3>Pak, send og få pengene</h3><p>Når køberen har betalt, printer du fragtlabelen og afleverer pakken. Når køberen har fået den, går pengene til din bankkonto.</p></div></li>
             </ol>
+            {/* Regneeksempel: hvad sælgeren får ud af et show. Køberne betaler fragt og køberbeskyttelse. */}
+            <div className="sell-example">
+              <span className="label red">Regneeksempel</span>
+              <p>
+                Du sælger <b>10 varer á 150 kr</b> på én aften. Så får du <b>1.500 kr</b> ind på din konto. Køberne betaler fragten og
+                køberbeskyttelsen, og det koster dig 0 kr at sælge{inBeta() ? ", mens vi er i beta" : ""}.
+              </p>
+            </div>
             <div className="ctas" style={{ marginTop: 28 }}>
               <Link className="btn btn-red" href="/studio">Opret dit første show</Link>
             </div>
@@ -87,7 +96,7 @@ export default function Saelg() {
             <p className="lede">Flere svar finder du under <Link href="/faq">spørgsmål og svar</Link> og i guiden <Link href="/guides/saelg-live-foerste-gang">sælg live første gang</Link>.</p>
           </div>
           <div className="faq-list">
-            <details open><summary><h3>Hvad koster det at sælge?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det er gratis at oprette en konto, gå live og sælge i beta-perioden. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke. Hvis vi senere indfører et salgsgebyr, får du besked, før det gælder.</p></details>
+            <details open><summary><h3>Hvad koster det at sælge?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det er gratis at oprette en konto, gå live og sælge{inBeta() ? " i beta-perioden" : ""}. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke. Hvis vi senere indfører et salgsgebyr, får du besked, før det gælder.</p></details>
             <details><summary><h3>Hvad skal jeg bruge for at gå live?</h3><span className="pm" aria-hidden="true">+</span></summary><p>En telefon eller computer med kamera og en stabil internetforbindelse. Et stativ og et ringlys gør billedet bedre, men det er ikke et krav.</p></details>
             <details><summary><h3>Hvor længe skal et show vare?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Det bestemmer du. Et godt første show er 20 minutter og 10 til 15 varer. I studiet er der en rundvisning, der viser dig, hvad hver knap gør.</p></details>
             <details><summary><h3>Kan jeg sælge sammen med en veninde?</h3><span className="pm" aria-hidden="true">+</span></summary><p>Ja. I studiet trykker du Inviter en sælger og sender linket. Op til 2 andre sælgere kan være med som gæster. I er på kameraet sammen, hver lægger sine egne varer i køen og får selv pengene for dem, og I tager hinandens følgere med. Du styrer, hvad der vises.</p></details>

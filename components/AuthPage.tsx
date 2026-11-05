@@ -26,7 +26,7 @@ export default function AuthPage({ mode }: { mode: "login" | "opret" }) {
       </div>
       <div className="auth-card">
         <Suspense fallback={null}>
-          <AuthForm cta={opret ? "Opret konto" : "Send login"} />
+          <AuthForm cta={opret ? "Opret konto" : "Send mig et login"} />
         </Suspense>
       </div>
     </div>

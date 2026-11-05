@@ -61,7 +61,7 @@ export default function SideNav() {
         {MAIN_CATEGORIES.map((c) => (
           <Link key={c.key} href={`/kategori/${c.slug}`} aria-current={current(`/kategori/${c.slug}`)}>
             <CategoryIcon k={c.key} size={18} />
-            <span>{c.key === "boernetoej" ? "Børnetøj" : c.key === "cykler" ? "Cykler og barnevogne" : c.short}</span>
+            <span>{c.key === "cykler" ? "Cykler og barnevogne" : c.short}</span>
           </Link>
         ))}
       </div>

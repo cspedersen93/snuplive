@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import CategoryIcon from "@/components/CategoryIcon";
+import EmptyNext from "@/components/EmptyNext";
 import ItemCard from "@/components/ItemCard";
 import ShowCard from "@/components/ShowCard";
 import SortNote from "@/components/SortNote";
@@ -144,12 +145,10 @@ export default async function Kategori({ params }: Params) {
           {forSale.length ? (
             <SortNote />
           ) : (
-            <div className="empty">
-              <p style={{ marginBottom: 14 }}>
-                Der er intet til salg i {cat.label.toLowerCase()} lige nu. Varer fra live-shows og videoannoncer lander her.
-              </p>
-              <Link className="btn btn-line" href="/til-salg">Se alt til salg</Link>
-            </div>
+            <EmptyNext
+              text={`Der er intet til salg i ${cat.label.toLowerCase()} lige nu. Skriv dig op, så får du besked, når der kommer nyt.`}
+              source="nyhedsbrev-tom-kategori"
+            />
           )}
         </div>
       </section>

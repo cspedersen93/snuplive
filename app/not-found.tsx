@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import BetaBar from "@/components/BetaBar";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+
+export const metadata: Metadata = { title: "Siden findes ikke", robots: { index: false } };
 
 export default function NotFound() {
   return (

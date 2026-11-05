@@ -264,6 +264,10 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     saleAll: "Se alle andre varer til salg",
     tipsH2: "Hvad skal du kigge efter, når du køber brugte varer?",
     tips: [
+      {
+        h: "Hvad hører til her?",
+        p: "Alt det, der ikke passer i de andre kategorier: bøger og tegneserier, sports- og fitnessudstyr, værktøj, hobby- og håndarbejdsudstyr, musikinstrumenter, spil og elektronik.",
+      },
       { h: "Se den virke", p: "Bed sælgeren tænde, starte eller prøve varen, mens du ser med." },
       { h: "Er alt med?", p: "Spørg til opladere, ledninger, låg og andre dele, der let bliver væk." },
       {

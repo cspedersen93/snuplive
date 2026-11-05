@@ -64,12 +64,11 @@ export function BigShowTile({ show }: { show: ShowWithSeller }) {
   );
 }
 
-/** Når ingen er live eller har planlagt et show. */
 /**
- * Det store kort, når ingen er live. Er der varer til salg, peger det på dem. Er der intet endnu (helt i starten),
- * peger det på at gå live selv, så knappen ikke fører til en tom side.
+ * Det store kort, når ingen er live eller har planlagt et show. Er der varer til salg, peger det på dem. Er der intet
+ * endnu, taler det til sælgerne indtil lanceringen og til køberne bagefter (tilmelding til nyhedsbrevet).
  */
-export function WelcomeTile({ hasItems = true }: { hasItems?: boolean }) {
+export function WelcomeTile({ hasItems = true, launched = false }: { hasItems?: boolean; launched?: boolean }) {
   return (
     <div className="ftile ftile-big ftile-welcome">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -86,7 +85,18 @@ export function WelcomeTile({ hasItems = true }: { hasItems?: boolean }) {
               <Link className="btn btn-line" href="/saelg">Sælg selv live</Link>
             </span>
           </>
+        ) : launched ? (
+          // Efter lanceringen taler kortet til køberne: få besked, når de første shows starter.
+          <>
+            <strong className="ftile-title">Vi går snart live</strong>
+            <span className="ftile-extra">Få besked, når de næste shows starter, så er du med fra første budsalg.</span>
+            <span className="ftile-btns">
+              <Link className="btn btn-red" href="/nyhedsbrev">Få besked først</Link>
+              <Link className="btn btn-line" href="/saelg">Sælg selv live</Link>
+            </span>
+          </>
         ) : (
+          // Indtil lanceringen taler kortet til sælgerne, så der kommer varer på siden.
           <>
             <strong className="ftile-title">Vær med fra starten</strong>
             <span className="ftile-extra">
@@ -94,7 +104,6 @@ export function WelcomeTile({ hasItems = true }: { hasItems?: boolean }) {
             </span>
             <span className="ftile-btns">
               <Link className="btn btn-red" href="/saelg">Sælg selv live</Link>
-              <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
             </span>
           </>
         )}

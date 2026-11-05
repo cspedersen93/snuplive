@@ -38,7 +38,7 @@ export default function Footer() {
             <h2>Kategorier</h2>
             <ul>
               {MAIN_CATEGORIES.map((c) => (
-                <li key={c.key}><Link href={`/kategori/${c.slug}`}>{c.short === "Børn" ? "Børnetøj" : c.short}</Link></li>
+                <li key={c.key}><Link href={`/kategori/${c.slug}`}>{c.short}</Link></li>
               ))}
             </ul>
           </div>

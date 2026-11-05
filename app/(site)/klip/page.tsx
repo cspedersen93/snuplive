@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import EmptyNext from "@/components/EmptyNext";
 import { CLIP_BATCH, loadClip, loadClips, type FeedClip } from "@/lib/clipFeed";
 import { createPublicClient } from "@/lib/supabase/public";
 import ClipFeed from "./ClipFeed";
@@ -33,11 +34,11 @@ export default async function KlipPage({ searchParams }: Props) {
           <span>Klip</span>
         </nav>
         <h1 className="h1" style={{ marginTop: 18 }}>Swipe og køb</h1>
-        <div className="empty" style={{ marginTop: 18 }}>
-          <p style={{ marginBottom: 14 }}>
-            Der er ingen klip lige nu. Her kan du swipe gennem korte videoer af varer til salg, fra live-shows og videoannoncer. Kig forbi igen efter næste show.
-          </p>
-          <Link className="btn btn-red" href="/til-salg">Se alt til salg</Link>
+        <div style={{ marginTop: 18 }}>
+          <EmptyNext
+            text="Der er ingen klip lige nu. Klip af varerne fra showene kommer her. Skriv dig op, så får du besked, når der er nyt."
+            source="nyhedsbrev-tom-klip"
+          />
         </div>
       </div>
     );

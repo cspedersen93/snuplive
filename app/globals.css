@@ -354,7 +354,8 @@ details[open] summary .pm{transform:rotate(45deg)}
 details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
 .faq-group{margin-bottom:40px}
 .faq-group h2{font-size:1.5rem;letter-spacing:-.025em;margin-bottom:12px}
-@media (max-width:860px){.faq{grid-template-columns:1fr}}
+@media (max-width:860px){.faq{grid-template-columns:1fr}.faq>.faq-help{order:2}}
+.faq-group{scroll-margin-top:90px}
 
 /* Show page */
 .show-wrap{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) minmax(0,340px);gap:20px;align-items:start;padding-block:24px 56px}
@@ -1066,7 +1067,7 @@ img.v-thumb{object-fit:cover}
 .foot-grid .sup-link{color:var(--muted);font-size:.95rem}
 .foot-grid .sup-link:hover{color:var(--text)}
 @media (max-width:560px){
-  .sup-fab{width:52px;height:52px;padding:0;justify-content:center}
+  .sup-fab{width:46px;height:46px;padding:0;justify-content:center}
   .sup-fab-t{display:none}
   .sup-panel{inset:0;width:auto;height:100dvh;border-radius:0;border:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);animation:none}
   .sup.is-open .sup-fab{display:none}
@@ -1393,7 +1394,8 @@ div.pip{cursor:default}
 .testbar{background:#2A2208;border-bottom:1px solid rgba(242,196,107,.55);color:#F6DFAE;font-size:.86rem;line-height:1.4}
 .testbar .wrap{display:flex;align-items:center;justify-content:center;gap:12px;padding-block:8px;text-align:left}
 .testbar-chip{flex:none;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#1b1406;background:var(--amber);padding:4px 10px;border-radius:99px}
-@media (max-width:640px){.testbar{font-size:.8rem}.testbar .wrap{align-items:flex-start;gap:10px}.testbar-chip{margin-top:1px}}
+.testbar-short{display:none}
+@media (max-width:640px){.testbar{font-size:.8rem}.testbar .wrap{gap:10px}.testbar-long{display:none}.testbar-short{display:inline}}
 .test-banner-set{display:flex;flex-direction:column;gap:10px}
 .test-banner-set .seg{max-width:420px}
 
@@ -1939,3 +1941,27 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .ai-writer{display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line-2);border-radius:14px;background:var(--surface)}
 .ai-writer-head{display:flex;align-items:center;gap:10px}
 .ai-badge{font:500 .68rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.45em .65em;border-radius:6px;background:#D97757;color:#1A1210}
+/* Tomme sider: kort besked og tilmelding til nyhedsbrevet (components/EmptyNext.tsx). */
+.empty-next{display:flex;flex-direction:column;align-items:center;gap:14px}
+.empty-next>p{margin:0;max-width:56ch}
+.empty-next .soon-form{width:100%;max-width:520px;text-align:left}
+.empty-next .soon-done{text-align:left}
+.empty-more{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:4px}
+/* Hjælp-knappen gemmer sig, mens man scroller ned på mobil og tablet (components/SupportChat.tsx). */
+@media (max-width:900px){.sup-fab{transition:transform .25s ease,opacity .25s ease}.sup-fab.is-tucked{transform:translateY(calc(100% + 90px));opacity:0;pointer-events:none}}
+@media (prefers-reduced-motion:reduce){.sup-fab{transition:none}}
+/* Showet på mobil: videoen så højt op som muligt. Ingen brødkrumme, og titlen står under videoen. */
+@media (max-width:820px){.show-crumbs{display:none}.show-wrap{padding-top:12px}.show-center>*{order:3}.show-center>.player{order:1}.show-center>.show-title{order:2;font-size:1.3rem}}
+.sell-example{display:flex;flex-direction:column;gap:6px;margin-top:24px;padding:16px 18px;border:1px solid var(--line-2);border-radius:16px;background:var(--surface)}
+.sell-example p{margin:0;color:var(--muted)}
+.sell-example b{color:var(--text)}
+/* Studiet: Kom i gang som sælger (app/(site)/studio/SellerChecklist.tsx). */
+.checklist{display:flex;flex-direction:column;gap:12px;border-color:rgba(242,196,107,.45)}
+.checklist-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.checklist-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.checklist-steps li{display:flex;align-items:center;gap:12px;font-size:.98rem}
+.checklist-steps li.done{color:var(--muted)}
+.checklist-steps a{color:var(--text)}
+.checklist-mark{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line-2);font-size:.8rem;font-weight:700}
+.checklist-steps li.done .checklist-mark{background:var(--mint);border-color:var(--mint);color:var(--mint-ink)}
+#nyt-show,#udbetaling,#afsender{scroll-margin-top:90px}

@@ -28,6 +28,9 @@ export default function SupportChat() {
   const [mounted, setMounted] = useState(false);
   const [unread, setUnread] = useState(0);
   const [active, setActive] = useState(false);
+  // Gemt væk, mens man scroller ned på en lille skærm, så knappen ikke dækker tekst og knapper. Kommer igen, når man
+  // scroller op (CSS'en gemmer den kun på mobil og tablet).
+  const [tucked, setTucked] = useState(false);
   const fab = useRef<HTMLButtonElement>(null);
   const back = useRef<HTMLElement | null>(null);
   const admin = /^\/admin(\/|$)/.test(path);
@@ -95,6 +98,19 @@ export default function SupportChat() {
     };
   }, [open, active, admin]);
 
+  useEffect(() => {
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const dy = y - last;
+      if (Math.abs(dy) < 8) return;
+      setTucked(dy > 0 && y > 120);
+      last = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const onSeen = useCallback(() => setUnread(0), []);
   const onThread = useCallback((has: boolean) => {
     try {
@@ -112,7 +128,7 @@ export default function SupportChat() {
         <button
           ref={fab}
           type="button"
-          className="sup-fab"
+          className={`sup-fab${tucked && !open && !unread ? " is-tucked" : ""}`}
           aria-label={open ? "Luk hjælp" : unread ? `Hjælp – ${unread} ${unread === 1 ? "nyt svar" : "nye svar"}` : "Hjælp – skriv til os"}
           aria-expanded={open}
           aria-controls="sup-panel"

@@ -7,7 +7,7 @@ import ReportButton from "@/components/ReportButton";
 import SellerFacts from "@/components/SellerFacts";
 import { fetchBundle } from "@/lib/bundles";
 import SetupNotice from "@/components/SetupNotice";
-import { when } from "@/lib/format";
+import { category, when } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { createPublicClient } from "@/lib/supabase/public";
 import { createClient, getUserId } from "@/lib/supabase/server";
@@ -125,9 +125,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
   return {
     title: `${d.seller.handle} – live shopping med brugte varer`.slice(0, 48),
-    description: d.show
-      ? `Følg ${name} på Relived. ${d.show.status === "planned" ? `Næste show: ${d.show.title}, ${when(d.show.starts_at).toLowerCase()}.` : "Se, hvornår næste show starter."}`.slice(0, 155)
-      : `${name} sælger brugte varer live på Relived. Kig forbi, når næste show starter.`.slice(0, 155),
+    // Hvad sælgeren sælger, og hvorfra, så beskrivelsen i Google siger mere end navnet.
+    description: (
+      `${name} sælger ${d.show ? category(d.show.category).label.toLowerCase() : "brugte varer"}` +
+      `${d.seller.area ? ` fra ${d.seller.area}` : ""} live på Relived. ` +
+      (d.show?.status === "planned"
+        ? `Næste show: ${d.show.title}, ${when(d.show.starts_at).toLowerCase()}.`
+        : "Følg med, og få besked, når næste show starter.")
+    ).slice(0, 155),
     alternates: { canonical },
   };
 }

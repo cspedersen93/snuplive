@@ -9,7 +9,16 @@ import { track } from "@/lib/track";
  * Tilmelding til nyhedsbrevet. Bruger samme liste som ventelisten (tabellen waitlist) med dobbelt tilmelding:
  * man får en mail og er først med, når man har trykket på linket. `source` fortæller, hvor man skrev sig op.
  */
-export default function NewsletterForm({ source, button = "Skriv mig op" }: { source: string; button?: string }) {
+export default function NewsletterForm({
+  source,
+  button = "Skriv mig op",
+  sellOption = true,
+}: {
+  source: string;
+  button?: string;
+  /** Fluebenet "Jeg vil også gerne sælge". Skjult i de små felter på tomme sider. */
+  sellOption?: boolean;
+}) {
   const id = useId();
   const [email, setEmail] = useState("");
   const [sell, setSell] = useState(false);
@@ -75,10 +84,12 @@ export default function NewsletterForm({ source, button = "Skriv mig op" }: { so
           <Link href="/privatliv">Sådan passer vi på dine oplysninger</Link>
         </span>
       </label>
-      <label className="check">
-        <input type="checkbox" checked={sell} onChange={(e) => setSell(e.target.checked)} />
-        <span>Jeg vil også gerne sælge i showene. Så kontakter vi dig.</span>
-      </label>
+      {sellOption ? (
+        <label className="check">
+          <input type="checkbox" checked={sell} onChange={(e) => setSell(e.target.checked)} />
+          <span>Jeg vil også gerne sælge i showene. Så kontakter vi dig.</span>
+        </label>
+      ) : null}
       {/* Felt, som kun robotter udfylder. */}
       <input className="hp" type="text" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} aria-hidden="true" />
     </form>

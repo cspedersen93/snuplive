@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { IconCamera, IconChat, IconShield, IconShieldCheck, IconStar, IconUser } from "@/components/Icons";
 import { kr } from "@/lib/format";
+import { inBeta } from "@/lib/launch";
 import {
   AUTO_COMPLETE_DAYS,
   DELIVERED_COMPLETE_DAYS,
@@ -199,7 +200,7 @@ export default async function Saadan() {
                 ) : null}
                 <tr>
                   <th scope="row">At sælge</th>
-                  <td>Gratis, mens vi er i beta</td>
+                  <td>{inBeta() ? "Gratis, mens vi er i beta" : "Gratis"}</td>
                 </tr>
               </tbody>
             </table>
@@ -280,7 +281,10 @@ export default async function Saadan() {
               ) : null}
               <li>
                 <b>Budsalg i live-shows</b>
-                <span>Buddene starter ved startprisen, og det højeste bud vinder. Byder ingen, kan varen købes bagefter til startprisen.</span>
+                <span>
+                  Buddene starter ved startprisen, og det højeste bud vinder. Byder ingen, kan varen købes bagefter til startprisen.{" "}
+                  <Link href="/budsalg">Se alle varer på budsalg</Link>.
+                </span>
               </li>
             </ul>
           </div>
@@ -316,7 +320,7 @@ export default async function Saadan() {
               <span className="label red">For sælgere</span>
               <h2 className="h2" id="h-seller">Vil du sælge?</h2>
               <p className="lede" style={{ margin: 0 }}>
-                Gratis i beta. Gå live fra telefonen, eller film en vare med Sælg med video. Pengene går til din bankkonto, når køberen har
+                {inBeta() ? "Gratis i beta." : "Det er gratis at sælge."} Gå live fra telefonen, eller film en vare med Sælg med video. Pengene går til din bankkonto, når køberen har
                 fået varen.
               </p>
             </div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import GuideCards from "@/components/GuideCards";
 import { SITE_URL } from "@/lib/env";
 import { GUIDES, guideHref } from "@/lib/guides";
+import { inBeta } from "@/lib/launch";
 
 export const metadata: Metadata = {
   title: { absolute: "Guides: køb og sælg second hand | Relived" },
@@ -78,7 +79,7 @@ export default function Guides() {
           <div className="cta-band">
             <div>
               <h2 className="h2" id="h-guides-cta">Prøv det selv</h2>
-              <p className="lede" style={{ marginTop: 12 }}>Se brugt tøj og design live på video, eller sælg dit eget. Det er gratis i beta.</p>
+              <p className="lede" style={{ marginTop: 12 }}>Se brugt tøj og design live på video, eller sælg dit eget. {inBeta() ? "Det er gratis i beta." : "Det er gratis at sælge."}</p>
             </div>
             <div className="ctas">
               <Link className="btn btn-red" href="/live">Se hvem der er live</Link>

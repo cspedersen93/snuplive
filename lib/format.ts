@@ -69,7 +69,7 @@ export const CATEGORIES = [
     word: "børnetøj",
     slug: "boernetoej",
     label: "Børnetøj og legetøj",
-    short: "Børn",
+    short: "Børnetøj",
     cover: "/img/cover-boernetoej.jpg",
     /** Billedet på kategorikortene. */
     card: "/img/kat-boernetoej.jpg",

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { inBeta } from "@/lib/launch";
 
 /**
  * Guides (/guides): artikler om at købe og sælge brugt, så flere finder Relived på Google.
@@ -44,7 +45,9 @@ export interface Guide {
   end: { h2: string; text: string; href: string; label: string };
 }
 
-const SAELG: GuideCta = { text: "Det er gratis at sælge på Relived i beta-perioden.", href: "/saelg", label: "Bliv sælger" };
+// "I beta" står kun, indtil Relived åbner (rigtige Stripe-nøgler, se lib/launch.ts).
+const BETA = inBeta();
+const SAELG: GuideCta = { text: BETA ? "Det er gratis at sælge på Relived i beta-perioden." : "Det er gratis at sælge på Relived.", href: "/saelg", label: "Bliv sælger" };
 
 export const GUIDES: Guide[] = [
   {
@@ -224,7 +227,7 @@ export const GUIDES: Guide[] = [
         "Skal jeg betale skat, når jeg sælger mit brugte tøj?",
         "Som regel ikke, når det er dit eget tøj, som du har købt til dig selv. Det er anderledes, hvis du køber tøj for at sælge det videre. Læs mere i guiden om skat ved salg af brugt tøj.",
       ],
-      ["Hvad koster det at sælge på Relived?", "Det er gratis at sælge i beta-perioden. Køberen betaler fragten og en køberbeskyttelse."],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten og en køberbeskyttelse.`],
     ],
     related: ["pris-paa-brugt-toej", "saelg-live-foerste-gang", "skat-ved-salg-af-brugt-toej"],
     end: { h2: "Klar til at rydde op i skabet?", text: "Opret en gratis konto, læg dit tøj i køen, og sælg det live eller med video.", href: "/saelg", label: "Bliv sælger" },
@@ -398,7 +401,7 @@ export const GUIDES: Guide[] = [
       ],
     ],
     related: ["saelg-brugt-toej", "saelg-live-foerste-gang", "er-designertasken-aegte"],
-    end: { h2: "Har du sat prisen?", text: "Læg dine varer i køen på Relived, og sælg dem live eller med video. Det er gratis i beta.", href: "/saelg", label: "Kom i gang" },
+    end: { h2: "Har du sat prisen?", text: `Læg dine varer i køen på Relived, og sælg dem live eller med video. ${BETA ? "Det er gratis i beta." : "Det er gratis at sælge."}`, href: "/saelg", label: "Kom i gang" },
   },
 
   {
@@ -570,7 +573,7 @@ export const GUIDES: Guide[] = [
       ["Hvor skriver jeg indtægten i TastSelv?", "Privat salg med fortjeneste skrives i rubrik 20 på årsopgørelsen og i felt 250 på forskudsopgørelsen."],
     ],
     related: ["saelg-brugt-toej", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
-    end: { h2: "Ryd op i skabet med god samvittighed", text: "Sælg dit eget brugte tøj live eller med video. Det er gratis i beta.", href: "/saelg", label: "Bliv sælger" },
+    end: { h2: "Ryd op i skabet med god samvittighed", text: `Sælg dit eget brugte tøj live eller med video. ${BETA ? "Det er gratis i beta." : "Det er gratis at sælge."}`, href: "/saelg", label: "Bliv sælger" },
   },
 
   {
@@ -1404,7 +1407,7 @@ export const GUIDES: Guide[] = [
       ["Hvordan sender jeg en vinylplade?", "I en papkasse til plader, med pladen uden for omslaget i sin inderlomme, så omslaget ikke flækker."],
     ],
     related: ["saelg-live-foerste-gang", "pris-paa-brugt-toej", "saelg-brugt-toej"],
-    end: { h2: "Har du noget, samlerne leder efter?", text: "Vis det frem live, eller sæt det på budsalg. Det er gratis i beta.", href: "/saelg", label: "Bliv sælger" },
+    end: { h2: "Har du noget, samlerne leder efter?", text: `Vis det frem live, eller sæt det på budsalg. ${BETA ? "Det er gratis i beta." : "Det er gratis at sælge."}`, href: "/saelg", label: "Bliv sælger" },
   },
 
   {
@@ -1507,7 +1510,7 @@ export const GUIDES: Guide[] = [
     faq: [
       ["Hvordan sælger jeg en designertaske trygt?", "Sælg gennem en markedsplads, hvor køberen betaler gennem siden, og hvor tasken bliver ægthedstjekket. Så slipper du for svindel og diskussioner."],
       ["Skal jeg have kvitteringen for at sælge min taske?", "Nej, men den gør det nemmere og løfter prisen. Uden kvittering er nærbilleder og ægthedstjekket ekstra vigtige."],
-      ["Hvad koster ægthedstjekket?", "Det er gratis for sælgeren på Relived i beta-perioden."],
+      ["Hvad koster ægthedstjekket?", `Det er gratis for sælgeren på Relived${BETA ? " i beta-perioden" : ""}.`],
       ["Hvad hvis tasken bliver afvist?", "Så kan den ikke sælges på Relived. Er du sikker på, at den er ægte, så send flere og tydeligere billeder, eller skriv til os."],
     ],
     related: ["er-designertasken-aegte", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],

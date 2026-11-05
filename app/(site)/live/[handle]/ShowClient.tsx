@@ -343,7 +343,7 @@ export default function ShowClient(props: Props) {
 
   return (
     <div className="wrap">
-      <nav className="crumbs" aria-label="Brødkrummer" style={{ paddingTop: 22 }}>
+      <nav className="crumbs show-crumbs" aria-label="Brødkrummer" style={{ paddingTop: 22 }}>
         <Link href="/">Forside</Link>
         <span aria-hidden="true">/</span>
         <Link href="/live">Live nu</Link>
@@ -438,7 +438,7 @@ export default function ShowClient(props: Props) {
           <ReportButton type="show" id={show.id} className="show-report" />
         </aside>
 
-        <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+        <div className="show-center" style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
           <h1 className="show-title">
             {show.title}
             {show.language === "en" ? (

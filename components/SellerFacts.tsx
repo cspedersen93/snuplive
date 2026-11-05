@@ -34,7 +34,9 @@ export default function SellerFacts({ seller, stars = true, bundle = null }: { s
         </span>
       ) : null}
       <span className="muted">
-        {business ? "Du har 14 dages fortrydelsesret. " : "Køb fra en privatperson er ikke omfattet af fortrydelsesret. "}
+        {business
+          ? "Du har 14 dages fortrydelsesret. "
+          : "Køb fra en privatperson er ikke omfattet af fortrydelsesret, men du kan melde et problem, hvis varen ikke er som vist. "}
         <Link href="/handelsbetingelser#fortrydelsesret">Læs mere</Link>
       </span>
     </div>

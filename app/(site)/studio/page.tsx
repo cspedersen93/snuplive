@@ -4,6 +4,7 @@ import AccountNav from "@/components/AccountNav";
 import { IconCamera } from "@/components/Icons";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
+import { inBeta } from "@/lib/launch";
 import { clock, dayLabel, when } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { ITEM_COUNT_EMBED } from "@/lib/queries";
@@ -19,6 +20,7 @@ import BundleDiscount from "./BundleDiscount";
 import { hiddenCategories } from "@/lib/categories";
 import Offers from "./Offers";
 import ForSale from "./ForSale";
+import SellerChecklist from "./SellerChecklist";
 import SellerPayments from "./SellerPayments";
 import ShowMenu from "./ShowMenu";
 import { myGuestShows } from "@/lib/guests";
@@ -47,7 +49,7 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
             <div>
               <span className="label red">Sælg live</span>
               <h1 className="h3" style={{ fontSize: "1.5rem", margin: "6px 0" }}>Bliv sælger på Relived</h1>
-              <p className="muted">Opret et show, læg dine varer i køen, og gå live direkte fra browseren. Det er gratis i beta-perioden.</p>
+              <p className="muted">Opret et show, læg dine varer i køen, og gå live direkte fra browseren. {inBeta() ? "Det er gratis i beta-perioden." : "Det er gratis at sælge."}</p>
             </div>
             <BecomeSeller />
           </div>
@@ -116,14 +118,8 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           <MitIdResult />
         </Suspense>
 
-        {!profile.seller_terms_at ? (
-          <div className="notice" role="status">
-            <span>
-              <b>Én ting mangler:</b> Bekræft, om du sælger som privatperson eller virksomhed, og sig ja til vilkårene for sælgere.{" "}
-              <Link href="/konto#saelger">Gør det her</Link>
-            </span>
-          </div>
-        ) : null}
+        {/* Tjeklisten for nye sælgere (sælgertype og vilkår, udbetaling, afsenderadresse, første show). */}
+        <SellerChecklist supabase={supabase} uid={uid} termsDone={Boolean(profile.seller_terms_at)} hasShows={all.length > 0} />
 
         {guestShows.length ? (
           <div className="box guest-shows">
@@ -146,7 +142,9 @@ export default async function Studio({ searchParams }: { searchParams: Promise<{
           </div>
         ) : null}
 
-        <NewShowForm sellerId={uid} englishReady={englishReady} closedReady={closedReady} hideCats={hideCats} />
+        <div id="nyt-show" className="anchor-target">
+          <NewShowForm sellerId={uid} englishReady={englishReady} closedReady={closedReady} hideCats={hideCats} />
+        </div>
 
         {canVideo ? (
           <div className="box vl-entry">

@@ -11,11 +11,11 @@ import { SITE_URL } from "@/lib/env";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Relived – live shopping med brugt tøj og andre varer",
+    default: "Relived – køb og sælg second hand live på video",
     template: "%s | Relived",
   },
   description:
-    "Køb og sælg brugt tøj og andre varer live på video. Se varen, før du køber, spørg sælgeren i chatten, og køb med ét tryk.",
+    "Køb og sælg brugte varer, ubrugte fejlkøb og restpartier live på video. Se varen, før du køber, spørg sælgeren, og køb med ét tryk.",
   applicationName: "Relived",
   openGraph: {
     type: "website",

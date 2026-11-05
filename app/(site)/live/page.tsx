@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SortNote from "@/components/SortNote";
+import EmptyNext from "@/components/EmptyNext";
 import Avatar from "@/components/Avatar";
 import RemindButton from "@/components/RemindButton";
 import { clock, dayLabel, vareOrd } from "@/lib/format";
@@ -44,15 +45,23 @@ export default async function LiveNu() {
               <SortNote />
             </>
           ) : (
-            <div className="empty">
-              <p style={{ marginBottom: 14 }}>
-                Ingen er live lige nu.
-                {upcoming.length
-                  ? " Se, hvem der går live senere, og tryk Husk mig, så giver vi dig besked."
-                  : " Følg de sælgere, du kan lide, så giver vi dig besked, når de går live."}
-              </p>
-              <Link className="btn btn-red" href="/til-salg">Køb til fast pris</Link>
-            </div>
+            upcoming.length ? (
+              <div className="empty">
+                <p style={{ marginBottom: 14 }}>Se, hvem der går live senere, og tryk Husk mig, så giver vi dig besked.</p>
+                <a className="btn btn-red" href="#h-sched">Se programmet</a>
+              </div>
+            ) : (
+              // Intet live og intet i programmet: tilmelding til nyhedsbrevet i stedet for en knap til en anden tom side.
+              <EmptyNext
+                text="Programmet er tomt lige nu. Skriv dig op, så får du besked, når de næste shows starter."
+                source="nyhedsbrev-tom-live"
+              >
+                <div className="empty-more">
+                  <Link className="btn btn-line btn-sm" href="/saadan-virker-det">Sådan virker live shopping</Link>
+                  <Link className="btn btn-line btn-sm" href="/saelg">Sælg selv live</Link>
+                </div>
+              </EmptyNext>
+            )
           )}
         </div>
       </section>
