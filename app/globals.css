@@ -1712,9 +1712,10 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .offer-form .fine a{color:var(--muted)}
 
 /* Forsiden som feed (app-rammen) */
-.home-feed{display:grid;gap:28px;padding-block:22px 48px}
-@media (min-width:1100px){.home-feed{grid-template-columns:minmax(0,1fr) 300px;align-items:start;gap:32px}}
-.feed-main{min-width:0;container-type:inline-size;display:flex;flex-direction:column;gap:18px}
+.home-feed{display:grid;gap:18px;padding-block:22px 48px}
+/* Computer: toppen i første række, feedet og højre kolonne i anden, så kolonnen starter ud for videoen. */
+@media (min-width:1100px){.home-feed{grid-template-columns:minmax(0,1fr) 300px;align-items:start;gap:18px 32px}.feed-top{grid-column:1;grid-row:1}.feed-main{grid-column:1;grid-row:2}.feed-rail{grid-column:2;grid-row:2}}
+.feed-top,.feed-main{min-width:0;container-type:inline-size;display:flex;flex-direction:column;gap:18px}
 .feed-head{display:flex;flex-direction:column;gap:8px}
 .feed-eyebrow{display:inline-flex;align-items:center;gap:8px}
 .feed-h1{font-size:clamp(1.75rem,3.2vw,2.6rem);line-height:1.02;letter-spacing:-.04em;max-width:22ch}
@@ -1788,7 +1789,8 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 }
 .feed-more{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px}
 
-.feed-rail{display:flex;flex-direction:column;gap:14px;min-width:0}
+.feed-rail{display:flex;flex-direction:column;gap:14px;min-width:0;margin-top:10px}
+@media (min-width:1100px){.feed-rail{margin-top:0}}
 .rail-box{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:18px;background:var(--bg-2);border:1px solid var(--line)}
 .rail-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .rail-h{font-size:1.02rem;letter-spacing:-.01em}

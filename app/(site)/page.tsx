@@ -91,8 +91,9 @@ export default async function Forside() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      {/* Toppen (overskrift, faner og sælgere) står for sig selv, så højre kolonne starter ud for feedet på computer. */}
       <div className="wrap home-feed">
-        <div className="feed-main">
+        <div className="feed-top">
           <div className="feed-head">
             <span className="label red feed-eyebrow">
               {live.length ? <span className="live-dot" aria-hidden="true" /> : null}
@@ -133,7 +134,9 @@ export default async function Forside() {
               })}
             </div>
           ) : null}
+        </div>
 
+        <div className="feed-main">
           <section aria-labelledby="h-feed">
             <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
             {/* Med få kort (fx i starten, når ingen er live) bliver det store kort et banner i fuld bredde, så der ikke står
