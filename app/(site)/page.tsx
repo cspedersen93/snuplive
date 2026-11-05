@@ -19,7 +19,7 @@ import { showImage } from "@/lib/images";
 import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed, fetchListing } from "@/lib/queries";
 
-/** Små kort i feedet ud over det store (12 går op i både 2, 3 og 4 kolonner med det store kort på 2×2). */
+/** Små kort under det store kort og kasserne (12 går op i både 2, 3 og 4 kolonner). */
 const FEED_TILES = 12;
 type Tile = { kind: "show"; show: ShowWithSeller } | { kind: "item"; item: FeedItem };
 
@@ -91,7 +91,7 @@ export default async function Forside() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
-      {/* Toppen (overskrift, faner og sælgere) står for sig selv, så højre kolonne starter ud for feedet på computer. */}
+      {/* Forsiden: toppen, det store kort i fuld bredde, kasserne under det (på mobil efter kortene), så shows og varer. */}
       <div className="wrap home-feed">
         <div className="feed-top">
           <div className="feed-head">
@@ -136,44 +136,10 @@ export default async function Forside() {
           ) : null}
         </div>
 
-        <div className="feed-main">
-          <section aria-labelledby="h-feed">
-            <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
-            {/* Med få kort (fx i starten, når ingen er live) bliver det store kort et banner i fuld bredde, så der ikke står
-                et tomt felt ved siden af det. */}
-            <div className={`feed-grid${tiles.length < 4 ? " sparse" : ""}`}>
-              {big ? <BigShowTile show={big} /> : <WelcomeTile hasItems={forSale.length > 0} />}
-              {tiles.map((t) =>
-                t.kind === "show" ? <ShowTile key={`s${t.show.id}`} show={t.show} /> : <ItemTile key={`i${t.item.id}`} item={t.item} />,
-              )}
-            </div>
-            {/* Knapperne under kortene kun, når der er kort. Står det store kort alene, har det sine egne knapper. */}
-            {tiles.length ? (
-              <div className="feed-more">
-                <Link className="btn btn-line" href="/til-salg">Se alt til salg</Link>
-                <Link className="btn btn-line" href="/live">Se hvem der går live</Link>
-              </div>
-            ) : null}
-          </section>
-
-          {/* Nyhedsbrev med reklame for de næste kampagner (slås til i Backoffice → Nyhedsbrev). Kortene forsvinder,
-              når kampagnerne er slut. */}
-          {flags.home ? (
-            <section className="camp" aria-labelledby="h-camp">
-              <div className="camp-head">
-                <span className="label red">Nyhedsbrev</span>
-                <h2 className="camp-h" id="h-camp">{campTitle}</h2>
-                <p>
-                  {camp.active
-                    ? "Skriv dig op, så sender vi en mail, før showene starter."
-                    : "Skriv dig op, så sender vi ugens shows og de bedste fund."}
-                </p>
-              </div>
-              <CampaignCards flags={flags} sellerLink />
-              <NewsletterForm source="nyhedsbrev-forside" />
-            </section>
-          ) : null}
-        </div>
+        <section className="feed-hero" aria-labelledby="h-feed">
+          <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
+          <div className="feed-grid sparse">{big ? <BigShowTile show={big} /> : <WelcomeTile hasItems={forSale.length > 0} />}</div>
+        </section>
 
         <aside className="feed-rail" aria-label="Til dig">
           <RailMine />
@@ -227,6 +193,38 @@ export default async function Forside() {
             <Link className="rail-link" href="/saadan-virker-det#priser">Priser, fragt og rabat</Link>
           </section>
         </aside>
+
+        {tiles.length ? (
+          <section className="feed-tiles" aria-label="Shows og varer">
+            <div className="feed-grid">
+              {tiles.map((t) =>
+                t.kind === "show" ? <ShowTile key={`s${t.show.id}`} show={t.show} /> : <ItemTile key={`i${t.item.id}`} item={t.item} />,
+              )}
+            </div>
+            <div className="feed-more">
+              <Link className="btn btn-line" href="/til-salg">Se alt til salg</Link>
+              <Link className="btn btn-line" href="/live">Se hvem der går live</Link>
+            </div>
+          </section>
+        ) : null}
+
+        {/* Nyhedsbrev med reklame for de næste kampagner (slås til i Backoffice → Nyhedsbrev). Kortene forsvinder,
+            når kampagnerne er slut. */}
+        {flags.home ? (
+          <section className="camp" aria-labelledby="h-camp">
+            <div className="camp-head">
+              <span className="label red">Nyhedsbrev</span>
+              <h2 className="camp-h" id="h-camp">{campTitle}</h2>
+              <p>
+                {camp.active
+                  ? "Skriv dig op, så sender vi en mail, før showene starter."
+                  : "Skriv dig op, så sender vi ugens shows og de bedste fund."}
+              </p>
+            </div>
+            <CampaignCards flags={flags} sellerLink />
+            <NewsletterForm source="nyhedsbrev-forside" />
+          </section>
+        ) : null}
       </div>
 
       <ItemRow id="budsalg" title="Kommende budsalg – byd med live" items={auctions} link={{ href: "/live", label: "Se programmet" }} />

@@ -1712,10 +1712,9 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .offer-form .fine a{color:var(--muted)}
 
 /* Forsiden som feed (app-rammen) */
-.home-feed{display:grid;gap:18px;padding-block:22px 48px}
-/* Computer: toppen i første række, feedet og højre kolonne i anden, så kolonnen starter ud for videoen. */
-@media (min-width:1100px){.home-feed{grid-template-columns:minmax(0,1fr) 300px;align-items:start;gap:18px 32px}.feed-top{grid-column:1;grid-row:1}.feed-main{grid-column:1;grid-row:2}.feed-rail{grid-column:2;grid-row:2}}
-.feed-top,.feed-main{min-width:0;container-type:inline-size;display:flex;flex-direction:column;gap:18px}
+/* Forsiden er én kolonne: toppen, det store kort i fuld bredde, kasserne og så shows og varer. */
+.home-feed{display:flex;flex-direction:column;gap:18px;padding-block:22px 48px;container-type:inline-size}
+.feed-top{min-width:0;display:flex;flex-direction:column;gap:18px}
 .feed-head{display:flex;flex-direction:column;gap:8px}
 .feed-eyebrow{display:inline-flex;align-items:center;gap:8px}
 .feed-h1{font-size:clamp(1.75rem,3.2vw,2.6rem);line-height:1.02;letter-spacing:-.04em;max-width:22ch}
@@ -1740,9 +1739,9 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 .story-time{font:500 .66rem/1 var(--mono);color:var(--amber);margin-top:-2px}
 
 .feed-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.feed-grid>:nth-child(n+14){display:none}
-@container (min-width:520px){.feed-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.feed-grid>:nth-child(13){display:none}}
-@container (min-width:780px){.feed-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.feed-grid>:nth-child(13){display:flex}}
+.feed-grid>:nth-child(n+13){display:none}
+@container (min-width:520px){.feed-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}}
+@container (min-width:780px){.feed-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}}
 .ftile{position:relative;display:flex;flex-direction:column;justify-content:flex-end;aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:var(--surface);text-decoration:none;color:#fff;isolation:isolate}
 .ftile-big{grid-column:span 2;grid-row:span 2;aspect-ratio:auto;min-height:420px;border-radius:22px}
 @container (min-width:520px){.ftile-big{min-height:0}}
@@ -1789,8 +1788,9 @@ a.v-follow:focus-visible,button.v-follow:focus-visible{outline:2px solid #fff;ou
 }
 .feed-more{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px}
 
-.feed-rail{display:flex;flex-direction:column;gap:14px;min-width:0;margin-top:10px}
-@media (min-width:1100px){.feed-rail{margin-top:0}}
+/* Kasserne: på mobil under shows og varer, på computer i en række lige under det store kort. */
+.feed-rail{display:flex;flex-direction:column;gap:14px;min-width:0;order:1;margin-top:10px}
+@media (min-width:900px){.feed-rail{order:0;margin-top:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}}
 .rail-box{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:18px;background:var(--bg-2);border:1px solid var(--line)}
 .rail-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .rail-h{font-size:1.02rem;letter-spacing:-.01em}
