@@ -5,10 +5,29 @@ import NewsletterForm from "@/components/NewsletterForm";
  * En tom side (intet live, intet til salg, ingen budsalg eller klip): fortæl det kort, og giv køberen én ting at gøre
  * med det samme, nemlig at skrive sig op til nyhedsbrevet, i stedet for at sende hende videre til en anden tom side.
  * `source` gemmes ved tilmeldingen, så Backoffice kan se, hvilken side folk skrev sig op fra.
+ * Med `title` og `icon` står beskeden som en rolig flade med et ikon og en kort overskrift.
  */
-export default function EmptyNext({ text, source, children }: { text: ReactNode; source: string; children?: ReactNode }) {
+export default function EmptyNext({
+  title,
+  text,
+  icon,
+  source,
+  children,
+}: {
+  title?: string;
+  text: ReactNode;
+  icon?: ReactNode;
+  source: string;
+  children?: ReactNode;
+}) {
   return (
     <div className="empty empty-next">
+      {icon ? (
+        <span className="empty-ico" aria-hidden="true">
+          {icon}
+        </span>
+      ) : null}
+      {title ? <p className="empty-title">{title}</p> : null}
       <p>{text}</p>
       <NewsletterForm source={source} button="Giv mig besked" sellOption={false} />
       {children}

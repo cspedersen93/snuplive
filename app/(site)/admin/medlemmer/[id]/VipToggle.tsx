@@ -33,7 +33,7 @@ export default function VipToggle({ user, role, value, label }: { user: string; 
       <input type="checkbox" checked={on} disabled={busy} onChange={(e) => change(e.target.checked)} />
       <span>
         <b>{label}</b>
-        <span className="muted" style={{ display: "block", fontSize: ".88rem", marginTop: 2 }}>
+        <span className="muted" style={{ display: "block", fontSize: ".875rem", marginTop: 2 }}>
           Får VIP ved navnet med det samme, uanset hvor mange handler der er.
         </span>
       </span>

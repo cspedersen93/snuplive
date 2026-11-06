@@ -131,7 +131,7 @@ export default async function Konto() {
                       <Avatar handle={f.handle} path={f.avatar_path} size={40} />
                       <span style={{ minWidth: 0 }}>
                         <strong>{f.handle}</strong>
-                        <span className="muted" style={{ fontSize: ".85rem" }}>{[f.display_name, f.area].filter(Boolean).join(" · ")}</span>
+                        <span className="muted" style={{ fontSize: ".875rem" }}>{[f.display_name, f.area].filter(Boolean).join(" · ")}</span>
                       </span>
                     </Link>
                     <FollowButton sellerId={f.id} handle={f.handle} next="/konto" />
@@ -139,7 +139,7 @@ export default async function Konto() {
                 ))}
               </ul>
             ) : (
-              <p className="muted" style={{ fontSize: ".95rem", marginBottom: 6 }}>
+              <p className="muted" style={{ fontSize: ".9375rem", marginBottom: 6 }}>
                 Du følger ikke nogen endnu. Tryk <b>Følg</b> hos en sælger, så får du besked, når sælgeren går live.
               </p>
             )}
@@ -153,7 +153,7 @@ export default async function Konto() {
           <div className="box" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 14 }}>
             <div>
               <h2 className="h3">Din side</h2>
-              <p className="muted" style={{ fontSize: ".95rem" }}>Del linket med dine følgere. Det viser altid dit næste eller igangværende show.</p>
+              <p className="muted" style={{ fontSize: ".9375rem" }}>Del linket med dine følgere. Det viser altid dit næste eller igangværende show.</p>
             </div>
             <Link className="btn btn-line" href={`/live/${profile.handle}`}>{SITE_HOST}/live/{profile.handle}</Link>
           </div>
@@ -162,7 +162,7 @@ export default async function Konto() {
             <div>
               <span className="label red">Sælg live</span>
               <h2 className="h3" style={{ marginTop: 6 }}>Har du et skab, der skal ryddes?</h2>
-              <p className="muted" style={{ fontSize: ".95rem" }}>Bliv sælger, læg dine varer i køen, og gå live fra telefonen eller computeren.</p>
+              <p className="muted" style={{ fontSize: ".9375rem" }}>Bliv sælger, læg dine varer i køen, og gå live fra telefonen eller computeren.</p>
             </div>
             <BecomeSeller />
           </div>
@@ -172,7 +172,7 @@ export default async function Konto() {
           <div className="box become-box" id="saelger">
             <div>
               <h2 className="h3">Sælgeroplysninger</h2>
-              <p className="muted" style={{ fontSize: ".95rem" }}>Køberne kan se, om du sælger som privatperson eller virksomhed.</p>
+              <p className="muted" style={{ fontSize: ".9375rem" }}>Køberne kan se, om du sælger som privatperson eller virksomhed.</p>
             </div>
             <BecomeSeller profile={profile} />
             {mitid?.verified ? (

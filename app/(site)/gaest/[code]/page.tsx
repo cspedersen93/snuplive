@@ -64,7 +64,7 @@ export default async function GuestInvite({ params }: { params: Promise<{ code: 
           <Avatar handle={info.host_handle} path={info.host_avatar} />
           <div>
             <strong>@{info.host_handle} har inviteret dig med i sit show</strong>
-            <span className="muted" style={{ fontSize: ".9rem" }}>
+            <span className="muted" style={{ fontSize: ".875rem" }}>
               {info.title} · {info.status === "live" ? "Live nu" : when(info.starts_at)}
             </span>
           </div>

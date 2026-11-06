@@ -358,7 +358,7 @@ export default async function ItemPage({ params }: Params) {
               <Avatar handle={seller.handle} path={seller.avatar_path} size={46} />
               <span>
                 <strong>{seller.handle}</strong>
-                <span className="muted" style={{ fontSize: ".88rem" }}>
+                <span className="muted" style={{ fontSize: ".875rem" }}>
                   {[seller.area, d.video ? "Videoannonce" : show.status === "ended" ? `Fra showet ${show.title}` : show.title].filter(Boolean).join(" · ")}
                 </span>
               </span>

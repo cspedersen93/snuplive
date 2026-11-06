@@ -33,7 +33,7 @@ export default function BundleDiscount({ initial }: { initial: BundleTiers }) {
   return (
     <form className="box bundle-box" onSubmit={save} aria-labelledby="h-samlerabat" id="samlerabat">
       <h2 className="h3" id="h-samlerabat" style={{ marginBottom: 4 }}>Samlerabat</h2>
-      <p className="muted" style={{ fontSize: ".9rem" }}>
+      <p className="muted" style={{ fontSize: ".875rem" }}>
         Giv rabat, når en køber køber flere varer hos dig. Varerne sendes alligevel i én pakke, og rabatten bliver trukket
         automatisk, når køberen betaler. Den gælder både i dine shows og på de varer, du har til salg.
       </p>

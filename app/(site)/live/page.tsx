@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SortNote from "@/components/SortNote";
 import EmptyNext from "@/components/EmptyNext";
+import { IconLive } from "@/components/Icons";
 import Avatar from "@/components/Avatar";
 import RemindButton from "@/components/RemindButton";
 import { clock, dayLabel, vareOrd } from "@/lib/format";
@@ -53,12 +54,14 @@ export default async function LiveNu() {
             ) : (
               // Intet live og intet i programmet: tilmelding til nyhedsbrevet i stedet for en knap til en anden tom side.
               <EmptyNext
-                text="Programmet er tomt lige nu. Skriv dig op, så får du besked, når de næste shows starter."
+                title="Programmet er tomt lige nu"
+                text="Skriv dig op, så får du besked, når de næste shows starter."
+                icon={<IconLive />}
                 source="nyhedsbrev-tom-live"
               >
                 <div className="empty-more">
                   <Link className="btn btn-line btn-sm" href="/saadan-virker-det">Sådan virker live shopping</Link>
-                  <Link className="btn btn-line btn-sm" href="/saelg">Sælg selv live</Link>
+                  <Link className="btn btn-line btn-sm" href="/saelg">Sælg dine varer</Link>
                 </div>
               </EmptyNext>
             )

@@ -78,7 +78,7 @@ export default function OverviewChart({ buckets, unit }: { buckets: Bucket[]; un
       <div className="adm-chart-head">
         <div>
           <h2 className="h3">{m.label} pr. {unit}</h2>
-          <span className="muted" style={{ fontSize: ".88rem" }}>I alt {m.fmt(total)}</span>
+          <span className="muted" style={{ fontSize: ".875rem" }}>I alt {m.fmt(total)}</span>
         </div>
         <fieldset className="seg">
           <legend className="sr-only">Vis</legend>

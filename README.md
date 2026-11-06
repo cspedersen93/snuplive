@@ -1054,6 +1054,10 @@ Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal
   hjørnerne til den smalle menu. Ikonerne (`app/icon.png`, `app/apple-icon.png`, `public/icon-192.png`, `public/icon-512.png`)
   er samme "re" på mørk flade, og `public/img/logo.png` er den lyse udgave. Det gamle logo (hvidt på rød flade) ligger i Git.
   Delingsbilledet er `public/img/og-v2.jpg`.
+- **Designregler** (november 2026): skriftstørrelser følger en fast skala (12, 13, 14, 15, 16, 18, 20, 24, 28 og 32 px,
+  skrevet i rem); kun overskrifterne skalerer med skærmen (clamp). Mærker og små etiketter er mindst 12 px. Knapper og
+  links til `/saelg` hedder "Sælg dine varer" (bundmenuen bare "Sælg"). Tomme sider bruger `components/EmptyNext.tsx`
+  med ikon, kort overskrift og tilmelding. Kategorierne står kun i venstremenuen inde under Kategorier.
 - **Skiltet på væggen** i stuebillederne (`sell-phone-v2.jpg`, `how-live-v2.jpg`, `saelg-stue-v2.jpg`) og i
   velkomstvideoen viser det nye logo (november 2026). Videoen slutter nu, før det gamle logo kom til sidst.
 - **Kategorikortene** bruger Caspers egne billeder, `public/img/kat-*.jpg` (feltet `card` i `lib/format.ts`). De er skåret

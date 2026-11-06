@@ -83,7 +83,7 @@ export default function Guides() {
             </div>
             <div className="ctas">
               <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
-              <Link className="btn btn-line" href="/saelg">Bliv sælger</Link>
+              <Link className="btn btn-line" href="/saelg">Sælg dine varer</Link>
             </div>
           </div>
         </div>

@@ -43,7 +43,7 @@ export default async function Medlem({ params }: { params: Promise<{ id: string 
 
   return (
     <div className="adm-page">
-      <p style={{ fontSize: ".9rem" }}><Link href="/admin/medlemmer">← Alle medlemmer</Link></p>
+      <p style={{ fontSize: ".875rem" }}><Link href="/admin/medlemmer">← Alle medlemmer</Link></p>
       <div className="seller-row" style={{ gap: 14 }}>
         <Avatar handle={m.handle} path={m.avatar_path} />
         <div>

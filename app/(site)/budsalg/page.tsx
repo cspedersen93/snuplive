@@ -3,6 +3,7 @@ import Link from "next/link";
 import ItemCard from "@/components/ItemCard";
 import Pager from "@/components/Pager";
 import EmptyNext from "@/components/EmptyNext";
+import { IconGavel } from "@/components/Icons";
 import { AUCTION_SECONDS, EXTEND_SECONDS } from "@/lib/auction";
 import { vareOrd } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
@@ -68,7 +69,9 @@ export default async function Budsalg({ searchParams }: Props) {
             </div>
           ) : (
             <EmptyNext
-              text="Der er ingen varer på budsalg lige nu. Skriv dig op, så får du besked, når de næste budsalg starter."
+              title="Ingen varer på budsalg lige nu"
+              text="Skriv dig op, så får du besked, når de næste budsalg starter."
+              icon={<IconGavel />}
               source="nyhedsbrev-tom-budsalg"
             >
               <div className="empty-more">

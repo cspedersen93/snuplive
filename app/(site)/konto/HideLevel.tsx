@@ -24,7 +24,7 @@ export default function HideLevel({ uid, hidden }: { uid: string; hidden: boolea
       <input type="checkbox" checked={show} disabled={busy} onChange={(e) => change(e.target.checked)} />
       <span>
         Vis mit køberniveau og mine købermærker ved mit navn
-        <span className="muted" style={{ display: "block", fontSize: ".85rem", marginTop: 2 }}>
+        <span className="muted" style={{ display: "block", fontSize: ".875rem", marginTop: 2 }}>
           Andre ser kun niveauet, aldrig hvad eller hvor meget du har købt.
         </span>
       </span>

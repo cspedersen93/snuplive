@@ -80,7 +80,7 @@ export default async function Anmeldelser() {
               <span>
                 <b>{reasonText(r.reason)}.</b> {r.message ? <q>{r.message}</q> : null}
                 <br />
-                <span className="muted" style={{ fontSize: ".85rem" }}>
+                <span className="muted" style={{ fontSize: ".875rem" }}>
                   {r.reporter ? `@${r.reporter.handle}` : r.reporter_email ?? "Anonym"} · {at(r.created_at)}
                 </span>
               </span>

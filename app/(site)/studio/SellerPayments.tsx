@@ -137,7 +137,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
             <IconCard />
             <div>
               <h2 className="h3">Udbetaling</h2>
-              <p className="muted" style={{ fontSize: ".92rem", maxWidth: "52ch" }}>
+              <p className="muted" style={{ fontSize: ".9375rem", maxWidth: "52ch" }}>
                 {acct?.payouts_enabled
                   ? "Klar. Når køberen har fået sine varer, går pengene for varerne til din bankkonto."
                   : acct?.details_submitted
@@ -158,7 +158,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
       <div className="box">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6, gap: 12, flexWrap: "wrap" }}>
           <h2 className="h3">Skal sendes</h2>
-          <span className="muted" style={{ fontSize: ".9rem" }}>{earned ? `${kr(earned)} tjent i alt` : ""}</span>
+          <span className="muted" style={{ fontSize: ".875rem" }}>{earned ? `${kr(earned)} tjent i alt` : ""}</span>
         </div>
         {toHandle.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -259,7 +259,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
             ))}
           </div>
         ) : (
-          <p className="muted" style={{ fontSize: ".95rem" }}>Når nogen har betalt for dine varer, står pakkerne her med adressen.</p>
+          <p className="muted" style={{ fontSize: ".9375rem" }}>Når nogen har betalt for dine varer, står pakkerne her med adressen.</p>
         )}
       </div>
 
@@ -269,7 +269,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
             <IconBox />
             <div>
               <h2 className="h3">Fragt og afsenderadresse</h2>
-              <p className="muted" style={{ fontSize: ".92rem", maxWidth: "56ch" }}>
+              <p className="muted" style={{ fontSize: ".9375rem", maxWidth: "56ch" }}>
                 Køberen vælger en DAO- eller GLS-pakkeshop og betaler fragten. Du laver labelen her med ét tryk. Din adresse står
                 som afsender, og pakken kommer retur hertil, hvis den ikke bliver hentet.
                 {shipmondoSandbox() ? " (Testmiljø: labels er mærket SANDBOX og kan ikke bruges.)" : ""}
@@ -319,7 +319,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
       {reservations.length ? (
         <div className="box">
           <h2 className="h3" style={{ marginBottom: 4 }}>Købt, men ikke betalt endnu</h2>
-          <p className="muted" style={{ fontSize: ".9rem", marginBottom: 6 }}>
+          <p className="muted" style={{ fontSize: ".875rem", marginBottom: 6 }}>
             Køberen har {RESERVATION_DAYS} dage til at betale. Derefter bliver købet annulleret af sig selv.
           </p>
           <ul className="list">

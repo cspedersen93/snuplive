@@ -78,7 +78,7 @@ export default async function Venteliste() {
 
       <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <h2 className="h3">På siden</h2>
-        <p className="muted" style={{ fontSize: ".9rem" }}>
+        <p className="muted" style={{ fontSize: ".875rem" }}>
           Slå nyhedsbrevet og kampagnerne til, når I er klar. Det virker på siden inden for et minut. Siden{" "}
           <a href="/nyhedsbrev" target="_blank" rel="noopener">relived.dk/nyhedsbrev</a> virker altid, og kortene forsvinder af sig selv,
           når en kampagne er slut.

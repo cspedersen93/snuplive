@@ -76,7 +76,7 @@ export default async function Admin() {
           <section className="box" key={i.id} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 12px", alignItems: "baseline" }}>
               <strong>{isIssueReason(i.reason) ? ISSUE_REASONS[i.reason] : i.reason}</strong>
-              <span className="muted" style={{ fontSize: ".88rem" }}>Meldt {at(i.created_at)}</span>
+              <span className="muted" style={{ fontSize: ".875rem" }}>Meldt {at(i.created_at)}</span>
               <span className="chip warn" style={{ marginLeft: "auto" }}>{STATUS_TEXT[o.status] ?? o.status}</span>
             </div>
             <div className="issue-note">
@@ -107,7 +107,7 @@ export default async function Admin() {
               <br />
               <b>Beløb:</b> køberen betalte {kr(o.total_amount)}, sælgeren skal have {kr(sellerPayout(o))}
               <br />
-              <span className="muted" style={{ fontSize: ".82rem" }}>Ordre {o.id}</span>
+              <span className="muted" style={{ fontSize: ".8125rem" }}>Ordre {o.id}</span>
             </div>
             <AdminActions
               orderId={o.id}

@@ -30,7 +30,7 @@ export default function DeleteTestShows({ shows, items }: { shows: number; items
   if (!shows) return <p className="fine">Der er ingen shows. Siden er klar til de første rigtige shows.</p>;
   return open ? (
     <div className="reset-box" role="group" aria-label="Bekræft sletning af shows">
-      <p className="muted" style={{ fontSize: ".92rem" }}>
+      <p className="muted" style={{ fontSize: ".9375rem" }}>
         Det kan ikke fortrydes. Skriv <b>SLET</b> for at slette {shows} {shows === 1 ? "show" : "shows"} og {items}{" "}
         {items === 1 ? "vare" : "varer"} med chat, bud og alle testkøb.
       </p>

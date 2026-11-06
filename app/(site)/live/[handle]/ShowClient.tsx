@@ -369,7 +369,7 @@ export default function ShowClient(props: Props) {
               <Avatar handle={handle} path={props.seller.avatar_path} />
               <div>
                 <strong>{handle}</strong>
-                <span className="muted" style={{ fontSize: ".88rem" }}>
+                <span className="muted" style={{ fontSize: ".875rem" }}>
                   {[props.seller.display_name, props.seller.area].filter(Boolean).join(" · ") || "Sælger på Relived"}
                 </span>
               </div>
@@ -397,7 +397,7 @@ export default function ShowClient(props: Props) {
           <div className="box" id="i-showet">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
               <h2>I dette show</h2>
-              <span className="muted" style={{ fontSize: ".85rem" }}>
+              <span className="muted" style={{ fontSize: ".875rem" }}>
                 {items.length} {vareOrd(items.length)}{soldCount ? ` · ${soldCount} solgt` : ""}
               </span>
             </div>
@@ -436,7 +436,7 @@ export default function ShowClient(props: Props) {
                 })}
               </ul>
             ) : (
-              <p className="muted" style={{ fontSize: ".9rem" }}>Sælgeren har ikke lagt varer ind endnu.</p>
+              <p className="muted" style={{ fontSize: ".875rem" }}>Sælgeren har ikke lagt varer ind endnu.</p>
             )}
           </div>
           <div className="box ship-note">
@@ -507,19 +507,19 @@ export default function ShowClient(props: Props) {
                           : "Går live om et øjeblik …"}
                       </span>
                       {show.countdown_music ? <WaitMusic trackKey={show.countdown_music} /> : null}
-                      <span style={{ fontSize: ".85rem", opacity: 0.8 }}>Siden skifter selv til video, når showet starter.</span>
+                      <span style={{ fontSize: ".875rem", opacity: 0.8 }}>Siden skifter selv til video, når showet starter.</span>
                     </>
                   ) : show.status === "planned" ? (
                     <>
                       <span className="label" style={{ color: "#fff" }}>Næste show</span>
-                      <strong style={{ fontSize: "1.4rem", lineHeight: 1.2 }}>{when(show.starts_at)}</strong>
+                      <strong style={{ fontSize: "1.5rem", lineHeight: 1.2 }}>{when(show.starts_at)}</strong>
                       {startsIn !== null ? <span>{countdown(startsIn)}</span> : null}
-                      <span style={{ fontSize: ".85rem", opacity: 0.8 }}>Siden skifter selv til video, når showet starter.</span>
+                      <span style={{ fontSize: ".875rem", opacity: 0.8 }}>Siden skifter selv til video, når showet starter.</span>
                       <RemindButton showId={show.id} next={`/live/${handle}`} className="btn btn-red btn-sm" />
                     </>
                   ) : (
                     <>
-                      <strong style={{ fontSize: "1.4rem" }}>Showet er slut</strong>
+                      <strong style={{ fontSize: "1.5rem" }}>Showet er slut</strong>
                       <span>
                         {soldCount ? `${soldCount} ${vareOrd(soldCount)} blev solgt.` : "Tak fordi du kiggede forbi."}
                         {forSaleCount ? ` ${forSaleCount} ${vareOrd(forSaleCount)} kan stadig købes til fast pris.` : ""}

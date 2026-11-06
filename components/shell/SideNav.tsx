@@ -18,7 +18,8 @@ const MAIN = [
 ];
 
 /**
- * Menuen i venstre side på computeren. Bred med tekst, kategorier og dem, man følger, når der er plads.
+ * Menuen i venstre side på computeren. Bred med tekst og dem, man følger, når der er plads. Kategorierne vises under
+ * Kategorier, når man er inde på en kategoriside.
  * Smal med kun ikoner på mindre skærme og i live-shows, så videoen får pladsen.
  */
 export default function SideNav() {
@@ -56,15 +57,17 @@ export default function SideNav() {
         ))}
       </nav>
 
-      <div className="side-group side-wide">
-        <span className="side-head">Kategorier</span>
-        {MAIN_CATEGORIES.map((c) => (
-          <Link key={c.key} href={`/kategori/${c.slug}`} aria-current={current(`/kategori/${c.slug}`)}>
-            <CategoryIcon k={c.key} size={18} />
-            <span>{c.key === "cykler" ? "Cykler og barnevogne" : c.short}</span>
-          </Link>
-        ))}
-      </div>
+      {/* Kategorierne står kun i menuen, når man er inde under Kategorier, så menuen er luftig resten af tiden. */}
+      {path.startsWith("/kategori") ? (
+        <div className="side-group side-wide side-sub" aria-label="Kategorier">
+          {MAIN_CATEGORIES.map((c) => (
+            <Link key={c.key} href={`/kategori/${c.slug}`} aria-current={current(`/kategori/${c.slug}`)}>
+              <CategoryIcon k={c.key} size={18} />
+              <span>{c.key === "cykler" ? "Cykler og barnevogne" : c.short}</span>
+            </Link>
+          ))}
+        </div>
+      ) : null}
 
       {followed.length ? (
         <div className="side-group side-wide">
@@ -80,9 +83,9 @@ export default function SideNav() {
       ) : null}
 
       <div className="side-foot">
-        <Link className="btn btn-red side-sell" href={sellHref} title="Sælg en vare" aria-current={current(sellHref)}>
+        <Link className="btn btn-red side-sell" href={sellHref} title="Sælg dine varer" aria-current={current(sellHref)}>
           <IconPlus />
-          <span className="side-label">Sælg en vare</span>
+          <span className="side-label">Sælg dine varer</span>
         </Link>
       </div>
     </aside>

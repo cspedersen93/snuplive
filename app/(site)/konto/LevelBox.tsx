@@ -20,7 +20,7 @@ function LevelCard({ p, role }: { p: LevelProgress; role: Role }) {
       <span className="k">Som {role === "seller" ? "sælger" : "køber"}</span>
       <strong>
         <LevelChip level={level} role={role} full showNew />
-        {role === "buyer" && p.hide_buyer_level ? <span className="muted" style={{ fontSize: ".8rem", fontWeight: 400 }}>Skjult for andre</span> : null}
+        {role === "buyer" && p.hide_buyer_level ? <span className="muted" style={{ fontSize: ".8125rem", fontWeight: 400 }}>Skjult for andre</span> : null}
       </strong>
       {step ? (
         <>
@@ -49,9 +49,9 @@ export default function LevelBox({ p, uid }: { p: LevelProgress; uid: string }) 
     <div className="box" id="niveau">
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline", gap: "4px 14px" }}>
         <h2 className="h3">Dit niveau</h2>
-        <Link href="/niveauer" style={{ fontSize: ".9rem" }}>Sådan virker niveauerne</Link>
+        <Link href="/niveauer" style={{ fontSize: ".875rem" }}>Sådan virker niveauerne</Link>
       </div>
-      <p className="muted" style={{ fontSize: ".92rem", marginTop: 4 }}>
+      <p className="muted" style={{ fontSize: ".9375rem", marginTop: 4 }}>
         Niveauet stiger, når dine handler er afsluttet, altså når køberen har fået varen. Alle kan se niveauet ved dit navn.
       </p>
       <div className="lvl-cols">

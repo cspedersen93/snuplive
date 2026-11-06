@@ -152,7 +152,7 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
                 <Avatar handle={g.seller.handle} path={g.seller.avatar_path} />
                 <div>
                   <strong>{g.seller.handle}</strong>
-                  <span className="muted" style={{ fontSize: ".85rem" }}>{g.showTitle}</span>
+                  <span className="muted" style={{ fontSize: ".875rem" }}>{g.showTitle}</span>
                 </div>
               </div>
               <span className="chip warn">Betal senest {g.deadline}</span>
@@ -223,8 +223,8 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
           <section className="group pshop" ref={pickerRef} aria-labelledby="h-pshop">
             <div className="group-head">
               <div>
-                <h2 className="h3" id="h-pshop" style={{ fontSize: "1.05rem" }}>Hvilken pakkeshop skal pakken til?</h2>
-                <span className="muted" style={{ fontSize: ".88rem" }}>
+                <h2 className="h3" id="h-pshop" style={{ fontSize: "1rem" }}>Hvilken pakkeshop skal pakken til?</h2>
+                <span className="muted" style={{ fontSize: ".875rem" }}>
                   {groups.length > 1 ? "Gælder alle pakker herover, der skal sendes." : "Du får besked fra fragtfirmaet, når pakken er klar."}
                 </span>
               </div>
@@ -265,7 +265,7 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
                   />
                 </div>
               </div>
-              {loading ? <p className="muted" style={{ fontSize: ".9rem" }} role="status">Finder pakkeshops …</p> : null}
+              {loading ? <p className="muted" style={{ fontSize: ".875rem" }} role="status">Finder pakkeshops …</p> : null}
               {searchError ? <p className="fine" role="alert">{searchError}</p> : null}
               {!loading && points.length ? (
                 <div className="opts pshop-list" role="radiogroup" aria-label="Pakkeshops">
@@ -279,12 +279,12 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
                         </small>
                         {hoursText(p.hours) ? <small className="hours">{hoursText(p.hours)}</small> : null}
                       </span>
-                      <span className="num muted" style={{ fontSize: ".85rem" }}>{distanceText(p.distance)}</span>
+                      <span className="num muted" style={{ fontSize: ".875rem" }}>{distanceText(p.distance)}</span>
                     </label>
                   ))}
                 </div>
               ) : null}
-              {!zip ? <p className="muted" style={{ fontSize: ".9rem" }}>Skriv dit postnummer, så viser vi de nærmeste pakkeshops.</p> : null}
+              {!zip ? <p className="muted" style={{ fontSize: ".875rem" }}>Skriv dit postnummer, så viser vi de nærmeste pakkeshops.</p> : null}
             </div>
           </section>
         ) : null}

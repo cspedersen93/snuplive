@@ -42,7 +42,7 @@ export default async function Indstillinger() {
       </div>
       <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <h2 className="h3">Åbning</h2>
-        <p className="muted" style={{ fontSize: ".95rem" }}>
+        <p className="muted" style={{ fontSize: ".9375rem" }}>
           {siteIsOpen
             ? "Siden er åben for alle."
             : "Siden er lukket. Besøgende ser kun Kommer snart og kan skrive sig op. Admins og testere ser hele siden, når de er logget ind."}
@@ -55,13 +55,13 @@ export default async function Indstillinger() {
           help="Slå til, når I lancerer. Så forsvinder Kommer snart, og alle kan se shows, varer og sælgere. Det virker inden for et minut."
         />
         <h3 style={{ fontSize: "1rem", marginTop: 8 }}>Testere, der må se hele siden før åbningen</h3>
-        <p className="muted" style={{ fontSize: ".9rem" }}>Testeren logger ind på {SITE_HOST}/login med den e-mail, du skriver her.</p>
+        <p className="muted" style={{ fontSize: ".875rem" }}>Testeren logger ind på {SITE_HOST}/login med den e-mail, du skriver her.</p>
         <Testers testers={(testers.data ?? []) as Tester[]} />
       </section>
 
       <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <h2 className="h3">TESTFASE øverst på siden</h2>
-        <p className="muted" style={{ fontSize: ".95rem" }}>
+        <p className="muted" style={{ fontSize: ".9375rem" }}>
           Den gule bjælke fortæller alle, at Relived ikke er åbnet endnu, og at køb og betalinger er en test.
         </p>
         <TestBanner mode={bannerMode} test={paymentsAreTest()} />
@@ -69,7 +69,7 @@ export default async function Indstillinger() {
 
       <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <h2 className="h3">MitID for sælgere</h2>
-        <p className="muted" style={{ fontSize: ".95rem" }}>
+        <p className="muted" style={{ fontSize: ".9375rem" }}>
           {enabled
             ? `MitID er sat op. ${num(verified.count ?? 0)} af ${num(sellers.count ?? 0)} sælgere har bekræftet sig.`
             : "MitID er ikke sat op endnu. Læg IDURA_DOMAIN, IDURA_CLIENT_ID og IDURA_CLIENT_SECRET ind i Vercel, og tryk Redeploy."}
@@ -86,7 +86,7 @@ export default async function Indstillinger() {
       {testMode ? (
         <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <h2 className="h3">Nulstil testsalg</h2>
-          <p className="muted" style={{ fontSize: ".95rem" }}>
+          <p className="muted" style={{ fontSize: ".9375rem" }}>
             Betalingen kører i testtilstand. Her kan I slette alle testkøb, så omsætningen (og indberetningen til Skat) starter
             forfra. Det sletter køb, ordrer, bud, sager, bedømmelser og fragtlabels. Solgte varer bliver ikke til salg (sælgeren kan
             sætte dem til salg igen). Shows, varer, sælgere, købere og følgere bliver liggende. Knappen forsvinder, når I skifter til
@@ -99,7 +99,7 @@ export default async function Indstillinger() {
       {testMode ? (
         <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <h2 className="h3">Slet alle testshows</h2>
-          <p className="muted" style={{ fontSize: ".95rem" }}>
+          <p className="muted" style={{ fontSize: ".9375rem" }}>
             Før I åbner: slet alle shows fra testperioden med deres varer, chat, bud og testkøb, så de forsvinder fra siden og
             fra Google. Brugere, sælgerprofiler, følgere og nyhedsbrevet bliver liggende. Knappen forsvinder, når I skifter til
             rigtige Stripe-nøgler. Kræver, at 0031_slet_testshows.sql er kørt i Supabase.

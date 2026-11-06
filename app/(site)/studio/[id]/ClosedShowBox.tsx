@@ -63,7 +63,7 @@ export default function ClosedShowBox({ showId, handle }: { showId: string; hand
   return (
     <div className="box invite-box" data-tour="invite">
       <h2 className="h3">Lukket show</h2>
-      <p className="muted" style={{ fontSize: ".92rem" }}>
+      <p className="muted" style={{ fontSize: ".9375rem" }}>
         Showet står ikke på siden. Kun dem, der åbner linket og logger ind, kan se med, skrive og købe.
         {members !== null ? ` ${members === 1 ? "1 er" : `${members} er`} inviteret.` : ""}
       </p>

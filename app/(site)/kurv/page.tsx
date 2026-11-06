@@ -220,7 +220,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           <>
             <div className="sec-mini">
               <h2 className="h3">Til betaling</h2>
-              <p className="muted" style={{ fontSize: ".92rem" }}>
+              <p className="muted" style={{ fontSize: ".9375rem" }}>
                 Betal inden {RESERVATION_DAYS} dage, ellers bliver købet annulleret, og sælgeren kan sælge varen igen.
               </p>
             </div>
@@ -240,7 +240,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
         {myOffers.length ? (
           <div className="sec-mini" id="bud">
             <h2 className="h3">Dine bud</h2>
-            <p className="muted" style={{ fontSize: ".92rem" }}>
+            <p className="muted" style={{ fontSize: ".9375rem" }}>
               Sælgeren har 48 timer til at svare. Siger sælgeren ja, kommer varen her under Til betaling.
             </p>
             <ul className="list offer-list">
@@ -302,7 +302,7 @@ function OrderCard({ o }: { o: OrderRow }) {
           <Avatar handle={seller?.handle ?? "s"} path={seller?.avatar_path} />
           <div>
             <strong>{seller?.handle ?? "Sælger"}</strong>
-            <span className="muted" style={{ fontSize: ".85rem" }}>{o.show?.title}</span>
+            <span className="muted" style={{ fontSize: ".875rem" }}>{o.show?.title}</span>
           </div>
         </div>
         <span className={`chip ${cls}`}>{label}</span>

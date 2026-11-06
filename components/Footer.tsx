@@ -29,7 +29,7 @@ export default function Footer() {
           <div>
             <h2>Sælg</h2>
             <ul>
-              <li><Link href="/saelg">Bliv sælger</Link></li>
+              <li><Link href="/saelg">Sælg dine varer</Link></li>
               <li><Link href="/opret">Opret konto</Link></li>
               <li><Link href="/studio">Mine shows</Link></li>
             </ul>

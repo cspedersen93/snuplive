@@ -58,7 +58,7 @@ export default function Testers({ testers }: { testers: Tester[] }) {
           ))}
         </ul>
       ) : (
-        <p className="muted" style={{ fontSize: ".92rem" }}>Ingen testere endnu. Admins har altid adgang.</p>
+        <p className="muted" style={{ fontSize: ".9375rem" }}>Ingen testere endnu. Admins har altid adgang.</p>
       )}
       <form className="tester-form" onSubmit={add}>
         <div className="field">

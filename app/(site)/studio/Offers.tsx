@@ -37,7 +37,7 @@ export default async function Offers({ uid }: { uid: string }) {
       <h2 className="h3" style={{ marginBottom: 4 }}>
         Bud på dine varer <span className="count-dot">{rows.length}</span>
       </h2>
-      <p className="muted" style={{ fontSize: ".9rem", marginBottom: 6 }}>
+      <p className="muted" style={{ fontSize: ".875rem", marginBottom: 6 }}>
         Siger du ja, bliver varen reserveret til køberen til buddet, og køberen betaler inden 3 dage. Svarer du ikke, udløber buddet
         efter 48 timer.
       </p>

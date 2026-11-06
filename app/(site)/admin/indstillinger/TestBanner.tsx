@@ -49,7 +49,7 @@ export default function TestBanner({ mode, test }: { mode: Mode; test: boolean }
         {opt("on", "Vis")}
         {opt("off", "Skjul")}
       </fieldset>
-      <p className="muted" style={{ fontSize: ".9rem" }}>
+      <p className="muted" style={{ fontSize: ".875rem" }}>
         <b>Lige nu {shown ? "vises" : "vises ikke"} TESTFASE.</b>{" "}
         {cur === "auto"
           ? test

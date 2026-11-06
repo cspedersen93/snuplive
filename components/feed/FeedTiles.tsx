@@ -97,7 +97,7 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
             <span className="ftile-extra">Eller gå selv live og sælg en hel bunke på én aften.</span>
             <span className="ftile-btns">
               <Link className="btn btn-red" href="/til-salg">Se varer til salg</Link>
-              <Link className="btn btn-line" href="/saelg">Sælg selv live</Link>
+              <Link className="btn btn-line" href="/saelg">Sælg dine varer</Link>
             </span>
           </>
         ) : launched ? (
@@ -107,7 +107,7 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
             <span className="ftile-extra">Få besked, når de næste shows starter, så er du med fra første budsalg.</span>
             <span className="ftile-btns">
               <Link className="btn btn-red" href="/nyhedsbrev">Få besked først</Link>
-              <Link className="btn btn-line" href="/saelg">Sælg selv live</Link>
+              <Link className="btn btn-line" href="/saelg">Sælg dine varer</Link>
             </span>
           </>
         ) : (
@@ -118,7 +118,7 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
               Gå live fra stuen, og sælg en hel bunke på én aften. Det er gratis at sælge, mens vi er i beta.
             </span>
             <span className="ftile-btns">
-              <Link className="btn btn-red" href="/saelg">Sælg selv live</Link>
+              <Link className="btn btn-red" href="/saelg">Sælg dine varer</Link>
             </span>
           </>
         )}
@@ -193,9 +193,13 @@ export function ItemTile({ item }: { item: FeedItem }) {
             Live
           </span>
         ) : bid && item.starts_at ? (
-          <span className="fbadge bid">Budsalg {when(item.starts_at).toLowerCase()}</span>
+          // To små mærker i stedet for ét langt, så de kan være der på telefonen.
+          <>
+            <span className="fbadge bid">Budsalg</span>
+            <span className="fbadge later">{when(item.starts_at)}</span>
+          </>
         ) : state === "upcoming" && item.starts_at ? (
-          <span className="fbadge later">Vises {when(item.starts_at).toLowerCase()}</span>
+          <span className="fbadge later">{when(item.starts_at)}</span>
         ) : state === "for_sale" && item.clip_path ? (
           <span className="fbadge">
             <IconPlay />

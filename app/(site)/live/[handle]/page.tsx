@@ -295,7 +295,7 @@ function ProfileLevel({ seller, level }: { seller: boolean; level: MemberLevel |
   return (
     <span className="h-lvl" style={{ marginTop: 6 }}>
       <LevelChip level={l} role="buyer" full />
-      <Link className="muted" href="/niveauer" style={{ fontSize: ".82rem" }}>Hvad betyder det?</Link>
+      <Link className="muted" href="/niveauer" style={{ fontSize: ".8125rem" }}>Hvad betyder det?</Link>
     </span>
   );
 }

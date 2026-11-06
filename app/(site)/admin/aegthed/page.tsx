@@ -75,13 +75,13 @@ export default async function Aegthed() {
                 <h2 className="h3" id={`a-${r.id}`}>
                   {r.name} · {kr(r.price)}
                 </h2>
-                <span className="muted" style={{ fontSize: ".88rem" }}>
+                <span className="muted" style={{ fontSize: ".875rem" }}>
                   @{r.seller?.handle} · {category(r.category ?? r.show?.category).short} · {r.show?.title} · sendt {at(r.auth_at)}
                 </span>
               </div>
               <Link className="linkbtn" href={itemHref(r)} target="_blank">Se varen</Link>
             </div>
-            {r.description ? <p style={{ fontSize: ".92rem" }}>{r.description}</p> : null}
+            {r.description ? <p style={{ fontSize: ".9375rem" }}>{r.description}</p> : null}
             <div className="adm-auth-photos">
               {[...r.auth_photos, ...(r.images ?? []).slice(0, 2)].map((p, i) => (
                 <figure key={p} style={{ margin: 0 }}>

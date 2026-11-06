@@ -32,7 +32,7 @@ export default function SavedSearches({ initial }: { initial: SavedSearch[] }) {
       <h2 className="h3" style={{ marginBottom: 8 }}>Dine søgeagenter</h2>
       {list.length ? (
         <>
-          <p className="muted" style={{ fontSize: ".95rem", marginBottom: 6 }}>
+          <p className="muted" style={{ fontSize: ".9375rem", marginBottom: 6 }}>
             Du får besked, når der kommer en ny vare, der passer. Med besked på telefonen slået til kommer den der, ellers på mail.
           </p>
           <ul className="saved-list">
@@ -47,7 +47,7 @@ export default function SavedSearches({ initial }: { initial: SavedSearch[] }) {
           </ul>
         </>
       ) : (
-        <p className="muted" style={{ fontSize: ".95rem" }}>
+        <p className="muted" style={{ fontSize: ".9375rem" }}>
           Du har ingen søgeagenter. <Link href="/soeg">Søg</Link> efter det, du leder efter, og tryk <b>Giv mig besked om nye</b>.
         </p>
       )}

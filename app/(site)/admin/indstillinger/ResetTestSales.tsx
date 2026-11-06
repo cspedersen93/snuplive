@@ -30,7 +30,7 @@ export default function ResetTestSales({ orders, sales }: { orders: number; sale
   if (!orders && !sales) return <p className="fine">Der er ingen køb eller ordrer lige nu. Omsætningen står på 0.</p>;
   return open ? (
     <div className="reset-box" role="group" aria-label="Bekræft nulstilling">
-      <p className="muted" style={{ fontSize: ".92rem" }}>
+      <p className="muted" style={{ fontSize: ".9375rem" }}>
         Det kan ikke fortrydes. Skriv <b>NULSTIL</b> for at slette {orders} {orders === 1 ? "ordre" : "ordrer"} og {sales} køb.
       </p>
       <div className="reset-row">

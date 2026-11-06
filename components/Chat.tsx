@@ -142,7 +142,7 @@ export default function Chat({ showId, messages, me, live, loginHref, title = "C
             Live
           </span>
         ) : hint ? (
-          <span className="muted" style={{ fontSize: ".85rem" }}>{hint}</span>
+          <span className="muted" style={{ fontSize: ".875rem" }}>{hint}</span>
         ) : null}
       </div>
       <div
@@ -160,7 +160,7 @@ export default function Chat({ showId, messages, me, live, loginHref, title = "C
             return <ChatLine key={m.id} m={m} me={me} canModerate={canModerate} level={m.from_seller ? l?.seller_level : l?.buyer_level} />;
           })
         ) : (
-          <p className="muted" style={{ fontSize: ".9rem" }}>{live ? "Skriv den første besked." : "Chatten åbner, når showet går live."}</p>
+          <p className="muted" style={{ fontSize: ".875rem" }}>{live ? "Skriv den første besked." : "Chatten åbner, når showet går live."}</p>
         )}
       </div>
       {me ? (
@@ -184,7 +184,7 @@ export default function Chat({ showId, messages, me, live, loginHref, title = "C
         </form>
       ) : me === null ? (
         <div className="chat-form" style={{ justifyContent: "space-between", alignItems: "center" }}>
-          <span className="muted" style={{ fontSize: ".9rem" }}>Log ind for at skrive og købe</span>
+          <span className="muted" style={{ fontSize: ".875rem" }}>Log ind for at skrive og købe</span>
           <Link className="btn btn-red btn-sm" href={loginHref}>Log ind</Link>
         </div>
       ) : null}

@@ -559,7 +559,7 @@ export default function StudioClient(props: Props) {
           <div className="box" data-tour="queue">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
               <h2>Køen</h2>
-              <span className="muted" style={{ fontSize: ".85rem" }}>
+              <span className="muted" style={{ fontSize: ".875rem" }}>
                 {isHost ? `${queued.length} klar · ${sold.length} solgt` : `${queued.filter(mine).length} af dine klar · ${mineSold.length} solgt`}
               </span>
             </div>
@@ -658,7 +658,7 @@ export default function StudioClient(props: Props) {
                 })}
               </ul>
             ) : (
-              <p className="muted" style={{ fontSize: ".9rem" }}>Læg de varer ind, du vil vise frem. Med billeder og beskrivelse kan købere finde dem før showet.</p>
+              <p className="muted" style={{ fontSize: ".875rem" }}>Læg de varer ind, du vil vise frem. Med billeder og beskrivelse kan købere finde dem før showet.</p>
             )}
           </div>
           {!ended && !out ? (
@@ -697,7 +697,7 @@ export default function StudioClient(props: Props) {
           <div className="studio-bar">
             <div style={{ minWidth: 0 }}>
               <h1 className="h3">{show.title}</h1>
-              <span className="muted" style={{ fontSize: ".9rem" }}>
+              <span className="muted" style={{ fontSize: ".875rem" }}>
                 {isHost
                   ? live
                     ? "Du er live"
@@ -782,13 +782,13 @@ export default function StudioClient(props: Props) {
 
               {out ? (
                 <div className="pre-live">
-                  <strong style={{ fontSize: "1.3rem" }}>Du er ikke med i showet længere</strong>
+                  <strong style={{ fontSize: "1.25rem" }}>Du er ikke med i showet længere</strong>
                   <span style={{ maxWidth: "32ch" }}>Dine varer i køen kommer til salg, når showet slutter. Du finder dem under Mine shows.</span>
                   <Link className="btn btn-red btn-sm" href="/studio">Til mine shows</Link>
                 </div>
               ) : !live && !ended && !isHost ? (
                 <div className="pre-live">
-                  <strong style={{ fontSize: "1.3rem" }}>Du er gæst hos @{host.handle}</strong>
+                  <strong style={{ fontSize: "1.25rem" }}>Du er gæst hos @{host.handle}</strong>
                   {!cameraOn ? (
                     <>
                       <span style={{ maxWidth: "32ch" }}>
@@ -838,19 +838,19 @@ export default function StudioClient(props: Props) {
                     </>
                   ) : props.needsMitid ? (
                     <>
-                      <strong style={{ fontSize: "1.3rem" }}>Bekræft, hvem du er</strong>
+                      <strong style={{ fontSize: "1.25rem" }}>Bekræft, hvem du er</strong>
                       <span style={{ maxWidth: "30ch" }}>Før du går live første gang, skal du bekræfte dig med MitID. Det tager et minut.</span>
                       <MitIdButton next={`/studio/${show.id}`} />
                     </>
                   ) : !cameraOn ? (
                     <>
-                      <strong style={{ fontSize: "1.3rem" }}>Klar til at gå live?</strong>
+                      <strong style={{ fontSize: "1.25rem" }}>Klar til at gå live?</strong>
                       <span style={{ maxWidth: "30ch" }}>Tænd kameraet, og tjek billede og lyd. Ingen kan se dig, før du trykker Gå live.</span>
                       <button className="btn btn-red" type="button" onClick={() => setCameraOn(true)}>Tænd kameraet</button>
                     </>
                   ) : (
                     <>
-                      <strong style={{ fontSize: "1.3rem" }}>Klar til at gå live?</strong>
+                      <strong style={{ fontSize: "1.25rem" }}>Klar til at gå live?</strong>
                       <ul className="checks">
                         <li className={cameraReady ? "" : "wait"}>{cameraReady ? "Kamera og mikrofon virker" : "Venter på kameraet …"}</li>
                         <li className={queued.length ? "" : "wait"}>{queued.length ? `${queued.length} ${vareOrd(queued.length)} i køen` : "Læg varer i køen"}</li>
@@ -886,7 +886,7 @@ export default function StudioClient(props: Props) {
 
               {live && !cameraOn && !out ? (
                 <div className="pre-live">
-                  <strong style={{ fontSize: "1.2rem" }}>Kameraet er slukket</strong>
+                  <strong style={{ fontSize: "1.25rem" }}>Kameraet er slukket</strong>
                   <span>
                     {isHost
                       ? "Dine seere kan ikke se dig lige nu. Tænder du ikke kameraet igen inden 15 minutter, slutter showet af sig selv."
@@ -901,7 +901,7 @@ export default function StudioClient(props: Props) {
 
               {ended ? (
                 <div className="pre-live">
-                  <strong style={{ fontSize: "1.3rem" }}>Showet er slut</strong>
+                  <strong style={{ fontSize: "1.25rem" }}>Showet er slut</strong>
                   <span>{isHost ? `${sold.length} solgt` : `${mineSold.length} af dine varer solgt`} · {kr(revenue)} til dig</span>
                   <Link className="btn btn-red btn-sm" href="/studio">Til mine shows</Link>
                 </div>

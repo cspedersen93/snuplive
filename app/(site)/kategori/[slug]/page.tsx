@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import CategoryIcon from "@/components/CategoryIcon";
 import EmptyNext from "@/components/EmptyNext";
+import { IconBag } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import ShowCard from "@/components/ShowCard";
 import SortNote from "@/components/SortNote";
@@ -146,7 +147,9 @@ export default async function Kategori({ params }: Params) {
             <SortNote />
           ) : (
             <EmptyNext
-              text={`Der er intet til salg i ${cat.label.toLowerCase()} lige nu. Skriv dig op, så får du besked, når der kommer nyt.`}
+              title={`Der er intet til salg i ${cat.label.toLowerCase()} lige nu`}
+              text="Skriv dig op, så får du besked, når der kommer nyt."
+              icon={<IconBag />}
               source="nyhedsbrev-tom-kategori"
             />
           )}

@@ -81,7 +81,7 @@ export default function WaitlistMail({
   return (
     <section className="box news-mail" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <h2 className="h3">Skriv og send nyhedsbrevet</h2>
-      <p className="muted" style={{ fontSize: ".9rem" }}>
+      <p className="muted" style={{ fontSize: ".875rem" }}>
         Mailen går kun til dem, der har bekræftet og ikke har afmeldt sig. Et afmeldingslink kommer automatisk med nederst. Send en test til dig selv først.
         {count > 100 ? " Resends gratisplan sender højst 100 mails om dagen, så opgradér, før du sender til flere." : ""}
       </p>
@@ -93,7 +93,7 @@ export default function WaitlistMail({
         </div>
         {aiReady ? (
           <>
-            <p className="muted" style={{ fontSize: ".88rem", margin: 0 }}>
+            <p className="muted" style={{ fontSize: ".875rem", margin: 0 }}>
               Skriv med dine egne ord, hvad nyhedsbrevet skal handle om. Claude kender dagens dato, kampagnerne og de næste shows i
               programmet, men finder ikke selv på priser eller løfter. Du kan rette alt bagefter.
             </p>
@@ -133,7 +133,7 @@ export default function WaitlistMail({
             </div>
           </>
         ) : (
-          <p className="muted" style={{ fontSize: ".88rem", margin: 0 }}>
+          <p className="muted" style={{ fontSize: ".875rem", margin: 0 }}>
             Claude er ikke sat op. Læg ANTHROPIC_API_KEY ind i Vercel, og tryk Redeploy. Indtil da kan du skrive selv herunder.
           </p>
         )}

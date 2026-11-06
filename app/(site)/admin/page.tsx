@@ -242,7 +242,7 @@ export default async function Overblik({ searchParams }: { searchParams: Promise
               ))}
             </ul>
           ) : (
-            <p className="muted" style={{ fontSize: ".92rem" }}>Ingen salg i perioden endnu.</p>
+            <p className="muted" style={{ fontSize: ".9375rem" }}>Ingen salg i perioden endnu.</p>
           )}
         </div>
         <div className="box">
@@ -265,7 +265,7 @@ export default async function Overblik({ searchParams }: { searchParams: Promise
       <div className="box">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
           <h2 className="h3">Seneste ordrer</h2>
-          <Link href="/admin/ordrer" style={{ fontSize: ".9rem" }}>Se alle ordrer</Link>
+          <Link href="/admin/ordrer" style={{ fontSize: ".875rem" }}>Se alle ordrer</Link>
         </div>
         {latest.length ? (
           <ul className="list">
@@ -281,7 +281,7 @@ export default async function Overblik({ searchParams }: { searchParams: Promise
             ))}
           </ul>
         ) : (
-          <p className="muted" style={{ fontSize: ".92rem" }}>Ingen ordrer endnu.</p>
+          <p className="muted" style={{ fontSize: ".9375rem" }}>Ingen ordrer endnu.</p>
         )}
       </div>
     </div>

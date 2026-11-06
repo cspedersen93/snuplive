@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IconPlay } from "@/components/Icons";
+import { IconBag, IconPlay } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import Pager from "@/components/Pager";
 import EmptyNext from "@/components/EmptyNext";
@@ -104,11 +104,13 @@ export default async function TilSalg({ searchParams }: Props) {
             </div>
           ) : (
             <EmptyNext
+              title={cat ? `Der er intet til salg i ${cat.label.toLowerCase()} lige nu` : "Der er ingen varer til salg lige nu"}
               text={
                 cat
-                  ? `Der er intet til salg i ${cat.label.toLowerCase()} lige nu. Skriv dig op, så får du besked, når der kommer nyt.`
-                  : "Der er ingen varer til salg lige nu. Varer fra live-shows og videoannoncer lander her. Skriv dig op, så får du besked, når der kommer nyt."
+                  ? "Skriv dig op, så får du besked, når der kommer nyt."
+                  : "Varer fra live-shows og videoannoncer lander her. Skriv dig op, så får du besked, når der kommer nyt."
               }
+              icon={<IconBag />}
               source="nyhedsbrev-tom-til-salg"
             />
           )}

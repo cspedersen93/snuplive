@@ -66,7 +66,7 @@ export default function SettingToggle({
       />
       <span>
         <b>{label}</b>
-        {help ? <span className="muted" style={{ display: "block", fontSize: ".88rem", marginTop: 2 }}>{help}</span> : null}
+        {help ? <span className="muted" style={{ display: "block", fontSize: ".875rem", marginTop: 2 }}>{help}</span> : null}
       </span>
     </label>
   );

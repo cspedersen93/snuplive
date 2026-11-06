@@ -48,7 +48,7 @@ export default function ReportActions({ reportId, type }: { reportId: string; ty
           />
         </div>
       ) : (
-        <p className="muted" style={{ fontSize: ".9rem" }}>Det er allerede fjernet. Afvis anmeldelsen for at lukke sagen.</p>
+        <p className="muted" style={{ fontSize: ".875rem" }}>Det er allerede fjernet. Afvis anmeldelsen for at lukke sagen.</p>
       )}
       {ask ? (
         <div className="confirm-ask">
