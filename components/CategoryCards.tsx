@@ -13,10 +13,13 @@ export default function CategoryCards({ headingLevel = 3 }: { headingLevel?: 2 |
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={c.card} alt="" loading="lazy" />
             <span className="catcard-body">
-              <span className="catcard-ico" aria-hidden="true">
-                <CategoryIcon k={c.key} />
+              {/* Ikon og titel på samme linje, så kassen med teksten fylder mindst muligt af billedet. */}
+              <span className="catcard-head">
+                <span className="catcard-ico" aria-hidden="true">
+                  <CategoryIcon k={c.key} />
+                </span>
+                <H className="catcard-title">{c.label}</H>
               </span>
-              <H className="catcard-title">{c.label}</H>
               <span className="catcard-blurb">{c.blurb}</span>
             </span>
           </Link>
