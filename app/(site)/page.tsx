@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OG_IMAGE } from "@/lib/og";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import CampaignCards from "@/components/CampaignCards";
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
   title: { absolute: "Køb og sælg second hand live på video | Relived" },
   description:
     "Køb second hand live: se tøjet, tasken eller lampen på video, spørg sælgeren i chatten, og køb med ét tryk. Sælgeren får først pengene, når du har varen.",
-  openGraph: { title: "Second hand, du kan se live, før du køber" },
+  openGraph: { title: "Second hand, du kan se live, før du køber", images: [OG_IMAGE] },
   alternates: { canonical: "/", languages: { "da-DK": "/", en: "/en" } },
 };
 

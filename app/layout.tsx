@@ -1,4 +1,5 @@
 import "@fontsource-variable/familjen-grotesk";
+import { OG_IMAGE } from "@/lib/og";
 import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "da_DK",
     siteName: "Relived",
-    images: [{ url: "/img/og-v2.jpg", width: 1200, height: 630, alt: "Relived: køb og sælg second hand live på video" }],
+    images: [OG_IMAGE],
   },
   alternates: { canonical: "/" },
 };

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OG_IMAGE } from "@/lib/og";
 import { Suspense } from "react";
 import PhoneMock from "@/components/PhoneMock";
 import { SITE_URL } from "@/lib/env";
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "Køb og sælg brugt tøj, design og samleobjekter live på video. Skriv dig op til Relived, og få besked, så snart vi åbner.",
   alternates: { canonical: "/" },
-  openGraph: { title: "Køb og sælg second hand live – Relived åbner snart", url: "/" },
+  openGraph: { title: "Køb og sælg second hand live – Relived åbner snart", url: "/", images: [OG_IMAGE] },
 };
 
 const POINTS = [

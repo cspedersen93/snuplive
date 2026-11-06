@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OG_IMAGE } from "@/lib/og";
 import Link from "next/link";
 import { IconCamera, IconChat, IconShield, IconShieldCheck, IconStar, IconUser } from "@/components/Icons";
 import ShowCard from "@/components/ShowCard";
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
   description:
     "Buy and sell second hand clothes and things live on video in Denmark. Watch, ask the seller in the chat, and buy with one tap. Shows in English too.",
   alternates: { canonical: "/en", languages: { "da-DK": "/", en: "/en" } },
-  openGraph: { title: "Relived in English – second hand you can see live", locale: "en_GB", url: "/en" },
+  openGraph: { title: "Relived in English – second hand you can see live", locale: "en_GB", url: "/en", images: [OG_IMAGE] },
 };
 
 /** Danske ord, man møder på siden. */
