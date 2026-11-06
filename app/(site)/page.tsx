@@ -16,7 +16,7 @@ import { campaignState } from "@/lib/campaigns";
 import { inBeta, launched } from "@/lib/launch";
 import { SITE_URL } from "@/lib/env";
 import { clock, dayLabel } from "@/lib/format";
-import { showImage } from "@/lib/images";
+import { itemImage, showImage } from "@/lib/images";
 import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed, fetchListing } from "@/lib/queries";
 
@@ -57,7 +57,8 @@ export default async function Forside() {
   for (const s of live.slice(0, 4)) tiles.push({ kind: "show", show: s });
   const nextShow = upcoming[0];
   if (nextShow && tiles.length < 4) tiles.push({ kind: "show", show: nextShow });
-  const queues = [forSale, auctions, soon].map((q) => [...q]);
+  // Varer uden billede står ikke i feedet (de ligner tomme felter), men stadig i rækkerne længere nede og i showet.
+  const queues = [forSale, auctions, soon].map((q) => q.filter((it) => itemImage(it)));
   const usedSale = new Set<string>();
   while (tiles.length < FEED_TILES && queues.some((q) => q.length)) {
     for (const q of queues) {
@@ -258,7 +259,7 @@ export default async function Forside() {
         <div className="wrap split">
           <figure className="photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/how-live.jpg" alt="En sælger viser en brun lædertaske frem til telefonen foran ringlyset" loading="lazy" width={1360} height={768} />
+            <img src="/img/how-live-v2.jpg" alt="En sælger viser en brun lædertaske frem til telefonen foran ringlyset" loading="lazy" width={1360} height={768} />
             <figcaption>
               <span className="live-dot" aria-hidden="true" />
               Live fra stuen
@@ -283,7 +284,7 @@ export default async function Forside() {
         <div className="wrap">
           <article className="panel img sell-panel">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/sell-phone.jpg" alt="En sælger viser en lædertaske frem til telefonen på stativet, med trøjer og et tøjstativ ved siden af" loading="lazy" />
+            <img src="/img/sell-phone-v2.jpg" alt="En sælger viser en lædertaske frem til telefonen på stativet, med trøjer og et tøjstativ ved siden af" loading="lazy" />
             <span className="label red">Til sælgere</span>
             <h2 className="h2" id="h-saelg" style={{ maxWidth: "16ch" }}>Har du selv noget, der skal videre?</h2>
             <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>

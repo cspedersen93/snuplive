@@ -1044,8 +1044,8 @@ Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal
   giver samlerabat, Snart live, "Ny på Relived?" (kun logget ud) og Tryg handel. Under feedet står budsalg, flere varer
   til salg, kategorierne og teksterne om, hvordan det virker (de samme overskrifter som før, af hensyn til Google).
 - `/api/live-now` siger, hvor mange der er live (gemmes i 30 sekunder). Tallet står ved Live nu i menuen.
-- **Når ingen er live**, viser det store kort på forsiden en video uden lyd i ring (`public/video/welcome-live.mp4` og
-  `.webm`, billedet før den starter: `public/img/welcome-live-poster.jpg`). Den hentes først, når kortet kan ses, har en
+- **Når ingen er live**, viser det store kort på forsiden en video uden lyd i ring (`public/video/welcome-live-v2.mp4` og
+  `.webm`, billedet før den starter: `public/img/welcome-live-poster-v2.jpg`). Den hentes først, når kortet kan ses, har en
   knap til at stoppe den og spiller ikke for folk, der har bedt om mindre bevægelse eller sparer data. Er der få shows og
   varer, fylder kortet hele bredden. Koden: `components/feed/WelcomeVideo.tsx`.
 - **Logoet "Søgeren"** (november 2026): bogstaverne fra Caspers logo-fil (med pilen i e og play-tegn) uden den røde flade,
@@ -1053,7 +1053,9 @@ Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal
   til mørk baggrund (hvid tekst), `public/img/logo-dark.svg` til lys (sort tekst), og `public/img/logo-mark.svg` er "re" i
   hjørnerne til den smalle menu. Ikonerne (`app/icon.png`, `app/apple-icon.png`, `public/icon-192.png`, `public/icon-512.png`)
   er samme "re" på mørk flade, og `public/img/logo.png` er den lyse udgave. Det gamle logo (hvidt på rød flade) ligger i Git.
-  Delingsbilledet er `public/img/og.jpg`.
+  Delingsbilledet er `public/img/og-v2.jpg`.
+- **Skiltet på væggen** i stuebillederne (`sell-phone-v2.jpg`, `how-live-v2.jpg`, `saelg-stue-v2.jpg`) og i
+  velkomstvideoen viser det nye logo (november 2026). Videoen slutter nu, før det gamle logo kom til sidst.
 - **Kategorikortene** bruger Caspers egne billeder, `public/img/kat-*.jpg` (feltet `card` i `lib/format.ts`). De er skåret
   ud af ét samlet billede og forstørret 4 gange. `cover` (`public/img/cover-*.jpg`) bruges stadig til guiderne,
   reservebilledet til shows uden profilbillede og kategorisidernes delingsbillede. Bunden af siden nævner ikke, hvor

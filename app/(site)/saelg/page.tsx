@@ -42,7 +42,7 @@ export default function Saelg() {
         <div className="wrap split">
           <figure className="photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/saelg-stue.jpg" alt="En sælger sidder i sofaen og viser en taske frem live, med trøjer og et tøjstativ ved siden af" loading="lazy" width={1360} height={768} />
+            <img src="/img/saelg-stue-v2.jpg" alt="En sælger sidder i sofaen og viser en taske frem live, med trøjer og et tøjstativ ved siden af" loading="lazy" width={1360} height={768} />
             <figcaption>
               <span className="live-dot" aria-hidden="true" />
               Telefon, stativ og et godt lys

@@ -43,8 +43,6 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
             <span className="b-view">
               {dayLabel(item.starts_at)} {clock(item.starts_at)}
             </span>
-          ) : state === "for_sale" ? (
-            <span className="b-buy">Køb nu</span>
           ) : state === "sold" ? (
             <span className="b-view">Solgt</span>
           ) : null}

@@ -719,7 +719,7 @@ export const GUIDES: Guide[] = [
       </>
     ),
     teaser: "Sådan foregår et live-show, og hvorfor det passer så godt til brugt tøj og design.",
-    image: { src: "/img/how-live.jpg", alt: "En sælger viser en brun lædertaske frem til telefonen foran ringlyset", width: 1360, height: 768, position: "50% 40%" },
+    image: { src: "/img/how-live-v2.jpg", alt: "En sælger viser en brun lædertaske frem til telefonen foran ringlyset", width: 1360, height: 768, position: "50% 40%" },
     published: "2026-10-31",
     updated: "2026-10-31",
     sections: [
@@ -973,7 +973,7 @@ export const GUIDES: Guide[] = [
       </>
     ),
     teaser: "Varer, lys, lyd og hvad du siger: alt, du skal have styr på før dit første live-show.",
-    image: { src: "/img/sell-phone.jpg", alt: "En sælger viser en lædertaske frem til telefonen på stativet, med trøjer og et tøjstativ ved siden af", width: 1360, height: 768, position: "50% 40%" },
+    image: { src: "/img/sell-phone-v2.jpg", alt: "En sælger viser en lædertaske frem til telefonen på stativet, med trøjer og et tøjstativ ved siden af", width: 1360, height: 768, position: "50% 40%" },
     published: "2026-10-31",
     updated: "2026-10-31",
     sections: [

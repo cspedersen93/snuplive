@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "da_DK",
     siteName: "Relived",
-    images: [{ url: "/img/og.jpg", width: 1200, height: 630, alt: "Live shopping med brugt tøj på Relived" }],
+    images: [{ url: "/img/og-v2.jpg", width: 1200, height: 630, alt: "Relived: køb og sælg second hand live på video" }],
   },
   alternates: { canonical: "/" },
 };

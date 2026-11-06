@@ -6,6 +6,8 @@ export default function NoPhoto({ cat, text, size = "card" }: { cat?: string | n
   const c = category(cat);
   return (
     <span className={`nophoto${size === "large" ? " lg" : ""}`} aria-hidden="true">
+      {/* Kategoriens billede, sløret og mørkt, så feltet ikke ser tomt ud, men heller ikke ligner selve varen. */}
+      {c.card ? <span className="nophoto-bg" style={{ backgroundImage: `url(${c.card})` }} /> : null}
       <i>
         <CategoryIcon k={c.key} size={size === "large" ? 34 : 24} />
       </i>

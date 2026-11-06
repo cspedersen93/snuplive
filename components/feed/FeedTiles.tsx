@@ -201,8 +201,6 @@ export function ItemTile({ item }: { item: FeedItem }) {
             <IconPlay />
             Video
           </span>
-        ) : state === "for_sale" ? (
-          <span className="fbadge">Køb nu</span>
         ) : state === "sold" ? (
           <span className="fbadge">Solgt</span>
         ) : null}
