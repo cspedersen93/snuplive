@@ -870,12 +870,12 @@ img.v-thumb{object-fit:cover}
 .catcards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .catcard{position:relative;display:flex;flex-direction:column;justify-content:flex-end;aspect-ratio:3/4;border-radius:18px;overflow:hidden;text-decoration:none;color:#fff;isolation:isolate;background:var(--surface)}
 .catcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform .5s ease}
-.catcard::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,10,12,0) 45%,rgba(11,10,12,.35) 100%)}
+/* Glidende glas: den nederste del af billedet er sløret og mørk og glider blødt over i den skarpe del, så teksten kan
+   læses uden en kasse omkring. */
+.catcard::after{content:"";position:absolute;left:0;right:0;bottom:0;height:62%;z-index:-1;background:linear-gradient(180deg,rgba(16,15,18,0) 0%,rgba(16,15,18,.55) 45%,rgba(16,15,18,.8) 100%);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 45%);mask-image:linear-gradient(180deg,transparent 0%,#000 45%)}
 .catcard:hover img{transform:scale(1.04)}
-.catcard-body{display:flex;flex-direction:column;gap:6px;margin:10px;padding:10px 14px 12px 10px;border-radius:14px;background:rgba(16,15,18,.62);-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px -12px rgba(0,0,0,.6)}
+.catcard-body{display:flex;flex-direction:column;gap:6px;padding:14px 16px 16px}
 .catcard-head{display:flex;align-items:center;gap:10px;min-width:0}
-/* Andet (det brede kort): kassen er kun så bred som teksten. */
-.catcard[data-cat=andet] .catcard-body{align-self:flex-start;width:fit-content;max-width:calc(100% - 20px)}
 /* Telefonen: plads til to linjer i titlen, så alle kasser er lige høje. */
 /* Under 1280 px kan titlerne brydes: plads til to linjer i alle, så kasserne i en række er lige høje. */
 @media (max-width:1279px){.catcard:not([data-cat=andet]) .catcard-title{min-height:2.3em;display:flex;align-items:center}}
@@ -889,7 +889,7 @@ img.v-thumb{object-fit:cover}
 /* Går kategorierne ikke op i rækken, fylder den sidste (Andet) hele bredden. */
 @media (min-width:901px){.catcards li:last-child:nth-child(4n+1){grid-column:1/-1}.catcards li:last-child:nth-child(4n+1) .catcard{aspect-ratio:auto;min-height:190px}.catcards li:last-child:nth-child(4n+1) .catcard img{object-position:50% 40%}}
 @media (min-width:641px) and (max-width:900px){.catcards li:last-child:nth-child(odd){grid-column:1/-1}.catcards li:last-child:nth-child(odd) .catcard{aspect-ratio:16/9}}
-@media (max-width:640px){.catcards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.catcard{aspect-ratio:4/5}.catcard-blurb{display:none}.catcard-body{margin:8px;padding:8px 10px 8px 8px;border-radius:12px}.catcard-head{gap:8px}.catcard-title{font-size:.9375rem}}
+@media (max-width:640px){.catcards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.catcard{aspect-ratio:4/5}.catcard-blurb{display:none}.catcard-body{padding:10px 12px 12px}.catcard-head{gap:8px}.catcard-title{font-size:.9375rem}}
 .split-text{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(28px,6vw,88px);align-items:start}
 @media (max-width:860px){.split-text{grid-template-columns:minmax(0,1fr)}}
 /* Forside */
@@ -2047,7 +2047,7 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 /* Kategorikort: lave kort på to rækker, og det sidste (Andet) som en smal stribe. */
 @media (min-width:641px){
   .catcard{aspect-ratio:16/10}
-  .catcard-body{padding:8px 12px 10px 8px}
+  .catcard-body{padding:12px 14px 14px}
   .catcard-ico{width:28px;height:28px}
   .catcard-blurb{font-size:.8125rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 }
