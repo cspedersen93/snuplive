@@ -255,7 +255,7 @@ function ViewerStage({
       <>
         <div className="cam-split-bg" aria-hidden="true" />
         <SplitGrid cams={crewOrder(cams)} active={spotlight} />
-        <StartAudio label="Tryk for lyd" className="btn btn-red btn-sm start-audio" />
+        <StartAudio label="Tryk for lyd" className="btn btn-sm start-audio" />
       </>
     );
   }
@@ -269,7 +269,7 @@ function ViewerStage({
         </div>
       )}
       <PipRow cams={cams.filter((c) => c !== cam)} onPick={setPicked} />
-      <StartAudio label="Tryk for lyd" className="btn btn-red btn-sm start-audio" />
+      <StartAudio label="Tryk for lyd" className="btn btn-sm start-audio" />
     </>
   );
 }

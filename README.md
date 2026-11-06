@@ -1058,6 +1058,11 @@ Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal
   skrevet i rem); kun overskrifterne skalerer med skærmen (clamp). Mærker og små etiketter er mindst 12 px. Knapper og
   links til `/saelg` hedder "Sælg dine varer" (bundmenuen bare "Sælg"). Tomme sider bruger `components/EmptyNext.tsx`
   med ikon, kort overskrift og tilmelding. Kategorierne står kun i venstremenuen inde under Kategorier.
+- **Knapper og rødt** (november 2026): rød betyder "live" eller "tryk her", og hver skærm har én rød hovedknap. Efter
+  lanceringen er "Sælg dine varer" i menuen og + i bundmenuen neutrale for købere (røde for sælgere), styret af
+  `launched()` via `AppShell`. På telefonen: varesiden har en fast Køb-bjælke (`components/StickyCta.tsx`), når sidens
+  egen knap er ude af syne; forsidens "1 sælger er live nu" er en rød knap; videoen i et show er aldrig højere end
+  skærmen, så Køb/Byd altid kan ses; og "Tryk for lyd" er hvid, så Køb/Byd er den eneste røde knap i videoen.
 - **Skiltet på væggen** i stuebillederne (`sell-phone-v2.jpg`, `how-live-v2.jpg`, `saelg-stue-v2.jpg`) og i
   velkomstvideoen viser det nye logo (november 2026). Videoen slutter nu, før det gamle logo kom til sidst.
 - **Kategorikortene** bruger Caspers egne billeder, `public/img/kat-*.jpg` (feltet `card` i `lib/format.ts`). De er skåret

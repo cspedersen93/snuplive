@@ -12,7 +12,7 @@ export function hideTabBar(path: string) {
 }
 
 /** Menulinjen i bunden på telefonen, som i en app. */
-export default function TabBar() {
+export default function TabBar({ launched = false }: { launched?: boolean }) {
   const path = usePathname();
   const { signedIn, me, cartCount, liveCount } = useShell();
   if (hideTabBar(path)) return null;
@@ -33,7 +33,7 @@ export default function TabBar() {
         </span>
         <span>Live{liveCount ? ` (${liveCount})` : ""}</span>
       </Link>
-      <Link href={sellHref} className="tab-sell" aria-current={on(sellHref) && "page"}>
+      <Link href={sellHref} className={`tab-sell${launched && !me?.is_seller ? " is-quiet" : ""}`} aria-current={on(sellHref) && "page"}>
         <span className="tab-plus">
           <IconPlus />
         </span>

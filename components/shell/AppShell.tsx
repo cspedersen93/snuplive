@@ -12,15 +12,16 @@ const COMPACT = /^\/(live\/[^/]+|studio|gaest)(\/|$)/;
  * App-rammen: menuen i venstre side på computeren, siden i midten og menulinjen i bunden på telefonen.
  * Selve siderne er de samme som før; de står bare i rammen.
  */
-export default function AppShell({ children }: { children: React.ReactNode }) {
+/** `launched`: efter lanceringen er sælg-knapperne neutrale for købere, så køberknapperne står tydeligst. */
+export default function AppShell({ children, launched = false }: { children: React.ReactNode; launched?: boolean }) {
   const path = usePathname();
   return (
     <>
       <div className={`app${COMPACT.test(path) ? " app-compact" : ""}`}>
-        <SideNav />
+        <SideNav launched={launched} />
         <div className="app-main">{children}</div>
       </div>
-      <TabBar />
+      <TabBar launched={launched} />
       <InstallBanner />
     </>
   );

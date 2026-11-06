@@ -22,7 +22,7 @@ const MAIN = [
  * Kategorier, når man er inde på en kategoriside.
  * Smal med kun ikoner på mindre skærme og i live-shows, så videoen får pladsen.
  */
-export default function SideNav() {
+export default function SideNav({ launched = false }: { launched?: boolean }) {
   const path = usePathname();
   const { me, liveCount, liveSellers, follows } = useShell();
   const sellHref = me?.is_seller ? "/studio" : "/saelg";
@@ -83,7 +83,13 @@ export default function SideNav() {
       ) : null}
 
       <div className="side-foot">
-        <Link className="btn btn-red side-sell" href={sellHref} title="Sælg dine varer" aria-current={current(sellHref)}>
+        {/* Efter lanceringen er knappen hvid for købere (rød for sælgere), så den ikke konkurrerer med køberknapperne. */}
+        <Link
+          className={`btn side-sell ${launched && !me?.is_seller ? "btn-line" : "btn-red"}`}
+          href={sellHref}
+          title="Sælg dine varer"
+          aria-current={current(sellHref)}
+        >
           <IconPlus />
           <span className="side-label">Sælg dine varer</span>
         </Link>

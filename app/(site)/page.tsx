@@ -97,10 +97,20 @@ export default async function Forside() {
       <div className="wrap home-feed">
         <div className="feed-top">
           <div className="feed-head">
-            <span className="label red feed-eyebrow">
-              {live.length ? <span className="live-dot" aria-hidden="true" /> : null}
-              {live.length ? `${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu` : "Live Sale. Second Hand."}
-            </span>
+            {live.length ? (
+              // Når nogen er live, er linjen øverst et link til showet. På telefonen er det en rød knap, så køberne kan
+              // gå direkte ind fra første skærm.
+              <Link
+                className="label red feed-eyebrow feed-live-cta"
+                href={live.length === 1 && live[0].seller?.handle ? `/live/${live[0].seller.handle}` : "/live"}
+              >
+                <span className="live-dot" aria-hidden="true" />
+                {`${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu`}
+                <span className="feed-live-go"> · Se med</span>
+              </Link>
+            ) : (
+              <span className="label red feed-eyebrow">Live Sale. Second Hand.</span>
+            )}
             <h1 id="h-forside" className="h1 feed-h1">
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>

@@ -6,6 +6,7 @@ import Avatar from "@/components/Avatar";
 import { IconBell } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import NoPhoto from "@/components/NoPhoto";
+import StickyCta from "@/components/StickyCta";
 import RemindButton from "@/components/RemindButton";
 import ReportButton from "@/components/ReportButton";
 import { itemMeta } from "@/components/Screen";
@@ -198,6 +199,7 @@ export default async function ItemPage({ params }: Params) {
     ],
   };
 
+  const stickyPrice = bid ? kr(it.high_bid ?? it.price) : kr(state === "sold" ? soldPrice(it) : it.price);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld).replace(/</g, "\\u003c") }} />
@@ -346,6 +348,7 @@ export default async function ItemPage({ params }: Params) {
                 </>
               )}
             </div>
+            <StickyCta name={it.name} price={stickyPrice} />
 
             {it.description ? (
               <section aria-labelledby="h-beskrivelse">
