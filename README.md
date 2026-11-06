@@ -1058,8 +1058,9 @@ Siden er stadig en hjemmeside på relived.dk, men bygget op som en app. Der skal
   skrevet i rem); kun overskrifterne skalerer med skærmen (clamp). Mærker og små etiketter er mindst 12 px. Knapper og
   links til `/saelg` hedder "Sælg dine varer" (bundmenuen bare "Sælg"). Tomme sider bruger `components/EmptyNext.tsx`
   med ikon, kort overskrift og tilmelding. Kategorierne står kun i venstremenuen inde under Kategorier.
-- **Mørk koksgrå** (november 2026): baggrunden er `#19181B` (før næsten-sort `#0B0A0C`), med `--bg-2`, `--surface`,
-  `--surface-2` og `--side` (venstremenuen) i samme neutrale grå. Samme farve i `app/manifest.ts`, `themeColor` i
+- **Mørk koksgrå** (november 2026): baggrunden er `#141316` (før næsten-sort `#0B0A0C`), og kasserne (`--bg-2`,
+  `--surface`, `--surface-2`) er tydeligt lysere med en tynd lys kant foroven og en blød skygge, så siden ikke flader ud.
+  `--side` er venstremenuen. Samme farve i `app/manifest.ts`, `themeColor` i
   `app/layout.tsx`, `public/offline.html` og startskærmene i `public/splash/`. Mørke skygger oven på billeder er stadig
   næsten-sorte, så teksten kan læses.
 - **Knapper og rødt** (november 2026): rød betyder "live" eller "tryk her", og hver skærm har én rød hovedknap. Efter
