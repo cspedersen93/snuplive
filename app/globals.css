@@ -874,6 +874,12 @@ img.v-thumb{object-fit:cover}
 .catcard:hover img{transform:scale(1.04)}
 .catcard-body{display:flex;flex-direction:column;gap:6px;margin:10px;padding:10px 14px 12px 10px;border-radius:14px;background:rgba(16,15,18,.62);-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px -12px rgba(0,0,0,.6)}
 .catcard-head{display:flex;align-items:center;gap:10px;min-width:0}
+/* Andet (det brede kort): kassen er kun så bred som teksten. */
+.catcard[data-cat=andet] .catcard-body{align-self:flex-start;width:fit-content;max-width:calc(100% - 20px)}
+/* Telefonen: plads til to linjer i titlen, så alle kasser er lige høje. */
+/* Under 1280 px kan titlerne brydes: plads til to linjer i alle, så kasserne i en række er lige høje. */
+@media (max-width:1279px){.catcard:not([data-cat=andet]) .catcard-title{min-height:2.3em;display:flex;align-items:center}}
+@media (max-width:380px){.catcards .catcard-title{font-size:.875rem}.catcards .catcard-ico{display:none}.catcards .catcard-body{padding-left:12px}}
 .catcard-ico{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12)}
 .catcard-ico svg{width:16px;height:16px}
 .catcard-title{font-size:1.125rem;line-height:1.15;letter-spacing:-.015em}

@@ -9,7 +9,7 @@ export default function CategoryCards({ headingLevel = 3 }: { headingLevel?: 2 |
     <ul className="catcards">
       {CATEGORIES.map((c) => (
         <li key={c.key}>
-          <Link className="catcard" href={`/kategori/${c.slug}`}>
+          <Link className="catcard" href={`/kategori/${c.slug}`} data-cat={c.key}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={c.card} alt="" loading="lazy" />
             <span className="catcard-body">
@@ -18,7 +18,7 @@ export default function CategoryCards({ headingLevel = 3 }: { headingLevel?: 2 |
                 <span className="catcard-ico" aria-hidden="true">
                   <CategoryIcon k={c.key} />
                 </span>
-                <H className="catcard-title">{c.label}</H>
+                <H className="catcard-title">{"cardLabel" in c ? c.cardLabel : c.label}</H>
               </span>
               <span className="catcard-blurb">{c.blurb}</span>
             </span>
