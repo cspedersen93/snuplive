@@ -40,8 +40,6 @@ export const CATEGORIES = [
     slug: "luksus",
     label: "Luksus: tasker, ure og smykker",
     short: "Luksus",
-    /** Titlen på kategorikortet (kortere, så kortet er lige så stort som de andre). */
-    cardLabel: "Luksus, ure og smykker",
     cover: "/img/cover-luksus.jpg",
     /** Billedet på kategorikortene. */
     card: "/img/kat-luksus.jpg",
