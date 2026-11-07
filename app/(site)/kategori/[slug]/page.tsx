@@ -40,6 +40,8 @@ const SELL_GUIDE: Record<string, { href: string; label: string }> = {
   boernetoej: { href: "/guides/saelg-brugt-boernetoej", label: "Tips til at sælge børnetøj" },
   luksus: { href: "/guides/saelg-designertaske", label: "Sådan sælger du en designertaske" },
   samlerting: { href: "/guides/saelg-samleobjekter", label: "Tips til at sælge samleobjekter" },
+  cykler: { href: "/guides/saelg-brugt-barnevogn", label: "Tips til at sælge en barnevogn eller cykel" },
+  bolig: { href: "/guides/saelg-brugte-moebler", label: "Tips til at sælge møbler" },
 };
 const BUY_GUIDE: Record<string, { href: string; label: string }> = {
   bolig: { href: "/guides/koeb-brugt-design", label: "Sådan tjekker du brugt design" },

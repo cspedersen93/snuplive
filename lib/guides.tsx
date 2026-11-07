@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { inBeta } from "@/lib/launch";
+import { PARCELS } from "@/lib/pricing";
 
 /**
  * Guides (/guides): artikler om at købe og sælge brugt, så flere finder Relived på Google.
@@ -1515,6 +1516,559 @@ export const GUIDES: Guide[] = [
     ],
     related: ["er-designertasken-aegte", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
     end: { h2: "Klar til at sælge din taske?", text: "Opret en gratis konto, læg tasken op, og få den ægthedstjekket.", href: "/saelg", label: "Bliv sælger" },
+  },
+
+  {
+    slug: "saelg-brugt-barnevogn",
+    audience: "Sælger",
+    keyword: "sælg brugt barnevogn",
+    title: "Sælg brugt barnevogn: sådan får du den solgt | Relived",
+    description:
+      "Sælg din brugte barnevogn hurtigt og trygt: gør den klar, vis den på video, sæt den rigtige pris, og lad køberen hente den gratis.",
+    h1: "Sælg brugt barnevogn: sådan får du den solgt hurtigt",
+    short: "Sælg barnevogn",
+    lede: (
+      <>
+        En barnevogn bliver brugt i et par år og kan derefter køre videre hos en ny familie. Køberne er kritiske, for den skal være
+        sikker og nem at bruge. Viser du den ordentligt frem og er ærlig om standen, sælger den langt hurtigere.
+      </>
+    ),
+    teaser: "Gør den klar, vis hjul og bremse på video, og lad køberen hente den gratis.",
+    image: { src: "/img/kat-cykler.jpg", alt: "En brugt klapvogn står ved siden af en cykel", width: 1160, height: 988, position: "80% 50%" },
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    sections: [
+      {
+        id: "klar",
+        h2: "Hvordan gør du barnevognen klar til salg?",
+        body: (
+          <>
+            <p>
+              En ren barnevogn ser nyere ud og sælger for mere. Brug en halv time på den, før du filmer den:
+            </p>
+            <ul>
+              <li><b>Stel og hjul:</b> tør stellet af, og fjern sand, grus og hår fra hjul og aksler.</li>
+              <li><b>Betræk:</b> kan kalechen, kassen eller sædet tages af, så vask dem efter vaskemærket. Ellers kan de ofte rengøres med en klud og mild sæbe.</li>
+              <li><b>Kurven:</b> tøm den, og ryst den.</li>
+              <li><b>Luftdæk:</b> pump dem, så vognen kører let, når køberen prøver den.</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        id: "sikkerhed",
+        h2: "Hvad skal du tjekke for sikkerheden?",
+        body: (
+          <>
+            <p>Køberen skal kunne stole på, at vognen er sikker. Tjek det her, før du sætter den til salg:</p>
+            <ul>
+              <li>Bremsen holder vognen, også på en skråning.</li>
+              <li>Seler og spænder lukker og åbner, som de skal.</li>
+              <li>Låsene klikker på plads, når vognen er slået op.</li>
+              <li>Der er ingen revner i stellet eller i plastikdelene.</li>
+            </ul>
+            <p>
+              Tjek også, om din model er blevet kaldt tilbage. Producenten og Sikkerhedsstyrelsen har lister over tilbagekaldte
+              produkter. Er der noget, der ikke virker, så skriv det i beskrivelsen.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "beskriv",
+        h2: "Hvad skal stå i beskrivelsen?",
+        body: (
+          <>
+            <p>
+              Start navnet med, om det er en barnevogn eller en klapvogn, og skriv mærke, model og årgang. Køberne søger på dem.
+              Skriv derefter:
+            </p>
+            <ul>
+              <li><b>Hvad der følger med:</b> lift eller kasse, sportsvogn, regnslag, myggenet, kørepose og adaptere til autostol.</li>
+              <li><b>Mål sammenklappet:</b> så køberen ved, om den kan komme i bagagerummet eller elevatoren.</li>
+              <li><b>Slid og fejl:</b> ridser, falmet stof og slidte håndtag. Vis dem tæt på.</li>
+              <li><b>Hjemmet:</b> kommer den fra et hjem med røg eller dyr, så skriv det.</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        id: "video",
+        h2: "Hvorfor sælger en barnevogn bedre på video?",
+        body: (
+          <>
+            <p>
+              Det, køberne er mest i tvivl om, kan du ikke vise på et billede: hvor let den kører, hvordan den klappes sammen, og om
+              bremsen holder. På video kan du vise det hele på et halvt minut.
+            </p>
+            <p>
+              Film den med <b>Sælg med video</b> (5-45 sekunder), eller vis den i et live-show, hvor køberne kan spørge om mål og
+              stand i chatten, mens de ser med.
+            </p>
+          </>
+        ),
+        cta: { text: "Film barnevognen, og sæt den til salg på få minutter.", href: "/saelg", label: "Sådan sælger du på Relived" },
+      },
+      {
+        id: "pris",
+        h2: "Hvad skal den brugte barnevogn koste?",
+        body: (
+          <>
+            <p>
+              Prisen afhænger af mærke, model, alder, stand og tilbehør. Søg på samme model, og se, hvad den faktisk er blevet solgt
+              for, ikke kun hvad andre beder om. Tilbehør som regnslag og kørepose løfter prisen, så sælg det med.
+            </p>
+            <p>
+              Sætter du prisen lidt over det, du vil have, kan køberne <b>give et bud</b> på varen, og du vælger selv, om du vil tage
+              imod det.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "afhentning",
+        h2: "Hvordan foregår afhentningen?",
+        body: (
+          <>
+            <p>
+              En barnevogn er for stor til en pakkeshop, så køberen henter den hos dig. Det er gratis for køberen. Sådan foregår det
+              på Relived:
+            </p>
+            <ol>
+              <li>Køberen betaler gennem Relived, før vognen bliver hentet.</li>
+              <li>Du får køberens telefonnummer, og I aftaler tid og sted.</li>
+              <li>Køberen ser vognen efter og prøver den.</li>
+              <li>Køberen bekræfter, at vognen er hentet, og så går pengene til dig.</li>
+            </ol>
+            <p>Der er ingen kontanter og ingen diskussion om betaling på trappen.</p>
+          </>
+        ),
+        cta: SAELG,
+      },
+      {
+        id: "cykel",
+        h2: "Sælger du også en cykel?",
+        body: (
+          <p>
+            Cykler bliver også hentet hos sælgeren, og det samme gælder: gør den ren, pump dækkene, og vis på video, at gear og
+            bremser virker. Hav stelnummeret og gerne kvitteringen klar, så køberen kan tjekke cyklen i politiets register over
+            stjålne cykler på politi.dk.
+          </p>
+        ),
+      },
+    ],
+    faq: [
+      [
+        "Kan man sende en barnevogn med posten?",
+        "Ikke til en pakkeshop, for den er for stor. På Relived bliver barnevogne og cykler hentet hos sælgeren, og afhentningen er gratis for køberen.",
+      ],
+      [
+        "Hvad skal følge med, når man sælger en barnevogn?",
+        "Alt det, der hørte til, da den var ny: lift eller kasse, sportsvogn, regnslag og myggenet. Jo mere der følger med, jo nemmere er den at sælge.",
+      ],
+      ["Hvornår får jeg pengene?", "Køberen betaler gennem Relived, før vognen bliver hentet. Pengene går til dig, når køberen har bekræftet, at vognen er hentet."],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler en køberbeskyttelse.`],
+    ],
+    related: ["saelg-brugt-boernetoej", "flyttesalg", "saelg-live-foerste-gang"],
+    end: { h2: "Klar til at sælge barnevognen?", text: "Opret en gratis konto, film vognen, og lad den næste familie hente den.", href: "/saelg", label: "Bliv sælger" },
+  },
+
+  {
+    slug: "saelg-brugte-moebler",
+    audience: "Sælger",
+    keyword: "sælg brugte møbler",
+    title: "Sælg brugte møbler: sådan får du dem solgt | Relived",
+    description:
+      "Sælg brugte møbler hurtigere: gør dem klar, tag de rigtige mål, vis dem på video, og aftal afhentning. Tips til pris, design og store møbler.",
+    h1: "Sælg brugte møbler: sådan får du dem solgt hurtigere",
+    short: "Sælg brugte møbler",
+    lede: (
+      <>
+        Brugte møbler er efterspurgte, men de er store, tunge og svære at vurdere på et billede. Jo bedre du viser møblet frem og
+        forklarer mål og stand, jo hurtigere finder du en køber, der vil hente det.
+      </>
+    ),
+    teaser: "Mål, video og afhentning: sådan sælger du kommoden, stolene eller lampen.",
+    image: { src: "/img/kat-bolig.jpg", alt: "En bordlampe og vaser på et lille træbord", width: 1156, height: 992, position: "50% 50%" },
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    sections: [
+      {
+        id: "hvad",
+        h2: "Hvilke brugte møbler kan du sælge?",
+        body: (
+          <>
+            <p>
+              Møbler i massivt træ, designklassikere, spisebordsstole i sæt, kommoder, reoler, lænestole og lamper sælger godt. Billige
+              møbler i spånplade kan også sælges, men prisen er lav, og de tåler ikke altid at blive skilt ad og samlet igen.
+            </p>
+            <p>Madrasser og meget slidte sofaer er svære at sælge. Dem er det ofte bedre at give væk.</p>
+          </>
+        ),
+      },
+      {
+        id: "klar",
+        h2: "Hvordan gør du møblet klar?",
+        body: (
+          <ul>
+            <li><b>Rengør det:</b> tør støv af, også bagpå og under. Støvsug polstring og hynder.</li>
+            <li><b>Stram skruer:</b> et bord eller en stol, der vipper, virker slidt, selvom det kun er en løs skrue.</li>
+            <li><b>Fjern lugt:</b> luft polstrede møbler ud. Kommer de fra et hjem med røg eller dyr, så skriv det.</li>
+            <li><b>Tøm skuffer og skabe:</b> så køberen kan se, hvordan de ser ud indeni.</li>
+          </ul>
+        ),
+      },
+      {
+        id: "maal",
+        h2: "Hvilke mål skal du skrive?",
+        body: (
+          <>
+            <p>Køberen skal kunne se, om møblet passer ind, og om det kan komme op ad trappen. Skriv i centimeter:</p>
+            <ul>
+              <li>Højde, bredde og dybde.</li>
+              <li>Siddehøjde på stole, sofaer og lænestole.</li>
+              <li>Bordpladen, og hvor langt bordet bliver med udtræk.</li>
+              <li>Om møblet kan skilles ad, og om det er tungt at bære.</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        id: "design",
+        h2: "Har du et designmøbel?",
+        body: (
+          <>
+            <p>
+              Kig efter et stempel, et mærkat eller et brændemærke under sædet, bag på møblet eller inde i en skuffe. Skriv designer,
+              producent og model i navnet, og vis mærket tæt på. Det er det første, køberne leder efter.
+            </p>
+            <p>
+              Eftertragtede designmøbler kan du sætte til <b>budsalg</b> i et live-show. Læs, hvad køberne tjekker, i{" "}
+              <Link href="/guides/koeb-brugt-design">køb brugt design og lamper</Link>.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "video",
+        h2: "Hvorfor sælger møbler bedre på video?",
+        body: (
+          <>
+            <p>
+              På et billede er det svært at se, hvor stort et møbel er, og om det vipper. På video kan du gå rundt om det, åbne
+              skufferne, vise, at lågerne lukker, og vise slid tæt på. Film i dagslys, så farven bliver rigtig.
+            </p>
+            <p>Sælger du live, kan køberne bede dig om at vise bagsiden eller måle noget, mens de ser med.</p>
+          </>
+        ),
+        cta: { text: "Film dine møbler, og sæt dem til salg med video eller live.", href: "/saelg", label: "Sådan sælger du på Relived" },
+      },
+      {
+        id: "pris",
+        h2: "Hvad skal brugte møbler koste?",
+        body: (
+          <>
+            <p>
+              Søg på det samme møbel, og se, hvad det faktisk er blevet solgt for. Kendte designere og producenter holder prisen
+              bedst. Almindelige møbler sælges som regel langt under nyprisen, for køberen skal også selv hente dem.
+            </p>
+            <p>
+              Har du stole i et sæt, så sælg dem samlet. Har du flere møbler, kan du give <b>samlerabat</b>, så køberne tager flere
+              varer med på én gang.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "levering",
+        h2: "Afhentning eller pakkeshop?",
+        body: (
+          <>
+            <p>
+              Lamper, vaser, puder og andre små boligvarer op til 5 kg kan sendes til en pakkeshop. Køberen betaler fragten (
+              {PARCELS.large.price} kr for en stor pakke).
+            </p>
+            <p>
+              Store møbler skal hentes. Skriv tydeligt i beskrivelsen, at møblet skal hentes, og hvor det står, fx på 3. sal uden
+              elevator. Køberen betaler gennem Relived, henter møblet gratis og bekræfter bagefter, at det er hentet. Så går pengene
+              til dig.
+            </p>
+          </>
+        ),
+        cta: SAELG,
+      },
+    ],
+    faq: [
+      [
+        "Hvordan sælger jeg store møbler, der ikke kan sendes?",
+        "Skriv i beskrivelsen, at møblet skal hentes. Køberen betaler gennem Relived og henter møblet gratis hos dig. Pengene går til dig, når køberen har bekræftet, at det er hentet.",
+      ],
+      [
+        "Hvad sælger bedst af brugte møbler?",
+        "Møbler i massivt træ, designklassikere, spisebordsstole i sæt, kommoder og lamper. Kendte designere og producenter holder prisen bedst.",
+      ],
+      ["Skal jeg skille møblet ad?", "Kun hvis det ikke kan komme ud ellers, og du ved, at det kan samles igen. Skriv det i beskrivelsen, og læg skruerne i en pose."],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten og en køberbeskyttelse.`],
+    ],
+    related: ["koeb-brugt-design", "flyttesalg", "saelg-live-foerste-gang"],
+    end: { h2: "Klar til at gøre plads?", text: "Opret en gratis konto, film dine møbler, og find en køber, der henter dem.", href: "/saelg", label: "Bliv sælger" },
+  },
+
+  {
+    slug: "saelg-brugte-sneakers",
+    audience: "Sælger",
+    keyword: "sælg brugte sneakers",
+    title: "Sælg brugte sneakers: sådan får du mest for dem | Relived",
+    description:
+      "Sælg brugte sneakers til en god pris: rens dem, vis sålen og mærkatet, skriv den rigtige størrelse, og send dem sikkert. Sådan gør du.",
+    h1: "Sælg brugte sneakers: sådan får du mest for dem",
+    short: "Sælg brugte sneakers",
+    lede: (
+      <>
+        Sneakers er blandt de mest efterspurgte brugte varer. Køberne kigger dog nøje på slid, størrelse og om de er ægte. Viser du
+        det hele frem, får du både en hurtigere handel og en bedre pris.
+      </>
+    ),
+    teaser: "Rens dem, vis sålen og mærkatet, og send dem godt pakket.",
+    image: { src: "/img/kat-herretoej.jpg", alt: "Brugte jeans, en jakke og et par hvide sneakers", width: 1148, height: 1064, position: "75% 60%" },
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    sections: [
+      {
+        id: "hvad",
+        h2: "Hvilke sneakers kan du sælge?",
+        body: (
+          <>
+            <p>
+              Populære modeller, klassikere og begrænsede udgaver i pæn stand sælger bedst. Meget slidte løbesko og sko med huller
+              er svære at sælge.
+            </p>
+            <p>Kopier må ikke sælges. Det er ulovligt og forbudt på Relived.</p>
+          </>
+        ),
+      },
+      {
+        id: "rens",
+        h2: "Hvordan renser du sneakers før salg?",
+        body: (
+          <ul>
+            <li><b>Sålen:</b> børst snavs af, og rens kanten med mild sæbe og en blød børste.</li>
+            <li><b>Overdelen:</b> følg mærkets råd. Læder og ruskind skal ikke i vaskemaskinen.</li>
+            <li><b>Snørebåndene:</b> vask dem for sig, eller sæt nye i. Hvide snørebånd får skoen til at se nyere ud.</li>
+            <li><b>Lugt og form:</b> fyld skoene med papir, så de holder formen, og luft dem ud.</li>
+          </ul>
+        ),
+      },
+      {
+        id: "stoerrelse",
+        h2: "Hvordan skriver du den rigtige størrelse?",
+        body: (
+          <p>
+            Størrelsen står på mærkatet inde i tungen, ofte både i EU, UK og US. Skriv den præcise størrelse, fx 42 ⅔, og mål den
+            indvendige længde i centimeter, for mærkerne passer forskelligt. Skriv også, hvis de er små eller store i størrelsen.
+          </p>
+        ),
+      },
+      {
+        id: "aegte",
+        h2: "Hvordan viser du, at de er ægte?",
+        body: (
+          <>
+            <p>
+              Vis mærkatet inde i tungen tæt på, så køberen kan se størrelsen og produktkoden. Har du den originale æske og
+              kvitteringen, så vis dem også. De gør køberen tryg og løfter prisen.
+            </p>
+            <p>
+              Sneakers fra luksusmærker som Balenciaga og Gucci bliver ægthedstjekket af Relived, før de kan købes. Når du har lagt
+              dem op, trykker du <b>Send billeder</b> og lægger nærbilleder op.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "video",
+        h2: "Hvad vil køberne se på video?",
+        body: (
+          <>
+            <p>Drej skoene langsomt i dagslys, og vis det, køberne kigger efter:</p>
+            <ul>
+              <li>Sålen, især slid ved hælen.</li>
+              <li>Foret inde i hælen, hvor det slides først.</li>
+              <li>Folder ved tåen.</li>
+              <li>Gulnede kanter på lyse såler.</li>
+            </ul>
+            <p>Sælger du live, kan køberne spørge om størrelse og pasform i chatten, og du kan vise det med det samme.</p>
+          </>
+        ),
+        cta: { text: "Film dine sneakers, og sælg dem live eller med video.", href: "/saelg", label: "Sådan sælger du på Relived" },
+      },
+      {
+        id: "pris",
+        h2: "Hvad skal brugte sneakers koste?",
+        body: (
+          <>
+            <p>
+              Almindelige modeller sælges som regel et godt stykke under nyprisen, mens eftertragtede og begrænsede udgaver kan holde
+              prisen. Søg på model og farve, og se, hvad de faktisk er blevet solgt for. Æsken løfter prisen.
+            </p>
+            <p>
+              Er de eftertragtede, så sæt dem til <b>budsalg</b> i et live-show. Se flere råd i{" "}
+              <Link href="/guides/pris-paa-brugt-toej">pris på brugt tøj</Link>.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "send",
+        h2: "Hvordan sender du sneakers?",
+        body: (
+          <p>
+            Læg skoene i æsken, og læg æsken i en større kasse eller pose, så den ikke bliver mast. Med æske vejer et par sneakers
+            ofte over 1 kg, så vælg stor pakke, når du lægger dem op. Køberen betaler fragten ({PARCELS.large.price} kr).
+          </p>
+        ),
+        cta: SAELG,
+      },
+    ],
+    faq: [
+      ["Kan jeg sælge sneakers uden æske?", "Ja. Æsken løfter prisen, men den er ikke et krav. Pak dem godt i en kasse, så de ikke bliver klemt."],
+      [
+        "Hvordan ved køberen, at mine sneakers er ægte?",
+        "Vis mærkatet i tungen, æsken og gerne kvitteringen. Sneakers fra luksusmærker bliver ægthedstjekket af Relived, før de kan købes.",
+      ],
+      ["Kan jeg sælge sneakers, jeg har gået med?", "Ja. Vær ærlig om, hvor meget de er brugt, og vis slid på sål og hæl. Køberne betaler for den stand, de kan se."],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten og en køberbeskyttelse.`],
+    ],
+    related: ["saelg-brugt-toej", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
+    end: { h2: "Klar til at sælge dine sneakers?", text: "Opret en gratis konto, film dine sneakers, og sælg dem live eller med video.", href: "/saelg", label: "Bliv sælger" },
+  },
+
+  {
+    slug: "flyttesalg",
+    audience: "Sælger",
+    keyword: "flyttesalg",
+    title: "Flyttesalg: sælg det, du ikke skal have med | Relived",
+    description:
+      "Flyttesalg uden stress: sådan sorterer du, sætter priser og sælger mange varer på én aften, så du kun flytter det, du vil have med.",
+    h1: "Flyttesalg: sådan sælger du det, du ikke skal have med",
+    short: "Flyttesalg",
+    lede: (
+      <>
+        En flytning er det bedste tidspunkt at sælge. Alt, du sælger, skal du ikke pakke, bære eller betale for at få flyttet. Det
+        sværeste er at nå det hele, så her er en plan, der virker.
+      </>
+    ),
+    teaser: "Start i god tid, sælg mange varer på én aften, og lad køberne hente de store.",
+    image: { src: "/img/saelg-stue-v2.jpg", alt: "En sælger sidder i sofaen og viser en taske frem live", width: 1360, height: 768, position: "60% 40%" },
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    sections: [
+      {
+        id: "start",
+        h2: "Hvornår skal du starte flyttesalget?",
+        body: (
+          <p>
+            Start 4-6 uger før flyttedagen. Så har du tid til at sætte priserne ned og sælge igen, hvis noget ikke bliver solgt
+            første gang. Venter du til den sidste uge, ender det meste med at blive givet væk eller kørt på genbrugspladsen.
+          </p>
+        ),
+      },
+      {
+        id: "sorter",
+        h2: "Hvordan sorterer du?",
+        body: (
+          <>
+            <p>Gå rum for rum, og lav fire bunker: <b>Skal med</b>, <b>Sælg</b>, <b>Giv væk</b> og <b>Smid ud</b>.</p>
+            <p>
+              En god regel: har du ikke brugt det det sidste år, og koster det plads i flyttebilen, så sælg det. Mål møblerne og tag
+              noter, mens du sorterer, så går det hurtigt, når du skal sætte dem til salg.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "hvad",
+        h2: "Hvad kan du sælge?",
+        body: (
+          <>
+            <p>Næsten alt, der er i pæn stand. Det sælger især godt:</p>
+            <ul>
+              <li>Møbler og lamper. Se <Link href="/guides/saelg-brugte-moebler">sælg brugte møbler</Link>.</li>
+              <li>Barnevogne og cykler. Se <Link href="/guides/saelg-brugt-barnevogn">sælg brugt barnevogn</Link>.</li>
+              <li>Tøj og sko. Se <Link href="/guides/saelg-brugt-toej">sælg brugt tøj</Link>.</li>
+              <li>Børnetøj, legetøj og udstyr, børnene er vokset fra.</li>
+              <li>Bøger, vinyl og samleobjekter. Se <Link href="/guides/saelg-samleobjekter">sælg samleobjekter</Link>.</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        id: "en-aften",
+        h2: "Hvordan sælger du mange varer på én gang?",
+        body: (
+          <>
+            <p>
+              Ét og ét tager for lang tid, når du skal flytte. Saml i stedet varerne i ét live-show og kald det fx <i>Flyttesalg</i>.
+              Læg 15-30 varer i køen, og vis dem frem én ad gangen. Del linket til din side med venner, familie og naboer, så de kan
+              se med.
+            </p>
+            <p>
+              Giv <b>samlerabat</b>, så køberne tager flere varer med på én gang. Se hele tjeklisten i{" "}
+              <Link href="/guides/saelg-live-foerste-gang">sælg live første gang</Link>.
+            </p>
+          </>
+        ),
+        cta: { text: "Hold dit flyttesalg live, og sælg mange varer på én aften.", href: "/saelg", label: "Sådan sælger du live" },
+      },
+      {
+        id: "pris",
+        h2: "Hvordan sætter du priserne?",
+        body: (
+          <p>
+            Ved et flyttesalg handler det om at få varerne ud, ikke om at få det allerhøjeste for dem. Sæt priser, der føles som et
+            godt køb, og brug budsalg til de varer, som flere vil have. Sæt prisen ned på det, der ikke er solgt efter en uge.
+          </p>
+        ),
+      },
+      {
+        id: "afhentning",
+        h2: "Hvordan når du afhentningen før flyttedagen?",
+        body: (
+          <>
+            <p>
+              Store varer bliver hentet hos dig, og det er gratis for køberen. Skriv i beskrivelsen, hvornår varen senest skal være
+              hentet, og saml gerne afhentningerne på faste tidspunkter, fx lørdag kl. 10-14.
+            </p>
+            <p>
+              Små varer sendes fra en pakkeshop. Kasser og tape har du jo allerede. Køberen betaler gennem Relived, før varen bliver
+              hentet eller sendt, så du ikke skal jagte pengene midt i flytningen.
+            </p>
+          </>
+        ),
+        cta: SAELG,
+      },
+      {
+        id: "rest",
+        h2: "Hvad gør du med det, der ikke bliver solgt?",
+        body: (
+          <p>
+            Giv det til venner eller naboer, eller aflever det i en genbrugsbutik. Det, der er gået i stykker, kører du på
+            genbrugspladsen. Så står du kun tilbage med det, du vil have med.
+          </p>
+        ),
+      },
+    ],
+    faq: [
+      ["Hvor lang tid før flytningen skal jeg sælge?", "Start 4-6 uger før. Så har du tid til at sætte priserne ned og sælge igen, hvis noget ikke bliver solgt første gang."],
+      ["Hvordan sælger jeg mange varer hurtigt?", "Saml dem i ét live-show, og vis dem frem én ad gangen. Med samlerabat køber folk flere varer hos dig på én gang."],
+      [
+        "Hvad gør jeg med store møbler, der ikke kan sendes?",
+        "Skriv i beskrivelsen, at de skal hentes, og hvornår de senest skal være hentet. Afhentning er gratis for køberen.",
+      ],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten og en køberbeskyttelse.`],
+    ],
+    related: ["saelg-brugte-moebler", "saelg-live-foerste-gang", "saelg-brugt-barnevogn"],
+    end: { h2: "Skal du snart flytte?", text: "Opret en gratis konto, og sælg det, du ikke skal have med, før flyttedagen.", href: "/saelg", label: "Bliv sælger" },
   },
 ];
 
