@@ -12,6 +12,7 @@ import { aiConfigured } from "@/lib/claude";
 import { mitidState } from "@/lib/mitid";
 import { videoListingsReady } from "@/lib/videoShow";
 import VideoListingClient from "./VideoListingClient";
+import { packageSizesReady, pickupOnlyReady } from "@/lib/parcels";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sælg med video", robots: { index: false } };
@@ -62,7 +63,13 @@ export default async function VideoListingPage() {
                 </span>
               </div>
             ) : null}
-            <VideoListingClient sellerId={uid} aiReady={aiConfigured()} hideCats={await hiddenCategories(supabase)} />
+            <VideoListingClient
+              sellerId={uid}
+              aiReady={aiConfigured()}
+              hideCats={await hiddenCategories(supabase)}
+              parcelReady={await packageSizesReady(supabase)}
+              pickupReady={await pickupOnlyReady(supabase)}
+            />
           </>
         )}
       </div>

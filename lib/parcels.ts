@@ -23,3 +23,26 @@ export async function packageSizesReady(sb: SupabaseClient | null): Promise<bool
   const { error } = await sb.from("items").select("package_size").limit(1);
   return !error;
 }
+
+/**
+ * Varer, sælgeren har sat til "Kun afhentning" (0036_kun_afhentning.sql), fordi de er for store til en pakkeshop.
+ * Uden filen, eller hvis noget fejler, er sættet tomt, og køberen kan vælge mellem pakkeshop og afhentning som før.
+ */
+export async function fetchPickupOnly(sb: SupabaseClient, itemIds: string[]): Promise<Set<string>> {
+  const out = new Set<string>();
+  const ids = [...new Set(itemIds)].filter(Boolean);
+  if (!ids.length) return out;
+  const { data, error } = await sb.from("items").select("id,pickup_only").in("id", ids);
+  if (error) return out;
+  for (const r of (data ?? []) as { id: string; pickup_only: boolean | null }[]) {
+    if (r.pickup_only === true) out.add(r.id);
+  }
+  return out;
+}
+
+/** Er 0036_kun_afhentning.sql kørt? Så kan sælgeren sætte en vare til kun afhentning. */
+export async function pickupOnlyReady(sb: SupabaseClient | null): Promise<boolean> {
+  if (!sb) return false;
+  const { error } = await sb.from("items").select("pickup_only").limit(1);
+  return !error;
+}

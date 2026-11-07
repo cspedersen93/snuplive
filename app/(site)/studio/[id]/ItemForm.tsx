@@ -8,7 +8,8 @@ import type { AiListing } from "@/lib/aiListing";
 import { askAiListing } from "@/lib/aiListingClient";
 import { pingSearchAlerts } from "@/lib/searchPing";
 import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, nameExample, pickCategories, sizeField } from "@/lib/format";
-import { isParcel, itemParcel, PARCELS, type Parcel } from "@/lib/pricing";
+import { isParcel, itemParcel, type Parcel } from "@/lib/pricing";
+import DeliveryField from "@/components/DeliveryField";
 import { needsAuth } from "@/lib/luxury";
 import { storageUrl } from "@/lib/images";
 import { resizeImage } from "@/lib/resizeImage";
@@ -32,6 +33,8 @@ interface Props {
   hideCats?: readonly string[];
   /** Er 0030_pakkestoerrelse.sql kørt? Ellers bruges kategoriens pakkestørrelse, og feltet vises ikke. */
   parcelReady?: boolean;
+  /** Er 0036_kun_afhentning.sql kørt? Så kan varen sættes til kun afhentning. */
+  pickupReady?: boolean;
   onSaved: (item: Item) => void;
   onCancel?: () => void;
 }
@@ -39,7 +42,7 @@ interface Props {
 type Photo = { kind: "old"; path: string } | { kind: "new"; file: File; url: string };
 
 /** Formular til en vare i køen: navn, pris, stand, størrelse eller mål (efter kategorien), kategori, beskrivelse og billeder. */
-export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, aiReady = false, hideCats = [], parcelReady = false, onSaved, onCancel }: Props) {
+export default function ItemForm({ sellerId, showId, showCategory, item, nextPosition = 1, aiReady = false, hideCats = [], parcelReady = false, pickupReady = false, onSaved, onCancel }: Props) {
   const sb = getSupabase();
   const editing = Boolean(item);
   const [name, setName] = useState(item?.name ?? "");
@@ -54,6 +57,8 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   const [newOk, setNewOk] = useState(item?.condition === NEW_ONLY_CONDITION);
   // Pakkestørrelsen: tom = kategoriens standard (bolig og cykler er store, resten små).
   const [pkg, setPkg] = useState<Parcel | "">("");
+  // Kun afhentning (0036_kun_afhentning.sql): køberen kan ikke vælge pakkeshop.
+  const [pickupOnly, setPickupOnly] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [aiBusy, setAiBusy] = useState(false);
@@ -67,23 +72,26 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   const sizeF = sizeField(cat);
   const authNeeded = needsAuth({ name, description: desc, category: cat, price: Number(price.replace(/[^\d]/g, "")) || 0 });
 
-  // Når en vare rettes, hentes den pakkestørrelse, sælgeren har valgt (feltet er ikke med i ITEM_COLS, før filen er kørt).
+  // Når en vare rettes, hentes den levering, sælgeren har valgt (felterne er ikke med i ITEM_COLS, før filerne er kørt).
   useEffect(() => {
-    if (!parcelReady || !item?.id) return;
+    if ((!parcelReady && !pickupReady) || !item?.id) return;
     let alive = true;
+    const cols = [parcelReady ? "package_size" : "", pickupReady ? "pickup_only" : ""].filter(Boolean).join(",");
     void sb
       .from("items")
-      .select("package_size")
+      .select(cols)
       .eq("id", item.id)
       .maybeSingle()
       .then(({ data }) => {
-        const v = (data as { package_size?: string | null } | null)?.package_size;
-        if (alive && isParcel(v)) setPkg(v);
+        const r = data as { package_size?: string | null; pickup_only?: boolean | null } | null;
+        if (!alive) return;
+        if (isParcel(r?.package_size)) setPkg(r.package_size);
+        if (r?.pickup_only === true) setPickupOnly(true);
       });
     return () => {
       alive = false;
     };
-  }, [parcelReady, item?.id, sb]);
+  }, [parcelReady, pickupReady, item?.id, sb]);
   const parcel = pkg || itemParcel({ category: cat });
 
   useEffect(
@@ -178,6 +186,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         description: desc.trim() || null,
         images: paths,
         ...(parcelReady ? { package_size: pkg || null } : {}),
+        ...(pickupReady ? { pickup_only: pickupOnly } : {}),
       };
       const q = editing
         ? sb.from("items").update(fields).eq("id", id)
@@ -195,6 +204,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
         setCond("");
         setNewOk(false);
         setPkg("");
+        setPickupOnly(false);
         setPrice("");
         setDesc("");
         setPhotos([]);
@@ -281,17 +291,16 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
           <span>Produktet er nyt og uåbnet (forseglingen er intakt). Brugt makeup og hudpleje må ikke sælges.</span>
         </label>
       ) : null}
-      {parcelReady ? (
-        <div className="field">
-          <label htmlFor={`ni-pkg-${uid}`}>Pakke</label>
-          <select id={`ni-pkg-${uid}`} value={parcel} onChange={(e) => setPkg(isParcel(e.target.value) ? e.target.value : "")}>
-            {(Object.keys(PARCELS) as Parcel[]).map((p) => (
-              <option key={p} value={p}>
-                {PARCELS[p].label}, {PARCELS[p].weight} (køberen betaler {PARCELS[p].price} kr i fragt)
-              </option>
-            ))}
-          </select>
-        </div>
+      {parcelReady || pickupReady ? (
+        <DeliveryField
+          id={`ni-pkg-${uid}`}
+          value={pickupOnly ? "pickup" : parcel}
+          pickupReady={pickupReady}
+          onChange={(v) => {
+            setPickupOnly(v === "pickup");
+            if (v !== "pickup") setPkg(v);
+          }}
+        />
       ) : null}
       {authNeeded ? (
         <p className="notice auth-note" role="status">

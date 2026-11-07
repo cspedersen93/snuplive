@@ -12,7 +12,7 @@ import { clock, dayLabel, kr } from "@/lib/format";
 import { fetchBundles } from "@/lib/bundles";
 import { itemHref } from "@/lib/items";
 import { markCheckoutPaid } from "@/lib/orders";
-import { fetchPackageSizes } from "@/lib/parcels";
+import { fetchPackageSizes, fetchPickupOnly } from "@/lib/parcels";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, itemParcel, parcelFor, PICKUP_CATEGORIES, RESERVATION_DAYS, type Parcel } from "@/lib/pricing";
 import { hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
@@ -159,6 +159,8 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
   const showsOf = new Map<string, Set<string>>();
   // Pakkestørrelsen pr. vare (0030_pakkestoerrelse.sql), ellers kategoriens standard. Fragten følger hele pakken.
   const sizes = await fetchPackageSizes(supabase, toPay.map((s) => s.item_id));
+  // Varer, sælgeren har sat til kun afhentning (0036_kun_afhentning.sql). Betalingen tvinger det også på serveren.
+  const pickupOnly = await fetchPickupOnly(supabase, toPay.map((s) => s.item_id));
   const parcelsOf = new Map<string, Parcel[]>();
   for (const s of toPay) {
     const key = s.seller_id;
@@ -175,6 +177,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
     g.items.push({ id: s.id, name: s.item?.name ?? "Vare", meta: s.item ? itemMeta(s.item) : "", price: s.price });
     // Cykler og barnevogne kan ikke sendes til en pakkeshop, så afhentning er valgt på forhånd.
     if (PICKUP_CATEGORIES.includes((s.item?.category ?? s.show?.category ?? "") as string)) g.pickup = true;
+    if (pickupOnly.has(s.item_id)) g.pickupOnly = true;
     groupsMap.set(key, g);
     showsOf.set(key, (showsOf.get(key) ?? new Set()).add(s.show_id));
     parcelsOf.set(key, [...(parcelsOf.get(key) ?? []), itemParcel({ package_size: sizes.get(s.item_id), category: s.item?.category }, s.show?.category)]);

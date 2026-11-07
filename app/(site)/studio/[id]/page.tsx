@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import SetupNotice from "@/components/SetupNotice";
 import { requireProfile } from "@/lib/auth";
 import { hiddenCategories } from "@/lib/categories";
-import { packageSizesReady } from "@/lib/parcels";
+import { packageSizesReady, pickupOnlyReady } from "@/lib/parcels";
 import { aiConfigured } from "@/lib/claude";
 import { Suspense } from "react";
 import MitIdResult from "@/components/MitIdResult";
@@ -82,6 +82,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
       aiReady={aiConfigured()}
       hideCats={await hiddenCategories(supabase)}
       parcelReady={await packageSizesReady(supabase)}
+      pickupReady={await pickupOnlyReady(supabase)}
       visibility={visQ.error ? null : (visQ.data as { visibility?: string } | null)?.visibility === "invite" ? "invite" : "public"}
     />
     <Suspense fallback={null}>
