@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import CompanyInfo from "@/components/CompanyInfo";
 import LegalPage from "@/components/LegalPage";
+import ReuseCounter from "@/components/ReuseCounter";
 import SupportLink from "@/components/SupportLink";
 import { COMPANY } from "@/lib/company";
+import { reusedCount } from "@/lib/reuse";
 
 export const metadata: Metadata = {
   title: "Om Relived og kontakt",
@@ -11,7 +13,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/om-relived" },
 };
 
-export default function OmRelived() {
+export const revalidate = 300;
+
+export default async function OmRelived() {
+  const reused = await reusedCount();
   return (
     <LegalPage title="Om Relived og kontakt" crumb="Om Relived" updated="oktober 2026">
       <p className="lede">
@@ -28,6 +33,7 @@ export default function OmRelived() {
         Derfor har vi lavet Relived. Her viser sælgeren varen frem på video, du kan spørge om alt, og sælgeren får først pengene,
         når du har varen i hånden. Lidt som et loppemarked, bare fra sofaen. <Link href="/saadan-virker-det">Se, hvordan det virker</Link>.
       </p>
+      <ReuseCounter n={reused} />
 
       <h2>Kontakt</h2>
       <p>

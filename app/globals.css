@@ -2166,3 +2166,10 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
   body.has-sticky-cta .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 }
 @media (max-width:899px) and (prefers-reduced-motion:reduce){.sticky-cta{transition:none}}
+
+/* Genbrugstælleren (components/ReuseCounter.tsx og kontoen) */
+.reuse{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:.875rem;font-weight:600;color:var(--mint)}
+.reuse svg{flex:none}
+.reuse-box{display:flex;padding:14px 16px;border-radius:14px;background:rgba(185,217,198,.08);border:1px solid rgba(185,217,198,.18);color:var(--text);font-weight:400}
+.reuse-box svg{color:var(--mint)}
+.reuse-box b{color:var(--mint)}

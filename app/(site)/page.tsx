@@ -11,6 +11,7 @@ import { IconPlay } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import NewsletterForm from "@/components/NewsletterForm";
 import RemindButton from "@/components/RemindButton";
+import ReuseCounter from "@/components/ReuseCounter";
 import type { FeedItem, ShowWithSeller } from "@/lib/types";
 import { campaignFlags } from "@/lib/campaignFlags";
 import { campaignState } from "@/lib/campaigns";
@@ -20,6 +21,7 @@ import { clock, dayLabel } from "@/lib/format";
 import { itemImage, showImage } from "@/lib/images";
 import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed, fetchListing } from "@/lib/queries";
+import { reusedCount } from "@/lib/reuse";
 
 /** Små kort under det store kort og kasserne (12 går op i både 2, 3 og 4 kolonner). */
 const FEED_TILES = 12;
@@ -42,12 +44,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Forside() {
-  const [{ live, upcoming }, upcomingItems, auctions, forSale, flags] = await Promise.all([
+  const [{ live, upcoming }, upcomingItems, auctions, forSale, flags, reused] = await Promise.all([
     fetchListing(12, 12),
     fetchFeed("upcoming", { limit: 20 }),
     fetchFeed("auctions", { limit: 12 }),
     fetchFeed("for_sale", { limit: 24 }),
     campaignFlags(),
+    reusedCount(),
   ]);
   // Varer på budsalg har deres egen række, så de ikke står to gange.
   const soon = upcomingItems.filter((it) => it.sale_type !== "auction");
@@ -116,6 +119,7 @@ export default async function Forside() {
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
             <p className="feed-lede">Brugt, som ny eller med prismærket på. Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
+            <ReuseCounter n={reused} />
           </div>
 
           <nav className="feed-tabs" aria-label="Vis">

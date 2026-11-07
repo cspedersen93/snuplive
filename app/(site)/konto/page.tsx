@@ -30,11 +30,17 @@ export default async function Konto() {
   if (!ctx) return <SetupNotice />;
   const { supabase, uid, profile } = ctx;
 
-  const [mine, sales, shows] = await Promise.all([
+  const reuseQ = (col: "buyer_id" | "seller_id") =>
+    supabase.from("sales").select("id", { count: "exact", head: true }).eq(col, uid).in("status", ["paid", "shipped", "done"]);
+  const [mine, sales, shows, reuseBought, reuseSold] = await Promise.all([
     supabase.from("sales").select("price").eq("buyer_id", uid).eq("status", "reserved"),
     profile.is_seller ? supabase.from("sales").select("price").eq("seller_id", uid).neq("status", "cancelled") : Promise.resolve({ data: [] as { price: number }[] }),
     profile.is_seller ? supabase.from("shows").select("id,status").eq("seller_id", uid) : Promise.resolve({ data: [] as { id: string; status: string }[] }),
+    // Genbrug: varer, man har købt eller solgt (betalt), tæller med.
+    reuseQ("buyer_id"),
+    reuseQ("seller_id"),
   ]);
+  const reusedMine = (reuseBought.error ? 0 : (reuseBought.count ?? 0)) + (reuseSold.error ? 0 : (reuseSold.count ?? 0));
   const mitid = profile.is_seller ? await mitidState(supabase, profile) : null;
   // Følg sælgere (findes først, når 0016_foelg.sql er kørt).
   const [fol, fc] = await Promise.all([
@@ -115,6 +121,18 @@ export default async function Konto() {
             </>
           ) : null}
         </div>
+
+        {reusedMine ? (
+          <p className="reuse reuse-box">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 12a8 8 0 1 1-2.34-5.66" />
+              <path d="M20 4v5h-5" />
+            </svg>
+            <span>
+              Du har givet <b>{reusedMine} {reusedMine === 1 ? "vare" : "varer"}</b> et liv mere. Hver gang du køber eller sælger brugt, tæller det med.
+            </span>
+          </p>
+        ) : null}
 
         {levels ? <LevelBox p={levels} uid={uid} /> : null}
 
