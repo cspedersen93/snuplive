@@ -1158,3 +1158,15 @@ ligger i databasen. Browseren kan ikke snyde sig udenom.
 5. **PostNord** som tredje fragtfirma, hvis køberne efterspørger det.
 
 Husk også at oprette mailadressen `kontakt@relived.dk`, som privatlivspolitikken henviser til. 
+
+## Genbrugstælleren
+
+**Kør `0035_genbrug.sql` i Supabase → SQL Editor** (efter 0034). Indtil da vises tælleren ikke.
+
+- **Forsiden og Om Relived:** "1.248 varer har fået et liv mere via Relived" (varer, der er solgt og betalt). Linjen
+  vises først, når tallet er mindst 25 (`REUSE_MIN` i `lib/reuse.ts`).
+- **Min konto:** "Du har givet 12 varer et liv mere" (købt eller solgt og betalt), når man har mindst én.
+- **Grøn markedsføring:** siden 27. september 2026 må man ikke bruge generelle ord som "bæredygtig", "grøn" eller
+  "miljøvenlig" uden dokumentation, og CO2-påstande skal kunne bevises. Tælleren bruger Relivids egne tal og lover intet
+  om CO2. Skriv ikke de generelle ord om Relived i teksterne uden at tjekke reglerne først.
+- Koden: `supabase/migrations/0035_genbrug.sql`, `lib/reuse.ts`, `components/ReuseCounter.tsx` og `app/(site)/konto/page.tsx`.
