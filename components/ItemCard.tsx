@@ -5,7 +5,8 @@ import NoPhoto from "@/components/NoPhoto";
 import { itemMeta } from "@/components/Screen";
 import { clock, dayLabel, kr } from "@/lib/format";
 import { isAuction, soldPrice } from "@/lib/auction";
-import { itemImage } from "@/lib/images";
+import ClipPreview from "@/components/ClipPreview";
+import { clipUrl, itemImage } from "@/lib/images";
 import { itemHref, itemState } from "@/lib/items";
 import type { FeedItem } from "@/lib/types";
 
@@ -15,6 +16,7 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
   const state = itemState(item);
   const meta = itemMeta(item);
   const bid = isAuction(item) && (state === "upcoming" || state === "live" || state === "showing");
+  const clip = state === "for_sale" && item.clip_path ? clipUrl(item) : null;
   const price =
     state === "sold"
       ? kr(soldPrice(item))
@@ -46,13 +48,16 @@ export default function ItemCard({ item, priority = false }: { item: FeedItem; p
           ) : state === "sold" ? (
             <span className="b-view">Solgt</span>
           ) : null}
-          {state === "for_sale" && item.clip_path ? (
-            <span className="b-view" title="Se varen på video">
-              <IconPlay />
-              Video
-            </span>
-          ) : null}
         </span>
+        {clip ? (
+          <>
+            <ClipPreview src={clip} />
+            <span className="icard-seen">
+              <IconPlay />
+              Set på video
+            </span>
+          </>
+        ) : null}
       </div>
       <div className="icard-info">
         <strong className="num">{price}</strong>

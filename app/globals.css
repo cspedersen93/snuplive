@@ -2166,3 +2166,40 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
   body.has-sticky-cta .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 }
 @media (max-width:899px) and (prefers-reduced-motion:reduce){.sticky-cta{transition:none}}
+
+/* Programmet øverst på forsiden (components/feed/Program.tsx) */
+.prog{margin-top:18px}
+.prog-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+.prog-h{font-size:1.125rem;letter-spacing:-.02em;margin:0}
+.prog-more{font-size:.875rem;color:var(--dim);text-decoration:none;white-space:nowrap}
+.prog-more:hover{color:var(--text)}
+.prog-row{list-style:none;margin:0;padding:2px max(20px,env(safe-area-inset-left,0px));margin-inline:calc(-1 * max(20px,env(safe-area-inset-left,0px)));display:grid;grid-auto-flow:column;grid-auto-columns:minmax(240px,1fr);gap:12px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+.prog-row::-webkit-scrollbar{display:none}
+@media (min-width:900px){.prog-row{margin-inline:0;padding-inline:0;grid-auto-columns:minmax(260px,1fr)}}
+.prog-card{scroll-snap-align:start;min-width:0;display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.prog-card.on{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
+.prog-top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px}
+.prog-time{font:700 1rem/1 var(--mono);font-variant-numeric:tabular-nums}
+.prog-time small{font:500 .75rem/1 var(--mono);color:var(--dim);margin-left:4px}
+.prog-live{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;font:500 .75rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:6px 8px;border-radius:6px}
+.prog-title{font-size:.9375rem;font-weight:600;line-height:1.3;color:var(--text);text-decoration:none;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}
+.prog-title:hover{text-decoration:underline}
+.prog-who{display:flex;align-items:center;gap:8px;min-width:0;font-size:.8125rem;color:var(--dim)}
+.prog-who .ava{width:26px;height:26px;font-size:.75rem;flex:none}
+.prog-who>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Varens klip på varekortet (components/ClipPreview.tsx) */
+.icard-clip{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s ease;z-index:1;pointer-events:none}
+.icard-clip.on{opacity:1}
+.icard-seen{position:absolute;left:8px;bottom:8px;z-index:2;display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font-size:.75rem;font-weight:600;backdrop-filter:blur(6px)}
+.icard-seen svg{width:11px;height:11px}
+.icard-img:has(.icard-clip.on){box-shadow:inset 0 0 0 2px var(--red)}
+.icard-img:has(.icard-clip.on)::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2px var(--red);z-index:3;pointer-events:none}
+.icard-img:has(.icard-clip.on) .icard-seen{background:var(--red)}
+
+/* De tre løfter under købsknappen på varesiden */
+.trust3{list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+.trust3 li{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:12px 8px;border-radius:14px;background:var(--surface);border:1px solid var(--line);font-size:.8125rem;line-height:1.3}
+.trust3 svg{width:22px;height:22px;color:var(--mint);margin-bottom:4px}
+.trust3 b{font-weight:600}
+.trust3 span{color:var(--dim);font-size:.75rem}

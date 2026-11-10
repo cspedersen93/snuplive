@@ -5,6 +5,7 @@ import Avatar from "@/components/Avatar";
 import CampaignCards from "@/components/CampaignCards";
 import CategoryCards from "@/components/CategoryCards";
 import { ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
+import Program from "@/components/feed/Program";
 import RailHello from "@/components/feed/RailHello";
 import RailMine from "@/components/feed/RailMine";
 import { IconPlay } from "@/components/Icons";
@@ -24,12 +25,6 @@ import { fetchFeed, fetchListing } from "@/lib/queries";
 /** Små kort under det store kort og kasserne (12 går op i både 2, 3 og 4 kolonner). */
 const FEED_TILES = 12;
 type Tile = { kind: "show"; show: ShowWithSeller } | { kind: "item"; item: FeedItem };
-
-/** Én sælger én gang i rækken med runde billeder (live først, så dem der starter snart). */
-function uniqueBySeller(shows: ShowWithSeller[]) {
-  const seen = new Set<string>();
-  return shows.filter((s) => (seen.has(s.seller_id) ? false : (seen.add(s.seller_id), true)));
-}
 
 export const revalidate = 30;
 
@@ -72,7 +67,6 @@ export default async function Forside() {
   }
   const moreForSale = forSale.filter((it) => !usedSale.has(it.id)).slice(0, 10);
   const soonShows = upcoming.slice(0, 4);
-  const stories = uniqueBySeller([...live, ...upcoming]).slice(0, 12);
   const camp = campaignState(new Date(), flags);
   const campTitle =
     camp.gf.phase !== "over" && camp.jk.phase !== "over"
@@ -129,24 +123,7 @@ export default async function Forside() {
             <Link href="/klip">Klip</Link>
           </nav>
 
-          {stories.length ? (
-            <div className="stories" role="list" aria-label="Sælgere, der er live eller går live snart">
-              {stories.map((s) => {
-                const handle = s.seller?.handle ?? "sælger";
-                const on = s.status === "live";
-                return (
-                  <Link key={s.id} role="listitem" className={`story${on ? " on" : ""}`} href={`/live/${handle}`}>
-                    <span className="story-ring">
-                      <Avatar handle={handle} path={s.seller?.avatar_path} />
-                      {on ? <span className="story-tag">Live</span> : null}
-                    </span>
-                    <span className="story-name">{handle}</span>
-                    {!on && s.starts_at ? <span className="story-time">{clock(s.starts_at)}</span> : null}
-                  </Link>
-                );
-              })}
-            </div>
-          ) : null}
+          <Program live={live} upcoming={upcoming} />
         </div>
 
         <section className="feed-hero" aria-labelledby="h-feed">
@@ -158,33 +135,8 @@ export default async function Forside() {
 
         <aside className="feed-rail" aria-label="Til dig">
           <RailMine />
-          {soonShows.length ? (
-            <section className="rail-box" aria-labelledby="h-rail-snart">
-              <div className="rail-top">
-                <h2 className="rail-h" id="h-rail-snart">Snart live</h2>
-                <Link className="rail-more" href="/live#h-sched">Program</Link>
-              </div>
-              <ul className="rail-list">
-                {soonShows.map((s) => {
-                  const handle = s.seller?.handle ?? "sælger";
-                  return (
-                    <li key={s.id}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={showImage(s)} alt="" loading="lazy" />
-                      <span className="rail-txt">
-                        {s.starts_at ? <span className="rail-when">{dayLabel(s.starts_at)} {clock(s.starts_at)}</span> : null}
-                        <strong>
-                          <Link href={`/live/${handle}`}>{s.title}</Link>
-                        </strong>
-                        <span>{handle}</span>
-                        <RemindButton showId={s.id} next="/" className="btn btn-line btn-sm rail-remind" />
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ) : (
+          {/* Programmet står øverst på siden (components/feed/Program.tsx). Her står kun forklaringen, når det er tomt. */}
+          {soonShows.length ? null : (
             // Tomt program: forklar, hvad der kommer til at stå her, og giv sælgerne en vej ind.
             <section className="rail-box" aria-labelledby="h-rail-snart">
               <div className="rail-top">

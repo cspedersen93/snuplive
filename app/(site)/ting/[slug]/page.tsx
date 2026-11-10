@@ -27,7 +27,7 @@ import MaxBid from "@/components/MaxBid";
 import BuyNow from "./BuyNow";
 import MakeOffer from "./MakeOffer";
 import FollowButton from "@/components/FollowButton";
-import { IconShieldCheck } from "@/components/Icons";
+import { IconBox, IconShieldCheck, IconVideo } from "@/components/Icons";
 import Gallery from "./Gallery";
 
 export const revalidate = 30;
@@ -350,6 +350,43 @@ export default async function ItemPage({ params }: Params) {
             </div>
             <StickyCta name={it.name} price={stickyPrice} />
 
+            {/* De tre løfter lige under købsknappen: video, beskyttet betaling og levering (eller ægthedstjek). */}
+            {state !== "sold" ? (
+              <ul className="trust3">
+                {video || state === "upcoming" || state === "live" || state === "showing" ? (
+                  <li>
+                    <IconVideo />
+                    <b>{video ? "Vist på video" : "Vises live"}</b>
+                    <span>Se varen, før du køber</span>
+                  </li>
+                ) : null}
+                <li>
+                  <IconShieldCheck />
+                  <b>Pengene holdes</b>
+                  <span>til du har fået varen</span>
+                </li>
+                {d.auth === "approved" ? (
+                  <li>
+                    <IconShieldCheck />
+                    <b>Ægthedstjekket</b>
+                    <span>af Relived</span>
+                  </li>
+                ) : PICKUP_CATEGORIES.includes(cat.key) ? (
+                  <li>
+                    <IconBox />
+                    <b>Hentes gratis</b>
+                    <span>hos sælgeren{seller.area ? ` i ${seller.area}` : ""}</span>
+                  </li>
+                ) : (
+                  <li>
+                    <IconBox />
+                    <b>Fragt fra {DELIVERY.ship.price} kr</b>
+                    <span>eller gratis afhentning</span>
+                  </li>
+                )}
+              </ul>
+            ) : null}
+
             {it.description ? (
               <section aria-labelledby="h-beskrivelse">
                 <h2 className="h3" id="h-beskrivelse" style={{ marginBottom: 8 }}>Beskrivelse</h2>
@@ -370,7 +407,7 @@ export default async function ItemPage({ params }: Params) {
 
             {/* Det trygge først, så det, køberen skal vide om sælgeren (privat eller erhverv og fortrydelsesret). */}
             <ul className="item-trust">
-              <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har varen.</li>
+              {state === "sold" ? <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har varen.</li> : null}
               {PICKUP_CATEGORIES.includes(cat.key) ? (
                 <li>Hentes gratis hos {seller.handle}. Pengene går først til sælgeren, når du har bekræftet, at du har fået varen.</li>
               ) : (

@@ -894,6 +894,16 @@ pakkestørrelse, og feltet *Pakke* vises ikke i studiet. Alt andet virker.
   Vælger sælgeren en tungere label, betaler Relived forskellen.
 - Test: `qa_vaegt.py` (med filen) og `qa_vaegt.py uden0030` (efter `SKIP=0030 bash restart_qa.sh`).
 
+## Video overalt
+
+- **Programmet på forsiden** (`components/feed/Program.tsx`): "I aften på Relived" med de shows, der er live eller i programmet.
+  Live-showet har rød kant og *Se med*, de andre klokkeslæt og *Husk mig*. Det har afløst de runde sælgerbilleder.
+- **Klip på varekortene** (`components/ClipPreview.tsx`): varer til salg med et klip har mærket *Set på video*. Klippet afspilles
+  uden lyd, når musen holdes over kortet, eller når kortet står midt på skærmen på telefonen. Kun ét ad gangen, og videoen hentes
+  først, når den skal afspilles. Ingen afspilning ved "reducer bevægelse" eller datasparer.
+- **De tre løfter på varesiden** (`.trust3`): video, beskyttet betaling og levering (eller ægthedstjek) lige under købsknappen.
+- Test: `qa_video_overalt.py`.
+
 ## Nyhedsbrev, Green Friday og julekalender
 
 Der skal ikke køres noget i Supabase. Tilmeldingerne bruger samme liste som ventelisten (tabellen `waitlist`).
