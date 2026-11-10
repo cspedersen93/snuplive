@@ -1,3 +1,5 @@
+import FreeNote from "@/components/FreeNote";
+import { feeFreeState } from "@/lib/feeFree";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IconBolt, IconBox, IconCamera, IconCard, IconClip, IconList } from "@/components/Icons";
@@ -10,7 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/saelg" },
 };
 
-export default function Saelg() {
+export const revalidate = 300;
+
+export default async function Saelg() {
+  const free = await feeFreeState();
   return (
     <>
       <section className="phero" aria-labelledby="h-saelg">
@@ -59,11 +64,11 @@ export default function Saelg() {
               <li><div><h3>Pak, send og få pengene</h3><p>Når køberen har betalt, printer du fragtlabelen og afleverer pakken. Når køberen har fået den, går pengene til din bankkonto.</p></div></li>
             </ol>
             {/* Regneeksempel: hvad sælgeren får ud af et show. Køberne betaler fragt og køberbeskyttelse. */}
+            <FreeNote />
             <div className="sell-example">
               <span className="label red">Regneeksempel</span>
               <p>
-                Du sælger <b>10 varer á 150 kr</b> på én aften. Så får du <b>1.500 kr</b> ind på din konto. Køberne betaler fragten og
-                køberbeskyttelsen, og det koster dig 0 kr at sælge{inBeta() ? ", mens vi er i beta" : ""}.
+                Du sælger <b>10 varer á 150 kr</b> på én aften. Så får du <b>1.500 kr</b> ind på din konto. Køberne betaler {free.active ? "fragten" : "fragten og køberbeskyttelsen"}, og det koster dig 0 kr at sælge{inBeta() ? ", mens vi er i beta" : ""}.
               </p>
             </div>
             <div className="ctas" style={{ marginTop: 28 }}>

@@ -3,6 +3,9 @@ import SetupNotice from "@/components/SetupNotice";
 import { num, requireAdmin } from "@/lib/admin";
 import { mitidEnabled } from "@/lib/mitid";
 import SettingToggle from "./SettingToggle";
+import FeeFree from "./FeeFree";
+import { kr } from "@/lib/format";
+import { enforceFeeFreeCap, FEE_FREE_CAP, FEE_FREE_MONTHS, feeFreeActive, feeFreeDay, monthsAhead } from "@/lib/feeFree";
 import Testers, { type Tester } from "./Testers";
 import DeleteTestShows from "./DeleteTestShows";
 import ResetTestSales from "./ResetTestSales";
@@ -31,6 +34,10 @@ export default async function Indstillinger() {
     admin.from("shows").select("id", { count: "exact", head: true }),
     admin.from("items").select("id", { count: "exact", head: true }),
   ]);
+  // Gratis-kampagnen: stop den først, hvis loftet er nået, og hent så tallene.
+  const { setting: free, spend } = await enforceFeeFreeCap(admin);
+  const freeOn = feeFreeActive(free);
+  const freeDays = free && freeOn ? Math.max(0, Math.ceil((Date.parse(free.until) - Date.now()) / 864e5)) : 0;
   const bannerMode = banner.data?.value === true ? "on" : banner.data?.value === false ? "off" : "auto";
   const required = setting.data?.value === true;
   const siteIsOpen = open.data ? open.data.value !== false : true;
@@ -57,6 +64,44 @@ export default async function Indstillinger() {
         <h3 style={{ fontSize: "1rem", marginTop: 8 }}>Testere, der må se hele siden før åbningen</h3>
         <p className="muted" style={{ fontSize: ".875rem" }}>Testeren logger ind på {SITE_HOST}/login med den e-mail, du skriver her.</p>
         <Testers testers={(testers.data ?? []) as Tester[]} />
+      </section>
+
+      <section className="box" id="gratis" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h2 className="h3">Gratis-kampagne: 0 kr i køberbeskyttelse</h2>
+        <p className="muted" style={{ fontSize: ".9375rem" }}>
+          {freeOn && free
+            ? `Kampagnen er i gang til og med ${feeFreeDay(free.until)} (${freeDays} ${freeDays === 1 ? "dag" : "dage"} tilbage). Køberne betaler 0 kr i gebyr, og siden skriver det.`
+            : free?.ended
+              ? free.reason === "cap"
+                ? `Kampagnen stoppede af sig selv ${feeFreeDay(free.ended)}, fordi loftet på ${kr(FEE_FREE_CAP)} blev nået. Køberbeskyttelsen koster igen 5 % + 5 kr.`
+                : `Kampagnen blev stoppet ${feeFreeDay(free.ended)}. Køberbeskyttelsen koster igen 5 % + 5 kr.`
+              : free
+                ? `Kampagnen sluttede ${feeFreeDay(free.until)}. Køberbeskyttelsen koster igen 5 % + 5 kr.`
+                : "Kampagnen er ikke startet. Køberbeskyttelsen koster 5 % + 5 kr."}
+        </p>
+        {spend && free ? (
+          <>
+            <div className="ff-bar" role="img" aria-label={`Brugt ${kr(spend.cost)} af ${kr(FEE_FREE_CAP)}`}>
+              <span style={{ width: `${Math.min(100, Math.round((spend.cost / FEE_FREE_CAP) * 100))}%` }} />
+            </div>
+            <dl className="ff-stats">
+              <div><dt>Brugt indtil nu (skøn)</dt><dd>{kr(spend.cost)} af {kr(FEE_FREE_CAP)}</dd></div>
+              <div><dt>Betalte ordrer uden gebyr</dt><dd>{num(spend.orders)}</dd></div>
+              <div><dt>Købt for i alt</dt><dd>{kr(spend.volume)}</dd></div>
+              <div><dt>Gebyr, vi har givet afkald på</dt><dd>{kr(spend.waived)}</dd></div>
+            </dl>
+            <p className="muted" style={{ fontSize: ".8125rem" }}>
+              "Brugt" er et skøn over, hvad betalingerne koster os hos Stripe: 1,5 % + 1,80 kr pr. betaling, 0,25 % + 0,75 kr pr. udbetaling og
+              15 kr om måneden pr. sælger med salg. Rammer det {kr(FEE_FREE_CAP)}, stopper kampagnen af sig selv, og I får en mail.
+              Besøgende kan ikke se loftet eller tallene.
+            </p>
+          </>
+        ) : null}
+        <FeeFree active={freeOn} suggest={monthsAhead(FEE_FREE_MONTHS)} min={monthsAhead(0)} />
+        <p className="muted" style={{ fontSize: ".8125rem" }}>
+          Når kampagnen er i gang, står "0 kr i gebyr" og slutdatoen på forsiden, i kurven, på Sælg, Sådan virker det, Spørgsmål og svar og
+          i betingelserne. Det kan tage op til fem minutter, før alle sider har skiftet.
+        </p>
       </section>
 
       <section className="box" style={{ display: "flex", flexDirection: "column", gap: 12 }}>

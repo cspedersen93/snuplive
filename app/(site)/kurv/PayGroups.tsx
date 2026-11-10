@@ -37,7 +37,18 @@ function hoursText(hours: string[]) {
   return line ? `I dag ${line.replace(/^[^:]+:\s*/, "")}` : "";
 }
 
-export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGroup[]; ready: boolean; pakkeshop: boolean }) {
+export default function PayGroups({
+  groups,
+  ready,
+  pakkeshop,
+  feeFreeUntil = null,
+}: {
+  groups: PayGroup[];
+  ready: boolean;
+  pakkeshop: boolean;
+  /** Gratis-kampagnen er i gang: sidste dag som tekst ("9. maj 2027"). Så er køberbeskyttelsen 0 kr. */
+  feeFreeUntil?: string | null;
+}) {
   const [choice, setChoice] = useState<Record<string, Delivery>>(() => Object.fromEntries(groups.map((g) => [g.key, g.pickup || g.pickupOnly ? "pickup" : "ship"])));
   const [busy, setBusy] = useState(false);
 
@@ -54,7 +65,7 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
   // Samme regnestykke som betalingen på serveren (app/api/checkout/route.ts), med samlerabat pr. sælger.
   const sums = groups.map((g) => {
     const gross = g.items.reduce((a, i) => a + i.price, 0);
-    return orderAmounts(gross, choice[g.key] ?? "ship", bundleDiscount(gross, g.items.length, g.bundle), g.parcel);
+    return orderAmounts(gross, choice[g.key] ?? "ship", bundleDiscount(gross, g.items.length, g.bundle), g.parcel, Boolean(feeFreeUntil));
   });
   const total = sums.reduce(
     (a, s) => ({
@@ -132,6 +143,7 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           deliveries: choice,
+          feeFree: Boolean(feeFreeUntil),
           pakkeshop: needShop && selected ? { carrier: selected.carrier, id: selected.id, zipcode: zip } : undefined,
         }),
       });
@@ -303,7 +315,11 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
           <div className="sum-row discount"><span>Samlerabat</span><span className="num">−{kr(total.discount)}</span></div>
         ) : null}
         <div className="sum-row"><span>Fragt</span><span className="num">{kr(total.shipping)}</span></div>
-        <div className="sum-row"><span>Køberbeskyttelse</span><span className="num">{kr(total.fee)}</span></div>
+        <div className="sum-row">
+          <span>Køberbeskyttelse</span>
+          <span className="num">{feeFreeUntil ? "0 kr" : kr(total.fee)}</span>
+        </div>
+        {feeFreeUntil ? <p className="fine fee-free-note">0 kr i gebyr til og med {feeFreeUntil}.</p> : null}
         <div className="sum-row total"><span>I alt</span><span className="num">{kr(total.total)}</span></div>
         {needShop && selected ? (
           <p className="fine" style={{ margin: 0 }}>
@@ -319,7 +335,8 @@ export default function PayGroups({ groups, ready, pakkeshop }: { groups: PayGro
         <div className="protect">
           <IconShield />
           <span>
-            Pengene holdes tilbage hos Relived, indtil du har fået dine varer. Køberbeskyttelsen er 5 % + 5 kr pr. pakke.{" "}
+            Pengene holdes tilbage hos Relived, indtil du har fået dine varer.{" "}
+            {feeFreeUntil ? "Køberbeskyttelsen er gratis lige nu." : "Køberbeskyttelsen er 5 % + 5 kr pr. pakke."}{" "}
             <a href="/saadan-virker-det#priser">Sådan virker priser og fragt</a>
           </span>
         </div>

@@ -228,7 +228,7 @@ export const GUIDES: Guide[] = [
         "Skal jeg betale skat, når jeg sælger mit brugte tøj?",
         "Som regel ikke, når det er dit eget tøj, som du har købt til dig selv. Det er anderledes, hvis du køber tøj for at sælge det videre. Læs mere i guiden om skat ved salg af brugt tøj.",
       ],
-      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten og en køberbeskyttelse.`],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten.`],
     ],
     related: ["pris-paa-brugt-toej", "saelg-live-foerste-gang", "skat-ved-salg-af-brugt-toej"],
     end: { h2: "Klar til at rydde op i skabet?", text: "Opret en gratis konto, læg dit tøj i køen, og sælg det live eller med video.", href: "/saelg", label: "Bliv sælger" },
@@ -905,7 +905,7 @@ export const GUIDES: Guide[] = [
             <h3>6. Kend den samlede pris</h3>
             <p>
               Læg fragt og gebyrer til prisen. På Relived koster fragten 39 kr op til 1 kg og 49 kr op til 5 kg, én gang pr. sælger, og
-              køberbeskyttelsen er 5 % + 5 kr pr. pakke. Køber du flere varer hos samme sælger, betaler du kun fragt én gang.
+              du ser køberbeskyttelsen i kurven, før du betaler. Køber du flere varer hos samme sælger, betaler du kun fragt én gang.
             </p>
           </>
         ),
@@ -1667,7 +1667,7 @@ export const GUIDES: Guide[] = [
         "Alt det, der hørte til, da den var ny: lift eller kasse, sportsvogn, regnslag og myggenet. Jo mere der følger med, jo nemmere er den at sælge.",
       ],
       ["Hvornår får jeg pengene?", "Køberen betaler gennem Relived, før vognen bliver hentet. Pengene går til dig, når køberen har bekræftet, at vognen er hentet."],
-      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler en køberbeskyttelse.`],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}.`],
     ],
     related: ["saelg-brugt-boernetoej", "flyttesalg", "saelg-live-foerste-gang"],
     end: { h2: "Klar til at sælge barnevognen?", text: "Opret en gratis konto, film vognen, og lad den næste familie hente den.", href: "/saelg", label: "Bliv sælger" },
@@ -1808,7 +1808,7 @@ export const GUIDES: Guide[] = [
         "Møbler i massivt træ, designklassikere, spisebordsstole i sæt, kommoder og lamper. Kendte designere og producenter holder prisen bedst.",
       ],
       ["Skal jeg skille møblet ad?", "Kun hvis det ikke kan komme ud ellers, og du ved, at det kan samles igen. Skriv det i beskrivelsen, og læg skruerne i en pose."],
-      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten og en køberbeskyttelse.`],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten.`],
     ],
     related: ["koeb-brugt-design", "flyttesalg", "saelg-live-foerste-gang"],
     end: { h2: "Klar til at gøre plads?", text: "Opret en gratis konto, film dine møbler, og find en køber, der henter dem.", href: "/saelg", label: "Bliv sælger" },
@@ -1937,7 +1937,7 @@ export const GUIDES: Guide[] = [
         "Vis mærkatet i tungen, æsken og gerne kvitteringen. Sneakers fra luksusmærker bliver ægthedstjekket af Relived, før de kan købes.",
       ],
       ["Kan jeg sælge sneakers, jeg har gået med?", "Ja. Vær ærlig om, hvor meget de er brugt, og vis slid på sål og hæl. Køberne betaler for den stand, de kan se."],
-      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten og en køberbeskyttelse.`],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten.`],
     ],
     related: ["saelg-brugt-toej", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
     end: { h2: "Klar til at sælge dine sneakers?", text: "Opret en gratis konto, film dine sneakers, og sælg dem live eller med video.", href: "/saelg", label: "Bliv sælger" },
@@ -2065,7 +2065,7 @@ export const GUIDES: Guide[] = [
         "Hvad gør jeg med store møbler, der ikke kan sendes?",
         "Skriv i beskrivelsen, at de skal hentes, og hvornår de senest skal være hentet. Afhentning er gratis for køberen.",
       ],
-      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten og en køberbeskyttelse.`],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten.`],
     ],
     related: ["saelg-brugte-moebler", "saelg-live-foerste-gang", "saelg-brugt-barnevogn"],
     end: { h2: "Skal du snart flytte?", text: "Opret en gratis konto, og sælg det, du ikke skal have med, før flyttedagen.", href: "/saelg", label: "Bliv sælger" },

@@ -2210,3 +2210,14 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 .reuse-box{display:flex;padding:14px 16px;border-radius:14px;background:rgba(185,217,198,.08);border:1px solid rgba(185,217,198,.18);color:var(--text);font-weight:400}
 .reuse-box svg{color:var(--mint)}
 .reuse-box b{color:var(--mint)}
+
+/* Gratis-kampagnen: måler og tal i Backoffice, og noten på siderne */
+.ff-bar{height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.ff-bar span{display:block;height:100%;background:var(--mint);border-radius:inherit}
+.ff-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:0}
+.ff-stats div{padding:10px 12px;border-radius:12px;background:var(--surface-2)}
+.ff-stats dt{font-size:.8125rem;color:var(--dim)}
+.ff-stats dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
+.fee-free-note{margin:-4px 0 0;color:var(--mint)}
+.free-note{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;width:fit-content;max-width:100%;margin:10px 0 0;padding:7px 14px;border-radius:14px;background:rgba(185,217,198,.12);color:var(--mint);font-size:.875rem;font-weight:600}
+.free-note a{color:inherit;font-weight:500}

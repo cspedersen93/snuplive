@@ -894,6 +894,24 @@ pakkestørrelse, og feltet *Pakke* vises ikke i studiet. Alt andet virker.
   Vælger sælgeren en tungere label, betaler Relived forskellen.
 - Test: `qa_vaegt.py` (med filen) og `qa_vaegt.py uden0030` (efter `SKIP=0030 bash restart_qa.sh`).
 
+## Gratis-kampagnen (0 kr i køberbeskyttelse)
+
+Startes og stoppes i **Backoffice → Indstillinger → Gratis-kampagne**. Der skal ikke køres nogen fil i Supabase.
+
+- **Start:** vælg sidste dag (forslaget er seks måneder frem), og tryk *Start kampagnen*. Så koster køberbeskyttelsen 0 kr for alle.
+  Selve beskyttelsen gælder stadig: pengene holdes tilbage, til køberen har fået varen.
+- **Stop:** *Stop kampagnen nu*, eller automatisk på slutdatoen, eller når den anslåede udgift rammer loftet på 30.000 kr
+  (`FEE_FREE_CAP` i `lib/feeFree.ts`). Ved loftet får admins en mail. Loftet og tallene står kun i koden og i Backoffice.
+- **Tallene i Backoffice:** betalte ordrer uden gebyr, hvad der er købt for, det gebyr, vi har givet afkald på, og "Brugt":
+  et skøn over Stripes pris pr. betaling og udbetaling (`PAY_COST` i `lib/feeFree.ts`). Ret satserne, når de rigtige priser er kendt.
+- **På siden**, mens kampagnen er i gang: noten "0 kr i gebyr for køber og sælger til og med …" på forsiden og Sælg
+  (`components/FreeNote.tsx`), 0 kr i kurven, og nye tekster på Sådan virker det, Spørgsmål og svar, den engelske side,
+  handelsbetingelserne (§ 3) og vilkårene (§ 8). Siderne skifter inden for fem minutter.
+- **Betalingen** (`app/api/checkout/route.ts`) læser kampagnen frisk. Har prisen ændret sig, siden kurven blev åbnet, bliver
+  køberen bedt om at opdatere siden, så ingen betaler et andet beløb end det, de så.
+- Indstillingen ligger i `settings` under `fee_free`: `{ from, until }` og, når den er stoppet, `{ ended, reason }`.
+- Test: `qa_gratis.py`.
+
 ## Video overalt
 
 - **Programmet på forsiden** (`components/feed/Program.tsx`): "I aften på Relived" med de shows, der er live eller i programmet.

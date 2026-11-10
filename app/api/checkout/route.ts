@@ -6,6 +6,7 @@ import { SITE_URL } from "@/lib/env";
 import { cancelCheckout, markCheckoutPaid } from "@/lib/orders";
 import { fetchBundles } from "@/lib/bundles";
 import { fetchPackageSizes, fetchPickupOnly } from "@/lib/parcels";
+import { feeFreeActive, readFeeFree } from "@/lib/feeFree";
 import { bundleDiscount, bundlePct, DELIVERY, isDelivery, itemParcel, orderAmounts, PARCELS, parcelFor, spreadDiscount, type Delivery } from "@/lib/pricing";
 import { findPakkeshops, hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, ore } from "@/lib/stripe";
@@ -30,7 +31,7 @@ interface SaleRow {
 
 /**
  * Start en betaling for alle køberens ubetalte køb.
- * Body: { deliveries: { "<sælger-id>": "ship" | "pickup" }, pakkeshop?: { carrier, id, zipcode } }
+ * Body: { deliveries: { "<sælger-id>": "ship" | "pickup" }, pakkeshop?: { carrier, id, zipcode }, feeFree?: boolean }
  * Beløbene regnes ud her på serveren, ikke i browseren.
  */
 export async function POST(req: Request) {
@@ -44,6 +45,8 @@ export async function POST(req: Request) {
 
   const body = (await req.json().catch(() => ({}))) as {
     deliveries?: Record<string, unknown>;
+    /** Det, kurven viste: er gebyret 0 kr (gratis-kampagnen)? Passer det ikke længere, skal køberen se den nye pris først. */
+    feeFree?: unknown;
     pakkeshop?: { carrier?: unknown; id?: unknown; zipcode?: unknown };
   };
   const deliveries = body.deliveries ?? {};
@@ -86,6 +89,11 @@ export async function POST(req: Request) {
   }
   // Har sælgeren sat en af varerne til kun afhentning (0036_kun_afhentning.sql), er det afhentning, uanset hvad der er sendt.
   const pickupOnly = await fetchPickupOnly(admin, payable.map((s) => s.item_id));
+  // Gratis-kampagnen læses frisk her, så prisen altid passer med det, der gælder nu.
+  const feeFree = feeFreeActive(await readFeeFree(admin));
+  if (typeof body.feeFree === "boolean" && body.feeFree !== feeFree) {
+    return fail("Prisen er ændret, siden du åbnede kurven. Opdater siden, og prøv igen.", 409);
+  }
   const deliveryOf = (key: string): Delivery =>
     (groups.get(key) ?? []).some((s) => pickupOnly.has(s.item_id)) ? "pickup" : isDelivery(deliveries[key]) ? (deliveries[key] as Delivery) : "ship";
 
@@ -135,7 +143,7 @@ export async function POST(req: Request) {
     const discount = items - linePrices.reduce((a, p) => a + p, 0);
     const pct = discount > 0 ? bundlePct(sales.length, bundle) : 0;
     const parcel = parcelFor(sales.map((s) => itemParcel({ package_size: sizes.get(s.item_id), category: s.item?.category }, s.show?.category)));
-    const amounts = orderAmounts(items, delivery, discount, parcel);
+    const amounts = orderAmounts(items, delivery, discount, parcel, feeFree);
     feeTotal += amounts.fee;
     const handle = sales[0].seller?.handle ?? "sælger";
 
@@ -208,17 +216,20 @@ export async function POST(req: Request) {
     }
   }
 
-  lineItems.push({
-    quantity: 1,
-    price_data: {
-      currency: "dkk",
-      unit_amount: ore(feeTotal),
-      product_data: {
-        name: "Køberbeskyttelse",
-        description: "Pengene holdes tilbage, til du har fået dine varer",
+  // I gratis-kampagnen er gebyret 0 kr, og så er der ingen linje (beskyttelsen gælder stadig).
+  if (feeTotal > 0) {
+    lineItems.push({
+      quantity: 1,
+      price_data: {
+        currency: "dkk",
+        unit_amount: ore(feeTotal),
+        product_data: {
+          name: "Køberbeskyttelse",
+          description: "Pengene holdes tilbage, til du har fået dine varer",
+        },
       },
-    },
-  });
+    });
+  }
 
   const origin = new URL(req.url).origin || SITE_URL;
   try {

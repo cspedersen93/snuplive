@@ -6,6 +6,7 @@ import ShowCard from "@/components/ShowCard";
 import SupportLink from "@/components/SupportLink";
 import { COMPANY } from "@/lib/company";
 import { DELIVERY, PARCELS } from "@/lib/pricing";
+import { feeFreeState } from "@/lib/feeFree";
 import { inBeta } from "@/lib/launch";
 import { fetchEnglishShows } from "@/lib/queries";
 import { paymentsAreTest } from "@/lib/stripe";
@@ -40,6 +41,7 @@ const WORDS: [string, string][] = [
 ];
 
 export default async function English() {
+  const free = await feeFreeState();
   const shows = await fetchEnglishShows(10);
   const test = paymentsAreTest();
   return (
@@ -162,7 +164,13 @@ export default async function English() {
           <ul className="sort-list">
             <li><b>Prices</b> are in Danish kroner (kr).</li>
             <li><b>Delivery</b> is to DAO and GLS pickup points in Denmark, {PARCELS.small.price} kr per seller for up to 1 kg and {PARCELS.large.price} kr for up to 5 kg. Picking up from the seller is free.</li>
-            <li><b>Buyer protection</b> is 5 % of the items + 5 kr per parcel. You see the total before you pay.</li>
+            <li>
+              <b>Buyer protection</b>{" "}
+              {free.active && free.until
+                ? `is free until ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Copenhagen" }).format(new Date(free.until))}. After that it is 5 % of the items + 5 kr per parcel.`
+                : "is 5 % of the items + 5 kr per parcel."}{" "}
+              You see the total before you pay.
+            </li>
             <li><b>Our terms and privacy policy</b> are in Danish, and the Danish versions apply: <Link href="/handelsbetingelser" lang="da">Handelsbetingelser</Link>, <Link href="/vilkaar" lang="da">Vilkår</Link> and <Link href="/privatliv" lang="da">Privatlivspolitik</Link>.</li>
           </ul>
         </div>

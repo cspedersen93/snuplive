@@ -12,6 +12,7 @@ import { IconPlay } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import NewsletterForm from "@/components/NewsletterForm";
 import RemindButton from "@/components/RemindButton";
+import FreeNote from "@/components/FreeNote";
 import ReuseCounter from "@/components/ReuseCounter";
 import type { FeedItem, ShowWithSeller } from "@/lib/types";
 import { campaignFlags } from "@/lib/campaignFlags";
@@ -113,6 +114,7 @@ export default async function Forside() {
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
             <p className="feed-lede">Brugt, som ny eller med prismærket på. Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
+            <FreeNote />
             <ReuseCounter n={reused} />
           </div>
 

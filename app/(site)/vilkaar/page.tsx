@@ -3,6 +3,7 @@ import Link from "next/link";
 import CompanyInfo from "@/components/CompanyInfo";
 import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/company";
+import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { inBeta } from "@/lib/launch";
 import { RESERVATION_DAYS } from "@/lib/pricing";
 
@@ -13,7 +14,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/vilkaar" },
 };
 
-export default function Vilkaar() {
+export const revalidate = 300;
+
+export default async function Vilkaar() {
+  const free = await feeFreeState();
+  const freeDay = free.active && free.until ? feeFreeDay(free.until) : null;
   return (
     <LegalPage title="Vilkår for brugere og sælgere" crumb="Vilkår" updated="oktober 2026">
       <p className="lede">
@@ -106,7 +111,7 @@ export default function Vilkaar() {
 
       <h3>8. Gebyrer</h3>
       <p>
-        {inBeta() ? "Det er gratis at sælge, mens Relived er i beta." : "Det er gratis at sælge."} Køberen betaler køberbeskyttelsen. Indfører vi et salgsgebyr, får du besked,
+        {inBeta() ? "Det er gratis at sælge, mens Relived er i beta." : "Det er gratis at sælge."} Køberen betaler køberbeskyttelsen.{freeDay ? ` Til og med ${freeDay} koster køberbeskyttelsen 0 kr for køberen.` : ""} Indfører vi et salgsgebyr, får du besked,
         før det gælder.
       </p>
 

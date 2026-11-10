@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { inBeta } from "@/lib/launch";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 const groupId = (t: string) =>
   t.toLowerCase().replace(/æ/g, "ae").replace(/ø/g, "oe").replace(/å/g, "aa").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-const GROUPS: { title: string; qa: [string, string][] }[] = [
+const BASE: { title: string; qa: [string, string][] }[] = [
   {
     title: "Køb",
     qa: [
@@ -66,7 +67,29 @@ const GROUPS: { title: string; qa: [string, string][] }[] = [
   },
 ];
 
-export default function Faq() {
+export const revalidate = 300;
+
+/** I gratis-kampagnen (lib/feeFree.ts) er svarene om prisen nogle andre. */
+function withFree(day: string | null) {
+  if (!day) return BASE;
+  return BASE.map((g) => ({
+    ...g,
+    qa: g.qa.map(([q, a]): [string, string] =>
+      q === "Hvad koster det at købe?"
+        ? [
+            q,
+            `Du betaler prisen på varen og fragten. Køberbeskyttelsen koster 0 kr til og med ${day}. Den gælder stadig: vi holder pengene tilbage, til du har fået varen, og vi hjælper dig, hvis noget går galt. Derefter koster den 5 % af varerne + 5 kr pr. pakke. Du kan se det hele i kurven, før du betaler.`,
+          ]
+        : q === "Hvad koster det at sælge?"
+          ? [q, `Det er gratis at oprette en konto, gå live og sælge. Køberen betaler 0 kr i køberbeskyttelse til og med ${day}.`]
+          : [q, a],
+    ),
+  }));
+}
+
+export default async function Faq() {
+  const free = await feeFreeState();
+  const GROUPS = withFree(free.active && free.until ? feeFreeDay(free.until) : null);
   const ld = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

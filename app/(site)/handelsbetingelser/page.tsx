@@ -3,6 +3,7 @@ import Link from "next/link";
 import CompanyInfo from "@/components/CompanyInfo";
 import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/company";
+import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, RESERVATION_DAYS, PARCELS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -12,7 +13,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/handelsbetingelser" },
 };
 
-export default function Handelsbetingelser() {
+export const revalidate = 300;
+
+export default async function Handelsbetingelser() {
+  const free = await feeFreeState();
+  const freeDay = free.active && free.until ? feeFreeDay(free.until) : null;
   return (
     <LegalPage title="Handelsbetingelser for købere" crumb="Handelsbetingelser" updated="oktober 2026">
       <p className="lede">
@@ -43,6 +48,13 @@ export default function Handelsbetingelser() {
         <li><b>Varen:</b> den pris, der står ved varen, eller dit vindende bud.</li>
         <li><b>Fragt:</b> {PARCELS.small.price} kr for en lille pakke op til 1 kg og {PARCELS.large.price} kr for en stor pakke op til 5 kg, pr. sælger til en DAO- eller GLS-pakkeshop. Alt, du køber hos samme sælger, kommer i én pakke, og du ser fragten, før du betaler. Afhentning hos sælgeren er gratis.</li>
         <li><b>Køberbeskyttelse:</b> 5 % af varernes pris plus 5 kr pr. pakke. Den betaler for, at pengene bliver holdt tilbage, til du har fået dine varer.</li>
+        {/* Gratis-kampagnen (Backoffice → Indstillinger). Punktet står her kun, mens kampagnen er i gang. */}
+        {freeDay ? (
+          <li>
+            <b>Kampagne:</b> Til og med {freeDay} koster køberbeskyttelsen 0 kr. Beskyttelsen gælder fuldt ud i perioden. Relived kan afslutte
+            kampagnen før tid. Det gebyr, der står i kurven, når du betaler, er det, der gælder for dit køb.
+          </li>
+        ) : null}
       </ul>
       <p>Alle priser er i danske kroner og med moms, hvor der skal betales moms. Du ser den samlede pris, før du betaler.</p>
 

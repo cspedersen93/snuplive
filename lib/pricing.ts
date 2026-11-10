@@ -66,10 +66,11 @@ export function buyerFee(items: number) {
  * Beløbene for én pakke. `items` er varernes samlede pris, `discount` samlerabatten (se bundleDiscount), `parcel` pakkens størrelse.
  * I svaret er `items` beløbet efter rabatten: det, sælgeren får for varerne. Køberbeskyttelsen regnes af det.
  */
-export function orderAmounts(items: number, delivery: Delivery, discount = 0, parcel: Parcel = "small") {
+export function orderAmounts(items: number, delivery: Delivery, discount = 0, parcel: Parcel = "small", feeFree = false) {
   const net = Math.max(0, items - Math.max(0, discount));
   const shipping: number = delivery === "ship" ? PARCELS[parcel].price : 0;
-  const fee = buyerFee(net);
+  // Gratis-kampagnen (lib/feeFree.ts): gebyret er 0 kr, beskyttelsen gælder stadig.
+  const fee = feeFree ? 0 : buyerFee(net);
   return { gross: items, discount: items - net, items: net, shipping, fee, total: net + shipping + fee };
 }
 

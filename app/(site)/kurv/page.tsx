@@ -14,6 +14,7 @@ import { itemHref } from "@/lib/items";
 import { markCheckoutPaid } from "@/lib/orders";
 import { fetchPackageSizes, fetchPickupOnly } from "@/lib/parcels";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, itemParcel, parcelFor, PICKUP_CATEGORIES, RESERVATION_DAYS, type Parcel } from "@/lib/pricing";
+import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -161,6 +162,8 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
   const sizes = await fetchPackageSizes(supabase, toPay.map((s) => s.item_id));
   // Varer, sælgeren har sat til kun afhentning (0036_kun_afhentning.sql). Betalingen tvinger det også på serveren.
   const pickupOnly = await fetchPickupOnly(supabase, toPay.map((s) => s.item_id));
+  // Gratis-kampagnen: 0 kr i køberbeskyttelse (lib/feeFree.ts).
+  const free = await feeFreeState();
   const parcelsOf = new Map<string, Parcel[]>();
   for (const s of toPay) {
     const key = s.seller_id;
@@ -236,7 +239,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
                 </span>
               </div>
             ) : null}
-            <PayGroups groups={groups} ready={ready} pakkeshop={hasShipmondo()} />
+            <PayGroups groups={groups} ready={ready} pakkeshop={hasShipmondo()} feeFreeUntil={free.active && free.until ? feeFreeDay(free.until) : null} />
           </>
         ) : null}
 

@@ -3,6 +3,7 @@ import { CARRIERS, isCarrier } from "@/lib/carriers";
 import { SITE_URL } from "@/lib/env";
 import { kr } from "@/lib/format";
 import { ISSUE_REASONS, type IssueReason } from "@/lib/issues";
+import { enforceFeeFreeCap, FEE_FREE_CAP } from "@/lib/feeFree";
 import { adminEmails, sendMail } from "@/lib/mail";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, RESERVATION_DAYS, sellerPayout } from "@/lib/pricing";
 import { cancelLabel, createLabel, ensureTrackingWebhook, hasShipmondo } from "@/lib/shipmondo";
@@ -83,6 +84,22 @@ export async function markCheckoutPaid(admin: AdminClient, stripe: Stripe, sessi
       .in("id", shipIds);
   }
   await admin.from("sales").update({ status: "paid" }).in("order_id", ids).eq("status", "reserved");
+  // Gratis-kampagnen stopper af sig selv, når den anslåede udgift rammer loftet. Så får admins en mail.
+  try {
+    if ((await enforceFeeFreeCap(admin)).stopped) {
+      await sendMail({
+        to: adminEmails(),
+        subject: "Gratis-kampagnen på Relived er stoppet",
+        text: [
+          `Den anslåede udgift til kampagnen har ramt loftet på ${kr(FEE_FREE_CAP)}, så køberbeskyttelsen koster igen 5 % + 5 kr.`,
+          "",
+          `Se tallene, eller start kampagnen igen: ${SITE_URL}/admin/indstillinger`,
+        ].join("\n"),
+      });
+    }
+  } catch {
+    // Betalingen er gennemført uanset.
+  }
   return ids.length;
 }
 

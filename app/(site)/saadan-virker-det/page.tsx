@@ -1,3 +1,4 @@
+import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IconCamera, IconChat, IconShield, IconShieldCheck, IconStar, IconUser } from "@/components/Icons";
@@ -41,7 +42,9 @@ export default async function Saadan() {
   const { bundles, offers } = await features();
   const ship = DELIVERY.ship.price;
   // Regneeksemplet: 2 varer til 200 kr hos samme sælger, med 10 % i samlerabat, hvis den findes.
-  const ex = orderAmounts(400, "ship", bundles ? bundleDiscount(400, 2, { pct2: 10, pct3: 15 }) : 0);
+  const free = await feeFreeState();
+  const freeDay = free.active && free.until ? feeFreeDay(free.until) : null;
+  const ex = orderAmounts(400, "ship", bundles ? bundleDiscount(400, 2, { pct2: 10, pct3: 15 }) : 0, "small", Boolean(freeDay));
 
   const jump = [
     ["koeb", "Køb"],
@@ -88,8 +91,10 @@ export default async function Saadan() {
               <span>i fragt pr. pakke til pakkeshop ({SHIP_PRICES_TEXT}). Afhentning er gratis.</span>
             </li>
             <li>
-              <b>5 % + 5 kr</b>
-              <span>i køberbeskyttelse pr. pakke. Sælgeren får først pengene, når du har varen.</span>
+              <b>{freeDay ? "0 kr" : "5 % + 5 kr"}</b>
+              <span>
+                i køberbeskyttelse{freeDay ? ` til og med ${freeDay}` : " pr. pakke"}. Sælgeren får først pengene, når du har varen.
+              </span>
             </li>
             <li>
               <b>1 pakke</b>
@@ -170,7 +175,11 @@ export default async function Saadan() {
         <div className="wrap howto-two">
           <div className="sec-head">
             <h2 className="h2" id="h-priser">Hvad koster det?</h2>
-            <p className="lede">Du betaler for varen, fragten og køberbeskyttelsen. Der er ingen andre gebyrer.</p>
+            <p className="lede">
+              {freeDay
+                ? "Du betaler for varen og fragten. Der er ingen gebyrer lige nu."
+                : "Du betaler for varen, fragten og køberbeskyttelsen. Der er ingen andre gebyrer."}
+            </p>
           </div>
           <div>
             <table className="price-table">
@@ -190,7 +199,17 @@ export default async function Saadan() {
                 </tr>
                 <tr>
                   <th scope="row">Køberbeskyttelse</th>
-                  <td>5 % af varerne + 5 kr pr. pakke</td>
+                  <td>
+                    {freeDay ? (
+                      <>
+                        <b>0 kr til og med {freeDay}.</b> Beskyttelsen gælder stadig: pengene holdes tilbage, til du har fået varen. Derefter 5 %
+                        af varerne + 5 kr pr. pakke. Kampagnen kan slutte før tid, og det gebyr, der står i kurven, når du betaler, er det, der
+                        gælder.
+                      </>
+                    ) : (
+                      "5 % af varerne + 5 kr pr. pakke"
+                    )}
+                  </td>
                 </tr>
                 {bundles ? (
                   <tr>
