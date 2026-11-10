@@ -903,6 +903,19 @@ pakkestørrelse, og feltet *Pakke* vises ikke i studiet. Alt andet virker.
   først, når den skal afspilles. Ingen afspilning ved "reducer bevægelse" eller datasparer.
 - **De tre løfter på varesiden** (`.trust3`): video, beskyttet betaling og levering (eller ægthedstjek) lige under købsknappen.
 - Test: `qa_video_overalt.py`.
+## Kun afhentning
+
+**Kør `0036_kun_afhentning.sql` i Supabase → SQL Editor.** Indtil da kan køberen vælge pakkeshop eller afhentning til alle
+varer som før, og valget *Kun afhentning* vises ikke.
+
+- **Sælgeren** vælger under **Levering** (i køen i studiet, når en vare rettes, og ved videoannoncer): lille pakke, stor pakke
+  eller **Kun afhentning (for store varer)**. Det er til sofaer, kommoder og andet over 5 kg.
+- **Køberen** ser på varesiden "Skal hentes hos … i …". I kurven kan pakken fra den sælger kun hentes, og der står hvorfor.
+- **Betalingen** (`app/api/checkout/route.ts`) laver afhentning, hvis bare én af varerne fra sælgeren er sat til kun
+  afhentning, også selvom browseren sender pakkeshop.
+- Cykler og barnevogne har stadig afhentning valgt på forhånd (`PICKUP_CATEGORIES`), men kan sendes, hvis køberen vælger det.
+- Koden: `items.pickup_only`, `fetchPickupOnly` og `pickupOnlyReady` i `lib/parcels.ts`, `components/DeliveryField.tsx`.
+- Test: `qa_afhentning.py` (med filen) og `qa_afhentning.py uden0036` (efter `SKIP=0036 bash restart_qa.sh`).
 
 ## Nyhedsbrev, Green Friday og julekalender
 

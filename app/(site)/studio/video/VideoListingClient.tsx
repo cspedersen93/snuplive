@@ -4,6 +4,7 @@ import ConditionSelect from "@/components/ConditionSelect";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import AiNote from "@/components/AiNote";
+import DeliveryField, { type DeliveryChoice } from "@/components/DeliveryField";
 import { IconCamera, IconPlay, IconSparkle } from "@/components/Icons";
 import type { AiListing } from "@/lib/aiListing";
 import { askAiListing } from "@/lib/aiListingClient";
@@ -12,6 +13,7 @@ import { blobToBase64 } from "@/lib/bestPhoto";
 import type { Clip } from "@/lib/clipRecorder";
 import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, nameExample, pickCategories, sizeField } from "@/lib/format";
 import { itemHref } from "@/lib/items";
+import { itemParcel } from "@/lib/pricing";
 import { needsAuth } from "@/lib/luxury";
 import { resizeImage } from "@/lib/resizeImage";
 import { getSupabase } from "@/lib/supabase/client";
@@ -47,13 +49,21 @@ export default function VideoListingClient({
   sellerId,
   aiReady = false,
   hideCats = [],
+  parcelReady = false,
+  pickupReady = false,
 }: {
   sellerId: string;
   aiReady?: boolean;
   /** Kategorier, hvis fil ikke er kørt endnu (lib/categories.ts). */
   hideCats?: readonly string[];
+  /** Er 0030_pakkestoerrelse.sql kørt? Så kan sælgeren vælge pakkestørrelsen. */
+  parcelReady?: boolean;
+  /** Er 0036_kun_afhentning.sql kørt? Så kan varen sættes til kun afhentning. */
+  pickupReady?: boolean;
 }) {
   const [aiFill, setAiFill] = useState<"idle" | "busy">("idle");
+  // Levering: tom = kategoriens standard (bolig og cykler er store pakker, resten små).
+  const [deliv, setDeliv] = useState<DeliveryChoice | "">("");
   const [aiResult, setAiResult] = useState<AiListing | null>(null);
   const [step, setStep] = useState<Step>("start");
   const [err, setErr] = useState<string | null>(null);
@@ -397,6 +407,17 @@ export default function VideoListingClient({
         p_clip: clipPath,
       });
       if (error) throw error;
+      // Pakkestørrelse og kun afhentning sættes bagefter på varen (create_video_listing kender dem ikke).
+      if (deliv) {
+        const fields = {
+          ...(parcelReady && deliv !== "pickup" ? { package_size: deliv } : {}),
+          ...(pickupReady ? { pickup_only: deliv === "pickup" } : {}),
+        };
+        if (Object.keys(fields).length) {
+          const upd = await sb.from("items").update(fields).eq("id", id);
+          if (upd.error) toast("Annoncen er lagt op, men leveringen blev ikke gemt. Skriv til os, så retter vi den.");
+        }
+      }
       const row = (Array.isArray(data) ? data[0] : data) as { id: string; name: string; auth_required?: boolean } | null;
       setDone({ id, name: row?.name ?? n, authRequired: Boolean(row?.auth_required) });
       pingSearchAlerts();
@@ -410,6 +431,7 @@ export default function VideoListingClient({
       setCond("");
       setPrice("");
       setDesc("");
+      setDeliv("");
       setAiResult(null);
       setNewOk(false);
       touched.current = false;
@@ -681,6 +703,9 @@ export default function VideoListingClient({
                   <input type="checkbox" checked={newOk} onChange={(e) => setNewOk(e.target.checked)} />
                   <span>Produktet er nyt og uåbnet (forseglingen er intakt). Brugt makeup og hudpleje må ikke sælges.</span>
                 </label>
+              ) : null}
+              {parcelReady || pickupReady ? (
+                <DeliveryField id="vl-deliv" value={deliv || itemParcel({ category: cat })} pickupReady={pickupReady} onChange={setDeliv} />
               ) : null}
               <div className="field">
                 <label htmlFor="vl-desc">Beskrivelse (valgfri)</label>

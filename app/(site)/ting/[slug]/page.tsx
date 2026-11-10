@@ -44,7 +44,7 @@ const load = cache(async (slug: string) => {
   if (!sb) return { setup: false as const };
   const id = idFromSlug(decodeURIComponent(slug));
   if (!id) return { setup: true as const, item: null };
-  const [{ data }, clipRes, authRes, kindRes, visRes] = await Promise.all([
+  const [{ data }, clipRes, authRes, kindRes, visRes, pickupRes] = await Promise.all([
     sb
       .from("items")
       .select(
@@ -61,6 +61,8 @@ const load = cache(async (slug: string) => {
     sb.from("items").select("show:shows!items_show_id_fkey(kind)").eq("id", id).maybeSingle(),
     // Lukket show (0026_lukkede_shows.sql)?
     sb.from("items").select("show:shows!items_show_id_fkey(visibility)").eq("id", id).maybeSingle(),
+    // Kun afhentning (0036_kun_afhentning.sql)?
+    sb.from("items").select("pickup_only").eq("id", id).maybeSingle(),
   ]);
   const item = data as unknown as Loaded | null;
   // En ting eller et show, der er fjernet efter en anmeldelse, findes ikke længere.
@@ -70,6 +72,7 @@ const load = cache(async (slug: string) => {
   const auth = a?.auth_required ? (a.auth_status === "approved" ? ("approved" as const) : ("waiting" as const)) : null;
   const video = !kindRes.error && (kindRes.data as unknown as { show: { kind: string } | null } | null)?.show?.kind === "video";
   // Varer i et lukket show er kun for de inviterede, indtil showet er slut.
+  const pickupOnly = !pickupRes.error && (pickupRes.data as { pickup_only?: boolean } | null)?.pickup_only === true;
   const closed = !visRes.error && (visRes.data as unknown as { show: { visibility: string } | null } | null)?.show?.visibility === "invite" && item.show.status !== "ended";
   // Sælgerens samlerabat (0027_samlerabat.sql) og bud på varer til fast pris (0028_bud_paa_varer.sql).
   // Sælgerens niveau og mærker (0032_niveauer.sql).
@@ -79,7 +82,7 @@ const load = cache(async (slug: string) => {
     fetchLevel(sb, item.seller_id),
   ]);
   const offers = !offerQ.error;
-  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video, closed, bundle, offers, level };
+  return { setup: true as const, item, clip: clip?.clip_path ? { url: clipUrl(clip) as string, at: clip.clip_at } : null, auth, video, closed, bundle, offers, level, pickupOnly };
 });
 
 function stateOf(it: Loaded): ItemState {
@@ -371,10 +374,10 @@ export default async function ItemPage({ params }: Params) {
                     <b>Ægthedstjekket</b>
                     <span>af Relived</span>
                   </li>
-                ) : PICKUP_CATEGORIES.includes(cat.key) ? (
+                ) : d.pickupOnly || PICKUP_CATEGORIES.includes(cat.key) ? (
                   <li>
                     <IconBox />
-                    <b>Hentes gratis</b>
+                    <b>{d.pickupOnly ? "Skal hentes" : "Hentes gratis"}</b>
                     <span>hos sælgeren{seller.area ? ` i ${seller.area}` : ""}</span>
                   </li>
                 ) : (
@@ -408,7 +411,13 @@ export default async function ItemPage({ params }: Params) {
             {/* Det trygge først, så det, køberen skal vide om sælgeren (privat eller erhverv og fortrydelsesret). */}
             <ul className="item-trust">
               {state === "sold" ? <li>Betalingen er beskyttet. Sælgeren får først pengene, når du har varen.</li> : null}
-              {PICKUP_CATEGORIES.includes(cat.key) ? (
+              {d.pickupOnly ? (
+                <li>
+                  Skal hentes hos {seller.handle}
+                  {seller.area ? ` i ${seller.area}` : ""}, for varen er for stor til en pakkeshop. Afhentningen er gratis, og pengene går
+                  først til sælgeren, når du har bekræftet, at du har fået varen.
+                </li>
+              ) : PICKUP_CATEGORIES.includes(cat.key) ? (
                 <li>Hentes gratis hos {seller.handle}. Pengene går først til sælgeren, når du har bekræftet, at du har fået varen.</li>
               ) : (
                 <li>Fragt fra {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>

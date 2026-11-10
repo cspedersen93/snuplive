@@ -5,7 +5,7 @@ import { CARRIERS, isCarrier, type Pakkeshop } from "@/lib/carriers";
 import { SITE_URL } from "@/lib/env";
 import { cancelCheckout, markCheckoutPaid } from "@/lib/orders";
 import { fetchBundles } from "@/lib/bundles";
-import { fetchPackageSizes } from "@/lib/parcels";
+import { fetchPackageSizes, fetchPickupOnly } from "@/lib/parcels";
 import { bundleDiscount, bundlePct, DELIVERY, isDelivery, itemParcel, orderAmounts, PARCELS, parcelFor, spreadDiscount, type Delivery } from "@/lib/pricing";
 import { findPakkeshops, hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, ore } from "@/lib/stripe";
@@ -84,7 +84,10 @@ export async function POST(req: Request) {
     const key = s.seller_id;
     groups.set(key, [...(groups.get(key) ?? []), s]);
   }
-  const deliveryOf = (key: string): Delivery => (isDelivery(deliveries[key]) ? (deliveries[key] as Delivery) : "ship");
+  // Har sælgeren sat en af varerne til kun afhentning (0036_kun_afhentning.sql), er det afhentning, uanset hvad der er sendt.
+  const pickupOnly = await fetchPickupOnly(admin, payable.map((s) => s.item_id));
+  const deliveryOf = (key: string): Delivery =>
+    (groups.get(key) ?? []).some((s) => pickupOnly.has(s.item_id)) ? "pickup" : isDelivery(deliveries[key]) ? (deliveries[key] as Delivery) : "ship";
 
   // Med Shipmondo vælger køberen selv pakkeshoppen. Vi slår den op igen, så navn og adresse er rigtige.
   let shop: Pakkeshop | null = null;
