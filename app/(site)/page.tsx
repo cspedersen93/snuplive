@@ -5,6 +5,7 @@ import Avatar from "@/components/Avatar";
 import CampaignCards from "@/components/CampaignCards";
 import CategoryCards from "@/components/CategoryCards";
 import { ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
+import HomeHero from "@/components/feed/HomeHero";
 import Program from "@/components/feed/Program";
 import RailHello from "@/components/feed/RailHello";
 import RailMine from "@/components/feed/RailMine";
@@ -95,28 +96,24 @@ export default async function Forside() {
       {/* Forsiden: toppen, det store kort i fuld bredde, kasserne under det (på mobil efter kortene), så shows og varer. */}
       <div className="wrap home-feed">
         <div className="feed-top">
-          <div className="feed-head">
-            {live.length ? (
-              // Når nogen er live, er linjen øverst et link til showet. På telefonen er det en rød knap, så køberne kan
-              // gå direkte ind fra første skærm.
-              <Link
-                className="label red feed-eyebrow feed-live-cta"
-                href={live.length === 1 && live[0].seller?.handle ? `/live/${live[0].seller.handle}` : "/live"}
-              >
-                <span className="live-dot" aria-hidden="true" />
-                {`${live.length} ${live.length === 1 ? "sælger er" : "sælgere er"} live nu`}
-                <span className="feed-live-go"> · Se med</span>
-              </Link>
-            ) : (
-              <span className="label brass feed-eyebrow">Live Sale. Second Hand.</span>
-            )}
-            <h1 id="h-forside" className="h1 feed-h1">
-              Second hand, du kan se <em className="s">live</em>, før du køber
-            </h1>
-            <p className="feed-lede">Brugt, som ny eller med prismærket på. Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
+          <HomeHero
+            liveCount={live.length}
+            liveHref={live.length === 1 && live[0].seller?.handle ? `/live/${live[0].seller.handle}` : "/live"}
+            nextCard={
+              upcoming[0] ? (
+                <>
+                  <span className="label brass">
+                    Næste show · {upcoming[0].starts_at ? `${dayLabel(upcoming[0].starts_at).toLowerCase()} kl. ${clock(upcoming[0].starts_at)}` : "tidspunkt kommer"}
+                  </span>
+                  <Link className="hh-next-t" href={`/live/${upcoming[0].seller?.handle ?? ""}`}>{upcoming[0].title}</Link>
+                  <RemindButton showId={upcoming[0].id} next="/" className="btn btn-line btn-sm" />
+                </>
+              ) : null
+            }
+          >
             <FreeNote />
             <ReuseCounter n={reused} />
-          </div>
+          </HomeHero>
 
           <nav className="feed-tabs" aria-label="Vis">
             <Link href="/" aria-current="page">For dig</Link>
