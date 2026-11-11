@@ -166,7 +166,7 @@ export default async function Forside() {
             <ul className="rail-checks">
               <li>Sælgeren får først pengene, når du har varen.</li>
               <li>Alt fra samme sælger i én pakke, fra {DELIVERY.ship.price} kr til pakkeshop.</li>
-              <li>14 dages fortrydelsesret, når du køber på afstand.</li>
+              <li>Er varen ikke som vist, melder du et problem, og pengene venter.</li>
             </ul>
             <Link className="rail-link" href="/saadan-virker-det#priser">Priser, fragt og rabat</Link>
           </section>
