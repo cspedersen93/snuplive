@@ -164,8 +164,3 @@ export async function enforceFeeFreeCap(admin: SupabaseClient): Promise<{ settin
   console.info("[snuplive] gratis-kampagnen er stoppet: loftet er nået", spend.cost);
   return { setting: value, spend, stopped: true };
 }
-
-/** Til teksterne på siden (ikke til priser i kurven). I dag det samme som feeFreeState. */
-export async function feeFreeCopy(): Promise<FeeFreeState> {
-  return feeFreeState();
-}

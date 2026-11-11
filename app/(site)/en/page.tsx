@@ -6,7 +6,7 @@ import ShowCard from "@/components/ShowCard";
 import SupportLink from "@/components/SupportLink";
 import { COMPANY } from "@/lib/company";
 import { DELIVERY, PARCELS } from "@/lib/pricing";
-import { feeFreeCopy } from "@/lib/feeFree";
+import { feeFreeState } from "@/lib/feeFree";
 import { inBeta } from "@/lib/launch";
 import { fetchEnglishShows } from "@/lib/queries";
 import { paymentsAreTest } from "@/lib/stripe";
@@ -41,7 +41,7 @@ const WORDS: [string, string][] = [
 ];
 
 export default async function English() {
-  const free = await feeFreeCopy();
+  const free = await feeFreeState();
   const shows = await fetchEnglishShows(10);
   const test = paymentsAreTest();
   return (

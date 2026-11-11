@@ -1,5 +1,5 @@
 import FreeNote from "@/components/FreeNote";
-import { feeFreeCopy } from "@/lib/feeFree";
+import { feeFreeState } from "@/lib/feeFree";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IconBolt, IconBox, IconCamera, IconCard, IconClip, IconList } from "@/components/Icons";
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function Saelg() {
-  const free = await feeFreeCopy();
+  const free = await feeFreeState();
   return (
     <>
       <section className="phero" aria-labelledby="h-saelg">
@@ -27,9 +27,8 @@ export default async function Saelg() {
           </nav>
           <h1 className="h1" id="h-saelg">Sælg second hand live på video</h1>
           <p className="lede">
-            <b>Sælg en hel bunke på én aften.</b> Slip for at tage billeder, skrive tekster og svare på de samme spørgsmål ti
-            gange. Du går live fra telefonen eller computeren, viser varerne frem én efter én og svarer alle på én gang.
-            Køberen betaler fragten, og store varer kan sættes til kun afhentning.
+            <b>Sælg brugte fund, ubrugte fejlkøb og nye restpartier live.</b> Glem at fotografere og skrive en annonce til hver eneste vare. Gå live fra telefonen, vis varerne frem én ad gangen, og
+            sælg en hel bunke på én aften.
           </p>
           <div className="ctas">
             <Link className="btn btn-red" href="/opret">Opret gratis konto</Link>

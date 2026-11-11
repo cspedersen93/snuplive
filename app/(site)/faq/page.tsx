@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { feeFreeDay, feeFreeCopy } from "@/lib/feeFree";
+import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { inBeta } from "@/lib/launch";
 
 export const metadata: Metadata = {
-  title: { absolute: "Spørgsmål og svar om second hand live | Relived" },
+  title: { absolute: "Spørgsmål og svar om live shopping | Relived" },
   description:
     "Svar på de mest stillede spørgsmål om Relived: køb i live-shows, lynrunder, betaling, fragt, tryg handel og hvordan du går live som sælger.",
   alternates: { canonical: "/faq" },
@@ -38,7 +38,6 @@ const BASE: { title: string; qa: [string, string][] }[] = [
     title: "Betaling og fragt",
     qa: [
       ["Hvad koster det at købe?", "Du betaler prisen på varen, fragten og en køberbeskyttelse på 5 % af varerne + 5 kr pr. pakke. Med køberbeskyttelsen holder vi pengene tilbage, til du har fået varen, og vi hjælper dig, hvis noget går galt. Du kan se den samlede pris, før du betaler."],
-      ["Kan jeg fortryde et køb?", "Køber du af en erhvervssælger, har du 14 dages fortrydelsesret. Køb fra en privatperson er ikke omfattet, men du kan altid melde et problem, hvis varen ikke er som vist."],
       ["Hvordan betaler jeg?", "Under Mine køb betaler du samlet for alt, du har købt, med MobilePay, kort, Apple Pay eller Google Pay. Du har 3 dage til at betale."],
       ["Hvad hvis jeg køber hos flere sælgere i samme show?", "Nogle shows har gæster, så flere sælgere sælger sammen. Ved hver vare står, hvem der sælger den. Køber du hos flere af dem, får du en pakke fra hver sælger, og fragten betales pr. pakke."],
       ["Hvad koster fragten?", "39 kr for en lille pakke op til 1 kg og 49 kr for en stor pakke op til 5 kg, til en DAO- eller GLS-pakkeshop. Du betaler én gang pr. sælger, uanset hvor mange varer du køber hos sælgeren, og du ser prisen i kurven. Afhentning hos sælgeren er gratis."],
@@ -50,8 +49,6 @@ const BASE: { title: string; qa: [string, string][] }[] = [
     title: "Salg",
     qa: [
       ["Hvad koster det at sælge?", `Det er gratis at oprette en konto, gå live og sælge${inBeta() ? " i beta-perioden" : ""}. Køberen betaler en køberbeskyttelse på 5 % + 5 kr pr. pakke.`],
-      ["Hvad gør jeg med store varer som møbler og cykler?", "Sæt varen til kun afhentning. Så aftaler du og køberen, hvornår den bliver hentet."],
-      ["Hvad sker der med varer, der ikke bliver solgt i showet?", "De kan blive stående til fast pris under Til salg, med videoen fra showet."],
       ["Hvad skal jeg bruge for at gå live?", "En telefon eller computer med kamera og en stabil internetforbindelse. Du går live direkte i browseren."],
       ["Skal jeg være god til at stå foran et kamera?", "Nej. De bedste shows minder om en snak ved et bord på loppemarkedet. Start med et kort show og få varer."],
       ["Kan vi være flere sælgere i samme show?", "Ja. I studiet trykker du Inviter en sælger og sender linket til en anden sælger. Op til 2 gæster kan være med. I er på kameraet sammen, og gæsterne lægger deres egne varer i køen. Pengene for en gæsts varer går til gæsten, og gæsten sender selv sine varer. Du styrer showet: hvad der vises, budsalg, lynrunder og chatten. Følgerne af gæsterne får også besked, når showet går live."],
@@ -75,13 +72,9 @@ export const revalidate = 300;
 /** I gratis-kampagnen (lib/feeFree.ts) er svarene om prisen nogle andre. */
 function withFree(day: string | null) {
   if (!day) return BASE;
-  const why: [string, string] = [
-    "Hvorfor er der 0 kr i gebyr, og hvor længe?",
-    `Det er vores åbningskampagne. Den kører i seks måneder, til og med ${day}, og den kan slutte før tid. Derefter betaler køberen 5 % af varerne + 5 kr pr. pakke i køberbeskyttelse. Et køb, du har betalt under kampagnen, bliver ikke dyrere bagefter.`,
-  ];
   return BASE.map((g) => ({
     ...g,
-    qa: (g.title === "Betaling og fragt" ? [g.qa[0], why, ...g.qa.slice(1)] : g.qa).map(([q, a]): [string, string] =>
+    qa: g.qa.map(([q, a]): [string, string] =>
       q === "Hvad koster det at købe?"
         ? [
             q,
@@ -95,7 +88,7 @@ function withFree(day: string | null) {
 }
 
 export default async function Faq() {
-  const free = await feeFreeCopy();
+  const free = await feeFreeState();
   const GROUPS = withFree(free.active && free.until ? feeFreeDay(free.until) : null);
   const ld = {
     "@context": "https://schema.org",
@@ -114,7 +107,7 @@ export default async function Faq() {
             <span aria-hidden="true">/</span>
             <span>Spørgsmål og svar</span>
           </nav>
-          <h1 className="h1" id="h-faq">Spørgsmål og svar om at købe og sælge second hand live</h1>
+          <h1 className="h1" id="h-faq">Spørgsmål og svar om Relived</h1>
           <nav className="howto-jump" aria-label="Spring til">
             {GROUPS.map((g) => (
               <a key={g.title} href={`#${groupId(g.title)}`}>{g.title}</a>
