@@ -4,7 +4,7 @@ import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import CampaignCards from "@/components/CampaignCards";
 import CategoryCards from "@/components/CategoryCards";
-import { ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
+import { ItemTile, ShowTile } from "@/components/feed/FeedTiles";
 import HomeHero from "@/components/feed/HomeHero";
 import Program from "@/components/feed/Program";
 import RailHello from "@/components/feed/RailHello";
@@ -129,13 +129,7 @@ export default async function Forside() {
           <Program live={live} upcoming={upcoming} />
         </div>
 
-        <section className="feed-hero" aria-labelledby="h-feed">
-          <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
-          <div className="feed-grid sparse">
-            <WelcomeTile hasItems={forSale.length > 0} launched={launched()} liveCount={live.length} />
-          </div>
-        </section>
-
+        {/* Det store videokort er væk: toppen (HomeHero) viser nu selv et show. */}
         <aside className="feed-rail" aria-label="Til dig">
           <RailMine />
           {/* Programmet står øverst på siden (components/feed/Program.tsx). Her står kun forklaringen, når det er tomt. */}
