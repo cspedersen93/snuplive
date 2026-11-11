@@ -128,6 +128,7 @@ export default async function Forside() {
             <Link href="/budsalg">Budsalg</Link>
             <Link href="/til-salg">Til salg</Link>
             <Link href="/klip">Klip</Link>
+            <Link href="/foelger">Følger</Link>
           </nav>
 
           <Program live={live} upcoming={upcoming} />

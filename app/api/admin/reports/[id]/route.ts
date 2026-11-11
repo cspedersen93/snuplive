@@ -2,7 +2,7 @@ import { revalidatePath } from "next/cache";
 import { fail, json } from "@/lib/api";
 import { COMPANY } from "@/lib/company";
 import { isAdminEmail, sendMail } from "@/lib/mail";
-import { targetInfo } from "@/lib/moderation";
+import { moderatePost, targetInfo } from "@/lib/moderation";
 import { isReportTarget } from "@/lib/reports";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserInfo } from "@/lib/supabase/server";
@@ -38,9 +38,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     (open ?? []).map((r) => r.reporter_email).filter((e): e is string => Boolean(e)),
   );
 
-  const { data, error } = await admin.rpc("admin_moderate", { p_report: id, p_action: action, p_decision: decision || null });
-  if (error) return fail(error.message, 409);
-  const res = (Array.isArray(data) ? data[0] : data) as { owner_id: string | null } | null;
+  let res: { owner_id: string | null } | null;
+  if (report.target_type === "post") {
+    try {
+      res = await moderatePost(admin, report.target_id, action, decision);
+    } catch (e) {
+      return fail(e instanceof Error ? e.message : "Noget gik galt.", 409);
+    }
+  } else {
+    const { data, error } = await admin.rpc("admin_moderate", { p_report: id, p_action: action, p_decision: decision || null });
+    if (error) return fail(error.message, 409);
+    res = (Array.isArray(data) ? data[0] : data) as { owner_id: string | null } | null;
+  }
   console.info("[snuplive] admin", user.email, "anmeldelse", action, id);
   // Det fjernede skal forsvinde fra forsiden, kategorierne og tingens egen side med det samme.
   if (action === "remove") revalidatePath("/", "layout");
@@ -62,7 +71,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           "",
           `Begrundelse: ${decision}`,
           "",
-          "Ordrer, der allerede er betalt, bliver gjort færdige eller refunderet.",
+          ...(report.target_type === "post" ? [] : ["Ordrer, der allerede er betalt, bliver gjort færdige eller refunderet."]),
           `Er du uenig, så svar på denne mail eller skriv til ${COMPANY.email}, så ser vi på det igen.`,
           "",
           "Hilsen Relived",

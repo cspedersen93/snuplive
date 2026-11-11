@@ -16,6 +16,7 @@ import MitIdResult from "@/components/MitIdResult";
 import { mitidState } from "@/lib/mitid";
 import BecomeSeller from "./BecomeSeller";
 import ProfileForm from "./ProfileForm";
+import { fetchProfileExtra } from "@/lib/posts";
 import SavedSearches, { type SavedSearch } from "./SavedSearches";
 import { SITE_HOST } from "@/lib/env";
 import { videoShowId } from "@/lib/videoShow";
@@ -136,7 +137,7 @@ export default async function Konto() {
 
         {levels ? <LevelBox p={levels} uid={uid} /> : null}
 
-        <ProfileForm profile={profile} />
+        <ProfileForm profile={profile} extra={profile.is_seller ? await fetchProfileExtra(supabase, uid) : null} />
 
         {following ? (
           <div className="box" id="foelger">

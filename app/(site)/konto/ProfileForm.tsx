@@ -4,13 +4,16 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Avatar from "@/components/Avatar";
 import { HANDLE_RE } from "@/lib/format";
-import { resizeImage } from "@/lib/resizeImage";
+import { storageUrl } from "@/lib/images";
+import { BIO_MAX, type ProfileExtra } from "@/lib/posts";
+import { fitImage, resizeImage } from "@/lib/resizeImage";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import type { Profile } from "@/lib/types";
 import { SITE_HOST } from "@/lib/env";
 
-export default function ProfileForm({ profile }: { profile: Profile }) {
+/** extra er teksten og forsidebilledet på sælgerprofilen (0037_profil_opslag.sql). null: ikke slået til endnu. */
+export default function ProfileForm({ profile, extra = null }: { profile: Profile; extra?: ProfileExtra | null }) {
   const router = useRouter();
   const [handle, setHandle] = useState(profile.handle);
   const [name, setName] = useState(profile.display_name ?? "");
@@ -20,6 +23,50 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
   const [avatarPath, setAvatarPath] = useState(profile.avatar_path ?? null);
   const [uploading, setUploading] = useState(false);
   const [imgErr, setImgErr] = useState<string | null>(null);
+  const shop = Boolean(extra) && profile.is_seller;
+  const [bio, setBio] = useState(extra?.bio ?? "");
+  const [coverPath, setCoverPath] = useState(extra?.cover_path ?? null);
+  const [coverBusy, setCoverBusy] = useState(false);
+  const [coverErr, setCoverErr] = useState<string | null>(null);
+
+  async function onCover(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return setCoverErr("Vælg et billede (JPG, PNG eller HEIC fra telefonen).");
+    if (file.size > 20 * 1024 * 1024) return setCoverErr("Billedet er for stort. Vælg et under 20 MB.");
+    setCoverErr(null);
+    setCoverBusy(true);
+    const sb = getSupabase();
+    try {
+      const jpeg = await fitImage(file, 1800, 0.82);
+      const path = `${profile.id}/profil-${Date.now().toString(36)}.jpg`;
+      const up = await sb.storage.from("covers").upload(path, jpeg, { contentType: "image/jpeg", cacheControl: "31536000" });
+      if (up.error) throw up.error;
+      const { error } = await sb.from("profiles").update({ cover_path: path }).eq("id", profile.id);
+      if (error) throw error;
+      if (coverPath) await sb.storage.from("covers").remove([coverPath]);
+      setCoverPath(path);
+      toast("Dit forsidebillede er gemt");
+      router.refresh();
+    } catch (err) {
+      setCoverErr(errorText(err, "Billedet kunne ikke gemmes. Prøv et andet billede."));
+    } finally {
+      setCoverBusy(false);
+    }
+  }
+
+  async function removeCover() {
+    if (!coverPath) return;
+    setCoverBusy(true);
+    const sb = getSupabase();
+    const { error } = await sb.from("profiles").update({ cover_path: null }).eq("id", profile.id);
+    if (!error) await sb.storage.from("covers").remove([coverPath]);
+    setCoverBusy(false);
+    if (error) return setCoverErr(errorText(error));
+    setCoverPath(null);
+    router.refresh();
+  }
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -70,7 +117,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
     setErr(null);
     const { error } = await getSupabase()
       .from("profiles")
-      .update({ handle: h, display_name: name.trim() || null, area: area.trim() || null })
+      .update({ handle: h, display_name: name.trim() || null, area: area.trim() || null, ...(shop ? { bio: bio.trim() || null } : {}) })
       .eq("id", profile.id);
     setBusy(false);
     if (error) return setErr(errorText(error));
@@ -80,7 +127,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
   }
 
   return (
-    <form className="inline-form" onSubmit={save} noValidate>
+    <form className="inline-form" id="profil" onSubmit={save} noValidate>
       <h2 className="h3">Profil</h2>
       <div className="avatar-edit">
         <Avatar handle={handle || profile.handle} path={avatarPath} size={76} />
@@ -112,6 +159,33 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
           <input id="pf-area" value={area} onChange={(e) => setArea(e.target.value)} maxLength={40} placeholder="Fx Nørrebro" />
         </div>
       </div>
+      {shop ? (
+        <>
+          <div className="field">
+            <label htmlFor="pf-bio">Om dig og det, du sælger (valgfrit)</label>
+            <textarea id="pf-bio" value={bio} onChange={(e) => setBio(e.target.value)} maxLength={BIO_MAX} rows={3} placeholder="Fx: Jeg sælger vintage-strik og lædertasker fra Nørrebro. Nye varer hver søndag." />
+            <span className="fine">{BIO_MAX - bio.length} tegn tilbage. Vises øverst på din sælgerprofil.</span>
+          </div>
+          <div className="cover-edit">
+            {coverPath ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={storageUrl("covers", coverPath)} alt="" />
+            ) : (
+              <span className="cover-none">Intet forsidebillede</span>
+            )}
+            <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <input id="pf-cover" className="file-input" type="file" accept="image/*" onChange={onCover} disabled={coverBusy} />
+              <label className={`btn btn-line btn-sm${coverBusy ? " is-busy" : ""}`} htmlFor="pf-cover">
+                {coverBusy ? "Gemmer …" : coverPath ? "Skift forsidebillede" : "Tilføj forsidebillede"}
+              </label>
+              {coverPath && !coverBusy ? <button className="linkbtn" type="button" onClick={removeCover}>Fjern billede</button> : null}
+              <a className="linkbtn" href={`/profil/${profile.handle}`}>Se din sælgerprofil</a>
+            </div>
+            <span className="fine">Et bredt billede øverst på din sælgerprofil, fx af dine varer eller din stue.</span>
+            {coverErr ? <span className="err" role="alert">{coverErr}</span> : null}
+          </div>
+        </>
+      ) : null}
       <p className="fine">Dit brugernavn bliver vist i chatten og i adressen til dine shows: {SITE_HOST}/live/{handle.trim().toLowerCase() || "brugernavn"}</p>
       {err ? <p className="err" role="alert">{err}</p> : null}
       <div>

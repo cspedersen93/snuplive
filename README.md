@@ -1200,3 +1200,21 @@ Husk også at oprette mailadressen `kontakt@relived.dk`, som privatlivspolitikke
   "miljøvenlig" uden dokumentation, og CO2-påstande skal kunne bevises. Tælleren bruger Relivids egne tal og lover intet
   om CO2. Skriv ikke de generelle ord om Relived i teksterne uden at tjekke reglerne først.
 - Koden: `supabase/migrations/0035_genbrug.sql`, `lib/reuse.ts`, `components/ReuseCounter.tsx` og `app/(site)/konto/page.tsx`.
+
+## Sælgerprofil og opslag
+
+`/profil/[handle]` er sælgerens profil: forsidebillede, en kort tekst, tal (følgere, solgte varer, medlem siden),
+næste show, **opslag**, varer til salg og bedømmelser. Selve showet ligger stadig på `/live/[handle]`, som linker til profilen.
+Købere har ikke en profil og bliver sendt til `/live/[handle]`.
+
+- **Databasen:** `supabase/migrations/0037_profil_opslag.sql` (profiles.bio, profiles.cover_path, tabellen `posts`, og
+  opslag som noget, der kan anmeldes). Før den er kørt, vises profilen uden tekst, forsidebillede og opslag (`lib/posts.ts`
+  giver `null`), og `/api/opslag` svarer 503.
+- **Skrive:** sælgeren skriver på sin egen profil (`components/posts/PostComposer.tsx`): højst 600 tegn, fire billeder og
+  eventuelt et af sine kommende shows. Billederne ligger i lageret `covers` under sælgerens egen mappe (`<id>/opslag-…jpg`),
+  og databasen afviser andre stier. Højst 10 opslag i døgnet. `/api/opslag` gemmer opslaget og sender en besked til følgerne.
+- **Læse:** `/foelger` samler opslag fra de sælgere, man følger (kræver login). Fanen "Følger" på forsiden fører dertil.
+- **Anmelde:** hvert opslag har "Anmeld opslaget". Anmeldelsen lander i `/admin/anmeldelser`, og "Fjern opslaget" skjuler det
+  (`moderatePost` i `lib/moderation.ts`; opslag ligger uden for `admin_moderate()` i databasen).
+- **Rette profilen:** tekst og forsidebillede sættes under Min konto → Profil (kun sælgere).
+- Der er ingen kommentarer eller hjerter på opslag endnu. Det er bevidst udskudt, til vi ved, om opslagene bliver brugt.

@@ -77,6 +77,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!h || seen.has(h)) continue;
       seen.add(h);
       pages.push({ url: `${SITE_URL}/live/${h}`, lastModified: new Date(row.created_at), changeFrequency: "daily", priority: 0.6 });
+      // Sælgerens profil med opslag og varer til salg.
+      pages.push({ url: `${SITE_URL}/profil/${h}`, lastModified: new Date(row.created_at), changeFrequency: "daily", priority: 0.5 });
     }
     // Ting, der kan købes nu eller bliver vist snart. Solgte ting er ikke med.
     for (const kind of ["for_sale", "upcoming"] as const) {

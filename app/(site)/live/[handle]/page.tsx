@@ -231,6 +231,7 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
         {d.guestAt ? <GuestAtBanner handle={d.seller.handle} at={d.guestAt} /> : null}
         {d.seller.is_seller ? <FollowButton sellerId={d.seller.id} handle={d.seller.handle} next={`/live/${d.seller.handle}`} className="btn btn-ivory btn-sm" /> : null}
         {d.seller.is_seller ? <SellerFacts seller={d.seller} bundle={d.bundle} level={d.level} /> : null}
+        {d.seller.is_seller ? <p style={{ marginTop: 14 }}><Link className="btn btn-line btn-sm" href={`/profil/${d.seller.handle}`}>Se {d.seller.handle}s profil og opslag</Link></p> : null}
         {!d.seller.is_seller ? <BadgeList badges={d.level?.badges} role="buyer" className="profile-badges" /> : null}
         <div className="empty" style={{ marginTop: 18 }}>
           <p style={{ marginBottom: 14 }}>
@@ -276,6 +277,9 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
         bundle={d.bundle}
         sellerLevel={d.level}
       />
+      <div className="wrap" style={{ paddingBottom: 24 }}>
+        <Link className="btn btn-line btn-sm" href={`/profil/${d.seller.handle}`}>Se {d.seller.handle}s profil og opslag</Link>
+      </div>
       {d.ratings.length ? (
         <div className="wrap" style={{ paddingBottom: 64 }}>
           <SellerRatings handle={d.seller.handle} ratings={d.ratings} avg={d.seller.rating_avg} count={d.seller.rating_count} />

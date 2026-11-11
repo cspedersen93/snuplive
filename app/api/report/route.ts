@@ -40,10 +40,12 @@ export async function POST(req: Request) {
       ? await admin.from("items").select("id,name,seller:profiles!items_seller_id_fkey(handle)").eq("id", targetId).maybeSingle()
       : type === "show"
         ? await admin.from("shows").select("id,title,seller:profiles!shows_seller_id_fkey(handle)").eq("id", targetId).maybeSingle()
-        : await admin.from("profiles").select("id,handle").eq("id", targetId).maybeSingle();
+        : type === "post"
+          ? await admin.from("posts").select("id,body,seller:profiles!posts_seller_id_fkey(handle)").eq("id", targetId).is("removed_at", null).maybeSingle()
+          : await admin.from("profiles").select("id,handle").eq("id", targetId).maybeSingle();
   if (!target.data) return fail("Vi kunne ikke finde det, du vil anmelde.", 404);
-  const t = target.data as { name?: string; title?: string; handle?: string; seller?: { handle: string } | null };
-  const what = t.name ?? t.title ?? `@${t.handle}`;
+  const t = target.data as { name?: string; title?: string; body?: string; handle?: string; seller?: { handle: string } | null };
+  const what = t.name ?? t.title ?? (t.body ? `"${t.body.slice(0, 40)}"` : `@${t.handle}`);
   const owner = t.seller?.handle ?? t.handle ?? "";
 
   // Højst 10 anmeldelser i timen fra samme person, og ikke den samme to gange.
