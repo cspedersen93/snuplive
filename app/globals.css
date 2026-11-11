@@ -2252,3 +2252,6 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* Lyse knapper må ikke arve tekstskygge fra billed- og videoflader */
 .btn-ivory,.btn-line{text-shadow:none}
+
+/* Sælgerbanneret: vis ansigtet, når billedet beskæres bredt */
+.sell-panel>img{object-position:50% 18%}
