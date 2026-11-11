@@ -6,6 +6,7 @@ import CampaignCards from "@/components/CampaignCards";
 import CategoryCards from "@/components/CategoryCards";
 import { ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
 import Program from "@/components/feed/Program";
+import ShowPhone from "@/components/ShowPhone";
 import RailHello from "@/components/feed/RailHello";
 import RailMine from "@/components/feed/RailMine";
 import { IconPlay } from "@/components/Icons";
@@ -226,14 +227,7 @@ export default async function Forside() {
 
       <section className="sec band" aria-labelledby="h-how">
         <div className="wrap split">
-          <figure className="photo">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/how-live-v2.jpg" alt="En sælger viser en brun lædertaske frem til telefonen foran ringlyset" loading="lazy" width={1360} height={768} />
-            <figcaption>
-              <span className="live-dot" aria-hidden="true" />
-              Live fra stuen
-            </figcaption>
-          </figure>
+          <ShowPhone />
           <div>
             <h2 className="h2" id="h-how" style={{ marginBottom: 24 }}>Hvordan køber man brugt live?</h2>
             <ol className="steps">

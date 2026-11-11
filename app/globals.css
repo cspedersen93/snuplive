@@ -2264,3 +2264,51 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
   .sell-panel .label{text-shadow:none}
   .sell-panel .btn{align-self:stretch;justify-content:center;text-align:center}
 }
+
+/* ── Telefonen med et eksempel på et show (ShowPhone), i "Hvordan køber man brugt live?" ── */
+.hp-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:660px}
+.hp-stage::before{content:"";position:absolute;left:50%;top:50%;width:min(520px,96%);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(201,167,116,.26);pointer-events:none}
+.hp-phone{position:relative;width:306px;height:626px;padding:10px;border-radius:52px;background:linear-gradient(145deg,#3a393f 0%,#0c0c0e 38%,#0c0c0e 62%,#2c2b30 100%);box-shadow:0 0 0 1px rgba(255,236,228,.14),0 50px 90px -30px rgba(0,0,0,.95),0 0 80px -20px rgba(235,0,41,.28);transform:rotate(-4deg);transition:transform .6s var(--ease,ease)}
+.hp-stage:hover .hp-phone,.hp-phone:focus-within{transform:rotate(0)}
+.hp-key{position:absolute;width:3px;border-radius:2px;background:#2f2e33}
+.hp-key.k1{left:-3px;top:118px;height:28px}
+.hp-key.k2{left:-3px;top:164px;height:52px}
+.hp-key.k3{right:-3px;top:176px;height:78px}
+.hp-screen{position:relative;width:100%;height:100%;border-radius:42px;overflow:hidden;background:#141316;isolation:isolate}
+.hp-screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:47% 50%;z-index:-2}
+.hp-screen::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(20,19,22,.5) 0%,rgba(20,19,22,0) 20%,rgba(20,19,22,0) 46%,rgba(20,19,22,.94) 86%);pointer-events:none}
+.hp-island{position:absolute;left:50%;top:11px;width:88px;height:25px;transform:translateX(-50%);border-radius:14px;background:#000;z-index:3}
+.hp-badges{position:absolute;left:14px;right:14px;top:48px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.hp-live{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.75rem;letter-spacing:.1em;padding:6px 10px;border-radius:9px;background:var(--red);color:#fff}
+.hp-ex{font-size:.75rem;font-weight:500;padding:6px 10px;border-radius:9px;background:#141316;color:#F6F0EB}
+.hp-bottom{position:absolute;left:10px;right:10px;bottom:12px;display:flex;flex-direction:column;gap:9px}
+.hp-msgs{display:flex;flex-direction:column;gap:5px;padding:0 54px 0 6px;min-height:72px;justify-content:flex-end}
+.hp-msg{font-size:.8125rem;line-height:1.3;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.75);animation:hpIn .35s var(--ease,ease) both}
+.hp-msg b{font-weight:700;color:#E6CFA6}
+.hp-msg b.seller{color:#FF9AA8}
+.hp-msg b.me{color:var(--mint)}
+.hp-buy{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:20px;background:#1F1E22;border:1px solid rgba(255,236,228,.14)}
+.hp-buy .btn-red{padding:13px 20px}
+.hp-buy-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.hp-buy-t small{font-size:.8125rem;color:#B5AAB0}
+.hp-price{font-size:1.5rem;font-weight:700;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+.hp-done{font-size:1.125rem;font-weight:700;letter-spacing:-.02em;color:var(--mint);animation:hpIn .35s var(--ease,ease) both}
+.hp-form{display:flex;gap:8px;align-items:center}
+.hp-form input{flex:1;min-width:0;font:inherit;font-size:.875rem;padding:11px 14px;border-radius:999px;border:1px solid rgba(255,236,228,.22);background:rgba(20,19,22,.78);color:#F6F0EB}
+.hp-form input::placeholder{color:#B5AAB0}
+.hp-form input:focus{outline:none;border-color:var(--brass)}
+.hp-like{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,236,228,.22);background:rgba(20,19,22,.78);color:#FF8A9A;cursor:pointer;transition:transform .2s var(--ease,ease)}
+.hp-like:hover{transform:scale(1.08)}
+.hp-like:active{transform:scale(.9)}
+.hp-hearts{position:absolute;right:18px;bottom:178px;width:36px;height:230px;pointer-events:none}
+.hp-heart{position:absolute;right:6px;bottom:0;color:#FF5A78;animation:hpRise 2.6s ease-out both}
+.hp-heart.v1{color:#FF9AA8;right:14px;animation-duration:3s}
+.hp-heart.v2{color:#F6F0EB;right:0;animation-duration:2.3s}
+@keyframes hpRise{0%{opacity:0;transform:translateY(0) scale(.5)}15%{opacity:1;transform:translateY(-24px) scale(1)}100%{opacity:0;transform:translateY(-220px) translateX(-10px) scale(.8)}}
+@keyframes hpIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (max-width:520px){
+  .hp-stage{min-height:590px}
+  .hp-phone{width:280px;height:572px;border-radius:48px}
+  .hp-screen{border-radius:39px}
+}
+@media (prefers-reduced-motion:reduce){.hp-phone{transform:none;transition:none}.hp-heart,.hp-msg,.hp-done{animation:none}.hp-hearts{display:none}}
