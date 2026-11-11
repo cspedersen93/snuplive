@@ -45,8 +45,9 @@ export default async function Budsalg({ searchParams }: Props) {
           {total ? <span className="label red">{total} {vareOrd(total)} på budsalg</span> : null}
           <h1 className="h1" id="h-budsalg">Budsalg live – byd på brugte varer</h1>
           <p className="lede">
-            Her er alle varer, der kommer på budsalg i de næste shows. Tryk på en vare for at se den, sætte et maks-bud eller
-            trykke Husk mig, så du er klar, når budsalget starter.
+            Når sælgeren starter et budsalg, har du 30 sekunder til at byde. Hvert bud er et fast trin højere, så du skal bare
+            trykke, og det højeste bud vinder. Her er varerne, der kommer på budsalg i de næste shows: sæt et maks-bud, eller
+            tryk Husk mig, så du er klar.
           </p>
         </div>
       </section>

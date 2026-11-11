@@ -1,4 +1,4 @@
-import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
+import { feeFreeDay, feeFreeCopy } from "@/lib/feeFree";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IconCamera, IconChat, IconShield, IconShieldCheck, IconStar, IconUser } from "@/components/Icons";
@@ -42,7 +42,7 @@ export default async function Saadan() {
   const { bundles, offers } = await features();
   const ship = DELIVERY.ship.price;
   // Regneeksemplet: 2 varer til 200 kr hos samme sælger, med 10 % i samlerabat, hvis den findes.
-  const free = await feeFreeState();
+  const free = await feeFreeCopy();
   const freeDay = free.active && free.until ? feeFreeDay(free.until) : null;
   const ex = orderAmounts(400, "ship", bundles ? bundleDiscount(400, 2, { pct2: 10, pct3: 15 }) : 0, "small", Boolean(freeDay));
 

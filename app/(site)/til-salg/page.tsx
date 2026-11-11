@@ -65,7 +65,7 @@ export default async function TilSalg({ searchParams }: Props) {
           </nav>
           {total ? <span className="label mint">{total} {vareOrd(total)} til salg</span> : null}
           <h1 className="h1" id="h-til-salg">{cat ? `${cat.label} til salg` : "Brugt til salg – køb nu til fast pris"}</h1>
-          <p className="lede">Alt her er vist frem på video, i et live-show eller i en videoannonce. Køb det til fast pris lige nu.</p>
+          <p className="lede">Gik du glip af showet? Varerne her er vist frem på video, og du ser dem præcis, som de blev vist. Tryk Køb nu, så er varen din.</p>
           <SearchForm compact s={{ category: cat?.key ?? null }} />
           {items.some((i) => i.clip_path) ? (
             <Link className="btn btn-line" href="/klip" style={{ marginTop: 18 }}>

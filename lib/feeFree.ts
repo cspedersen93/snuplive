@@ -164,3 +164,15 @@ export async function enforceFeeFreeCap(admin: SupabaseClient): Promise<{ settin
   console.info("[snuplive] gratis-kampagnen er stoppet: loftet er nået", spend.cost);
   return { setting: value, spend, stopped: true };
 }
+
+/**
+ * Til teksterne på siden (ikke til priser i kurven): som feeFreeState, men på en testside hos Vercel (preview)
+ * vises kampagneteksterne altid med en slutdato seks måneder frem, så de kan læses, før kampagnen er startet.
+ */
+export async function feeFreeCopy(): Promise<FeeFreeState> {
+  const real = await feeFreeState();
+  if (real.active || process.env.VERCEL_ENV !== "preview") return real;
+  const d = new Date();
+  d.setMonth(d.getMonth() + FEE_FREE_MONTHS);
+  return { active: true, until: d.toISOString() };
+}

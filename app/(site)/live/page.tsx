@@ -35,6 +35,10 @@ export default async function LiveNu() {
             {live.length === 0 ? "Ingen er live lige nu" : live.length === 1 ? "1 sælger er live" : `${live.length} sælgere er live`}
           </span>
           <h1 className="h1" id="h-live">Live shopping lige nu</h1>
+          <p className="lede">
+            Et show er en sælger, et kamera og en bunke varer. Du ser hver vare blive holdt op, spørger i chatten og trykker Køb,
+            når du har set nok. Starter showet først senere, trykker du Husk mig, så får du besked.
+          </p>
         </div>
       </section>
 

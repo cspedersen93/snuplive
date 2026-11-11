@@ -2333,3 +2333,25 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
   .hh-trust{font-size:.8125rem;gap:6px 16px}
 }
 @media (prefers-reduced-motion:reduce){.hh-msg,.hh-omsg,.hh-done{animation:none}}
+
+/* ── Nye forsidesektioner (tekstrunden) ── */
+.hh-h1{max-width:15ch;font-size:clamp(2.4rem,5.1cqw,4.3rem)}
+.why{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,5vw,72px);align-items:start}
+.why .h2{margin-top:12px;max-width:14ch}
+.why-body{display:flex;flex-direction:column;align-items:flex-start;gap:22px}
+.why-body p{color:#D9D0D2;font-size:clamp(1.0625rem,1.5vw,1.25rem);line-height:1.6}
+.price-card{display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding:clamp(24px,4vw,48px);border-radius:24px;background:var(--surface);border:1px solid rgba(185,217,198,.3)}
+.price-card .h2{max-width:18ch}
+.price-card p{max-width:44em;color:#D9D0D2;font-size:1.0625rem;line-height:1.6}
+.price-card .price-fine{font-size:.9375rem;color:var(--muted)}
+.price-card .price-fine a{color:#F6F0EB;text-decoration:underline}
+.safe4{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.safe4 li{display:flex;flex-direction:column;gap:8px;padding:22px;border-radius:20px;background:var(--surface);border:1px solid var(--line)}
+.safe4 li::before{content:"";width:16px;height:9px;border-left:2px solid var(--mint);border-bottom:2px solid var(--mint);transform:rotate(-45deg);margin:4px 0 6px 2px}
+.safe4 h3{font-size:1.125rem;letter-spacing:-.02em;line-height:1.2}
+.safe4 p{color:var(--muted);font-size:.9375rem;line-height:1.5}
+.todo-note{display:inline-block;padding:6px 10px;border-radius:8px;border:1px dashed var(--brass);color:var(--brass);font-family:var(--mono);font-size:.8125rem}
+@media (max-width:980px){.safe4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.why{grid-template-columns:minmax(0,1fr)}.why .h2{max-width:none}}
+@media (max-width:520px){.safe4{grid-template-columns:minmax(0,1fr)}}
+@container (max-width:700px){.hh-h1{font-size:clamp(2.1rem,9.6cqw,2.7rem);max-width:none}}

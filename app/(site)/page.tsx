@@ -17,6 +17,7 @@ import FreeNote from "@/components/FreeNote";
 import ReuseCounter from "@/components/ReuseCounter";
 import type { FeedItem, ShowWithSeller } from "@/lib/types";
 import { campaignFlags } from "@/lib/campaignFlags";
+import { feeFreeCopy, feeFreeDay } from "@/lib/feeFree";
 import { campaignState } from "@/lib/campaigns";
 import { inBeta, launched } from "@/lib/launch";
 import { SITE_URL } from "@/lib/env";
@@ -33,9 +34,9 @@ type Tile = { kind: "show"; show: ShowWithSeller } | { kind: "item"; item: FeedI
 export const revalidate = 30;
 
 export const metadata: Metadata = {
-  title: { absolute: "Køb og sælg second hand live på video | Relived" },
+  title: { absolute: "Køb second hand live på video | Relived" },
   description:
-    "Køb second hand live: se tøjet, tasken eller lampen på video, spørg sælgeren i chatten, og køb med ét tryk. Sælgeren får først pengene, når du har varen.",
+    "Se varen på video, spørg sælgeren i chatten, og køb med ét tryk. Sælgeren får først pengene, når du har varen i hånden.",
   openGraph: { title: "Second hand, du kan se live, før du køber", images: [OG_IMAGE] },
   alternates: { canonical: "/", languages: { "da-DK": "/", en: "/en" } },
 };
@@ -73,6 +74,8 @@ export default async function Forside() {
   const moreForSale = forSale.filter((it) => !usedSale.has(it.id)).slice(0, 10);
   const soonShows = upcoming.slice(0, 4);
   const camp = campaignState(new Date(), flags);
+  const free = await feeFreeCopy();
+  const freeDay = free.active && free.until ? feeFreeDay(free.until) : null;
   const campTitle =
     camp.gf.phase !== "over" && camp.jk.phase !== "over"
       ? "Vær med til Green Friday og julekalenderen"
@@ -98,6 +101,7 @@ export default async function Forside() {
         <div className="feed-top">
           <HomeHero
             liveCount={live.length}
+            free={Boolean(freeDay)}
             liveHref={live.length === 1 && live[0].seller?.handle ? `/live/${live[0].seller.handle}` : "/live"}
             nextCard={
               upcoming[0] ? (
@@ -157,7 +161,7 @@ export default async function Forside() {
             <ul className="rail-checks">
               <li>Sælgeren får først pengene, når du har varen.</li>
               <li>Alt fra samme sælger i én pakke, fra {DELIVERY.ship.price} kr til pakkeshop.</li>
-              <li>14 dages fortrydelsesret, når du køber på afstand.</li>
+              <li>Er varen ikke som vist, melder du et problem, og pengene venter.</li>
             </ul>
             <Link className="rail-link" href="/saadan-virker-det#priser">Priser, fragt og rabat</Link>
           </section>
@@ -205,6 +209,47 @@ export default async function Forside() {
         extra={moreForSale.some((i) => i.clip_path) ? { href: "/klip", label: "Swipe gennem klip" } : undefined}
       />
 
+      <section className="sec band" aria-labelledby="h-video">
+        <div className="wrap why">
+          <div>
+            <span className="label brass">Derfor live</span>
+            <h2 className="h2" id="h-video">Billeder viser det pæne. Video viser det hele.</h2>
+          </div>
+          <div className="why-body">
+            <p>
+              Du kender det: fire billeder, en kort tekst og et håb om, at farven passer. På Relived holder sælgeren varen op til
+              kameraet, vender den og viser dig lynlåsen, foret og det lille mærke på ærmet. Er du i tvivl, spørger du, og
+              sælgeren svarer med det samme.
+            </p>
+            <Link className="btn btn-ivory" href="/til-salg">Se varer på video</Link>
+          </div>
+        </div>
+      </section>
+
+      {freeDay ? (
+        <section className="sec" aria-labelledby="h-pris">
+          <div className="wrap">
+            <div className="price-card">
+              <span className="label mint">Åbningskampagne</span>
+              <h2 className="h2" id="h-pris">Hvad koster det? Lige nu 0 kr i gebyr</h2>
+              <p>
+                Vi er nye, og vi vil gerne have, at du prøver os. Derfor betaler hverken køber eller sælger gebyr i vores
+                åbningskampagne. Du betaler varens pris og fragten, og du er lige så godt beskyttet som ellers.
+              </p>
+              <p className="price-fine">
+                Kampagnen kører i seks måneder, til og med {freeDay}, og den kan slutte før tid. Derefter betaler køberen en
+                køberbeskyttelse på 5 % af varerne + 5 kr pr. pakke. Det er stadig gratis at sælge.{" "}
+                <Link href="/saadan-virker-det#priser">Se vilkår</Link>
+              </p>
+              <div className="ctas">
+                <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+                <Link className="btn btn-line" href="/saelg">Sælg dine varer</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="sec tight" aria-labelledby="h-kategorier">
         <div className="wrap">
           <div className="row-head">
@@ -226,17 +271,33 @@ export default async function Forside() {
             </figcaption>
           </figure>
           <div>
-            <h2 className="h2" id="h-how" style={{ marginBottom: 24 }}>Hvordan køber man brugt live?</h2>
+            <h2 className="h2" id="h-how" style={{ marginBottom: 24 }}>Hvordan køber jeg på Relived?</h2>
             <ol className="steps">
               <li><div><h3>Find et show eller en vare</h3><p>Se, hvem der er live, eller tryk Husk mig på et show, der starter senere. Så giver vi dig besked.</p></div></li>
-              <li><div><h3>Se den tæt på, og spørg</h3><p>Bed sælgeren vise mærket, målene og slid tæt på. Du får svar, mens du ser med.</p></div></li>
-              <li><div><h3>Køb eller byd</h3><p>Tryk Køb, eller byd med på budsalg. Du betaler samlet bagefter, og alt fra samme sælger kommer i én pakke.</p></div></li>
+              <li><div><h3>Se varen, og spørg løs</h3><p>Mål, stand, pasform og lugt af røg: spørg om det, billeder aldrig svarer på.</p></div></li>
+              <li><div><h3>Køb med ét tryk</h3><p>Den første, der trykker Køb, får varen. På budsalg vinder det højeste bud.</p></div></li>
+              <li><div><h3>Hent pakken, og sig god for den</h3><p>Sælgeren får først pengene, når du har fået varen og bekræftet, at alt er i orden.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
-              <Link className="btn btn-ivory" href="/live">Find et show</Link>
+              <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
               <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="sec tight" aria-labelledby="h-tryg">
+        <div className="wrap">
+          <div className="row-head">
+            <h2 className="h2" id="h-tryg">Er det trygt at handle her?</h2>
+            <Link className="btn btn-line" href="/saadan-virker-det#tryg-handel">Læs om tryg handel</Link>
+          </div>
+          <ul className="safe4">
+            <li><h3>Pengene venter</h3><p>Vi holder betalingen tilbage, til du har varen.</p></li>
+            <li><h3>Du ser, hvem du handler med</h3><p>Stjerner, niveau og om sælgeren er privat eller en virksomhed.</p></li>
+            <li><h3>Mærkevarer bliver tjekket</h3><p>Luksusvarer til 1.000 kr eller mere skal ægthedstjekkes, før de kan sælges.</p></li>
+            <li><h3>Vi hjælper, hvis noget går galt</h3><p>Tryk Meld et problem på ordren, så venter pengene, til sagen er afgjort.</p></li>
+          </ul>
         </div>
       </section>
 
@@ -246,10 +307,10 @@ export default async function Forside() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/img/sell-phone-v2.jpg" alt="En sælger viser en lædertaske frem til telefonen på stativet, med trøjer og et tøjstativ ved siden af" loading="lazy" />
             <span className="label red">Til sælgere</span>
-            <h2 className="h2" id="h-saelg" style={{ maxWidth: "16ch" }}>Har du selv noget, der skal videre?</h2>
+            <h2 className="h2" id="h-saelg" style={{ maxWidth: "16ch" }}>Har du selv varer, der skal videre?</h2>
             <p style={{ maxWidth: 520, color: "rgba(246,240,235,.88)" }}>
-              Sælg brugte fund, ubrugte fejlkøb og nye restpartier live. Gå live fra stuen eller butikken, og sælg en hel bunke på
-              én aften i stedet for at lægge annoncer op én ad gangen. {inBeta() ? "Det er gratis at sælge, mens vi er i beta." : "Det er gratis at sælge."}
+              Tøm skabet på én aften i stedet for at lægge annoncer op én ad gangen. Du går live fra stuen med din telefon,
+              viser varerne frem og svarer på spørgsmål undervejs. {inBeta() ? "Det er gratis at sælge, mens vi er i beta." : "Det er gratis at sælge."}
             </p>
             <Link className="btn btn-ivory" href="/saelg">Sådan sælger du live</Link>
           </article>

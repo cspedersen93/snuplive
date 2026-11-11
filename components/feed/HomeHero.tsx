@@ -27,11 +27,14 @@ const SCRIPT: Msg[] = [
 export default function HomeHero({
   liveHref,
   liveCount,
+  free = false,
   nextCard,
   children,
 }: {
   liveHref: string;
   liveCount: number;
+  /** Kører gratis-kampagnen (0 kr i gebyr)? */
+  free?: boolean;
   /** Kortet med næste show (kun på brede skærme). */
   nextCard?: ReactNode;
   /** Noter under knapperne (gratis-kampagnen og genbrugstælleren). */
@@ -77,7 +80,7 @@ export default function HomeHero({
           <span className="label brass feed-eyebrow">Live Sale · Second Hand</span>
         )}
         <h1 id="h-forside" className="hh-h1">
-          Køb second hand <em className="s">live.</em> <span className="hh-dim">Se varen, før den er din.</span>
+          Second hand uden gætterier. <span className="hh-dim">Se varen <em className="s">live</em>, og spørg sælgeren.</span>
         </h1>
         <p className="hh-lede">
           Sælgeren viser varen frem på video. Du spørger i chatten og køber med ét tryk. Pengene holdes tilbage, til du har
@@ -92,8 +95,9 @@ export default function HomeHero({
           <Link className="btn btn-line" href="/saelg">Sælg dine varer</Link>
         </div>
         <ul className="hh-trust">
+          {free ? <li>0 kr i gebyr for køber og sælger</li> : null}
           <li>Beskyttet betaling</li>
-          <li>Gratis at sælge i beta</li>
+          {free ? null : <li>Gratis at sælge i beta</li>}
           <li className="hh-wide">Ingen app, det hele sker på siden</li>
         </ul>
         {children}
