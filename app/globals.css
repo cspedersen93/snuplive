@@ -2249,3 +2249,6 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
   .btn,.icard,.icard-img,.icard-img img{transition:none}
   .btn:hover,.icard:hover{transform:none}
 }
+
+/* Lyse knapper må ikke arve tekstskygge fra billed- og videoflader */
+.btn-ivory,.btn-line{text-shadow:none}
