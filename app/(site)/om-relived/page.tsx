@@ -33,7 +33,6 @@ export default async function OmRelived() {
         Det ville vi lave om. På et loppemarked tager du varen i hånden, vender den og spørger sælgeren. Det samme sker på
         Relived, bare på video. <Link href="/saadan-virker-det">Se, hvordan det virker</Link>.
       </p>
-      <p className="todo-note">[STIFTERNES HISTORIE: to til tre sætninger med jeres egne ord]</p>
       <ReuseCounter n={reused} />
 
       <h2>Hvad tror vi på?</h2>
@@ -46,7 +45,6 @@ export default async function OmRelived() {
 
       <h2>Hvem står bag?</h2>
       <p>Relived er lavet i Hvidovre af Casper Pedersen og Kasper Vahlgren.</p>
-      <p className="todo-note">[BILLEDE AF STIFTERNE]</p>
       <p>
         <Link className="btn btn-red" href="/live">Se hvem der er live</Link>{" "}
         <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
@@ -55,7 +53,7 @@ export default async function OmRelived() {
       <h2>Hvordan kontakter jeg Relived?</h2>
       <p>
         Skriv til os i chatten (<SupportLink className="sup-link inline">åbn chatten</SupportLink>, eller tryk <b>Hjælp</b> nederst på
-        siden), eller send en mail til <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. <span className="todo-note">[SVARTID: hvor hurtigt I svarer]</span>{" "}
+        siden), eller send en mail til <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
         Gælder det en ordre, så brug <b>Meld et problem</b> på ordren under Mine køb. Vil du anmelde en vare, et show eller en
         profil, så tryk <b>Anmeld</b> ved den.
       </p>

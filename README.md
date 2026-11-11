@@ -1200,3 +1200,16 @@ Husk også at oprette mailadressen `kontakt@relived.dk`, som privatlivspolitikke
   "miljøvenlig" uden dokumentation, og CO2-påstande skal kunne bevises. Tælleren bruger Relivids egne tal og lover intet
   om CO2. Skriv ikke de generelle ord om Relived i teksterne uden at tjekke reglerne først.
 - Koden: `supabase/migrations/0035_genbrug.sql`, `lib/reuse.ts`, `components/ReuseCounter.tsx` og `app/(site)/konto/page.tsx`.
+
+## Forsidens top (HomeHero)
+
+`components/feed/HomeHero.tsx` er toppen af forsiden: overskrift og knapper til venstre og et **eksempel på et show** i en
+telefon til højre (video, chat, hjerter og "Køb nu"). Det er en demonstration og mærket "Eksempel på et show": chatnavnene,
+tasken og prisen er opdigtede, og "Køb nu" køber ikke noget. Kun kortet "Næste show" og linjen "X sælgere er live nu" er
+rigtige data. På telefoner vises showet som et kort øverst uden telefonramme.
+
+- Stillbilledet (`/img/welcome-live-poster-960.webp`) hentes først, og videoen starter, når siden er klar.
+- Hjælp-knappen viger på telefoner, mens knapperne i toppen er i billedet (`body.hh-cta-in`).
+- "0 kr i gebyr" vises kun, når gratis-kampagnen kører (`feeFreeCopy()`); ellers står der "Gratis at sælge i beta".
+- Det store videokort (WelcomeTile) og kassen "Tryg handel" er fjernet fra forsiden, fordi toppen og sektionen
+  "Er det trygt at handle her?" dækker det samme.
