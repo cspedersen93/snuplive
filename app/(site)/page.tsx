@@ -211,17 +211,35 @@ export default async function Forside() {
 
       <section className="sec band" aria-labelledby="h-video">
         <div className="wrap why">
-          <div>
+          <div className="why-copy">
             <span className="label brass">Derfor live</span>
-            <h2 className="h2" id="h-video">Billeder viser det pæne. Video viser det hele.</h2>
-          </div>
-          <div className="why-body">
+            <h2 className="h2" id="h-video">Billeder viser det pæne. <span>Video viser det hele.</span></h2>
             <p>
               Du kender det: fire billeder, en kort tekst og et håb om, at farven passer. På Relived holder sælgeren varen op til
               kameraet, vender den og viser dig lynlåsen, foret og det lille mærke på ærmet. Er du i tvivl, spørger du, og
               sælgeren svarer med det samme.
             </p>
             <Link className="btn btn-ivory" href="/til-salg">Se varer på video</Link>
+          </div>
+          <div className="why-vs" role="img" aria-label="Til venstre fire små billeder af en frakke, som i en annonce. Til højre sælgeren, der holder hele frakken frem live.">
+            <figure className="why-ad">
+              <div className="why-grid">
+                <span style={{ backgroundPosition: "62% 40%" }} />
+                <span style={{ backgroundPosition: "80% 66%" }} />
+                <span style={{ backgroundPosition: "22% 74%" }} />
+                <span style={{ backgroundPosition: "56% 84%" }} />
+              </div>
+              <figcaption><b>En annonce</b>Fire billeder, og resten gætter du</figcaption>
+            </figure>
+            <figure className="why-live">
+              <div className="why-live-img">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/img/live-feed.jpg" alt="" loading="lazy" />
+                <span className="hh-live"><span className="live-dot white" aria-hidden="true" />LIVE</span>
+                <span className="why-q">Hvordan falder den i ryggen?</span>
+              </div>
+              <figcaption><b>På Relived</b>Hele varen, og du kan spørge</figcaption>
+            </figure>
           </div>
         </div>
       </section>

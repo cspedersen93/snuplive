@@ -2439,3 +2439,23 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
   .hp-hearts{bottom:96px;height:180px}
 }
 @media (prefers-reduced-motion:reduce){.hp-phone{transform:none;transition:none}.hp-heart,.hp-msg{animation:none}.hp-hearts{display:none}}
+
+/* "Derfor live": tekst til venstre, annonce over for live til højre */
+.why{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:center;gap:clamp(24px,5vw,80px)}
+.why-copy{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.why .h2{margin-top:0;max-width:15ch;font-size:clamp(1.9rem,3.4vw,3rem)}
+.why-copy p{color:#D9D0D2;font-size:clamp(1rem,1.3vw,1.1875rem);line-height:1.6;max-width:34em}
+.why-vs{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr);gap:clamp(14px,2vw,28px);align-items:end}
+.why-vs figure{margin:0;display:flex;flex-direction:column;gap:12px}
+.why-vs figcaption{display:flex;flex-direction:column;gap:2px;font-size:.9375rem;color:var(--muted);line-height:1.35}
+.why-vs figcaption b{font-family:var(--mono);font-weight:500;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:#D9D0D2}
+.why-live figcaption b{color:var(--brass)}
+.why-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px;border-radius:20px;background:var(--surface);border:1px solid var(--line)}
+.why-grid span{aspect-ratio:1;border-radius:12px;background-image:url(/img/live-feed.jpg);background-size:330%;filter:grayscale(.75) brightness(.8)}
+.why-live-img{position:relative;aspect-ratio:4/5;border-radius:24px;overflow:hidden;border:1px solid rgba(201,167,116,.4);box-shadow:0 30px 60px -30px rgba(0,0,0,.9)}
+.why-live-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%}
+.why-live-img .hh-live{position:absolute;left:12px;top:12px}
+.why-q{position:absolute;left:12px;right:12px;bottom:12px;padding:10px 14px;border-radius:14px;background:#1F1E22;border:1px solid rgba(255,236,228,.14);font-size:.9375rem;color:#F6F0EB}
+@media (max-width:900px){.why{grid-template-columns:minmax(0,1fr)}.why .h2{max-width:none}}
+.home-feed~.sec .why .h2{font-size:clamp(1.75rem,2.9vw,2.75rem);max-width:none;line-height:1.05}
+.why .h2 span{display:block;color:var(--brass)}
