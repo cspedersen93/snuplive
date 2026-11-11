@@ -2221,3 +2221,31 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 .fee-free-note{margin:-4px 0 0;color:var(--mint)}
 .free-note{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;width:fit-content;max-width:100%;margin:10px 0 0;padding:7px 14px;border-radius:14px;background:rgba(185,217,198,.12);color:var(--mint);font-size:.875rem;font-weight:600}
 .free-note a{color:inherit;font-weight:500}
+
+/* Designsystem (november 2026): messing for kvalitet, lys knap til den næstvigtigste handling, rolige bevægelser.
+   Rød bruges kun til at købe, betale, oprette og gå live. Mint er tryghed. Se README → Designsystem. */
+:root{--brass:#C9A774;--ease:cubic-bezier(.2,.8,.2,1)}
+.label.brass{color:var(--brass)}
+.btn{transition:background-color .2s,border-color .2s,color .2s,transform .2s var(--ease),box-shadow .2s}
+.btn:active:not(:disabled){transform:scale(.98)}
+.btn-red:hover:not(:disabled){box-shadow:0 10px 28px -10px rgba(235,0,41,.7)}
+.btn-ivory{background:var(--text);color:var(--bg)}
+.btn-ivory:hover{background:#fff}
+.icard{transition:transform .32s var(--ease)}
+.icard-img{border-radius:20px;transition:box-shadow .32s}
+@media (hover:hover){
+  .icard:hover{transform:translateY(-4px)}
+  .icard:hover .icard-img{box-shadow:0 24px 48px -24px rgba(0,0,0,.9)}
+}
+.icard-info strong{font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--brass);box-shadow:0 0 0 4px rgba(201,167,116,.18)}
+.prog-card{border-radius:20px}
+.trust3 li{border-radius:16px}
+.trust3 li.brass svg{color:var(--brass)}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(255,255,255,.55)}70%{box-shadow:0 0 0 8px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+.live-dot.white{animation:ring 1.8s ease-out infinite}
+@media (prefers-reduced-motion: reduce){
+  .live-dot,.live-dot.white{animation:none}
+  .btn,.icard,.icard-img,.icard-img img{transition:none}
+  .btn:hover,.icard:hover{transform:none}
+}

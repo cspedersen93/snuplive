@@ -68,7 +68,7 @@ export default async function TilSalg({ searchParams }: Props) {
           <p className="lede">Alt her er vist frem på video, i et live-show eller i en videoannonce. Køb det til fast pris lige nu.</p>
           <SearchForm compact s={{ category: cat?.key ?? null }} />
           {items.some((i) => i.clip_path) ? (
-            <Link className="btn btn-red" href="/klip" style={{ marginTop: 18 }}>
+            <Link className="btn btn-line" href="/klip" style={{ marginTop: 18 }}>
               <IconPlay width={14} height={14} />
               Swipe gennem klip
             </Link>

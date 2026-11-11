@@ -894,6 +894,18 @@ pakkestørrelse, og feltet *Pakke* vises ikke i studiet. Alt andet virker.
   Vælger sælgeren en tungere label, betaler Relived forskellen.
 - Test: `qa_vaegt.py` (med filen) og `qa_vaegt.py uden0030` (efter `SKIP=0030 bash restart_qa.sh`).
 
+## Designsystem
+
+Forslaget ligger som et designlærred ("Relived designsystem"). Det er ført over i `app/globals.css` (sidst i filen):
+
+- **Farver med ét job hver:** rød (`--red`) kun til at købe, betale, oprette og gå live. Messing (`--brass`) er kvalitet:
+  ægthedstjek og det lille mærke over forsidens overskrift. Mint (`--mint`) er tryghed. Resten er koksgrå og elfenben.
+- **`.btn-ivory`:** den lyse knap til den næstvigtigste handling ("Se med", "Se varer til salg"), så der kun er én rød knap pr. skærm.
+- **Bevægelse:** knapper løfter sig og trykkes sammen, varekort løfter sig 4 px, live-prikken har en rolig ring.
+  Alt slås fra ved "reducer bevægelse".
+- **Felter** har en messingring, når de er i fokus. Kort og varebilleder har hjørner på 20.
+- Skriften er uændret (Familjen Grotesk og Geist Mono).
+
 ## Gratis-kampagnen (0 kr i køberbeskyttelse)
 
 Startes og stoppes i **Backoffice → Indstillinger → Gratis-kampagne**. Der skal ikke køres nogen fil i Supabase.

@@ -108,7 +108,7 @@ export default async function Forside() {
                 <span className="feed-live-go"> · Se med</span>
               </Link>
             ) : (
-              <span className="label red feed-eyebrow">Live Sale. Second Hand.</span>
+              <span className="label brass feed-eyebrow">Live Sale. Second Hand.</span>
             )}
             <h1 id="h-forside" className="h1 feed-h1">
               Second hand, du kan se <em className="s">live</em>, før du køber
@@ -242,7 +242,7 @@ export default async function Forside() {
               <li><div><h3>Køb eller byd</h3><p>Tryk Køb, eller byd med på budsalg. Du betaler samlet bagefter, og alt fra samme sælger kommer i én pakke.</p></div></li>
             </ol>
             <div className="ctas" style={{ marginTop: 28 }}>
-              <Link className="btn btn-red" href="/live">Find et show</Link>
+              <Link className="btn btn-ivory" href="/live">Find et show</Link>
               <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
             </div>
           </div>
@@ -290,7 +290,7 @@ function ItemRow({
           <h2 className="h2" id={id}>{title}</h2>
           {extra ? (
             <div className="row-head-btns">
-              <Link className="btn btn-red" href={extra.href}>
+              <Link className="btn btn-line" href={extra.href}>
                 <IconPlay width={14} height={14} />
                 {extra.label}
               </Link>

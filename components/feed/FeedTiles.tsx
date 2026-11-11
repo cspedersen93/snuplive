@@ -52,7 +52,7 @@ export function BigShowTile({ show }: { show: ShowWithSeller }) {
               {n} {vareOrd(n)} i showet
             </span>
           ) : null}
-          {live ? <span className="btn btn-red ftile-btn">Se med nu</span> : null}
+          {live ? <span className="btn btn-ivory ftile-btn">Se med nu</span> : null}
         </span>
       </Link>
       {!live ? (
@@ -85,7 +85,7 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
             <strong className="ftile-title">Se med, mens varerne bliver vist frem</strong>
             <span className="ftile-extra">Spørg sælgeren i chatten, og køb med ét tryk, eller byd med på budsalg.</span>
             <span className="ftile-btns">
-              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+              <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
               <Link className="btn btn-line" href="/til-salg">Se varer til salg</Link>
             </span>
           </>
@@ -96,7 +96,7 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
             <strong className="ftile-title">Se varer, der allerede er vist frem på video</strong>
             <span className="ftile-extra">Eller gå selv live og sælg en hel bunke på én aften.</span>
             <span className="ftile-btns">
-              <Link className="btn btn-red" href="/til-salg">Se varer til salg</Link>
+              <Link className="btn btn-ivory" href="/til-salg">Se varer til salg</Link>
               <Link className="btn btn-line" href="/saelg">Sælg dine varer</Link>
             </span>
           </>

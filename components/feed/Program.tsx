@@ -39,7 +39,7 @@ export default function Program({ live, upcoming }: { live: ShowWithSeller[]; up
                   <span className="prog-time"><small>Tidspunkt kommer</small></span>
                 )}
                 {on ? (
-                  <Link className="btn btn-red btn-sm" href={`/live/${handle}`}>Se med</Link>
+                  <Link className="btn btn-ivory btn-sm" href={`/live/${handle}`}>Se med</Link>
                 ) : (
                   <RemindButton showId={s.id} next="/" className="btn btn-line btn-sm" />
                 )}

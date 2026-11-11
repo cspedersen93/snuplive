@@ -369,7 +369,7 @@ export default async function ItemPage({ params }: Params) {
                   <span>til du har fået varen</span>
                 </li>
                 {d.auth === "approved" ? (
-                  <li>
+                  <li className="brass">
                     <IconShieldCheck />
                     <b>Ægthedstjekket</b>
                     <span>af Relived</span>

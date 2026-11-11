@@ -21,7 +21,7 @@ export default function SearchForm({ s, compact = false, autoFocus = false }: { 
           enterKeyHint="search"
           autoFocus={autoFocus}
         />
-        <button className="btn btn-red btn-sm" type="submit">Søg</button>
+        <button className="btn btn-ivory btn-sm" type="submit">Søg</button>
       </div>
       {compact ? (cat ? <input type="hidden" name="kategori" value={cat.slug} /> : null) : <SearchFilters s={s} />}
     </form>

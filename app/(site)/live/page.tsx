@@ -49,7 +49,7 @@ export default async function LiveNu() {
             upcoming.length ? (
               <div className="empty">
                 <p style={{ marginBottom: 14 }}>Se, hvem der går live senere, og tryk Husk mig, så giver vi dig besked.</p>
-                <a className="btn btn-red" href="#h-sched">Se programmet</a>
+                <a className="btn btn-ivory" href="#h-sched">Se programmet</a>
               </div>
             ) : (
               // Intet live og intet i programmet: tilmelding til nyhedsbrevet i stedet for en knap til en anden tom side.
