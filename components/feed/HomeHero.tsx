@@ -45,6 +45,14 @@ export default function HomeHero({
   const next = useRef(2);
   const [bought, setBought] = useState(false);
   const [draft, setDraft] = useState("");
+  // Hjerterne, der stiger op i højre side, som i et rigtigt show. Kun de seneste bliver tegnet.
+  const [hearts, setHearts] = useState<number[]>([]);
+  const heartId = useRef(0);
+  const addHeart = () => {
+    heartId.current += 1;
+    const id = heartId.current;
+    setHearts((cur) => [...cur, id].slice(-7));
+  };
 
   useEffect(() => {
     const calm = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -57,7 +65,13 @@ export default function HomeHero({
       next.current += 1;
       setMsgs((cur) => [...cur, m].slice(-4));
     }, 2600);
-    return () => window.clearInterval(t);
+    const h = window.setInterval(() => {
+      if (!document.hidden) addHeart();
+    }, 1700);
+    return () => {
+      window.clearInterval(t);
+      window.clearInterval(h);
+    };
   }, []);
 
   function send(e: FormEvent) {
@@ -103,64 +117,66 @@ export default function HomeHero({
         {children}
       </div>
 
-      <div className="hh-stage" aria-label="Eksempel på et show">
-        <div className="hh-video">
-          <video ref={video} muted loop playsInline preload="metadata" poster={POSTER} aria-label="En sælger viser en lædertaske frem til telefonen på stativet">
-            <source src={WEBM} type="video/webm" />
-            <source src={MP4} type="video/mp4" />
-          </video>
-          <div className="hh-badges">
-            <span className="hh-live"><span className="live-dot white" aria-hidden="true" />LIVE</span>
-            <span className="hh-ex">Eksempel på et show</span>
-          </div>
-          <div className="hh-over" aria-hidden="true">
-            {msgs.slice(-2).map((m, i) => (
-              <span key={`${next.current}-${i}`} className="hh-omsg"><b className={m.kind ?? ""}>{m.name}</b> {m.text}</span>
-            ))}
-          </div>
-          <div className="hh-buy">
-            <div className="hh-buy-t" aria-live="polite">
-              {bought ? (
-                <>
-                  <b className="hh-done">Den er din</b>
-                  <small>Sådan er det at købe i et show</small>
-                </>
-              ) : (
-                <>
-                  <small>Lædertaske, cognac</small>
-                  <b className="hh-price">350 kr</b>
-                </>
-              )}
+      <div className="hp-stage" aria-label="Eksempel på et show">
+        <div className="hp-phone">
+          <span className="hp-key k1" aria-hidden="true" />
+          <span className="hp-key k2" aria-hidden="true" />
+          <span className="hp-key k3" aria-hidden="true" />
+          <div className="hp-screen">
+            <video ref={video} muted loop playsInline preload="metadata" poster={POSTER} aria-label="En sælger viser en lædertaske frem til telefonen på stativet">
+              <source src={WEBM} type="video/webm" />
+              <source src={MP4} type="video/mp4" />
+            </video>
+            <span className="hp-island" aria-hidden="true" />
+            <div className="hp-badges">
+              <span className="hh-live"><span className="live-dot white" aria-hidden="true" />LIVE</span>
+              <span className="hh-ex">Eksempel på et show</span>
             </div>
-            {bought ? (
-              <button type="button" className="btn btn-line btn-sm" onClick={() => setBought(false)}>Prøv igen</button>
-            ) : (
-              <button type="button" className="btn btn-red" onClick={() => setBought(true)}>Køb nu</button>
-            )}
+            <div className="hp-hearts" aria-hidden="true">
+              {hearts.map((h) => (
+                <span key={h} className={`hp-heart v${h % 3}`}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.300C.5 8.200 2.300 4.500 6 4.500c2.100 0 3.600 1.200 4.500 2.500h3c.9-1.300 2.400-2.500 4.500-2.500 3.700 0 5.500 3.700 4 7.200C19.500 16.400 12 21 12 21z" /></svg>
+                </span>
+              ))}
+            </div>
+            <div className="hp-bottom">
+              <div className="hp-msgs" aria-hidden="true">
+                {msgs.slice(-3).map((m, i) => (
+                  <span key={`${next.current}-${i}`} className="hp-msg"><b className={m.kind ?? ""}>{m.name}</b> {m.text}</span>
+                ))}
+              </div>
+              <div className="hp-buy">
+                <div className="hh-buy-t" aria-live="polite">
+                  {bought ? (
+                    <>
+                      <b className="hh-done">Den er din</b>
+                      <small>Sådan er det at købe i et show</small>
+                    </>
+                  ) : (
+                    <>
+                      <small>Lædertaske, cognac</small>
+                      <b className="hh-price">350 kr</b>
+                    </>
+                  )}
+                </div>
+                {bought ? (
+                  <button type="button" className="btn btn-line btn-sm" onClick={() => setBought(false)}>Prøv igen</button>
+                ) : (
+                  <button type="button" className="btn btn-red" onClick={() => setBought(true)}>Køb nu</button>
+                )}
+              </div>
+              <form className="hp-form" onSubmit={send}>
+                <label className="sr-only" htmlFor="hh-q">Stil et spørgsmål (eksempel)</label>
+                <input id="hh-q" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Stil et spørgsmål" autoComplete="off" maxLength={80} />
+                <button type="button" className="hp-like" aria-label="Send et hjerte (eksempel)" onClick={addHeart}>
+                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20s-7-4.400-7-10a4 4 0 0 1 7-2.400A4 4 0 0 1 19 10c0 5.600-7 10-7 10z" /></svg>
+                </button>
+              </form>
+            </div>
           </div>
         </div>
 
-        <div className="hh-chat">
-          <div className="hh-chat-top">
-            <b>Chat</b>
-            <span className="label">Spørg sælgeren</span>
-          </div>
-          <div className="hh-chat-list">
-            {msgs.map((m, i) => (
-              <p key={`${next.current}-${i}`} className="hh-msg">
-                <b className={m.kind ?? ""}>{m.name}</b>
-                <span>{m.text}</span>
-              </p>
-            ))}
-          </div>
-          <form className="hh-chat-form" onSubmit={send}>
-            <label className="sr-only" htmlFor="hh-q">Stil et spørgsmål (eksempel)</label>
-            <input id="hh-q" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Stil et spørgsmål" autoComplete="off" maxLength={80} />
-            <button type="submit" className="btn btn-ivory btn-sm">Send</button>
-          </form>
-        </div>
-
-        {nextCard ? <div className="hh-next">{nextCard}</div> : null}
+        {nextCard ? <div className="hp-next">{nextCard}</div> : null}
       </div>
     </div>
   );
