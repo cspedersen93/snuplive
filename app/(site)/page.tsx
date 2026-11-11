@@ -23,7 +23,6 @@ import { inBeta, launched } from "@/lib/launch";
 import { SITE_URL } from "@/lib/env";
 import { clock, dayLabel } from "@/lib/format";
 import { itemImage, showImage } from "@/lib/images";
-import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed, fetchListing } from "@/lib/queries";
 import { reusedCount } from "@/lib/reuse";
 
@@ -156,15 +155,6 @@ export default async function Forside() {
             </section>
           )}
           <RailHello />
-          <section className="rail-box" aria-labelledby="h-rail-tryg">
-            <h2 className="rail-h" id="h-rail-tryg">Tryg handel</h2>
-            <ul className="rail-checks">
-              <li>Sælgeren får først pengene, når du har varen.</li>
-              <li>Alt fra samme sælger i én pakke, fra {DELIVERY.ship.price} kr til pakkeshop.</li>
-              <li>Er varen ikke som vist, melder du et problem, og pengene venter.</li>
-            </ul>
-            <Link className="rail-link" href="/saadan-virker-det#priser">Priser, fragt og rabat</Link>
-          </section>
         </aside>
 
         {tiles.length ? (

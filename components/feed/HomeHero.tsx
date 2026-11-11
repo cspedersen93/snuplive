@@ -5,7 +5,8 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 
 const WEBM = "/video/welcome-live-v2.webm";
 const MP4 = "/video/welcome-live-v2.mp4";
-const POSTER = "/img/welcome-live-poster-v2.jpg";
+// Lille stillbillede i samme format som videoen: det er det første, man ser, så det skal hentes hurtigt.
+const POSTER = "/img/welcome-live-poster-960.webp";
 
 type Msg = { name: string; text: string; kind?: "seller" | "me" };
 
@@ -58,7 +59,12 @@ export default function HomeHero({
     const calm = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
     if (calm) return; // stillbillede og stille chat
-    if (!saveData) void video.current?.play().catch(() => {});
+    // Videoen hentes først, når resten af siden er klar, så den ikke tager båndbredde fra tekst og billeder.
+    const start = () => {
+      if (!saveData) void video.current?.play().catch(() => {});
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
     const t = window.setInterval(() => {
       if (document.hidden) return;
       const m = SCRIPT[next.current % SCRIPT.length];
@@ -74,6 +80,19 @@ export default function HomeHero({
     };
   }, []);
 
+  // På telefonen ligger Hjælp-knappen ellers hen over "Sælg dine varer". Den viger, mens knapperne er i billedet.
+  const cta = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = cta.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => document.body.classList.toggle("hh-cta-in", e.isIntersecting), { threshold: 0.2 });
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      document.body.classList.remove("hh-cta-in");
+    };
+  }, []);
+
   function send(e: FormEvent) {
     e.preventDefault();
     const t = draft.trim();
@@ -84,6 +103,7 @@ export default function HomeHero({
 
   return (
     <div className="hh">
+      <link rel="preload" as="image" href={POSTER} fetchPriority="high" />
       <div className="hh-copy">
         {liveCount ? (
           <Link className="label red feed-eyebrow" href={liveHref}>
@@ -100,7 +120,7 @@ export default function HomeHero({
           Sælgeren viser varen frem på video. Du spørger i chatten og køber med ét tryk. Pengene holdes tilbage, til du har
           varen i hånden.
         </p>
-        <div className="hh-cta">
+        <div className="hh-cta" ref={cta}>
           <Link className="btn btn-red hh-main" href={liveHref}>
             <span className="live-dot white" aria-hidden="true" />
             <span className="hh-long">Se hvem der er live</span>
@@ -123,7 +143,7 @@ export default function HomeHero({
           <span className="hp-key k2" aria-hidden="true" />
           <span className="hp-key k3" aria-hidden="true" />
           <div className="hp-screen">
-            <video ref={video} muted loop playsInline preload="metadata" poster={POSTER} aria-label="En sælger viser en lædertaske frem til telefonen på stativet">
+            <video ref={video} muted loop playsInline preload="none" poster={POSTER} aria-label="En sælger viser en lædertaske frem til telefonen på stativet">
               <source src={WEBM} type="video/webm" />
               <source src={MP4} type="video/mp4" />
             </video>
