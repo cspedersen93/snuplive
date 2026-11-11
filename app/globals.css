@@ -2255,3 +2255,12 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* Sælgerbanneret: vis ansigtet, når billedet beskæres bredt */
 .sell-panel>img{object-position:50% 18%}
+.sell-panel .label{color:#F6F0EB;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+/* Mobil: billedet øverst og teksten nedenunder, så ansigtet står frit */
+@media (max-width:640px){
+  .sell-panel{min-height:0;justify-content:flex-start;background:var(--surface);padding-top:calc(60vw + 22px)}
+  .sell-panel>img{inset:0 0 auto 0;height:60vw;object-position:50% 30%}
+  .sell-panel.img::before{inset:0 0 auto 0;height:60vw;background:linear-gradient(180deg,rgba(11,10,12,0) 70%,rgba(11,10,12,.35) 100%)}
+  .sell-panel .label{text-shadow:none}
+  .sell-panel .btn{align-self:stretch;justify-content:center;text-align:center}
+}
