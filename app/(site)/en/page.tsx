@@ -62,7 +62,7 @@ export default async function English() {
             tap, and the seller only gets paid once you have the item.
           </p>
           <div className="ctas">
-            <Link className="btn btn-red" href="/live">See who&apos;s live</Link>
+            <Link className="btn btn-ivory" href="/live">See who&apos;s live</Link>
             <a className="btn btn-line" href="#shows">Shows in English</a>
           </div>
           <ul className="points" style={{ marginTop: 22 }}>
@@ -99,7 +99,7 @@ export default async function English() {
                 No shows in English right now. Most shows are in Danish, but most Danes speak English, so feel free to ask in English
                 in the chat.
               </p>
-              <Link className="btn btn-red" href="/live">See who&apos;s live</Link>
+              <Link className="btn btn-ivory" href="/live">See who&apos;s live</Link>
             </div>
           )}
         </div>

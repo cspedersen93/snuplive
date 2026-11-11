@@ -60,7 +60,7 @@ export default function CookieNotice() {
         <b>Cookies:</b> Vi bruger kun dem, der skal til, for at du kan logge ind, købe og sælge. Ingen reklame eller sporing.{" "}
         <Link href="/cookies">Læs mere</Link>
       </p>
-      <button className="btn btn-red btn-sm" type="button" onClick={ok}>
+      <button className="btn btn-ivory btn-sm" type="button" onClick={ok}>
         OK
       </button>
     </div>

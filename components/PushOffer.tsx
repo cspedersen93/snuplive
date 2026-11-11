@@ -64,7 +64,7 @@ export function PushOffer({ handle }: { handle: string }) {
         <div>
           <p>Vil du have besked på telefonen, når @{handle} går live? Ellers får du en mail.</p>
           <div className="push-offer-btns">
-            <button className="btn btn-red btn-sm" type="button" onClick={yes} disabled={busy}>
+            <button className="btn btn-ivory btn-sm" type="button" onClick={yes} disabled={busy}>
               Ja tak
             </button>
             <button className="linkbtn" type="button" onClick={no}>
@@ -142,7 +142,7 @@ export function PushToggle() {
         </p>
       </div>
       {support === "yes" && state !== "denied" && state !== null ? (
-        <button className={`btn ${state === "on" ? "btn-line" : "btn-red"} btn-sm`} type="button" onClick={toggle} disabled={busy}>
+        <button className={`btn ${state === "on" ? "btn-line" : "btn-ivory"} btn-sm`} type="button" onClick={toggle} disabled={busy}>
           {state === "on" ? "Slå fra" : "Slå til"}
         </button>
       ) : null}

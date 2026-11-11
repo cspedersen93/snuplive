@@ -178,14 +178,14 @@ export default function Chat({ showId, messages, me, live, loginHref, title = "C
             autoComplete="off"
             disabled={!live}
           />
-          <button className="btn btn-red btn-sm" type="submit" disabled={!live || busy || !text.trim()}>
+          <button className="btn btn-ivory btn-sm" type="submit" disabled={!live || busy || !text.trim()}>
             Send
           </button>
         </form>
       ) : me === null ? (
         <div className="chat-form" style={{ justifyContent: "space-between", alignItems: "center" }}>
           <span className="muted" style={{ fontSize: ".875rem" }}>Log ind for at skrive og købe</span>
-          <Link className="btn btn-red btn-sm" href={loginHref}>Log ind</Link>
+          <Link className="btn btn-ivory btn-sm" href={loginHref}>Log ind</Link>
         </div>
       ) : null}
     </div>

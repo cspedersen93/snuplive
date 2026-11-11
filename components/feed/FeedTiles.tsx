@@ -57,7 +57,7 @@ export function BigShowTile({ show }: { show: ShowWithSeller }) {
       </Link>
       {!live ? (
         <div className="ftile-cta">
-          <RemindButton showId={show.id} next="/" className="btn btn-red" />
+          <RemindButton showId={show.id} next="/" className="btn btn-ivory" />
         </div>
       ) : null}
     </div>
@@ -106,7 +106,7 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
             <strong className="ftile-title">Vi går snart live</strong>
             <span className="ftile-extra">Få besked, når de næste shows starter, så er du med fra første budsalg.</span>
             <span className="ftile-btns">
-              <Link className="btn btn-red" href="/nyhedsbrev">Få besked først</Link>
+              <Link className="btn btn-ivory" href="/nyhedsbrev">Få besked først</Link>
               <Link className="btn btn-line" href="/saelg">Sælg dine varer</Link>
             </span>
           </>
@@ -118,7 +118,7 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
               Gå live fra stuen, og sælg en hel bunke på én aften. Det er gratis at sælge, mens vi er i beta.
             </span>
             <span className="ftile-btns">
-              <Link className="btn btn-red" href="/saelg">Sælg dine varer</Link>
+              <Link className="btn btn-ivory" href="/saelg">Sælg dine varer</Link>
             </span>
           </>
         )}

@@ -87,7 +87,7 @@ export default function ReportButton({ type, id, className = "" }: { type: Repor
         Sælgeren kan ikke se, hvem der har anmeldt. Du får besked, når vi har afgjort sagen.
       </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button className="btn btn-red btn-sm" type="submit" disabled={busy}>{busy ? "Sender …" : "Send anmeldelsen"}</button>
+        <button className="btn btn-ivory btn-sm" type="submit" disabled={busy}>{busy ? "Sender …" : "Send anmeldelsen"}</button>
         <button className="btn btn-line btn-sm" type="button" onClick={() => setOpen(false)} disabled={busy}>Fortryd</button>
       </div>
     </form>

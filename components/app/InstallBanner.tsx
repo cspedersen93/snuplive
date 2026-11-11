@@ -74,7 +74,7 @@ export default function InstallBanner() {
       <div className="app-banner-act">
         {st.canPrompt ? (
           <button
-            className="btn btn-red btn-sm"
+            className="btn btn-ivory btn-sm"
             type="button"
             onClick={async () => {
               const ok = await promptInstall();
@@ -86,7 +86,7 @@ export default function InstallBanner() {
             Hent
           </button>
         ) : (
-          <Link className="btn btn-red btn-sm" href="/app" onClick={close}>
+          <Link className="btn btn-ivory btn-sm" href="/app" onClick={close}>
             Se hvordan
           </Link>
         )}

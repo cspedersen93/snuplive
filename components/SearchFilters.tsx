@@ -141,7 +141,7 @@ export default function SearchFilters({ s }: { s?: Partial<Search> }) {
           </label>
         </div>
         <div className="sf-actions">
-          <button className="btn btn-red btn-sm" type="submit">Vis varer</button>
+          <button className="btn btn-ivory btn-sm" type="submit">Vis varer</button>
           {count || s?.category ? (
             <Link className="linkbtn" href={searchHref({ q: s?.q ?? "", category: null, maxPrice: null, size: null })}>
               Nulstil filtre

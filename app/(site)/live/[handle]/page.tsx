@@ -229,14 +229,14 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
           </div>
         </div>
         {d.guestAt ? <GuestAtBanner handle={d.seller.handle} at={d.guestAt} /> : null}
-        {d.seller.is_seller ? <FollowButton sellerId={d.seller.id} handle={d.seller.handle} next={`/live/${d.seller.handle}`} className="btn btn-red btn-sm" /> : null}
+        {d.seller.is_seller ? <FollowButton sellerId={d.seller.id} handle={d.seller.handle} next={`/live/${d.seller.handle}`} className="btn btn-ivory btn-sm" /> : null}
         {d.seller.is_seller ? <SellerFacts seller={d.seller} bundle={d.bundle} level={d.level} /> : null}
         {!d.seller.is_seller ? <BadgeList badges={d.level?.badges} role="buyer" className="profile-badges" /> : null}
         <div className="empty" style={{ marginTop: 18 }}>
           <p style={{ marginBottom: 14 }}>
             {d.seller.handle} har ikke planlagt et show endnu.{d.seller.is_seller ? " Følg sælgeren, så får du besked, når der kommer et." : ""}
           </p>
-          <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+          <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
         </div>
         <SellerRatings handle={d.seller.handle} ratings={d.ratings} avg={d.seller.rating_avg} count={d.seller.rating_count} />
         <ReportButton type="profile" id={d.seller.id} className="page-report" />

@@ -88,7 +88,7 @@ export default async function Kategori({ params }: Params) {
             {forSale.length ? (
               <a className="btn btn-red" href="#til-salg">Køb nu til fast pris</a>
             ) : (
-              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+              <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
             )}
             {soon.length ? <a className="btn btn-line" href="#snart">Snart live</a> : null}
           </div>
@@ -174,7 +174,7 @@ export default async function Kategori({ params }: Params) {
             </div>
             {copy.note ? <div className="muted cat-note" style={{ marginTop: 18 }}>{copy.note}</div> : null}
             <div className="ctas" style={{ marginTop: 24 }}>
-              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+              <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
               {BUY_GUIDE[cat.key] ? (
                 <Link className="btn btn-line" href={BUY_GUIDE[cat.key].href}>{BUY_GUIDE[cat.key].label}</Link>
               ) : (
@@ -191,7 +191,7 @@ export default async function Kategori({ params }: Params) {
             <div className="cta-band">
               <h2 className="h2" id="h-kat-saelg" style={{ maxWidth: 560 }}>{copy.sellH2}</h2>
               <div className="ctas">
-                <Link className="btn btn-red" href="/saelg">Sælg det live</Link>
+                <Link className="btn btn-ivory" href="/saelg">Sælg det live</Link>
                 {SELL_GUIDE[cat.key] ? (
                   <Link className="btn btn-line" href={SELL_GUIDE[cat.key].href}>{SELL_GUIDE[cat.key].label}</Link>
                 ) : null}

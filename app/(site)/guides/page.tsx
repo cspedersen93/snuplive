@@ -82,7 +82,7 @@ export default function Guides() {
               <p className="lede" style={{ marginTop: 12 }}>Se brugt tøj og design live på video, eller sælg dit eget. {inBeta() ? "Det er gratis i beta." : "Det er gratis at sælge."}</p>
             </div>
             <div className="ctas">
-              <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+              <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
               <Link className="btn btn-line" href="/saelg">Sælg dine varer</Link>
             </div>
           </div>

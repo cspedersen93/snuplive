@@ -13,7 +13,7 @@ const TABS: { key: Platform; label: string }[] = [
 ];
 
 /** Knappen, der installerer med det samme, hvor browseren kan (Chrome og Edge). */
-export function InstallNowButton({ className = "btn btn-red", label = "Hent appen" }: { className?: string; label?: string }) {
+export function InstallNowButton({ className = "btn btn-ivory", label = "Hent appen" }: { className?: string; label?: string }) {
   const st = useInstall();
   if (!st?.canPrompt) return null;
   return (

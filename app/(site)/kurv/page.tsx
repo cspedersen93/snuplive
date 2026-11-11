@@ -286,7 +286,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
         {!groups.length && !orders.length && !myOffers.length ? (
           <div className="empty">
             <p style={{ marginBottom: 14 }}>Du har ikke købt noget endnu.</p>
-            <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+            <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
           </div>
         ) : null}
       </div>

@@ -344,7 +344,7 @@ export default async function Saadan() {
               </p>
             </div>
             <div className="ctas">
-              <Link className="btn btn-red" href="/saelg">Læs om at sælge</Link>
+              <Link className="btn btn-ivory" href="/saelg">Læs om at sælge</Link>
               <Link className="btn btn-line" href="/studio">Gå til studiet</Link>
             </div>
           </div>

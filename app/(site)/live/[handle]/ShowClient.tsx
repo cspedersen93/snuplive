@@ -374,7 +374,7 @@ export default function ShowClient(props: Props) {
                 </span>
               </div>
             </div>
-            <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} className="btn btn-red btn-sm" />
+            <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} className="btn btn-ivory btn-sm" />
             <SellerFacts seller={props.seller} bundle={props.bundle} level={props.sellerLevel} />
             {guests.length ? (
               <div className="show-guests">
@@ -515,7 +515,7 @@ export default function ShowClient(props: Props) {
                       <strong style={{ fontSize: "1.5rem", lineHeight: 1.2 }}>{when(show.starts_at)}</strong>
                       {startsIn !== null ? <span>{countdown(startsIn)}</span> : null}
                       <span style={{ fontSize: ".875rem", opacity: 0.8 }}>Siden skifter selv til video, når showet starter.</span>
-                      <RemindButton showId={show.id} next={`/live/${handle}`} className="btn btn-red btn-sm" />
+                      <RemindButton showId={show.id} next={`/live/${handle}`} className="btn btn-ivory btn-sm" />
                     </>
                   ) : (
                     <>
@@ -525,9 +525,9 @@ export default function ShowClient(props: Props) {
                         {forSaleCount ? ` ${forSaleCount} ${vareOrd(forSaleCount)} kan stadig købes til fast pris.` : ""}
                       </span>
                       {forSaleCount ? (
-                        <a className="btn btn-red btn-sm" href="#i-showet">Se hvad der er tilbage</a>
+                        <a className="btn btn-ivory btn-sm" href="#i-showet">Se hvad der er tilbage</a>
                       ) : (
-                        <Link className="btn btn-red btn-sm" href="/live">Find et andet show</Link>
+                        <Link className="btn btn-ivory btn-sm" href="/live">Find et andet show</Link>
                       )}
                       <FollowButton sellerId={props.seller.id} handle={handle} next={`/live/${handle}`} label={`Følg @${handle}, og få besked næste gang`} />
                     </>

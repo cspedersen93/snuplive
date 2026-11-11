@@ -269,7 +269,7 @@ export default function ClipFeed({ initial, batch }: { initial: FeedClip[]; batc
               <div className="clip-endbox">
                 <strong>Du har set alle klip</strong>
                 <p>Følg sælgerne, så får du besked, når de går live med nye varer.</p>
-                <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+                <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
                 <Link className="btn btn-line" href="/til-salg">Alt til salg</Link>
               </div>
             </div>

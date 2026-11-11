@@ -128,7 +128,7 @@ export default async function GuidePage({ params }: Params) {
                 {s.cta ? (
                   <aside className="guide-cta">
                     <p>{s.cta.text}</p>
-                    <Link className="btn btn-red btn-sm" href={s.cta.href}>
+                    <Link className="btn btn-ivory btn-sm" href={s.cta.href}>
                       {s.cta.label}
                     </Link>
                   </aside>

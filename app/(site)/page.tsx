@@ -260,7 +260,7 @@ export default async function Forside() {
               Sælg brugte fund, ubrugte fejlkøb og nye restpartier live. Gå live fra stuen eller butikken, og sælg en hel bunke på
               én aften i stedet for at lægge annoncer op én ad gangen. {inBeta() ? "Det er gratis at sælge, mens vi er i beta." : "Det er gratis at sælge."}
             </p>
-            <Link className="btn btn-red" href="/saelg">Sådan sælger du live</Link>
+            <Link className="btn btn-ivory" href="/saelg">Sådan sælger du live</Link>
           </article>
         </div>
       </section>

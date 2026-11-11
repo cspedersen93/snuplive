@@ -9,7 +9,7 @@ export default function NotFoundBody() {
         <h1 className="h2">Siden findes ikke</h1>
         <p className="lede">Måske er showet slut, eller linket er skrevet forkert.</p>
         <div className="ctas">
-          <Link className="btn btn-red" href="/live">Se hvem der er live</Link>
+          <Link className="btn btn-ivory" href="/live">Se hvem der er live</Link>
           <Link className="btn btn-line" href="/">Til forsiden</Link>
         </div>
       </div>

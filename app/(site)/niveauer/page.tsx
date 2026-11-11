@@ -51,7 +51,7 @@ export default function Niveauer() {
             din side og ved dine varer, så andre kan se, at du er god at handle med.
           </p>
           <div className="ctas" style={{ marginTop: 18 }}>
-            <Link className="btn btn-red" href="/konto#niveau">Se dit niveau</Link>
+            <Link className="btn btn-ivory" href="/konto#niveau">Se dit niveau</Link>
             <Link className="btn btn-line" href="/live">Find et show</Link>
           </div>
         </div>

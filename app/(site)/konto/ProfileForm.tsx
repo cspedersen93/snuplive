@@ -115,7 +115,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
       <p className="fine">Dit brugernavn bliver vist i chatten og i adressen til dine shows: {SITE_HOST}/live/{handle.trim().toLowerCase() || "brugernavn"}</p>
       {err ? <p className="err" role="alert">{err}</p> : null}
       <div>
-        <button className="btn btn-red" type="submit" disabled={busy}>{busy ? "Gemmer …" : "Gem profil"}</button>
+        <button className="btn btn-ivory" type="submit" disabled={busy}>{busy ? "Gemmer …" : "Gem profil"}</button>
       </div>
     </form>
   );
