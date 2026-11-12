@@ -6,6 +6,7 @@ import CampaignCards from "@/components/CampaignCards";
 import CategoryCards from "@/components/CategoryCards";
 import { ItemTile, ShowTile, WelcomeTile } from "@/components/feed/FeedTiles";
 import Program from "@/components/feed/Program";
+import HowSimple from "@/components/HowSimple";
 import ShowPhone from "@/components/ShowPhone";
 import RailHello from "@/components/feed/RailHello";
 import RailMine from "@/components/feed/RailMine";
@@ -115,6 +116,7 @@ export default async function Forside() {
               Second hand, du kan se <em className="s">live</em>, før du køber
             </h1>
             <p className="feed-lede">Brugt, som ny eller med prismærket på. Se varen på video, spørg sælgeren i chatten, og køb med ét tryk.</p>
+            <p className="feed-new"><a href="#saadan">Ny her? Se, hvordan det virker, i tre trin</a></p>
             <FreeNote />
             <ReuseCounter n={reused} />
           </div>
@@ -216,6 +218,19 @@ export default async function Forside() {
         extra={moreForSale.some((i) => i.clip_path) ? { href: "/klip", label: "Swipe gennem klip" } : undefined}
       />
 
+      <section className="sec band" id="saadan" aria-labelledby="h-how">
+        <div className="wrap how2">
+          <div className="how2-head">
+            <span className="label brass">Tre trin</span>
+            <h2 className="h2" id="h-how">Sådan gør du</h2>
+          </div>
+          <div className="how2-body">
+            <HowSimple />
+            <ShowPhone />
+          </div>
+        </div>
+      </section>
+
       <section className="sec tight" aria-labelledby="h-kategorier">
         <div className="wrap">
           <div className="row-head">
@@ -223,24 +238,6 @@ export default async function Forside() {
             <Link className="btn btn-line" href="/kategori">Alle kategorier</Link>
           </div>
           <CategoryCards />
-        </div>
-      </section>
-
-      <section className="sec band" aria-labelledby="h-how">
-        <div className="wrap split">
-          <ShowPhone />
-          <div>
-            <h2 className="h2" id="h-how" style={{ marginBottom: 24 }}>Hvordan køber man brugt live?</h2>
-            <ol className="steps">
-              <li><div><h3>Find et show eller en vare</h3><p>Se, hvem der er live, eller tryk Husk mig på et show, der starter senere. Så giver vi dig besked.</p></div></li>
-              <li><div><h3>Se den tæt på, og spørg</h3><p>Bed sælgeren vise mærket, målene og slid tæt på. Du får svar, mens du ser med.</p></div></li>
-              <li><div><h3>Køb eller byd</h3><p>Tryk Køb, eller byd med på budsalg. Du betaler samlet bagefter, og alt fra samme sælger kommer i én pakke.</p></div></li>
-            </ol>
-            <div className="ctas" style={{ marginTop: 28 }}>
-              <Link className="btn btn-ivory" href="/live">Find et show</Link>
-              <Link className="btn btn-line" href="/saadan-virker-det">Sådan virker det</Link>
-            </div>
-          </div>
         </div>
       </section>
 
