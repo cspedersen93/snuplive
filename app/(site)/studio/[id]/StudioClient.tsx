@@ -21,6 +21,7 @@ import type { CamLayout, Item, Message, Profile, Show, ShowLanguage } from "@/li
 import { pingSearchAlerts } from "@/lib/searchPing";
 import ClosedShowBox from "./ClosedShowBox";
 import ItemForm from "./ItemForm";
+import PileFilm from "./PileFilm";
 import SwipeCard from "./SwipeCard";
 import AuthPanel from "./AuthPanel";
 import { SITE_HOST } from "@/lib/env";
@@ -61,6 +62,8 @@ interface Props {
   camLayout?: CamLayout | null;
   /** Claude er sat op: "Udfyld med AI" i formularen. */
   aiReady?: boolean;
+  /** Vis "Film bunken" (en prøve, se studio/[id]/page.tsx). */
+  pileReady?: boolean;
   /** Nedtælling til live kan bruges (0034_nedtaelling.sql er kørt). */
   countdownReady?: boolean;
   /** Kategorier, hvis fil ikke er kørt endnu (lib/categories.ts). */
@@ -665,6 +668,9 @@ export default function StudioClient(props: Props) {
           </div>
           {!ended && !out ? (
             <div data-tour="item-form">
+              {props.pileReady ? (
+                <PileFilm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} hideCats={props.hideCats} parcelReady={props.parcelReady} pickupReady={props.pickupReady} onSaved={saved} />
+              ) : null}
               <ItemForm sellerId={me.id} showId={show.id} showCategory={show.category} nextPosition={nextPosition} aiReady={props.aiReady} hideCats={props.hideCats} parcelReady={props.parcelReady} pickupReady={props.pickupReady} onSaved={saved} />
             </div>
           ) : null}

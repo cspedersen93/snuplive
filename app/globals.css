@@ -2376,3 +2376,45 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 .post-who{text-decoration:none}
 .post-who time{text-decoration:none}
 @media (max-width:520px){.prof-head{margin-top:-26px}}
+
+/* ── "Film bunken" i studiet (PileFilm) ── */
+.pile-open{display:inline-flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-bottom:14px;border-color:rgba(201,167,116,.5)}
+.pile-open .ico{width:18px;height:18px;stroke:currentColor;color:var(--brass)}
+.pile{display:flex;flex-direction:column;gap:14px;padding:16px;margin-bottom:16px;border-radius:18px;background:var(--surface);border:1px solid rgba(201,167,116,.4)}
+.pile-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pile-how{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;color:#D9D0D2;font-size:.9375rem;line-height:1.45}
+.pile-pick{display:flex;gap:10px;flex-wrap:wrap}
+.pile-busy{display:flex;align-items:center;gap:10px;font-weight:600}
+.pile-spin{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,236,228,.2);border-top-color:var(--brass);animation:pileSpin .8s linear infinite;flex:none}
+@keyframes pileSpin{to{transform:rotate(360deg)}}
+.pile-sum{color:#D9D0D2;font-size:.9375rem;line-height:1.5}
+.pile-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.pile-item{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;padding:14px;border-radius:16px;background:#141316;border:1px solid var(--line)}
+.pile-item.off{opacity:.55}
+.pile-item.saved{border-color:rgba(185,217,198,.5)}
+.pile-photos{display:flex;flex-direction:column;gap:6px}
+.pile-photos img{width:96px;aspect-ratio:4/5;object-fit:cover;border-radius:10px;display:block}
+.pile-photos img+img{width:45px;display:inline-block}
+.pile-photos img:nth-child(n+2){width:45px}
+.pile-photos{flex-direction:row;flex-wrap:wrap;align-content:flex-start}
+.pile-fields{display:flex;flex-direction:column;gap:10px;min-width:0}
+.pile-fields .field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.pile-fields label{font-size:.8125rem;color:var(--muted)}
+.pile-fields input:not([type=checkbox]),.pile-fields select,.pile-fields textarea{width:100%;font:inherit;font-size:.9375rem;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,236,228,.2);background:var(--surface);color:#F6F0EB}
+.pile-fields input:focus,.pile-fields select:focus,.pile-fields textarea:focus{outline:none;border-color:var(--brass)}
+.pile-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.pile-on{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;font-size:.9375rem!important;font-weight:600;color:#F6F0EB!important}
+.pile-on input{width:18px;height:18px;accent-color:#C9A774}
+.pile-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){.pile-spin{animation:none}}
+@media (max-width:520px){.pile-item{grid-template-columns:72px minmax(0,1fr);gap:10px;padding:12px}.pile-photos img{width:72px}.pile-photos img:nth-child(n+2){width:33px}}
+/* Studiets kolonne er smal: her står billederne øverst, og felterne i fuld bredde */
+.pile{container-type:inline-size}
+.pile-row .field{min-width:110px}
+@container (max-width:460px){
+  .pile-item{grid-template-columns:minmax(0,1fr)}
+  .pile-photos{flex-direction:row;flex-wrap:nowrap;gap:8px}
+  .pile-photos img,.pile-photos img:nth-child(n+2){width:calc((100% - 16px)/3);max-width:110px}
+  .pile-row{flex-direction:column;align-items:stretch}
+  .pile-row .btn{align-self:flex-start}
+}

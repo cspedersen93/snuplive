@@ -5,6 +5,7 @@ import { requireProfile } from "@/lib/auth";
 import { hiddenCategories } from "@/lib/categories";
 import { packageSizesReady, pickupOnlyReady } from "@/lib/parcels";
 import { aiConfigured } from "@/lib/claude";
+import { isAdminEmail } from "@/lib/mail";
 import { Suspense } from "react";
 import MitIdResult from "@/components/MitIdResult";
 import { mitidState } from "@/lib/mitid";
@@ -18,6 +19,16 @@ export const metadata: Metadata = { title: "Studie", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * "Film bunken" er en prøve: indtil videre ser kun Relived's egne (ADMIN_EMAILS) knappen.
+ * Sæt PILE_FILM=all i Vercel for at åbne den for alle sælgere.
+ */
+async function pileOpen(supabase: Awaited<ReturnType<typeof import("@/lib/supabase/server").createClient>>) {
+  if (process.env.PILE_FILM === "all") return true;
+  const { data } = await supabase.auth.getUser();
+  return isAdminEmail(data.user?.email);
+}
 
 export default async function StudioShow({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -80,6 +91,7 @@ export default async function StudioShow({ params }: { params: Promise<{ id: str
       camLayout={layoutQ.error ? null : ((layoutQ.data as { cam_layout?: CamLayout } | null)?.cam_layout ?? "split")}
       language={langQ.error ? null : (langQ.data as { language?: ShowLanguage } | null)?.language === "en" ? "en" : "da"}
       aiReady={aiConfigured()}
+      pileReady={aiConfigured() && (await pileOpen(supabase))}
       hideCats={await hiddenCategories(supabase)}
       parcelReady={await packageSizesReady(supabase)}
       pickupReady={await pickupOnlyReady(supabase)}

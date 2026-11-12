@@ -1218,3 +1218,19 @@ Købere har ikke en profil og bliver sendt til `/live/[handle]`.
   (`moderatePost` i `lib/moderation.ts`; opslag ligger uden for `admin_moderate()` i databasen).
 - **Rette profilen:** tekst og forsidebillede sættes under Min konto → Profil (kun sælgere).
 - Der er ingen kommentarer eller hjerter på opslag endnu. Det er bevidst udskudt, til vi ved, om opslagene bliver brugt.
+
+## Film bunken (prøve)
+
+I studiet, over "Læg en vare i køen": sælgeren filmer sine varer i ét stræk, én vare ad gangen (højst 3 minutter), og får et
+forslag til en annonce pr. vare. `app/(site)/studio/[id]/PileFilm.tsx`.
+
+- **Sådan virker det:** telefonen tager op til 60 små stillbilleder af videoen (mindst 1,5 sekund imellem). Claude deler dem
+  i varer (`/api/studio/pile-split`, reglerne i `lib/pile.ts`). For hver vare tages op til tre store billeder, og
+  "AI skriver annoncen" laver forslaget. Videoen forlader ikke telefonen.
+- **Sælgeren godkender alt:** prisen er aldrig udfyldt (kun et forslag, "Brug 350 kr"), og intet lægges i køen, før sælgeren
+  trykker "Læg N varer i køen". Varer kan tages ud med fluebenet.
+- **Hvem ser den:** kun Relived's egne (`ADMIN_EMAILS`), indtil den er prøvet med rigtige videoer. `PILE_FILM=all` i Vercel
+  åbner den for alle sælgere. Kræver `ANTHROPIC_API_KEY`.
+- **Grænser:** højst 24 varer pr. video og 6 videoer på 10 minutter pr. sælger.
+- **Ikke prøvet endnu:** rigtige videoer fra en iPhone eller Android, og hvor godt Claude deler en rigtig bunke op.
+  Testen bruger en lavet video og en falsk Claude.
