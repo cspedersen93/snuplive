@@ -57,8 +57,7 @@ export default async function Forside() {
   // Hvem der er live, står i de runde billeder øverst og i de små kort.
   const tiles: Tile[] = [];
   for (const s of live.slice(0, 4)) tiles.push({ kind: "show", show: s });
-  const nextShow = upcoming[0];
-  if (nextShow && tiles.length < 4) tiles.push({ kind: "show", show: nextShow });
+  // Kommende shows står kun i programmet øverst, ikke også som kort her.
   // Varer uden billede står ikke i feedet (de ligner tomme felter), men stadig i rækkerne længere nede og i showet.
   const queues = [forSale, auctions, soon].map((q) => q.filter((it) => itemImage(it)));
   const usedSale = new Set<string>();
