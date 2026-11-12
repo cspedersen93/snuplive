@@ -155,10 +155,13 @@ export default function PileFilm({ sellerId, showId, showCategory, nextPosition,
 
       // 3) Store billeder og et forslag til annoncen for hver vare.
       setPhase("write");
-      const made: Draft[] = [];
+      // Billederne findes én vare ad gangen (der er kun én video), men annoncerne skrives tre ad gangen, så det går hurtigere.
+      const jobs: Promise<Draft>[] = [];
+      const running = new Set<Promise<unknown>>();
+      let written = 0;
       for (let n = 0; n < segs.length; n++) {
         if (cancelled.current) return;
-        setProgress(`Finder de skarpeste billeder og skriver annonce ${n + 1} af ${segs.length} …`);
+        setProgress(`Finder de skarpeste billeder af vare ${n + 1} af ${segs.length} …`);
         const photos: Draft["photos"] = [];
         // Led efter de skarpeste billeder i den tid, varen vises: mål skarpheden mange steder, og tag kun de bedste.
         const seg = segs[n];
@@ -181,28 +184,37 @@ export default function PileFilm({ sellerId, showId, showCategory, nextPosition,
           }
         }
         if (!photos.length) continue;
-        const ai = await askAiListing(photos.map((p) => p.blob));
-        const l: AiListing | null = "listing" in ai ? ai.listing : null;
-        const cat = l?.category && cats.some((c) => c.key === l.category) ? l.category : showCategory;
-        made.push({
-          key: `${Date.now().toString(36)}-${n}`,
-          photos,
-          name: l?.name ?? "",
-          price: "",
-          suggested: l ? suggestedPrice(l) : null,
-          size: l?.size ?? "",
-          condition: l?.condition ?? "",
-          category: cat,
-          description: l?.description ?? "",
-          unsure: l?.unsure ?? [],
-          on: true,
-          newOk: false,
-          blank: !l,
-          saved: false,
-          error: null,
+        while (running.size >= 3) await Promise.race(running);
+        const job = askAiListing(photos.map((p) => p.blob)).then((ai): Draft => {
+          const l: AiListing | null = "listing" in ai ? ai.listing : null;
+          const cat = l?.category && cats.some((c) => c.key === l.category) ? l.category : showCategory;
+          written += 1;
+          return {
+            key: `${Date.now().toString(36)}-${n}`,
+            photos,
+            name: l?.name ?? "",
+            price: "",
+            suggested: l ? suggestedPrice(l) : null,
+            size: l?.size ?? "",
+            condition: l?.condition ?? "",
+            category: cat,
+            description: l?.description ?? "",
+            unsure: l?.unsure ?? [],
+            on: true,
+            newOk: false,
+            blank: !l,
+            saved: false,
+            error: null,
+          };
         });
-        setDrafts([...made]);
+        jobs.push(job);
+        running.add(job);
+        void job.finally(() => running.delete(job));
       }
+      setProgress(`Skriver de sidste annoncer … ${written} af ${jobs.length} er klar`);
+      const made = await Promise.all(jobs);
+      if (cancelled.current) return;
+      setDrafts(made);
       if (!made.length) throw new Error("Der kom ingen brugbare billeder ud af videoen. Prøv igen med bedre lys.");
       setPhase("review");
       setProgress("");

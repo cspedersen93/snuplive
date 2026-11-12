@@ -33,7 +33,9 @@ export function aiListingPrompt(hint?: string) {
     `- condition: én af ${AI_CONDITIONS.map((c) => `"${c}"`).join(", ")}, ud fra det, du kan se.`,
     "- category: én af dametoej, herretoej, luksus (designertasker, ure og smykker fra luksusmærker), skoenhed (kun ny og uåbnet makeup, parfume og hudpleje), boernetoej, cykler (cykler, børnecykler, ladcykler, elcykler, løbehjul, barnevogne og klapvogne), bolig (lamper, keramik, glas, møbler og design til hjemmet), samlerting (vinyl, LEGO, samlekort, retrospil) eller andet.",
     "- description: 2-4 korte, ærlige sætninger på dansk til køberen: mærke og materiale, hvis de kan læses, farve, stil og pasform, og synlige fejl eller slid. Ingen emojis og ingen overdrivelser. Skriv aldrig, at varen er ægte eller original.",
-    "- price_low og price_high: et realistisk prisleje i hele kroner for varen brugt i Danmark ud fra type, mærke og stand. Er du usikker, så gør spændet bredt.",
+    "- price_low og price_high: det, varen realistisk kan sælges for BRUGT mellem private i Danmark, i hele kroner. Det er langt under nyprisen.",
+    "  Uden et mærke, du kan læse, er almindelige hverdagsvarer billige: et krus eller glas 10-25 kr, en bog 10-40 kr, en T-shirt eller bluse 20-60 kr, et par jeans 50-120 kr, legetøj 20-80 kr, en lille lampe 50-150 kr.",
+    "  Kun et kendt mærke, dansk design, en samlervare eller en vare med prismærke kan ligge højere. Er du i tvivl, så vælg den lave ende. Hellere for lavt end for højt.",
     '- unsure: de ting, sælgeren skal tjekke ekstra, med korte danske ord, fx ["størrelse", "mærke", "fejl"]. Nævn altid "mål", da du ikke kan måle.',
     '- Viser billederne ikke en vare, der kan sælges, så svar {"error": "no_item"}.',
   ].join("\n");
@@ -104,6 +106,6 @@ export function parseAiListing(text: string): AiListing | "no_item" | null {
 export function suggestedPrice(l: Pick<AiListing, "priceLow" | "priceHigh">) {
   if (!l.priceLow || !l.priceHigh) return null;
   const mid = (l.priceLow + l.priceHigh) / 2;
-  const step = mid >= 1000 ? 50 : mid >= 200 ? 25 : mid >= 50 ? 5 : 1;
+  const step = mid >= 1000 ? 50 : mid >= 200 ? 25 : mid >= 10 ? 5 : 1;
   return Math.max(1, Math.round(mid / step) * step);
 }
