@@ -89,3 +89,34 @@ export function pileShots(s: PileSegment): number[] {
   }
   return picks;
 }
+
+/**
+ * Tidspunkter, hvor der ledes efter skarpe billeder af én vare: jævnt fordelt over den tid, varen vises (plus lidt til hver
+ * side, hvis varen kun ses på ét stillbillede), højst 12 og mindst 0,3 sekund imellem.
+ */
+export function pileCandidateTimes(tFirst: number, tLast: number, step: number, duration: number): number[] {
+  const pad = tLast - tFirst < step ? step * 0.4 : 0;
+  const from = Math.max(0.1, tFirst - pad);
+  const to = Math.min(Math.max(from, duration - 0.15), tLast + pad);
+  const n = Math.max(1, Math.min(12, Math.floor((to - from) / 0.3) + 1));
+  if (n === 1) return [Math.round(((from + to) / 2) * 100) / 100];
+  return Array.from({ length: n }, (_, i) => Math.round((from + ((to - from) * i) / (n - 1)) * 100) / 100);
+}
+
+/**
+ * Vælger op til `want` billeder: det skarpeste først, og derefter de skarpeste, som ligger et stykke fra de valgte
+ * (så billederne ikke er ens) og ikke er meget mere slørede end det bedste. Hellere få skarpe end mange slørede.
+ */
+export function pickSharp<T extends { t: number; sharp: number }>(cands: T[], want = 3): T[] {
+  const sorted = [...cands].sort((a, b) => b.sharp - a.sharp);
+  if (!sorted.length) return [];
+  const span = Math.max(...cands.map((c) => c.t)) - Math.min(...cands.map((c) => c.t));
+  const gap = Math.max(0.7, span / 5);
+  const picked = [sorted[0]];
+  for (const c of sorted.slice(1)) {
+    if (picked.length >= want) break;
+    if (c.sharp < sorted[0].sharp * 0.6) break;
+    if (picked.every((p) => Math.abs(p.t - c.t) >= gap)) picked.push(c);
+  }
+  return picked;
+}

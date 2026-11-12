@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { IconSparkle } from "@/components/Icons";
 import { suggestedPrice, type AiListing } from "@/lib/aiListing";
 import { askAiListing, checkText } from "@/lib/aiListingClient";
-import { blobToBase64 } from "@/lib/bestPhoto";
+import { blobToBase64, sharpness } from "@/lib/bestPhoto";
 import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, pickCategories } from "@/lib/format";
-import { PILE_MAX_ITEMS, PILE_MAX_SECONDS, pileShots, pileTimes, type PileSegment } from "@/lib/pile";
+import { PILE_MAX_ITEMS, PILE_MAX_SECONDS, pickSharp, pileCandidateTimes, pileTimes, type PileSegment } from "@/lib/pile";
 import { frameFromVideo } from "@/lib/resizeImage";
 import { pingSearchAlerts } from "@/lib/searchPing";
 import { getSupabase } from "@/lib/supabase/client";
@@ -158,12 +158,21 @@ export default function PileFilm({ sellerId, showId, showCategory, nextPosition,
       const made: Draft[] = [];
       for (let n = 0; n < segs.length; n++) {
         if (cancelled.current) return;
-        setProgress(`Skriver annonce ${n + 1} af ${segs.length} …`);
+        setProgress(`Finder de skarpeste billeder og skriver annonce ${n + 1} af ${segs.length} …`);
         const photos: Draft["photos"] = [];
-        for (const idx of pileShots(segs[n])) {
-          const t = times[usable[idx]?.i ?? -1];
-          if (t === undefined) continue;
+        // Led efter de skarpeste billeder i den tid, varen vises: mål skarpheden mange steder, og tag kun de bedste.
+        const seg = segs[n];
+        const tFirst = times[usable[seg.first]?.i ?? -1];
+        const tLast = times[usable[seg.last]?.i ?? -1];
+        if (tFirst === undefined || tLast === undefined) continue;
+        const cands: { t: number; sharp: number }[] = [];
+        for (const t of pileCandidateTimes(tFirst, tLast, step, video.duration)) {
+          if (cancelled.current) return;
           await seek(video, t);
+          cands.push({ t, sharp: sharpness(video) });
+        }
+        for (const c of pickSharp(cands)) {
+          await seek(video, c.t);
           const big = await frameFromVideo(video, 1080, 1350, 0.85);
           if (big) {
             const url = URL.createObjectURL(big);
