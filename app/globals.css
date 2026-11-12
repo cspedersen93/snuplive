@@ -2376,3 +2376,37 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 .post-who{text-decoration:none}
 .post-who time{text-decoration:none}
 @media (max-width:520px){.prof-head{margin-top:-26px}}
+
+/* ── "Sådan gør du" i tre trin (HowSimple) ── */
+.feed-new{margin-top:2px}
+.feed-new a{display:inline-flex;align-items:center;gap:8px;font-size:.9375rem;font-weight:600;color:#F6F0EB;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--brass)}
+.feed-new a::after{content:"↓";text-decoration:none;color:var(--brass)}
+#saadan{scroll-margin-top:90px}
+.how2-head{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.home-feed~.sec .how2 .h2{font-size:clamp(2rem,3.6vw,3rem)}
+.how2-body{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center}
+.hs{display:flex;flex-direction:column;gap:22px;min-width:0}
+.hs-tabs{display:inline-flex;align-self:flex-start;padding:5px;border-radius:999px;background:#141316;border:1px solid var(--line)}
+.hs-tabs button{font:inherit;font-weight:600;font-size:1rem;padding:12px 22px;border-radius:999px;border:0;background:none;color:var(--muted);cursor:pointer;transition:background-color .2s,color .2s}
+.hs-tabs button[aria-selected="true"]{background:#F6F0EB;color:#141316}
+.hs-tabs button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.hs-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hs-steps li{position:relative;display:flex;flex-direction:column;gap:10px;padding:22px 20px 24px;border-radius:20px;background:#141316;border:1px solid var(--line)}
+.hs-ico{display:grid;place-items:center;width:60px;height:60px;border-radius:18px;background:rgba(201,167,116,.14);color:var(--brass);margin-bottom:6px}
+.hs-num{position:absolute;right:16px;top:12px;font-size:3.25rem;font-weight:700;letter-spacing:-.05em;line-height:1;color:rgba(255,236,228,.1);font-variant-numeric:tabular-nums}
+.hs-steps h3{font-size:1.375rem;letter-spacing:-.025em;line-height:1.15}
+.hs-steps p{color:#D9D0D2;font-size:1rem;line-height:1.5}
+.hs-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.how2 .hp-stage{min-height:640px}
+@media (max-width:1180px){.how2-body{grid-template-columns:minmax(0,1fr)}.how2 .hp-stage{order:2}}
+@media (max-width:720px){
+  .hs-tabs{align-self:stretch}
+  .hs-tabs button{flex:1;padding:13px 10px}
+  .hs-steps{grid-template-columns:minmax(0,1fr);gap:10px}
+  .hs-steps li{display:grid;grid-template-columns:52px minmax(0,1fr);column-gap:14px;row-gap:4px;padding:16px;align-items:start}
+  .hs-ico{width:52px;height:52px;border-radius:16px;margin:0;grid-row:1/3}
+  .hs-num{font-size:2.25rem;right:14px;top:10px}
+  .hs-steps h3{font-size:1.1875rem;padding-right:34px}
+  .hs-steps p{font-size:.9375rem}
+  .hs-cta .btn{flex:1;justify-content:center;text-align:center}
+}
