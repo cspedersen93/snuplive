@@ -2452,3 +2452,11 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
   .hs-steps p{font-size:.9375rem}
   .hs-cta .btn{flex:1;justify-content:center;text-align:center}
 }
+
+/* Programmet: kortene har fast bredde på brede skærme, så ét show ikke bliver til en lang, tom bjælke */
+@media (min-width:900px){.prog-row{grid-auto-columns:minmax(260px,340px);justify-content:start}}
+.prog-invite{border-style:dashed;border-color:rgba(201,167,116,.45);background:none}
+.prog-invite .prog-time{min-height:36px;display:flex;align-items:center}
+.prog-invite .prog-title{min-height:0;-webkit-line-clamp:3}
+.prog-invite .btn{align-self:flex-start}
+.prog-time,.prog-time small{white-space:nowrap}
