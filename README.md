@@ -1244,6 +1244,7 @@ Når en køber melder et problem, skal der kunne ses, hvad sælgeren viste, og h
   Sælgeren og admin ser dem via links, serveren laver, og som virker i en time (`lib/issueProof.ts`).
 - **Videoen fra showet:** Klippet slettes ikke, mens ordren er betalt eller sendt, mens en sag er åben, eller de første
   30 dage efter, at sagen er afgjort (`clips_to_clean`).
+- **Låst klip:** Når varen er solgt, kan sælgeren ikke slette eller bytte klippet, hverken i studiet eller direkte i lageret.
 - **Admin → Sager:** viser klip eller billede af hver vare, køberens billeder og historikken for begge parter
   (antal køb/salg, antal sager, og hvor mange der endte med refusion).
 - **Sælgeren:** får et tip om at filme pakningen under "Skal sendes".

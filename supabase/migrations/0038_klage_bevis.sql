@@ -96,4 +96,88 @@ $$;
 revoke execute on function public.clips_to_clean() from public, anon, authenticated;
 grant  execute on function public.clips_to_clean() to service_role;
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 4. Sælgeren kan ikke slette eller bytte klippet, når varen er solgt. Før kunne klippet fjernes fra studiet
+--    eller direkte i lageret, også efter et salg, og så var beviset væk.
+-- ─────────────────────────────────────────────────────────────────────────────
+create or replace function public.set_item_clip(p_item uuid, p_path text)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_old    text;
+  v_id     uuid;
+  v_status text;
+begin
+  select i.id, i.clip_path, i.status into v_id, v_old, v_status
+    from public.items i
+   where i.id = p_item and i.seller_id = auth.uid() and i.removed_at is null
+   for update;
+  if v_id is null then
+    raise exception 'Tingen findes ikke';
+  end if;
+  -- Bliver varen købt, mens de 15 sekunder optages, skal det første klip stadig gemmes. Et klip, der findes, kan ikke byttes.
+  if v_status = 'sold' and v_old is not null then
+    raise exception 'Varen er solgt, så videoen kan ikke ændres';
+  end if;
+  update public.items set clip_path = p_path, clip_at = now() where id = p_item;
+  return v_old;
+end;
+$$;
+revoke execute on function public.set_item_clip(uuid, text) from public, anon;
+grant  execute on function public.set_item_clip(uuid, text) to authenticated;
+
+create or replace function public.clear_item_clip(p_item uuid)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_old    text;
+  v_id     uuid;
+  v_status text;
+begin
+  select i.id, i.clip_path, i.status into v_id, v_old, v_status
+    from public.items i
+   where i.id = p_item and i.seller_id = auth.uid()
+   for update;
+  if v_id is null then
+    raise exception 'Tingen findes ikke';
+  end if;
+  if v_status = 'sold' then
+    raise exception 'Varen er solgt, så videoen kan ikke slettes. Den slettes af sig selv senere.';
+  end if;
+  update public.items set clip_path = null, clip_at = null where id = p_item;
+  return v_old;
+end;
+$$;
+revoke execute on function public.clear_item_clip(uuid) from public, anon;
+grant  execute on function public.clear_item_clip(uuid) to authenticated;
+
+-- Samme regel direkte i lageret: filen til en solgt vare kan hverken slettes eller overskrives af sælgeren.
+create or replace function public.clip_is_locked(p_path text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (select 1 from public.items i where i.clip_path = p_path and i.status = 'sold');
+$$;
+revoke execute on function public.clip_is_locked(text) from public, anon;
+grant  execute on function public.clip_is_locked(text) to authenticated, service_role;
+
+drop policy if exists "klip_update_own" on storage.objects;
+create policy "klip_update_own" on storage.objects for update
+  to authenticated
+  using (bucket_id = 'clips' and (storage.foldername(name))[1] = (select auth.uid())::text and not public.clip_is_locked(name))
+  with check (bucket_id = 'clips' and (storage.foldername(name))[1] = (select auth.uid())::text);
+drop policy if exists "klip_delete_own" on storage.objects;
+create policy "klip_delete_own" on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'clips' and (storage.foldername(name))[1] = (select auth.uid())::text and not public.clip_is_locked(name));
+
 notify pgrst, 'reload schema';
