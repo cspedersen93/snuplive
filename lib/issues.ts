@@ -27,3 +27,13 @@ export const RESOLUTION_TEXT: Record<string, string> = {
   closed: "Sagen er lukket.",
   buyer_confirmed: "Køberen har bekræftet, at alt er i orden.",
 };
+
+/** Så mange billeder kan køberen lægge på en sag. */
+export const ISSUE_PHOTOS_MAX = 4;
+
+/** Ved de her grunde skal køberen vise varen, som den ser ud, da den kom. */
+export const PHOTO_REASONS: readonly IssueReason[] = ["not_as_shown", "damaged", "counterfeit"];
+
+/** Billeder på en sag ligger altid i køberens egen mappe: <køberens id>/sag-<tilfældigt>.jpg */
+export const isIssuePhotoPath = (path: unknown, buyerId: string): path is string =>
+  typeof path === "string" && path.startsWith(`${buyerId}/sag-`) && /^[0-9a-f-]{36}\/sag-[a-z0-9-]{4,40}\.jpg$/.test(path);

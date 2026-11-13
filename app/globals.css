@@ -2460,3 +2460,20 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 .prog-invite .prog-title{min-height:0;-webkit-line-clamp:3}
 .prog-invite .btn{align-self:flex-start}
 .prog-time,.prog-time small{white-space:nowrap}
+
+/* Billeder på en sag ("Meld et problem") og beviserne i sagen */
+.problem-ph-l{font-weight:600;font-size:.875rem}
+.problem-ph{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.problem-ph li{position:relative;display:flex;flex-direction:column;gap:4px}
+.problem-ph img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;border:1px solid var(--line-2)}
+.problem-ph button{min-height:32px;border:0;background:none;color:var(--muted);font:inherit;font-size:.8125rem;text-decoration:underline;cursor:pointer}
+.problem-form label.problem-ph-add{align-self:flex-start;margin-top:8px;position:relative;overflow:hidden;justify-content:center}
+.problem-ph-add input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.proof{display:flex;flex-direction:column;gap:10px}
+.proof h3{font-size:.9375rem;margin:0}
+.proof-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.proof-grid figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.proof-grid img,.proof-grid video{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:1px solid var(--line-2);background:#000}
+.proof-grid figcaption{font-size:.8125rem;color:var(--muted)}
+.issue-ph{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.issue-ph img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--line-2)}

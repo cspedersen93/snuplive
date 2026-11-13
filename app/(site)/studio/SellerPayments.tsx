@@ -2,6 +2,7 @@ import Link from "next/link";
 import { IconBox, IconCard, IconInfo } from "@/components/Icons";
 import { itemMeta } from "@/components/Screen";
 import { CARRIERS, isCarrier, LABEL_WEIGHTS, trackingText } from "@/lib/carriers";
+import { issuePhotos } from "@/lib/issueProof";
 import { ISSUE_REASONS, isIssueReason } from "@/lib/issues";
 import { clock, dayLabel, kr } from "@/lib/format";
 import { DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS, sellerPayout, PARCELS } from "@/lib/pricing";
@@ -41,7 +42,7 @@ interface SellerOrder {
   tracking_status: string | null;
   delivered_at: string | null;
   issue_open: boolean;
-  issues: { reason: string; message: string; status: string; created_at: string }[];
+  issues: { id: string; reason: string; message: string; status: string; created_at: string }[];
   buyer: { handle: string } | null;
   show: { title: string } | null;
   sales: { id: string; price: number; item: ItemInfo | null }[];
@@ -59,7 +60,7 @@ interface Reservation {
 const at = (iso: string | null) => (iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "");
 
 /** Køberen har meldt et problem: vis det til sælgeren. */
-function IssueNote({ o }: { o: SellerOrder }) {
+function IssueNote({ o, photos }: { o: SellerOrder; photos: Record<string, string[]> }) {
   const issue = (o.issues ?? []).find((i) => i.status === "open");
   if (!o.issue_open || !issue) return null;
   return (
@@ -68,6 +69,16 @@ function IssueNote({ o }: { o: SellerOrder }) {
       <span>
         {isIssueReason(issue.reason) ? ISSUE_REASONS[issue.reason] : "Problem"}: <q>{issue.message}</q>
       </span>
+      {photos[issue.id]?.length ? (
+        <span className="issue-ph">
+          {photos[issue.id].map((url, n) => (
+            <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={url} alt={`Køberens billede ${n + 1}`} />
+            </a>
+          ))}
+        </span>
+      ) : null}
       <span>Pengene holdes tilbage, mens Relived kigger på sagen. Du har fået en mail, du kan svare på.</span>
     </div>
   );
@@ -92,7 +103,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
     supabase
       .from("orders")
       .select(
-        "id,status,delivery,items_amount,shipping_amount,total_amount,ship_name,ship_line1,ship_line2,ship_postal_code,ship_city,buyer_phone,carrier,tracking,transfer_status,paid_at,sp_carrier,sp_id,sp_name,sp_address,sp_zipcode,sp_city,shipmondo_shipment_id,labelless_code,tracking_status,delivered_at,issue_open,issues:order_issues!order_issues_order_id_fkey(reason,message,status,created_at),buyer:profiles!orders_buyer_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
+        "id,status,delivery,items_amount,shipping_amount,total_amount,ship_name,ship_line1,ship_line2,ship_postal_code,ship_city,buyer_phone,carrier,tracking,transfer_status,paid_at,sp_carrier,sp_id,sp_name,sp_address,sp_zipcode,sp_city,shipmondo_shipment_id,labelless_code,tracking_status,delivered_at,issue_open,issues:order_issues!order_issues_order_id_fkey(id,reason,message,status,created_at),buyer:profiles!orders_buyer_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales:sales!sales_order_id_fkey(id,price,item:items(name,size,condition))",
       )
       .eq("seller_id", uid)
       .in("status", ["paid", "shipped", "completed", "refunded"])
@@ -120,6 +131,10 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
   const finished = orders.filter((o) => o.status === "completed" || o.status === "refunded");
   const earned = orders.filter((o) => o.status === "completed").reduce((a, o) => a + sellerPayout(o), 0);
   const needsLabel = toHandle.some((o) => o.sp_id && !o.shipmondo_shipment_id);
+  // Køberens billeder på åbne sager (0038). De ligger i en lukket mappe, så serveren laver links til sælgeren.
+  const openIssueIds = orders.flatMap((o) => (o.issue_open ? (o.issues ?? []).filter((i) => i.status === "open").map((i) => i.id) : []));
+  const proofAdmin = openIssueIds.length ? createAdminClient() : null;
+  const issuePh = proofAdmin ? await issuePhotos(proofAdmin, openIssueIds) : {};
   const notice = search ? NOTICE[search] : null;
 
   return (
@@ -162,6 +177,9 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
         </div>
         {toHandle.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <p className="fine" style={{ margin: 0 }}>
+              Tip: film eller tag et billede, når du lægger varerne i pakken og lukker den. Så kan du vise, hvad du sendte, hvis køberen melder et problem.
+            </p>
             {toHandle.map((o) => (
               <div className="seller-order" key={o.id}>
                 <div className="so-head">
@@ -253,7 +271,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                     {o.buyer_phone ? ` på ${o.buyer_phone}` : ""} og aftal tid og sted. Køberen bekræfter i appen, når varerne er hentet.
                   </p>
                 )}
-                <IssueNote o={o} />
+                <IssueNote o={o} photos={issuePh} />
                 <RefundButton orderId={o.id} amount={kr(o.total_amount)} />
               </div>
             ))}
@@ -307,7 +325,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                             ? "Modtaget. Pengene venter, til du har tilknyttet udbetaling."
                             : "Modtaget. Udbetalingen bliver forsøgt igen i nat."}
                   </span>
-                  <IssueNote o={o} />
+                  <IssueNote o={o} photos={issuePh} />
                 </div>
                 <span className="num" style={{ fontWeight: 600 }}>{kr(sellerPayout(o))}</span>
               </li>

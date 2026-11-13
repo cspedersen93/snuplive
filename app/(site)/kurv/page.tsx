@@ -132,6 +132,9 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
       .limit(50),
   ]);
 
+  // Billeder på en sag (0038_klage_bevis.sql). Uden filen vises feltet ikke.
+  const photosReady = !(await supabase.from("order_issues").select("photos").limit(1)).error;
+
   // Køberens åbne bud på varer til fast pris (0028_bud_paa_varer.sql). Uden filen er listen tom.
   const offersQ = await supabase
     .from("offers")
@@ -269,7 +272,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           <div className="sec-mini">
             <h2 className="h3">På vej til dig</h2>
             {active.map((o) => (
-              <OrderCard key={o.id} o={o} />
+              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} />
             ))}
           </div>
         ) : null}
@@ -278,7 +281,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           <div className="sec-mini">
             <h2 className="h3">Tidligere køb</h2>
             {done.map((o) => (
-              <OrderCard key={o.id} o={o} />
+              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} />
             ))}
           </div>
         ) : null}
@@ -294,7 +297,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
   );
 }
 
-function OrderCard({ o }: { o: OrderRow }) {
+function OrderCard({ o, uid, photosReady }: { o: OrderRow; uid: string; photosReady: boolean }) {
   const [cls, label] = STATUS[o.status];
   const issue = [...(o.issues ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
   const seller = o.seller;
@@ -388,7 +391,7 @@ function OrderCard({ o }: { o: OrderRow }) {
           {o.status === "shipped" || (o.status === "paid" && o.delivery === "pickup") ? (
             <ConfirmReceived orderId={o.id} pickup={o.delivery === "pickup"} />
           ) : null}
-          {(o.status === "paid" || o.status === "shipped") && !o.issue_open ? <ReportProblem orderId={o.id} business={seller?.seller_type === "business"} /> : null}
+          {(o.status === "paid" || o.status === "shipped") && !o.issue_open ? <ReportProblem orderId={o.id} uid={uid} photosReady={photosReady} business={seller?.seller_type === "business"} /> : null}
         </div>
       </div>
     </section>

@@ -1234,3 +1234,19 @@ forslag til en annonce pr. vare. `app/(site)/studio/[id]/PileFilm.tsx`.
 - **Grænser:** højst 24 varer pr. video og 6 videoer på 10 minutter pr. sælger.
 - **Ikke prøvet endnu:** rigtige videoer fra en iPhone eller Android, og hvor godt Claude deler en rigtig bunke op.
   Testen bruger en lavet video og en falsk Claude.
+
+## Beviser i en sag (0038)
+
+Når en køber melder et problem, skal der kunne ses, hvad sælgeren viste, og hvad køberen fik.
+
+- **Køberens billeder:** Ved "ikke som vist", "gået i stykker" og "falsk" skal køberen vedhæfte mindst ét billede (højst fire).
+  Billederne ligger i den lukkede mappe `issues` under `<køberens id>/sag-….jpg` og kan ikke byttes ud bagefter.
+  Sælgeren og admin ser dem via links, serveren laver, og som virker i en time (`lib/issueProof.ts`).
+- **Videoen fra showet:** Klippet slettes ikke, mens ordren er betalt eller sendt, mens en sag er åben, eller de første
+  30 dage efter, at sagen er afgjort (`clips_to_clean`).
+- **Admin → Sager:** viser klip eller billede af hver vare, køberens billeder og historikken for begge parter
+  (antal køb/salg, antal sager, og hvor mange der endte med refusion).
+- **Sælgeren:** får et tip om at filme pakningen under "Skal sendes".
+- Før `0038_klage_bevis.sql` er kørt, virker "Meld et problem" som før, uden billedfelt.
+
+Test: `qa_bevis.py` (`med` / `uden`).

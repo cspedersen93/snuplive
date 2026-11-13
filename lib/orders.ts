@@ -473,7 +473,7 @@ export async function resolveIssues(
 }
 
 /** Køberen melder et problem. Pengene holdes tilbage, og admin og sælger får en mail. */
-export async function reportIssue(admin: AdminClient, orderId: string, buyerId: string, reason: IssueReason, message: string) {
+export async function reportIssue(admin: AdminClient, orderId: string, buyerId: string, reason: IssueReason, message: string, photos: string[] = []) {
   const { data: order } = await admin
     .from("orders")
     .select(
@@ -488,7 +488,14 @@ export async function reportIssue(admin: AdminClient, orderId: string, buyerId: 
   }
   if (order.issue_open) throw new IssueError("Du har allerede meldt et problem med den her ordre.");
 
-  const { error } = await admin.from("order_issues").insert({ order_id: orderId, buyer_id: buyerId, reason, message });
+  // Billederne skal faktisk ligge i lageret. Før 0038 er kørt, findes kolonnen ikke, og sagen gemmes uden billeder.
+  const row: Record<string, unknown> = { order_id: orderId, buyer_id: buyerId, reason, message };
+  if (photos.length) row.photos = photos;
+  let { error } = await admin.from("order_issues").insert(row);
+  if (error && photos.length && /photos/i.test(error.message) && /column|schema/i.test(error.message)) {
+    photos = [];
+    ({ error } = await admin.from("order_issues").insert({ order_id: orderId, buyer_id: buyerId, reason, message }));
+  }
   if (error) {
     if (/duplicate|unique/i.test(error.message)) throw new IssueError("Du har allerede meldt et problem med den her ordre.");
     throw error;
@@ -512,6 +519,7 @@ export async function reportIssue(admin: AdminClient, orderId: string, buyerId: 
       "",
       `Grund: ${what}`,
       `Beskrivelse: ${message}`,
+      `Billeder fra køberen: ${photos.length ? photos.length : "ingen"}`,
       `Beløb: ${kr(o.total_amount)}`,
       `Ordre: ${orderId}`,
       "",
@@ -532,6 +540,7 @@ export async function reportIssue(admin: AdminClient, orderId: string, buyerId: 
         "",
         `Grund: ${what}`,
         `Køberen skriver: ${message}`,
+        ...(photos.length ? [`Køberen har vedhæftet ${photos.length === 1 ? "et billede" : `${photos.length} billeder`}. Du kan se dem på ordren i dit studie.`] : []),
         "",
         "Pengene for ordren holdes tilbage, mens Relived kigger på sagen. Du kan svare på den her mail, hvis du vil fortælle din side.",
         "",
