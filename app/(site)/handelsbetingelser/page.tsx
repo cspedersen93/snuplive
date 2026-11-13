@@ -19,7 +19,7 @@ export default async function Handelsbetingelser() {
   const free = await feeFreeState();
   const freeDay = free.active && free.until ? feeFreeDay(free.until) : null;
   return (
-    <LegalPage title="Handelsbetingelser for købere" crumb="Handelsbetingelser" updated="oktober 2026">
+    <LegalPage title="Handelsbetingelser for købere" crumb="Handelsbetingelser" updated="13. november 2026">
       <p className="lede">
         Her står, hvad der gælder, når du køber på Relived. Sælgerne har deres egne <Link href="/vilkaar">vilkår</Link>.
       </p>
@@ -78,6 +78,18 @@ export default async function Handelsbetingelser() {
         Kommer pakken ikke frem, eller er varen væsentligt anderledes end vist og beskrevet, så tryk <b>Meld et problem</b> på ordren
         under Mine køb, før ordren er afsluttet. Så holder vi pengene tilbage, sælgeren får besked, og vi hjælper jer med at finde en
         løsning. Kan I ikke blive enige, afgør vi sagen og kan give dig pengene tilbage.
+      </p>
+      <p>
+        Er varen ikke som vist, gået i stykker eller falsk, skal du vedhæfte billeder af varen, som du modtog den. Vi sammenligner
+        dem med videoen og billederne fra showet.
+      </p>
+      <p>
+        Giver vi dig medhold, sender du varen retur til sælgeren med sporing inden 7 dage. Du får pengene tilbage, når varen er
+        sendt. Skal varen ikke retur, fx fordi den er falsk eller ødelagt, giver vi besked.
+      </p>
+      <p>
+        Vi kan afvise en sag, hvis billederne ikke viser det, du beskriver, eller hvis varen ikke er den, der blev vist. Misbrug af
+        køberbeskyttelsen kan føre til, at kontoen lukkes.
       </p>
       <p>
         Køberbeskyttelsen dækker ikke, at du har fortrudt et køb fra en privatperson, eller slid og fejl, som sælgeren viste eller
