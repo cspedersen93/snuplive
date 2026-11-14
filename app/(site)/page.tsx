@@ -109,7 +109,7 @@ export default async function Forside() {
                 <span className="feed-live-go"> · Se med</span>
               </Link>
             ) : (
-              <span className="label brass feed-eyebrow">Live Sale. Second Hand.</span>
+              <span className="label brass feed-eyebrow">Lights. Camera. Relived.</span>
             )}
             <h1 id="h-forside" className="h1 feed-h1">
               Second hand, du kan se <em className="s">live</em>, før du køber
