@@ -7,7 +7,9 @@ import { fetchFeed } from "@/lib/queries";
 import { siteOpen } from "@/lib/siteAccess";
 import { createPublicClient } from "@/lib/supabase/public";
 
-export const revalidate = 600;
+// Skal følge kontakten "siden er åben" med det samme. Med en fast udløbstid blev filen hængende i dagevis,
+// efter at siden var åbnet, og Google måtte kun se forsiden og guiderne.
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
