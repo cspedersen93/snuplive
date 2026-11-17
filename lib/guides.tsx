@@ -52,6 +52,7 @@ const SAELG: GuideCta = { text: BETA ? "Det er gratis at sælge på Relived i be
 
 export const GUIDES: Guide[] = [
   {
+    // Undtagelse fra reglen om altid at skrive "varer": de to spørgsmål nederst siger "brugte ting", fordi det er det, folk søger på (Casper, 17/11).
     slug: "saelg-brugt-paa-nettet",
     audience: "Sælger",
     keyword: "sælg brugt på nettet",
@@ -209,10 +210,10 @@ export const GUIDES: Guide[] = [
       },
     ],
     faq: [
-      ["Hvor kan man sælge brugte varer på nettet?", "På annoncesider, i apps til tøj, i budsalg og i live-salg på video. Har du få, store varer, er en annonce nok. Har du mange, går det hurtigst at vise dem frem på video."],
+      ["Hvor kan man sælge brugte ting på nettet?", "På annoncesider, i apps til tøj, i budsalg og i live-salg på video. Har du få, store varer, er en annonce nok. Har du mange, går det hurtigst at vise dem frem på video."],
       ["Hvad sælger bedst brugt?", "Tøj og sko i god stand, børnetøj og udstyr, møbler og lamper, mærkevarer og samleobjekter. Varen skal være hel, ren og virke."],
       ["Hvordan undgår jeg at blive snydt, når jeg sælger brugt?", "Send aldrig, før pengene er betalt, tryk ikke på links fra køberen, send med sporing, og lad køberen betale gennem markedspladsen."],
-      ["Skal jeg betale skat, når jeg sælger mine brugte varer?", "Som regel ikke, når det er dine egne private varer. Køber du varer for at sælge dem videre, gælder der andre regler."],
+      ["Skal jeg betale skat, når jeg sælger mine brugte ting?", "Som regel ikke, når det er dine egne private varer. Køber du varer for at sælge dem videre, gælder der andre regler."],
       ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten.`],
     ],
     related: ["saelg-brugt-toej", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
