@@ -52,6 +52,173 @@ const SAELG: GuideCta = { text: BETA ? "Det er gratis at sælge på Relived i be
 
 export const GUIDES: Guide[] = [
   {
+    slug: "saelg-brugt-paa-nettet",
+    audience: "Sælger",
+    keyword: "sælg brugt på nettet",
+    title: "Sælg brugt på nettet: sådan gør du trin for trin | Relived",
+    description:
+      "Sælg brugt på nettet uden bøvl: find ud af, hvad der kan sælges, sæt prisen, vis varen frem, undgå svindel, og send den sikkert. Trin for trin.",
+    h1: "Sælg brugt på nettet: sådan får du solgt dine brugte varer",
+    short: "Sælg brugt på nettet",
+    lede: (
+      <>
+        Skabe, kælder og loft er fulde af varer, andre gerne vil betale for. Det svære er sjældent at finde en køber. Det er at få
+        det gjort. Her er hele vejen fra bunke til betaling, så du kan sælge brugt på nettet uden at bruge dine aftener på det.
+      </>
+    ),
+    teaser: "Hele vejen fra bunke til betaling: hvad der sælger, pris, billeder, svindel og forsendelse.",
+    image: { src: "/img/kat-dametoej.jpg", alt: "Brugt tøj, et par sneakers og en brun lædertaske lagt frem til salg", width: 1156, height: 1064, position: "50% 50%" },
+    published: "2026-11-17",
+    updated: "2026-11-17",
+    sections: [
+      {
+        id: "hvad",
+        h2: "Hvad kan du sælge brugt på nettet?",
+        body: (
+          <>
+            <p>Næsten alt, der er helt, rent og virker. Det her er lettest at få solgt:</p>
+            <ul>
+              <li>Tøj, sko og tasker. Se <Link href="/guides/saelg-brugt-toej">sælg brugt tøj</Link> og <Link href="/guides/saelg-brugte-sneakers">sælg brugte sneakers</Link>.</li>
+              <li>Børnetøj, legetøj og udstyr. Se <Link href="/guides/saelg-brugt-boernetoej">sælg brugt børnetøj</Link> og <Link href="/guides/saelg-brugt-barnevogn">sælg brugt barnevogn</Link>.</li>
+              <li>Møbler, lamper og design. Se <Link href="/guides/saelg-brugte-moebler">sælg brugte møbler</Link>.</li>
+              <li>Mærkevarer og designertasker. Se <Link href="/guides/saelg-designertaske">sælg designertaske</Link>.</li>
+              <li>Vinyl, bøger, kort og andre samleobjekter. Se <Link href="/guides/saelg-samleobjekter">sælg samleobjekter</Link>.</li>
+            </ul>
+            <p>
+              Det, der er slidt op, plettet eller i stykker, er sjældent besværet værd. Giv det væk, eller aflevér det til genbrug,
+              og brug tiden på det, der kan sælges.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "hvor",
+        h2: "Hvor kan du sælge dine brugte varer?",
+        body: (
+          <>
+            <p>Der er fire slags steder, og de passer til hver sin slags vare:</p>
+            <ul>
+              <li><b>Annoncesider.</b> Du lægger en annonce op og venter på henvendelser. Godt til store varer, der skal hentes.</li>
+              <li><b>Apps til tøj.</b> Du fotograferer og beskriver ét stykke ad gangen. Godt til enkelte stykker tøj, men det tager tid, når du har mange.</li>
+              <li><b>Budsalg.</b> Køberne byder, og højeste bud vinder. Godt til varer, som flere vil have, og hvor du er i tvivl om prisen.</li>
+              <li><b>Live-salg på video.</b> Du viser varerne frem én ad gangen, mens køberne ser med og spørger. Godt, når du har mange varer og vil have dem solgt på én aften.</li>
+            </ul>
+            <p>
+              Har du 3 varer, er en annonce nok. Har du 30, er det hurtigere at vise dem frem på video end at skrive 30 annoncer. Læs
+              mere i <Link href="/guides/hvad-er-live-shopping">hvad er live shopping</Link>.
+            </p>
+          </>
+        ),
+        cta: { text: "Vis dine varer frem på video, og sælg en hel bunke på én aften.", href: "/saelg", label: "Sådan sælger du live" },
+      },
+      {
+        id: "klar",
+        h2: "Hvordan gør du varen klar til salg?",
+        body: (
+          <>
+            <p>Ti minutter her giver en højere pris og færre spørgsmål:</p>
+            <ol>
+              <li><b>Gør den ren.</b> Vask tøjet, tør møblet af, og puds skoene.</li>
+              <li><b>Tjek, at den virker.</b> Lynlåse, knapper, hjul og ledninger.</li>
+              <li><b>Find mål og mærke.</b> Størrelse, længde og bredde, og hvad der står på mærket.</li>
+              <li><b>Skriv fejlene ned.</b> En plet eller en ridse, du selv fortæller om, giver ingen klager bagefter.</li>
+            </ol>
+          </>
+        ),
+      },
+      {
+        id: "pris",
+        h2: "Hvordan sætter du prisen på brugte varer?",
+        body: (
+          <>
+            <p>
+              Se, hvad tilsvarende varer faktisk bliver solgt for, ikke hvad de bliver sat til salg for. Sæt din pris lidt under,
+              hvis du vil have varen solgt hurtigt, og sæt den ned efter en uge, hvis ingen har bidt på.
+            </p>
+            <p>
+              Er du i tvivl, så lad køberne bestemme med et budsalg. Til tøj er der en tommelfingerregel i{" "}
+              <Link href="/guides/pris-paa-brugt-toej">pris på brugt tøj</Link>.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "billeder",
+        h2: "Billeder eller video: hvad sælger bedst?",
+        body: (
+          <>
+            <p>
+              Køberen kan ikke røre ved varen, så dit billede skal gøre arbejdet. Brug dagslys, en rolig baggrund, og vis varen forfra,
+              bagfra og tæt på, også der, hvor den har en fejl.
+            </p>
+            <p>
+              Video viser det, et billede ikke kan: hvordan stoffet falder, om skuffen glider, og hvor stor varen er i en hånd. Når
+              køberen kan spørge imens, er der ikke meget tilbage at være i tvivl om. Se tjeklisten i{" "}
+              <Link href="/guides/saelg-live-foerste-gang">sælg live første gang</Link>.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "svindel",
+        h2: "Hvordan undgår du svindel, når du sælger brugt?",
+        body: (
+          <>
+            <p>De fleste handler går fint. De få, der går galt, ligner hinanden. Hold dig til de her regler:</p>
+            <ul>
+              <li><b>Send aldrig, før pengene er betalt.</b> Et skærmbillede af en overførsel er ikke en betaling.</li>
+              <li><b>Tryk ikke på links fra køberen.</b> En køber, der vil have dig til at &quot;bekræfte&quot; noget på en anden side, er ude efter dine kortoplysninger.</li>
+              <li><b>Sig nej til at få for meget.</b> En køber, der betaler for meget og beder om resten retur, er et kendt trick.</li>
+              <li><b>Send med sporing.</b> Så kan du vise, at pakken er afleveret.</li>
+              <li><b>Handl gennem siden.</b> Når køberen betaler gennem markedspladsen, står pengene der, før du sender.</li>
+            </ul>
+            <p>
+              På Relived betaler køberen gennem siden, før varen bliver sendt eller hentet, og videoen fra showet viser, hvad du har
+              solgt, hvis der bliver tvivl bagefter.
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "send",
+        h2: "Hvordan sender du varen?",
+        body: (
+          <>
+            <p>
+              Små og mellemstore varer sendes fra en pakkeshop. Pak varen, så den ikke kan ryste i kassen, og aflevér den inden for et
+              par dage. Store varer som møbler og cykler er billigst at lade køberen hente.
+            </p>
+            <p>
+              På Relived betaler køberen fragten, du får en fragtlabel til pakken, og køber samme person flere varer hos dig, kommer
+              de i én pakke.
+            </p>
+          </>
+        ),
+        cta: SAELG,
+      },
+      {
+        id: "skat",
+        h2: "Skal du betale skat, når du sælger brugt?",
+        body: (
+          <p>
+            Sælger du dine egne private varer, skal du som regel ikke betale skat af pengene. Det er anderledes, hvis du køber varer
+            for at sælge dem videre. Se reglerne, og hvad markedspladser indberetter, i{" "}
+            <Link href="/guides/skat-ved-salg-af-brugt-toej">skat ved salg af brugt tøj</Link>.
+          </p>
+        ),
+      },
+    ],
+    faq: [
+      ["Hvor kan man sælge brugte varer på nettet?", "På annoncesider, i apps til tøj, i budsalg og i live-salg på video. Har du få, store varer, er en annonce nok. Har du mange, går det hurtigst at vise dem frem på video."],
+      ["Hvad sælger bedst brugt?", "Tøj og sko i god stand, børnetøj og udstyr, møbler og lamper, mærkevarer og samleobjekter. Varen skal være hel, ren og virke."],
+      ["Hvordan undgår jeg at blive snydt, når jeg sælger brugt?", "Send aldrig, før pengene er betalt, tryk ikke på links fra køberen, send med sporing, og lad køberen betale gennem markedspladsen."],
+      ["Skal jeg betale skat, når jeg sælger mine brugte varer?", "Som regel ikke, når det er dine egne private varer. Køber du varer for at sælge dem videre, gælder der andre regler."],
+      ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten.`],
+    ],
+    related: ["saelg-brugt-toej", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
+    end: { h2: "Klar til at sælge dine brugte varer?", text: "Opret en gratis konto, læg varerne ind, og vis dem frem på video.", href: "/saelg", label: "Bliv sælger" },
+  },
+  {
     slug: "saelg-brugt-toej",
     audience: "Sælger",
     keyword: "sælg brugt tøj",
@@ -2075,6 +2242,7 @@ export const GUIDES: Guide[] = [
 // Hvilke kategorier en guide handler om (kategoriens slug). Guiden linker til dem, og kategorisiden linker tilbage,
 // så Google kan følge sporet fra en guide til de sider, hvor varerne er.
 export const GUIDE_CATEGORIES: Record<string, string[]> = {
+  "saelg-brugt-paa-nettet": ["dametoej", "boernetoej", "bolig-og-design", "samleobjekter"],
   "saelg-brugt-toej": ["dametoej", "herretoej", "boernetoej"],
   "pris-paa-brugt-toej": ["dametoej", "herretoej", "boernetoej"],
   "skat-ved-salg-af-brugt-toej": ["dametoej", "herretoej"],
