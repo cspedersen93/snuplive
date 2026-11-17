@@ -52,18 +52,18 @@ const SAELG: GuideCta = { text: BETA ? "Det er gratis at sælge på Relived i be
 
 export const GUIDES: Guide[] = [
   {
-    // Undtagelse fra reglen om altid at skrive "varer": de to spørgsmål nederst siger "brugte ting", fordi det er det, folk søger på (Casper, 17/11).
+    // Undtagelse fra reglen om altid at skrive "varer": overskrifterne og de to spørgsmål nederst siger "brugte ting", fordi det er det, folk søger på (Casper, 17/11).
     slug: "saelg-brugt-paa-nettet",
     audience: "Sælger",
     keyword: "sælg brugt på nettet",
     title: "Sælg brugt på nettet: sådan gør du trin for trin | Relived",
     description:
       "Sælg brugt på nettet uden bøvl: find ud af, hvad der kan sælges, sæt prisen, vis varen frem, undgå svindel, og send den sikkert. Trin for trin.",
-    h1: "Sælg brugt på nettet: sådan får du solgt dine brugte varer",
+    h1: "Sælg brugt på nettet: sådan får du solgt dine brugte ting",
     short: "Sælg brugt på nettet",
     lede: (
       <>
-        Skabe, kælder og loft er fulde af varer, andre gerne vil betale for. Det svære er sjældent at finde en køber. Det er at få
+        Skabe, kælder og loft er fulde af ting, andre gerne vil betale for. Det svære er sjældent at finde en køber. Det er at få
         det gjort. Her er hele vejen fra bunke til betaling, så du kan sælge brugt på nettet uden at bruge dine aftener på det.
       </>
     ),
@@ -94,7 +94,7 @@ export const GUIDES: Guide[] = [
       },
       {
         id: "hvor",
-        h2: "Hvor kan du sælge dine brugte varer?",
+        h2: "Hvor kan du sælge dine brugte ting?",
         body: (
           <>
             <p>Der er fire slags steder, og de passer til hver sin slags vare:</p>
@@ -129,7 +129,7 @@ export const GUIDES: Guide[] = [
       },
       {
         id: "pris",
-        h2: "Hvordan sætter du prisen på brugte varer?",
+        h2: "Hvordan sætter du prisen på brugte ting?",
         body: (
           <>
             <p>
@@ -217,7 +217,7 @@ export const GUIDES: Guide[] = [
       ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}. Køberen betaler fragten.`],
     ],
     related: ["saelg-brugt-toej", "pris-paa-brugt-toej", "saelg-live-foerste-gang"],
-    end: { h2: "Klar til at sælge dine brugte varer?", text: "Opret en gratis konto, læg varerne ind, og vis dem frem på video.", href: "/saelg", label: "Bliv sælger" },
+    end: { h2: "Klar til at sælge dine brugte ting?", text: "Opret en gratis konto, læg varerne ind, og vis dem frem på video.", href: "/saelg", label: "Bliv sælger" },
   },
   {
     slug: "saelg-brugt-toej",
