@@ -3,12 +3,14 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import CategoryIcon from "@/components/CategoryIcon";
 import EmptyNext from "@/components/EmptyNext";
+import GuideCards from "@/components/GuideCards";
 import { IconBag } from "@/components/Icons";
 import ItemCard from "@/components/ItemCard";
 import ShowCard from "@/components/ShowCard";
 import SortNote from "@/components/SortNote";
 import { CATEGORY_PAGES } from "@/lib/categoryPages";
 import { CATEGORIES, categoryBySlug } from "@/lib/format";
+import { guidesForCategory } from "@/lib/guides";
 import { feedTotal } from "@/lib/items";
 import { fetchFeed, fetchListing } from "@/lib/queries";
 
@@ -64,6 +66,7 @@ export default async function Kategori({ params }: Params) {
     fetchFeed("for_sale", { category: cat.key, limit: FOR_SALE }),
   ]);
   const shows = [...live, ...upcoming].slice(0, 10);
+  const guides = guidesForCategory(cat.slug).slice(0, 3);
   const forSaleTotal = feedTotal(forSale);
   const allForSale = `/til-salg?kategori=${cat.slug}`;
 
@@ -201,7 +204,19 @@ export default async function Kategori({ params }: Params) {
         </section>
       ) : null}
 
-      <section className="sec tight" style={{ paddingTop: copy.sellH2 ? undefined : 0 }} aria-labelledby="h-kat-andre">
+      {guides.length ? (
+        <section className="sec tight" style={{ paddingTop: copy.sellH2 ? undefined : 0, paddingBottom: 0 }} aria-labelledby="h-kat-guides">
+          <div className="wrap">
+            <div className="row-head">
+              <h2 className="h3" id="h-kat-guides">Guides om {cat.word}</h2>
+              <Link className="linkbtn" href="/guides">Alle guides</Link>
+            </div>
+            <GuideCards guides={guides} />
+          </div>
+        </section>
+      ) : null}
+
+      <section className="sec tight" style={{ paddingTop: copy.sellH2 || guides.length ? undefined : 0 }} aria-labelledby="h-kat-andre">
         <div className="wrap">
           <h2 className="h3" id="h-kat-andre" style={{ marginBottom: 16 }}>Andre kategorier</h2>
           <nav className="filters" aria-label="Andre kategorier">

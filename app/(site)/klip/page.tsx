@@ -43,6 +43,17 @@ export default async function KlipPage({ searchParams }: Props) {
             source="nyhedsbrev-tom-klip"
           />
         </div>
+        <div className="prose page-text" style={{ marginTop: 40 }}>
+          <h2>Korte klip af varer til salg</h2>
+          <p>
+            Når en sælger viser en vare frem i et show, gemmer vi de første sekunder som et klip. Her kan du swipe gennem klippene, se
+            varen med lyd og billede og købe den med ét tryk.
+          </p>
+          <p>
+            Indtil der er klip, kan du se, <Link href="/live">hvem der er live</Link>, eller finde{" "}
+            <Link href="/til-salg">brugte varer til fast pris</Link>.
+          </p>
+        </div>
       </div>
     );
   }

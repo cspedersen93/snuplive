@@ -2072,6 +2072,33 @@ export const GUIDES: Guide[] = [
   },
 ];
 
+// Hvilke kategorier en guide handler om (kategoriens slug). Guiden linker til dem, og kategorisiden linker tilbage,
+// så Google kan følge sporet fra en guide til de sider, hvor varerne er.
+export const GUIDE_CATEGORIES: Record<string, string[]> = {
+  "saelg-brugt-toej": ["dametoej", "herretoej", "boernetoej"],
+  "pris-paa-brugt-toej": ["dametoej", "herretoej", "boernetoej"],
+  "skat-ved-salg-af-brugt-toej": ["dametoej", "herretoej"],
+  "er-designertasken-aegte": ["luksus"],
+  "hvad-er-live-shopping": ["dametoej", "bolig-og-design", "samleobjekter"],
+  "koeb-brugt-toej-online": ["dametoej", "herretoej", "boernetoej"],
+  "saelg-live-foerste-gang": ["dametoej", "bolig-og-design", "samleobjekter"],
+  "saelg-brugt-boernetoej": ["boernetoej", "cykler-og-barnevogne"],
+  "koeb-brugt-design": ["bolig-og-design"],
+  "saelg-samleobjekter": ["samleobjekter"],
+  "saelg-designertaske": ["luksus", "dametoej"],
+  "saelg-brugt-barnevogn": ["cykler-og-barnevogne", "boernetoej"],
+  "saelg-brugte-moebler": ["bolig-og-design"],
+  "saelg-brugte-sneakers": ["herretoej", "dametoej"],
+  flyttesalg: ["bolig-og-design", "samleobjekter"],
+};
+
+/** Guiderne, der handler om en kategori (kategoriens slug), de vigtigste først. */
+export function guidesForCategory(categorySlug: string): Guide[] {
+  const hits = GUIDES.filter((g) => (GUIDE_CATEGORIES[g.slug] ?? []).includes(categorySlug));
+  // Guider, der har kategorien som deres første, står før dem, der kun nævner den. Ellers som i listen ovenfor.
+  return hits.sort((a, b) => GUIDE_CATEGORIES[a.slug].indexOf(categorySlug) - GUIDE_CATEGORIES[b.slug].indexOf(categorySlug));
+}
+
 export function guideBySlug(slug: string) {
   return GUIDES.find((g) => g.slug === slug);
 }

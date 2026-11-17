@@ -2477,3 +2477,7 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 .proof-grid figcaption{font-size:.8125rem;color:var(--muted)}
 .issue-ph{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .issue-ph img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--line-2)}
+
+/* Fast tekst nederst på oversigtssider (live, til salg, klip), så siden også siger noget, når der ingen varer er */
+.page-text{max-width:68ch}
+.page-text h2{margin-top:0}

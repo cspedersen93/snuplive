@@ -117,6 +117,29 @@ export default async function TilSalg({ searchParams }: Props) {
         </div>
       </section>
 
+      {page === 1 ? (
+        <section className="sec tight" style={{ paddingTop: 0 }} aria-labelledby="h-salg-om">
+          <div className="wrap">
+            <div className="prose page-text">
+              <h2 id="h-salg-om">Brugt til fast pris, vist på video</h2>
+              <p>
+                Her finder du varer, du kan købe med det samme, uden at vente på et show. Varerne er vist frem i et live-show eller i en
+                videoannonce, så du kan se dem i bevægelse, før du køber.
+              </p>
+              <p>
+                Prisen står på varen, og fragten lægges til i kurven. Sælgeren får først pengene, når du har varen. Er varen ikke som
+                vist, melder du et problem, og pengene bliver stående, mens vi ser på sagen.
+              </p>
+              <p>
+                Læs mere om <Link href="/saadan-virker-det">køberbeskyttelse og fragt</Link>, eller få gode råd i guiden{" "}
+                <Link href="/guides/koeb-brugt-toej-online">Køb brugt tøj online</Link>. Vil du hellere se varerne blive vist frem, kan du
+                se, <Link href="/live">hvem der er live</Link>.
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
     </>
   );
 }

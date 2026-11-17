@@ -111,6 +111,27 @@ export default async function LiveNu() {
         </section>
       ) : null}
 
+      <section className="sec tight" aria-labelledby="h-live-om">
+        <div className="wrap">
+          <div className="prose page-text">
+            <h2 id="h-live-om">Hvad er et live-show på Relived?</h2>
+            <p>
+              I et live-show viser sælgeren sine varer frem på video, én ad gangen. Du ser stand, farve og detaljer, mens det sker, og du
+              kan bede sælgeren vende varen, måle den eller holde den tæt på kameraet.
+            </p>
+            <p>
+              Stil dine spørgsmål i chatten, og tryk Køb, når du har set nok. Sælgeren får først pengene, når du har varen, og køber du
+              flere varer af samme sælger, kommer de i én pakke.
+            </p>
+            <p>
+              Er der ingen live lige nu? Se <Link href="/til-salg">brugte varer til fast pris</Link>, find en{" "}
+              <Link href="/kategori">kategori</Link>, eller læs <Link href="/guides/hvad-er-live-shopping">hvad live shopping er</Link>. Vil
+              du selv sende, kan du <Link href="/saelg">sælge dine varer live</Link>.
+            </p>
+          </div>
+        </div>
+      </section>
+
     </>
   );
 }

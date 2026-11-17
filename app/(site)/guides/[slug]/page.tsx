@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import GuideCards, { AUDIENCE, readMinutes } from "@/components/GuideCards";
 import { SITE_URL } from "@/lib/env";
-import { GUIDES, guideBySlug, guideDate, guideHref, type Guide } from "@/lib/guides";
+import { CATEGORIES } from "@/lib/format";
+import { GUIDE_CATEGORIES, GUIDES, guideBySlug, guideDate, guideHref, type Guide } from "@/lib/guides";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -37,6 +38,7 @@ export default async function GuidePage({ params }: Params) {
   if (!g) notFound();
   const url = `${SITE_URL}${guideHref(g)}`;
   const related = g.related.map(guideBySlug).filter((x): x is Guide => Boolean(x));
+  const cats = (GUIDE_CATEGORIES[g.slug] ?? []).map((slug) => CATEGORIES.find((c) => c.slug === slug)).filter((c) => c !== undefined);
 
   const ld = {
     "@context": "https://schema.org",
@@ -153,6 +155,22 @@ export default async function GuidePage({ params }: Params) {
           </div>
         </div>
       </article>
+
+      {cats.length ? (
+        <section className="sec tight" style={{ paddingBottom: 0 }} aria-labelledby="h-guide-kat">
+          <div className="wrap">
+            <h2 className="h3" id="h-guide-kat" style={{ marginBottom: 16 }}>Se varerne på Relived</h2>
+            <nav className="filters" aria-label="Kategorier, guiden handler om">
+              {cats.map((c) => (
+                <Link key={c.key} className="fchip" href={`/kategori/${c.slug}`}>
+                  {c.label}
+                </Link>
+              ))}
+              <Link className="fchip" href="/til-salg">Alt til fast pris</Link>
+            </nav>
+          </div>
+        </section>
+      ) : null}
 
       {related.length ? (
         <section className="sec tight" aria-labelledby="h-flere">
