@@ -22,6 +22,9 @@ import { createClient, getUserId } from "@/lib/supabase/server";
 import { SELLER_FACT_COLS, type Profile } from "@/lib/types";
 import { videoShowId } from "@/lib/videoShow";
 import SellerRatings, { type Rating } from "../../live/[handle]/SellerRatings";
+import { og } from "@/lib/og";
+import JsonLd, { crumbsLd } from "@/components/JsonLd";
+import { SITE_URL } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
@@ -96,7 +99,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title: `${s.handle}: second hand${where}`,
     description: desc.slice(0, 155),
     alternates: { canonical: `/profil/${s.handle}` },
-    openGraph: d.extra?.cover_path ? { images: [storageUrl("covers", d.extra.cover_path)] } : undefined,
+    openGraph: og(`/profil/${s.handle}`, { type: "profile", ...(d.extra?.cover_path ? { images: [storageUrl("covers", d.extra.cover_path)] } : {}) }),
   };
 }
 
@@ -114,8 +117,35 @@ export default async function ProfilePage({ params }: Params) {
   const since = new Date(s.created_at).toLocaleDateString("da-DK", { month: "long", year: "numeric", timeZone: "Europe/Copenhagen" });
   const nextShow = d.planned[0] ?? null;
 
+  const avatar = s.avatar_path ? storageUrl("avatars", s.avatar_path) : null;
   return (
     <div className="prof">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "ProfilePage",
+              url: `${SITE_URL}/profil/${s.handle}`,
+              dateCreated: s.created_at,
+              inLanguage: "da-DK",
+              mainEntity: {
+                "@type": "Person",
+                name: s.display_name || s.handle,
+                alternateName: s.handle,
+                identifier: s.handle,
+                url: `${SITE_URL}/profil/${s.handle}`,
+                ...(d.extra?.bio ? { description: d.extra.bio } : {}),
+                ...(avatar ? { image: avatar } : {}),
+                ...(d.followers !== null
+                  ? { interactionStatistic: { "@type": "InteractionCounter", interactionType: "https://schema.org/FollowAction", userInteractionCount: d.followers } }
+                  : {}),
+              },
+            },
+            crumbsLd([["Forside", "/"], [s.handle, `/profil/${s.handle}`]]),
+          ],
+        }}
+      />
       <div className={`prof-cover${d.extra?.cover_path ? "" : " none"}`}>
         {d.extra?.cover_path ? (
           // eslint-disable-next-line @next/next/no-img-element

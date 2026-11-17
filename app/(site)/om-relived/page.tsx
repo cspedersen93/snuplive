@@ -6,11 +6,15 @@ import ReuseCounter from "@/components/ReuseCounter";
 import SupportLink from "@/components/SupportLink";
 import { COMPANY } from "@/lib/company";
 import { reusedCount } from "@/lib/reuse";
+import { og } from "@/lib/og";
+import JsonLd, { crumbsLd, orgLd } from "@/components/JsonLd";
+import { SITE_URL } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Om Relived og kontakt",
   description: "Relived er en dansk markedsplads, hvor brugt tøj og andre varer bliver solgt live på video. Læs, hvorfor vi har lavet den, og hvordan du kontakter os.",
   alternates: { canonical: "/om-relived" },
+  openGraph: og("/om-relived"),
 };
 
 export const revalidate = 300;
@@ -19,6 +23,16 @@ export default async function OmRelived() {
   const reused = await reusedCount();
   return (
     <LegalPage title="Om Relived og kontakt" crumb="Om Relived" updated="oktober 2026">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            { "@type": "AboutPage", url: `${SITE_URL}/om-relived`, name: "Om Relived og kontakt", inLanguage: "da-DK", mainEntity: { "@id": `${SITE_URL}/#organisation` } },
+            orgLd(),
+            crumbsLd([["Forside", "/"], ["Om Relived", "/om-relived"]]),
+          ],
+        }}
+      />
       <p className="lede">
         Relived er en dansk markedsplads for brugte varer. Sælgerne viser varerne frem på video, og køberne køber med ét tryk, byder
         eller køber bagefter til fast pris.

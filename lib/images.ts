@@ -41,3 +41,9 @@ export function itemImages(item: { images?: string[] | null }) {
 export function clipUrl(item: { clip_path?: string | null; clip_at?: string | null }) {
   return item.clip_path ? storageUrl("clips", item.clip_path, item.clip_at) : null;
 }
+
+/**
+ * Stillbilledet til videoen øverst på forsiden. Det er sidens største element, så det er en lille WebP, og forsiden
+ * beder browseren hente det med det samme (preload i app/(site)/page.tsx).
+ */
+export const WELCOME_POSTER = "/img/welcome-live-poster-960.webp";

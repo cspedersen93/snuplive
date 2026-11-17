@@ -4,16 +4,36 @@ import CampaignCards from "@/components/CampaignCards";
 import NewsletterForm from "@/components/NewsletterForm";
 import { campaignFlags } from "@/lib/campaignFlags";
 import { campaignState } from "@/lib/campaigns";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 // Teksten følger datoen (nedtælling og dagens låge), så siden bygges igen hvert 5. minut.
 export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "Nyhedsbrev: Green Friday og julekalender live",
-  description:
-    "Skriv dig op til nyhedsbrevet fra Relived, og få besked om Green Friday-showet 27. november, julekalenderen med 24 live-shows og ugens bedste fund.",
-  alternates: { canonical: "/nyhedsbrev" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { gf, jk } = campaignState(new Date(), await campaignFlags());
+  const both = gf.phase !== "over" && jk.phase !== "over";
+  const title = both
+    ? "Nyhedsbrev: Green Friday og julekalender live"
+    : jk.phase !== "over"
+      ? "Nyhedsbrev: julekalender med 24 live-shows"
+      : gf.phase !== "over"
+        ? "Nyhedsbrev: Green Friday live"
+        : "Nyhedsbrev: ugens live-shows og bedste fund";
+  const about = both
+    ? "Green Friday-showet 27. november, julekalenderen med 24 live-shows og ugens bedste fund"
+    : jk.phase !== "over"
+      ? "julekalenderen med 24 live-shows og ugens bedste fund"
+      : gf.phase !== "over"
+        ? "Green Friday-showet 27. november og ugens bedste fund"
+        : "ugens live-shows, nye sælgere og de bedste fund";
+  return {
+    title,
+    description: `Skriv dig op til nyhedsbrevet fra Relived, og få besked om ${about}.`,
+    alternates: { canonical: "/nyhedsbrev" },
+    openGraph: og("/nyhedsbrev"),
+  };
+}
 
 export default async function Nyhedsbrev() {
   const flags = await campaignFlags();
@@ -31,6 +51,7 @@ export default async function Nyhedsbrev() {
     <>
       <section className="phero" aria-labelledby="h-nyhedsbrev">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Nyhedsbrev", "/nyhedsbrev"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

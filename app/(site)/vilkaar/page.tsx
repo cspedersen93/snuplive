@@ -6,12 +6,14 @@ import { COMPANY } from "@/lib/company";
 import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { inBeta } from "@/lib/launch";
 import { RESERVATION_DAYS } from "@/lib/pricing";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   title: "Vilkår for brugere og sælgere",
   description:
     "Vilkår for at bruge og sælge på Relived: konto, regler for varer og shows, anmeldelser, gebyrer, udbetaling og indberetning til Skattestyrelsen.",
   alternates: { canonical: "/vilkaar" },
+  openGraph: og("/vilkaar"),
 };
 
 export const revalidate = 300;

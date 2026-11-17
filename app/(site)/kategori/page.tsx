@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CategoryCards from "@/components/CategoryCards";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
   title: { absolute: "Kategorier – køb second hand live på video | Relived" },
   description:
     "Find second hand i 9 kategorier: tøj, tasker, luksus, børn, cykler, bolig og samleobjekter. Se varerne live, og køb med ét tryk.",
   alternates: { canonical: "/kategori" },
+  openGraph: og("/kategori"),
 };
 
 export default function Kategorier() {
@@ -14,6 +17,7 @@ export default function Kategorier() {
     <>
       <section className="phero" aria-labelledby="h-kategorier">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Kategorier", "/kategori"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

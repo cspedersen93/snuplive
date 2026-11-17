@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { inBeta } from "@/lib/launch";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
   title: { absolute: "Spørgsmål og svar om live shopping | Relived" },
   description:
     "Svar på de mest stillede spørgsmål om Relived: køb i live-shows, lynrunder, betaling, fragt, tryg handel og hvordan du går live som sælger.",
   alternates: { canonical: "/faq" },
+  openGraph: og("/faq"),
 };
 
 /** "Betaling og fragt" → "betaling-og-fragt", til knapperne øverst. */
@@ -102,6 +105,7 @@ export default async function Faq() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <section className="phero" aria-labelledby="h-faq">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Spørgsmål og svar", "/faq"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

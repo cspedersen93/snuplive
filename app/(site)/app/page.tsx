@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import InstallGuide from "@/components/app/InstallGuide";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
   title: { absolute: "Hent Relived som app på iPhone og Android | Relived" },
   description:
     "Læg Relived på hjemmeskærmen på din iPhone, Android eller computer. Gratis, uden App Store, og med besked, når dine sælgere går live.",
   alternates: { canonical: "/app" },
+  openGraph: og("/app"),
 };
 
 const WHY = [
@@ -21,6 +24,7 @@ export default function AppSide() {
     <>
       <section className="phero" aria-labelledby="h-app">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Hent appen", "/app"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

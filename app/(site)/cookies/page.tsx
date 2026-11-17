@@ -4,11 +4,13 @@ import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/company";
 import { COOKIES, LOCAL, type StoredThing } from "@/lib/cookies";
 import ForgetChoices from "./ForgetChoices";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   title: "Cookies: kun det, der skal til",
   description: "Relived bruger kun nødvendige cookies, så du kan logge ind, købe og sælge. Ingen cookies til reklame, statistik eller sporing. Se listen her.",
   alternates: { canonical: "/cookies" },
+  openGraph: og("/cookies"),
 };
 
 function Table({ rows, caption }: { rows: StoredThing[]; caption: string }) {

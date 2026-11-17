@@ -30,6 +30,8 @@ export const metadata: Metadata = {
     images: [OG_IMAGE],
   },
   alternates: { canonical: "/" },
+  // Google må vise store billeder og hele uddrag i søgeresultatet. Sider, der ikke skal i Google, sætter selv noindex.
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
 };
 
 export const viewport: Viewport = {

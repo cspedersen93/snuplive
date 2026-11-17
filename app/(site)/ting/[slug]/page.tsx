@@ -29,6 +29,7 @@ import MakeOffer from "./MakeOffer";
 import FollowButton from "@/components/FollowButton";
 import { IconBox, IconShieldCheck, IconVideo } from "@/components/Icons";
 import Gallery from "./Gallery";
+import { og } from "@/lib/og";
 
 export const revalidate = 30;
 
@@ -116,7 +117,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     alternates: { canonical: itemHref(it) },
     // Solgte og fjernede ting skal ikke ligge i Google.
     robots: state === "sold" || state === "off" || d.closed ? { index: false, follow: true } : undefined,
-    openGraph: images.length ? { images: [{ url: images[0], width: 1080, height: 1350, alt: it.name }] } : undefined,
+    openGraph: og(itemHref(it), images.length ? { images: [{ url: images[0], width: 1080, height: 1350, alt: it.name }] } : {}),
   };
 }
 

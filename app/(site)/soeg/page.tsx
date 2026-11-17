@@ -10,6 +10,7 @@ import { filtersJson, parseSearch, searchable, searchHref, searchLabel } from "@
 import { createPublicClient } from "@/lib/supabase/public";
 import { createClient, getUserId } from "@/lib/supabase/server";
 import type { FeedItem } from "@/lib/types";
+import { og } from "@/lib/og";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     // Søgeresultater skal ikke i Google (de skifter hele tiden). Linkene på siden må gerne følges.
     robots: { index: false, follow: true },
     alternates: { canonical: "/soeg" },
+    openGraph: og("/soeg"),
   };
 }
 

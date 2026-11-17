@@ -3,11 +3,13 @@ import Link from "next/link";
 import CompanyInfo from "@/components/CompanyInfo";
 import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/company";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   title: "Privatlivspolitik",
   description: "Sådan behandler Relived dine oplysninger: hvad vi gemmer, hvorfor, hvem der hjælper os, og hvordan du får dem slettet.",
   alternates: { canonical: "/privatliv" },
+  openGraph: og("/privatliv"),
 };
 
 export default function Privatliv() {

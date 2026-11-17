@@ -36,32 +36,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...guides,
     ];
   }
+  // Kun sider, der faktisk skifter indhold løbende, får "ændret nu". En dato, der altid er i dag, lærer Google at se bort fra datoen.
   const pages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${SITE_URL}/live`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
     { url: `${SITE_URL}/til-salg`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
     { url: `${SITE_URL}/klip`, lastModified: now, changeFrequency: "hourly", priority: 0.7 },
-    { url: `${SITE_URL}/kategori`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
+    { url: `${SITE_URL}/kategori`, changeFrequency: "daily", priority: 0.8 },
     ...CATEGORIES.map((c) => ({
       url: `${SITE_URL}/kategori/${c.slug}`,
       lastModified: now,
       changeFrequency: "hourly" as const,
       priority: c.key === "andet" ? 0.5 : 0.8,
     })),
-    { url: `${SITE_URL}/saelg`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${SITE_URL}/saadan-virker-det`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/niveauer`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${SITE_URL}/saelg`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/saadan-virker-det`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/faq`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/niveauer`, changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE_URL}/budsalg`, lastModified: now, changeFrequency: "hourly", priority: 0.7 },
-    { url: `${SITE_URL}/nyhedsbrev`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
+    { url: `${SITE_URL}/nyhedsbrev`, changeFrequency: "weekly", priority: 0.6 },
     ...guides,
     { url: `${SITE_URL}/en`, lastModified: now, changeFrequency: "daily", priority: 0.5 },
-    { url: `${SITE_URL}/opret`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
-    { url: `${SITE_URL}/privatliv`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${SITE_URL}/cookies`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${SITE_URL}/handelsbetingelser`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${SITE_URL}/vilkaar`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${SITE_URL}/om-relived`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITE_URL}/app`, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${SITE_URL}/opret`, changeFrequency: "yearly", priority: 0.5 },
+    { url: `${SITE_URL}/privatliv`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/cookies`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/handelsbetingelser`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/vilkaar`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/om-relived`, changeFrequency: "yearly", priority: 0.3 },
   ];
   const sb = createPublicClient();
   if (!sb) return pages;

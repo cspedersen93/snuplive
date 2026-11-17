@@ -49,6 +49,7 @@ export default function Footer() {
               <li><Link href="/faq">Spørgsmål og svar</Link></li>
               <li className="only-web"><Link href="/app">Hent appen</Link></li>
               <li><Link href="/guides">Guides</Link></li>
+              <li><Link href="/niveauer">Niveauer og mærker</Link></li>
               <li><Link href="/saadan-virker-det#tryg-handel">Tryg handel</Link></li>
               <li><Link href="/handelsbetingelser">Handelsbetingelser</Link></li>
               <li><Link href="/vilkaar">Vilkår</Link></li>

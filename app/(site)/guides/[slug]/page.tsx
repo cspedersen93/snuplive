@@ -23,6 +23,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     alternates: { canonical: guideHref(g) },
     openGraph: {
       type: "article",
+      locale: "da_DK",
+      siteName: "Relived",
       title: g.h1,
       description: g.description,
       url: guideHref(g),

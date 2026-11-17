@@ -8,6 +8,8 @@ import { AUCTION_SECONDS, EXTEND_SECONDS } from "@/lib/auction";
 import { vareOrd } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
 import { fetchFeed } from "@/lib/queries";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 const PER_PAGE = 30;
 
@@ -23,6 +25,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     description:
       "Byd på brugt tøj, design og samleobjekter live på video. Se varen tæt på, sæt et maks-bud før showet, og vind med det højeste bud.",
     alternates: { canonical: href(page) },
+    openGraph: og(href(page)),
   };
 }
 
@@ -37,6 +40,7 @@ export default async function Budsalg({ searchParams }: Props) {
     <>
       <section className="phero" aria-labelledby="h-budsalg">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Budsalg", "/budsalg"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

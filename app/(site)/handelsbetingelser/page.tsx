@@ -5,12 +5,14 @@ import LegalPage from "@/components/LegalPage";
 import { COMPANY } from "@/lib/company";
 import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, RESERVATION_DAYS, PARCELS } from "@/lib/pricing";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   title: "Handelsbetingelser for købere",
   description:
     "Handelsbetingelser for køb på Relived: hvem du køber af, priser, fragt, betaling, køberbeskyttelse, fortrydelsesret og klager.",
   alternates: { canonical: "/handelsbetingelser" },
+  openGraph: og("/handelsbetingelser"),
 };
 
 export const revalidate = 300;

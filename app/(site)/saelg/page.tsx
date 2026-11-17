@@ -4,12 +4,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { IconBolt, IconBox, IconCamera, IconCard, IconClip, IconList } from "@/components/Icons";
 import { inBeta } from "@/lib/launch";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
   title: { absolute: `Sælg second hand live på video – ${inBeta() ? "gratis i beta" : "gratis"} | Relived` },
   description:
     `Gå live fra telefonen, og sælg en hel bunke på én aften: brugte fund, ubrugte fejlkøb og nye restpartier. ${inBeta() ? "Gratis at sælge i beta." : "Gratis at sælge."}`,
   alternates: { canonical: "/saelg" },
+  openGraph: og("/saelg"),
 };
 
 export const revalidate = 300;
@@ -20,6 +23,7 @@ export default async function Saelg() {
     <>
       <section className="phero" aria-labelledby="h-saelg">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Sælg live", "/saelg"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

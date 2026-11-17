@@ -17,6 +17,8 @@ import {
   SHIP_PRICES_TEXT,
 } from "@/lib/pricing";
 import { createPublicClient } from "@/lib/supabase/public";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 // Én side med det hele: hvordan man køber, hvad det koster, fragt, rabat og bud, tryg handel og sortering.
 // Tallene kommer fra lib/pricing.ts, så siden altid passer med kurven og betalingen.
@@ -28,6 +30,7 @@ export const metadata: Metadata = {
   description:
     "Alt om at købe og sælge live på Relived samlet ét sted: hvordan du køber, køberbeskyttelse, fragt og afhentning, samlerabat, bud og tryg handel.",
   alternates: { canonical: "/saadan-virker-det" },
+  openGraph: og("/saadan-virker-det"),
 };
 
 /** Er samlerabat (0027) og bud (0028) slået til? Uden filerne står de ikke på siden. */
@@ -59,6 +62,7 @@ export default async function Saadan() {
     <>
       <section className="phero" aria-labelledby="h-saadan">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Sådan virker det", "/saadan-virker-det"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { WELCOME_POSTER } from "@/lib/images";
 
 const WEBM = "/video/welcome-live-v2.webm";
 const MP4 = "/video/welcome-live-v2.mp4";
 // Lille stillbillede i samme format som videoen, så telefonen ikke står tom, før videoen er hentet.
-const POSTER = "/img/welcome-live-poster-960.webp";
+const POSTER = WELCOME_POSTER;
 
 type Msg = { name: string; text: string; kind?: "seller" | "me" };
 

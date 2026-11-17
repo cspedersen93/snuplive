@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { WELCOME_POSTER } from "@/lib/images";
 
 const WEBM = "/video/welcome-live-v2.webm";
 const MP4 = "/video/welcome-live-v2.mp4";
-const POSTER = "/img/welcome-live-poster-v2.jpg";
+const POSTER = WELCOME_POSTER;
 
 /**
  * Videoen i det store kort på forsiden, når ingen er live: en sælger viser varer frem i stuen. Uden lyd og i ring.

@@ -4,12 +4,14 @@ import GuideCards from "@/components/GuideCards";
 import { SITE_URL } from "@/lib/env";
 import { GUIDES, guideHref } from "@/lib/guides";
 import { inBeta } from "@/lib/launch";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   title: { absolute: "Guides: køb og sælg second hand | Relived" },
   description:
     "Gode råd til at købe og sælge brugt: sæt den rigtige pris, sælg live, tjek om en designertaske er ægte, og se reglerne for skat ved salg af brugt tøj.",
   alternates: { canonical: "/guides" },
+  openGraph: og("/guides"),
 };
 
 export default function Guides() {

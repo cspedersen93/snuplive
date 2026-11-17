@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BadgeIcon, LevelChip } from "@/components/Level";
 import { BADGES, BADGE_ORDER, LEVEL_ORDER, levelNeeds, type Role } from "@/lib/levels";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 // Forklaringen på niveauerne og mærkerne. Kravene kommer fra lib/levels.ts (samme tal som 0032_niveauer.sql).
 
@@ -10,6 +12,7 @@ export const metadata: Metadata = {
   description:
     "Sådan får du Bronze, Sølv, Guld og VIP på Relived. Niveauet stiger med hver afsluttet handel og står ved dit navn i chatten og på din side.",
   alternates: { canonical: "/niveauer" },
+  openGraph: og("/niveauer"),
 };
 
 function LevelTable({ role }: { role: Role }) {
@@ -40,6 +43,7 @@ export default function Niveauer() {
     <>
       <section className="phero" aria-labelledby="h-niveauer">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Niveauer og mærker", "/niveauer"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

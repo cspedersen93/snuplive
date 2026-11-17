@@ -9,6 +9,8 @@ import SortNote from "@/components/SortNote";
 import { CATEGORIES, categoryBySlug, vareOrd } from "@/lib/format";
 import { feedTotal } from "@/lib/items";
 import { fetchFeed } from "@/lib/queries";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 const PER_PAGE = 30;
 
@@ -35,6 +37,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     description:
       "Køb brugt tøj, børnetøj, design og samleobjekter til fast pris. Alt er vist frem på video, så du ved, hvad du får. Fragt fra 39 kr til pakkeshop.",
     alternates: { canonical: href(cat?.slug ?? null, page) },
+    openGraph: og(href(cat?.slug ?? null, page)),
     // Filtrerede lister findes også som kategorisider, så kun den samlede liste skal i Google.
     robots: cat ? { index: false, follow: true } : undefined,
   };
@@ -50,6 +53,7 @@ export default async function TilSalg({ searchParams }: Props) {
     <>
       <section className="phero" aria-labelledby="h-til-salg">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Til salg", "/til-salg"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>

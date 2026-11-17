@@ -21,6 +21,9 @@ import { showGuests, type Guest } from "@/lib/guests";
 import { BadgeList, LevelChip } from "@/components/Level";
 import { fetchLevel, type MemberLevel } from "@/lib/levels";
 import { fetchCountdown } from "@/lib/countdown";
+import { og } from "@/lib/og";
+import JsonLd, { crumbsLd } from "@/components/JsonLd";
+import { SITE_URL } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
@@ -128,7 +131,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: { absolute: `${d.seller.handle} er live: ${d.show.title}`.slice(0, 60) },
       description: `${name} er live på Relived lige nu med ${d.show.title.toLowerCase()}. Se med, stil spørgsmål i chatten, og køb det, du kan lide.`.slice(0, 155),
       alternates: { canonical },
-      openGraph: { images: [showImage({ ...d.show, seller: d.seller })] },
+      openGraph: og(canonical, { images: [showImage({ ...d.show, seller: d.seller })] }),
     };
   }
   return {
@@ -142,6 +145,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
         : "Følg med, og få besked, når næste show starter.")
     ).slice(0, 155),
     alternates: { canonical },
+    openGraph: og(canonical, d.show ? { images: [showImage({ ...d.show, seller: d.seller })] } : {}),
   };
 }
 
@@ -245,8 +249,34 @@ export default async function SellerPage({ params, searchParams }: PageProps) {
     );
   }
 
+  // Showet som begivenhed, så Google kan vise det med dato og klokkeslæt. Kun åbne shows, der er planlagt eller i gang.
+  const showUrl = `${SITE_URL}/live/${d.seller.handle}`;
+  const eventLd =
+    !d.closed && (d.show.status === "planned" || d.show.status === "live") && (d.show.starts_at || d.show.started_at)
+      ? {
+          "@type": "Event",
+          name: d.show.title,
+          description: `${d.seller.display_name || d.seller.handle} viser ${category(d.show.category).label.toLowerCase()} frem live på video. Se med, stil spørgsmål i chatten, og køb med ét tryk.`,
+          startDate: d.show.status === "live" ? d.show.started_at ?? d.show.starts_at : d.show.starts_at,
+          eventStatus: "https://schema.org/EventScheduled",
+          eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+          location: { "@type": "VirtualLocation", url: showUrl },
+          image: [showImage({ ...d.show, seller: d.seller })].map((u) => (u.startsWith("http") ? u : `${SITE_URL}${u}`)),
+          isAccessibleForFree: true,
+          inLanguage: d.show.language === "en" ? "en" : "da-DK",
+          organizer: { "@type": "Person", name: d.seller.display_name || d.seller.handle, url: `${SITE_URL}/profil/${d.seller.handle}` },
+          url: showUrl,
+        }
+      : null;
+
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [...(eventLd ? [eventLd] : []), crumbsLd([["Forside", "/"], ["Live nu", "/live"], [d.seller.handle, `/live/${d.seller.handle}`]])],
+        }}
+      />
       {d.guestAt ? (
         <div className="wrap" style={{ paddingTop: 18 }}>
           <GuestAtBanner handle={d.seller.handle} at={d.guestAt} />

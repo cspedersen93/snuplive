@@ -5,6 +5,8 @@ import { IconVideo } from "@/components/Icons";
 import { CLIP_BATCH, loadClip, loadClips, type FeedClip } from "@/lib/clipFeed";
 import { createPublicClient } from "@/lib/supabase/public";
 import ClipFeed from "./ClipFeed";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 type Props = { searchParams: Promise<{ ting?: string }> };
 
@@ -14,6 +16,7 @@ export const metadata: Metadata = {
   title: { absolute: "Swipe og køb brugte varer i videoklip | Relived" },
   description: "Swipe gennem korte videoer af brugt tøj, design og samleobjekter. Se varen med lyd og billede, og køb den med ét tryk.",
   alternates: { canonical: "/klip" },
+  openGraph: og("/klip"),
 };
 
 export default async function KlipPage({ searchParams }: Props) {
@@ -29,6 +32,7 @@ export default async function KlipPage({ searchParams }: Props) {
   if (!clips?.length) {
     return (
       <div className="wrap" style={{ paddingBlock: "56px 96px" }}>
+        <CrumbsLd items={[["Forside", "/"], ["Klip", "/klip"]]} />
         <nav className="crumbs" aria-label="Brødkrummer">
           <Link href="/">Forside</Link>
           <span aria-hidden="true">/</span>

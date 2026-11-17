@@ -11,8 +11,11 @@ import SortNote from "@/components/SortNote";
 import { CATEGORY_PAGES } from "@/lib/categoryPages";
 import { CATEGORIES, categoryBySlug } from "@/lib/format";
 import { guidesForCategory } from "@/lib/guides";
-import { feedTotal } from "@/lib/items";
+import { feedTotal, itemHref } from "@/lib/items";
 import { fetchFeed, fetchListing } from "@/lib/queries";
+import { og } from "@/lib/og";
+import JsonLd, { crumbsLd } from "@/components/JsonLd";
+import { SITE_URL } from "@/lib/env";
 
 export const revalidate = 30;
 
@@ -29,7 +32,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title: { absolute: cat.title },
     description: cat.description,
     alternates: { canonical: `/kategori/${cat.slug}` },
-    openGraph: { images: [cat.cover] },
+    openGraph: og(`/kategori/${cat.slug}`, { images: [cat.cover] }),
   };
 }
 
@@ -72,6 +75,31 @@ export default async function Kategori({ params }: Params) {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "CollectionPage",
+              name: cat.h1,
+              description: cat.description,
+              url: `${SITE_URL}/kategori/${cat.slug}`,
+              inLanguage: "da-DK",
+              isPartOf: { "@type": "WebSite", name: "Relived", url: `${SITE_URL}/` },
+              ...(forSale.length
+                ? {
+                    mainEntity: {
+                      "@type": "ItemList",
+                      numberOfItems: forSaleTotal,
+                      itemListElement: forSale.slice(0, 20).map((it, i) => ({ "@type": "ListItem", position: i + 1, name: it.name, url: `${SITE_URL}${itemHref(it)}` })),
+                    },
+                  }
+                : {}),
+            },
+            crumbsLd([["Forside", "/"], ["Kategorier", "/kategori"], [cat.label, `/kategori/${cat.slug}`]]),
+          ],
+        }}
+      />
       <section className="phero" aria-labelledby="h-kat">
         <div className="wrap">
           <nav className="crumbs" aria-label="Brødkrummer">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { OG_IMAGE } from "@/lib/og";
+import { og } from "@/lib/og";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import CampaignCards from "@/components/CampaignCards";
@@ -26,6 +26,8 @@ import { itemImage, showImage } from "@/lib/images";
 import { DELIVERY } from "@/lib/pricing";
 import { fetchFeed, fetchListing } from "@/lib/queries";
 import { reusedCount } from "@/lib/reuse";
+import { orgLd } from "@/components/JsonLd";
+import { WELCOME_POSTER } from "@/lib/images";
 
 /** Små kort under det store kort og kasserne (12 går op i både 2, 3 og 4 kolonner). */
 const FEED_TILES = 12;
@@ -37,8 +39,8 @@ export const metadata: Metadata = {
   title: { absolute: "Køb og sælg second hand live på video | Relived" },
   description:
     "Køb second hand live: se tøjet, tasken eller lampen på video, spørg sælgeren i chatten, og køb med ét tryk. Sælgeren får først pengene, når du har varen.",
-  openGraph: { title: "Second hand, du kan se live, før du køber", images: [OG_IMAGE] },
-  alternates: { canonical: "/", languages: { "da-DK": "/", en: "/en" } },
+  openGraph: og("/", { title: "Second hand, du kan se live, før du køber" }),
+  alternates: { canonical: "/", languages: { "da-DK": "/", en: "/en", "x-default": "/" } },
 };
 
 export default async function Forside() {
@@ -85,14 +87,16 @@ export default async function Forside() {
   const ld = {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "Organization", name: "Relived", url: `${SITE_URL}/`, logo: `${SITE_URL}/img/logo.png` },
-      { "@type": "WebSite", name: "Relived", url: `${SITE_URL}/`, inLanguage: "da-DK" },
+      orgLd(),
+      { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: "Relived", alternateName: "relived.dk", url: `${SITE_URL}/`, inLanguage: "da-DK", publisher: { "@id": `${SITE_URL}/#organisation` } },
     ],
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      {/* Stillbilledet til videoen øverst er sidens største element: bed browseren hente det før alt andet. */}
+      <link rel="preload" as="image" href={WELCOME_POSTER} type="image/webp" fetchPriority="high" />
       {/* Forsiden: toppen, det store kort i fuld bredde, kasserne under det (på mobil efter kortene), så shows og varer. */}
       <div className="wrap home-feed">
         <div className="feed-top">

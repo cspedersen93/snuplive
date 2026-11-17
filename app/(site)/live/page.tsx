@@ -9,6 +9,8 @@ import { clock, dayLabel, vareOrd } from "@/lib/format";
 import { showImage } from "@/lib/images";
 import { fetchListing, itemCount } from "@/lib/queries";
 import LiveGrid from "./LiveGrid";
+import { og } from "@/lib/og";
+import { CrumbsLd } from "@/components/JsonLd";
 
 export const revalidate = 15;
 
@@ -17,6 +19,7 @@ export const metadata: Metadata = {
   description:
     "Se hvem der er live lige nu. Find live-shows med vintagetøj, vinyl og retro design, og køb det, du kan lide, med ét tryk.",
   alternates: { canonical: "/live" },
+  openGraph: og("/live"),
 };
 
 export default async function LiveNu() {
@@ -25,6 +28,7 @@ export default async function LiveNu() {
     <>
       <section className="phero" aria-labelledby="h-live">
         <div className="wrap">
+          <CrumbsLd items={[["Forside", "/"], ["Live nu", "/live"]]} />
           <nav className="crumbs" aria-label="Brødkrummer">
             <Link href="/">Forside</Link>
             <span aria-hidden="true">/</span>
