@@ -924,7 +924,7 @@ img.v-thumb{object-fit:cover}
 /* Vilkår og firmaoplysninger */
 .company-info{list-style:none;margin:0;padding:16px 18px;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;gap:6px;background:var(--bg-2)}
 .company-info li{color:var(--muted)}
-.prose a{color:var(--text)}
+.prose a:not(.btn){color:var(--text)}
 .prose h3{font-size:1rem;letter-spacing:-.01em;margin-top:6px}
 .prose ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px}
 .prose ol li{color:var(--muted)}
