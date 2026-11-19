@@ -13,7 +13,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!admin) return fail("Betaling er ikke sat op.", 503);
   const uid = await getUserId(await createClient());
   if (!uid) return fail("Log ind igen.", 401);
-  const body = (await req.json().catch(() => ({}))) as { reason?: unknown; message?: unknown; photos?: unknown; photosReady?: unknown };
+  const body = (await req.json().catch(() => ({}))) as { reason?: unknown; message?: unknown; photos?: unknown };
   const message = typeof body.message === "string" ? body.message.trim().slice(0, 1000) : "";
   if (!isIssueReason(body.reason)) return fail("Vælg, hvad problemet er.", 400);
   if (message.length < 10) return fail("Skriv lidt mere om, hvad der er galt (mindst 10 tegn).", 400);
@@ -21,8 +21,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (rawPhotos.length > ISSUE_PHOTOS_MAX) return fail(`Du kan højst vedhæfte ${ISSUE_PHOTOS_MAX} billeder.`, 400);
   if (!rawPhotos.every((p) => isIssuePhotoPath(p, uid))) return fail("Et af billederne kunne ikke bruges. Prøv at vælge det igen.", 400);
   const photos = [...new Set(rawPhotos as string[])];
-  // Billeder kræves kun, når siden selv har vist feltet (dvs. når databasen er klar til dem).
-  if (body.photosReady === true && photos.length < minIssuePhotos(body.reason)) {
+  // Billeder kræves, når databasen er klar til dem (0038). Serveren tjekker det selv og stoler ikke på det, browseren sender.
+  const photosReady = !(await admin.from("order_issues").select("photos").limit(1)).error;
+  if (photosReady && photos.length < minIssuePhotos(body.reason)) {
     return fail(
       body.reason === "damaged"
         ? "Vedhæft to billeder: ét af pakken udefra og ét af skaden."

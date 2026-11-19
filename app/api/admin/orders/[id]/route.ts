@@ -1,7 +1,7 @@
 import { fail, json } from "@/lib/api";
 import { isAdminEmail } from "@/lib/mail";
 import { closeIssue, completeOrder, refundOrder } from "@/lib/orders";
-import { coverOrder, ReturnError, startReturn } from "@/lib/returns";
+import { cancelUnusedReturn, coverOrder, ReturnError, startReturn } from "@/lib/returns";
 import { getStripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserInfo } from "@/lib/supabase/server";
@@ -31,6 +31,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       ok = true;
     } else return fail("Ukendt handling.", 400);
     if (!ok) return fail("Ordren kan ikke ændres sådan lige nu. Opdatér siden.", 409);
+    // Afgjort uden retur: en ubrugt returlabel annulleres (refusion er undtaget, for dér kan pakken stadig være på vej).
+    if (action !== "refund") await cancelUnusedReturn(admin, id).catch(() => false);
     console.info("[snuplive] admin", user.email, action, id);
     return json({ ok: true });
   } catch (e) {

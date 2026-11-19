@@ -84,7 +84,7 @@ function IssueNote({ o, photos, ret }: { o: SellerOrder; photos: Record<string, 
         <span>
           Relived har givet køberen medhold. Køberen sender varen retur
           {ret.manual ? " til din adresse" : ` til ${ret.sp_name}, ${ret.sp_address}, ${ret.sp_zipcode} ${ret.sp_city}`} og får pengene tilbage.
-          {!ret.manual && ret.price ? ` Returfragten (${kr(ret.price)}) trækkes fra din næste udbetaling.` : ""}
+          {!ret.manual && ret.price ? ` Når køberen har sendt pakken, trækkes returfragten (${kr(ret.price)}) fra din næste udbetaling.` : ""}
         </span>
       ) : (
         <span>Pengene holdes tilbage, mens Relived kigger på sagen. Du har fået en mail, du kan svare på.</span>

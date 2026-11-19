@@ -709,7 +709,13 @@ update items set removed_at = now() where id = '20000000-0000-0000-0000-00000000
 select t.ok((select count(*) from clips_to_clean()) = 1, 'klip af en fjernet ting ryddes op');
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
-select t.ok((select clear_item_clip('20000000-0000-0000-0000-000000000093')) like '%clip-new.mp4', 'sælgeren kan fjerne sit klip');
+-- 0038: klippet af en solgt vare er bevis i en sag og kan ikke fjernes af sælgeren.
+select t.throws($$select clear_item_clip('20000000-0000-0000-0000-000000000093')$$, 'Varen er solgt');
+reset role;
+update items set status = 'unsold', sold_at = null where id = '20000000-0000-0000-0000-000000000093';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select clear_item_clip('20000000-0000-0000-0000-000000000093')) like '%clip-new.mp4', 'sælgeren kan fjerne sit klip på en vare, der ikke er solgt');
 reset role;
 select t.ok((select clip_path is null from items where id = '20000000-0000-0000-0000-000000000093'), 'klippet er væk fra tingen');
 delete from items where id in ('20000000-0000-0000-0000-000000000091', '20000000-0000-0000-0000-000000000092', '20000000-0000-0000-0000-000000000093');

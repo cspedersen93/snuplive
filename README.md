@@ -1258,7 +1258,9 @@ Test: `qa_bevis.py` (`med` / `uden`).
   Var ordren sendt til en pakkeshop, køber Relived en returlabel til en pakkeshop tæt på sælgeren (`startReturn` i
   `lib/returns.ts`), og køberen henter den under Mine køb (`/api/orders/[id]/returlabel`). Ellers sender køberen selv.
   Sagen står åben, indtil admin trykker "Refundér køberen". Sporingen af returpakken sætter `order_returns.sent_at`.
-- **Returfragten er sælgerens gæld** (`seller_debts`). Den trækkes fra sælgerens næste udbetalinger i `releaseOrder`
+- **Returfragten er sælgerens gæld** (`seller_debts`), men først når køberen har sendt returpakken (`chargeReturnFreight` i
+  `applyTracking`). Afgøres sagen uden retur (udbetalt, lukket eller dækket), annulleres den ubrugte label, og sælgeren
+  betaler ikke. Gælden trækkes fra sælgerens næste udbetalinger i `releaseOrder`
   via `reserve_debt_for_order`, som giver samme beløb, hver gang der spørges for samme ordre.
 - **Relived dækker**: køberen får alle pengene tilbage, og sælgeren får sin udbetaling alligevel (`coverOrder`).
   Sælgeren betales først, derefter refunderes køberen. Fejler refusionen, står sagen åben med én knap til at gøre den færdig.

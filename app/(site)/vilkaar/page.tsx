@@ -22,7 +22,7 @@ export default async function Vilkaar() {
   const free = await feeFreeState();
   const freeDay = free.active && free.until ? feeFreeDay(free.until) : null;
   return (
-    <LegalPage title="Vilkår for brugere og sælgere" crumb="Vilkår" updated="oktober 2026">
+    <LegalPage title="Vilkår for brugere og sælgere" crumb="Vilkår" updated="19. november 2026">
       <p className="lede">
         Vilkårene gælder for alle, der bruger Relived. Del B gælder også for sælgere. Når du køber, gælder også{" "}
         <Link href="/handelsbetingelser">handelsbetingelserne</Link>.
@@ -123,6 +123,11 @@ export default async function Vilkaar() {
         vilkår gælder for den konto. Pengene bliver sendt til din bankkonto, når køberen har fået varerne. Har køberen meldt et
         problem, venter pengene, til sagen er afgjort. Betaler køberen ikke inden {RESERVATION_DAYS} dage, bliver købet annulleret, og
         varen kan sælges igen.
+      </p>
+      <p>
+        <b>Retur, når køberen får medhold.</b> Melder en køber et problem, og giver Relived køberen medhold, fordi varen ikke var
+        som vist eller beskrevet, sender køberen varen retur til dig, og køberen får pengene tilbage. Du betaler returfragten.
+        Relived lægger ud for returlabelen og trækker beløbet fra dine næste udbetalinger. Du kan se beløbet i dit studie.
       </p>
 
       <h3>10. Skat og indberetning til Skattestyrelsen</h3>

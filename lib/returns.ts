@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/env";
 import { kr } from "@/lib/format";
 import { adminEmails, sendMail } from "@/lib/mail";
 import { releaseOrder, resolveIssues } from "@/lib/orders";
-import { createLabel, ensureTrackingWebhook, findPakkeshops, hasShipmondo } from "@/lib/shipmondo";
+import { cancelLabel, createLabel, ensureTrackingWebhook, findPakkeshops, hasShipmondo } from "@/lib/shipmondo";
 import { ore } from "@/lib/stripe";
 import type { AdminClient } from "@/lib/supabase/admin";
 
@@ -181,10 +181,7 @@ export async function startReturn(admin: AdminClient, orderId: string) {
 
   const { error: saved } = await admin.from("order_returns").update(ret).eq("order_id", orderId);
   if (saved) console.error("[relived] RETURLABEL LAVET MEN IKKE GEMT", orderId, ret.shipment_id, saved);
-  if (!ret.manual && ret.price) {
-    const { error } = await admin.from("seller_debts").insert({ seller_id: order.seller_id, order_id: orderId, amount: ret.price });
-    if (error && !/duplicate|unique/i.test(error.message)) console.error("[relived] returfragt kunne ikke noteres som gæld", orderId, error);
-  }
+  // Returfragten bliver først sælgerens gæld, når køberen har sendt pakken (applyTracking i lib/orders.ts).
 
   const o = order as unknown as { buyer: { handle: string } | null; seller: { handle: string } | null };
   const admins = adminEmails();
@@ -230,7 +227,7 @@ export async function startReturn(admin: AdminClient, orderId: string) {
           ? ["Køberen sender selv pakken til din adresse."]
           : [
               `Pakken kommer til ${ret.sp_name}, ${ret.sp_address}, ${ret.sp_zipcode} ${ret.sp_city}. Du får besked, når den kan hentes.`,
-              `Returfragten er ${kr(ret.price ?? 0)}. Den trækker vi fra din næste udbetaling.`,
+              `Returfragten er ${kr(ret.price ?? 0)}. Når køberen har sendt pakken, trækker vi den fra din næste udbetaling.`,
             ]),
         "",
         "Du kan svare på den her mail, hvis du har spørgsmål.",
@@ -241,6 +238,22 @@ export async function startReturn(admin: AdminClient, orderId: string) {
     });
   }
   return { manual: Boolean(ret.manual), price: ret.price ?? 0 };
+}
+
+/**
+ * Sagen er afgjort uden retur (udbetalt til sælgeren, lukket eller dækket af Relived): en returlabel, der ikke er
+ * brugt, annulleres, så den ikke bliver sendt senere, og sælgeren ikke kommer til at betale for den.
+ */
+export async function cancelUnusedReturn(admin: AdminClient, orderId: string) {
+  const { data: ret, error } = await admin.from("order_returns").select("shipment_id,manual,sent_at").eq("order_id", orderId).maybeSingle();
+  if (error || !ret || ret.manual || ret.sent_at || !ret.shipment_id || !hasShipmondo()) return false;
+  try {
+    await cancelLabel(Number(ret.shipment_id));
+    return true;
+  } catch (e) {
+    console.error("[relived] returlabel kunne ikke annulleres", orderId, e);
+    return false;
+  }
 }
 
 /**

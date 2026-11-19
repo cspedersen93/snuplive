@@ -433,6 +433,19 @@ export async function createLabelForOrder(admin: AdminClient, orderId: string, s
 const MOVING = new Set(["EN_ROUTE", "AVAILABLE_FOR_DELIVERY", "DELIVERED"]);
 
 /** En sporingsbesked fra Shipmondo: opdatér status, og markér pakken som sendt eller hentet. */
+/**
+ * Returfragten bliver sælgerens gæld (0039), når køberen faktisk har sendt returpakken. Ikke før: bliver labelen
+ * aldrig brugt, skal sælgeren ikke betale for den. Og ikke, hvis sagen er afgjort uden retur (udbetalt, lukket
+ * eller dækket af Relived). Kan kaldes flere gange: der kan kun være én gæld pr. ordre.
+ */
+async function chargeReturnFreight(admin: AdminClient, orderId: string, price: number) {
+  if (!(price > 0)) return;
+  const { data: o } = await admin.from("orders").select("seller_id,status,issue_open").eq("id", orderId).maybeSingle();
+  if (!o || !(o.issue_open || o.status === "refunded")) return;
+  const { error } = await admin.from("seller_debts").insert({ seller_id: o.seller_id, order_id: orderId, amount: price });
+  if (error && !/duplicate|unique/i.test(error.message)) console.error("[relived] returfragt kunne ikke noteres som gæld", orderId, error);
+}
+
 export async function applyTracking(admin: AdminClient, ev: Record<string, unknown>) {
   const shipmentId = Number(ev.shipment_id);
   const status = String(ev.current_status ?? "").toUpperCase().slice(0, 40);
@@ -447,11 +460,12 @@ export async function applyTracking(admin: AdminClient, ev: Record<string, unkno
     .maybeSingle();
   if (!order) {
     // Måske er det en returpakke (0039): notér, at køberen har sendt den.
-    const ret = await admin.from("order_returns").select("order_id,sent_at").eq("shipment_id", shipmentId).maybeSingle();
+    const ret = await admin.from("order_returns").select("order_id,sent_at,manual,price").eq("shipment_id", shipmentId).maybeSingle();
     if (ret.error || !ret.data) return false;
     const patch: Record<string, unknown> = { tracking_status: status };
     if (MOVING.has(status) && !ret.data.sent_at) patch.sent_at = at;
     await admin.from("order_returns").update(patch).eq("order_id", ret.data.order_id);
+    if (MOVING.has(status) && !ret.data.manual) await chargeReturnFreight(admin, ret.data.order_id as string, Number(ret.data.price) || 0);
     return true;
   }
 

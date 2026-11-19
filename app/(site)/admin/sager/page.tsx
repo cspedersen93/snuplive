@@ -132,7 +132,7 @@ export default async function Admin() {
                 <b>Krav mod fragtfirmaet:</b> Labelen er købt af Relived, så det er jer, der rejser kravet hos{" "}
                 {CARRIERS[o.sp_carrier].name}
                 {o.sp_carrier === "dao" ? " (direkte hos dao)" : " (på GLS' hjemmeside under \"Need Help?\")"}. Fragtfirmaet erstatter op til{" "}
-                {kr(CARRIER_COVER[o.sp_carrier] ?? 0)} pr. pakke. Varerne her kostede {kr(o.items_amount)}.
+                {kr(CARRIER_COVER[o.sp_carrier] ?? 0)} pr. pakke ifølge Shipmondo. Det er ikke bekræftet, at det også gælder brugte varer. Varerne her kostede {kr(o.items_amount)}.
                 {o.tracking ? ` Pakkenummer: ${o.tracking}.` : ""}
                 {i.reason === "damaged" ? " Bed køberen gemme varen og al emballagen, til kravet er afgjort." : ""}
               </div>
@@ -182,7 +182,7 @@ export default async function Admin() {
                   Bedt om retur {at(returns[o.id].created_at)}.{" "}
                   {returns[o.id].manual
                     ? "Køberen sender selv og skal svare med et sporingsnummer."
-                    : `Returlabel med ${returns[o.id].carrier} til ${returns[o.id].sp_name}, ${returns[o.id].sp_zipcode} ${returns[o.id].sp_city}. Returfragten (${kr(returns[o.id].price)}) trækkes fra sælgerens næste udbetaling.`}
+                    : `Returlabel med ${returns[o.id].carrier} til ${returns[o.id].sp_name}, ${returns[o.id].sp_zipcode} ${returns[o.id].sp_city}. Returfragten (${kr(returns[o.id].price)}) trækkes fra sælgerens næste udbetaling, når køberen har sendt pakken.`}
                   {returns[o.id].sent_at ? ` Sendt ${at(returns[o.id].sent_at as string)}. Nu kan du refundere køberen.` : ""}
                 </span>
               </div>

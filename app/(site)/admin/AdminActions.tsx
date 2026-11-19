@@ -11,7 +11,7 @@ const TEXT: Record<Action, { button: string; ask: string; done: string }> = {
   release: { button: "Send pengene til sælgeren", ask: "Ordren afsluttes, og sælgeren får pengene.", done: "Pengene er sendt til sælgeren." },
   return: {
     button: "Bed om varen retur",
-    ask: "Køberen får besked om at sende varen retur og får en returlabel, hvis ordren blev sendt til en pakkeshop. Returfragten bliver trukket fra sælgerens næste udbetaling. Pengene holdes tilbage, indtil du refunderer.",
+    ask: "Køberen får besked om at sende varen retur og får en returlabel, hvis ordren blev sendt til en pakkeshop. Når køberen har sendt pakken, bliver returfragten trukket fra sælgerens næste udbetaling. Pengene holdes tilbage, indtil du refunderer.",
     done: "Køberen har fået besked om at sende varen retur.",
   },
   cover: {
