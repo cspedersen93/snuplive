@@ -21,7 +21,7 @@ export default async function Handelsbetingelser() {
   const free = await feeFreeState();
   const freeDay = free.active && free.until ? feeFreeDay(free.until) : null;
   return (
-    <LegalPage title="Handelsbetingelser for købere" crumb="Handelsbetingelser" updated="13. november 2026">
+    <LegalPage title="Handelsbetingelser for købere" crumb="Handelsbetingelser" updated="19. november 2026">
       <p className="lede">
         Her står, hvad der gælder, når du køber på Relived. Sælgerne har deres egne <Link href="/vilkaar">vilkår</Link>.
       </p>
@@ -32,7 +32,7 @@ export default async function Handelsbetingelser() {
         sælgeren er, og om sælgeren er en privatperson eller en virksomhed. Relived står for betalingen, køberbeskyttelsen og
         fragtlabels til pakkeshops.
       </p>
-      <CompanyInfo />
+      <CompanyInfo phone />
 
       <h2>2. Hvornår er købet bindende?</h2>
       <ul>
@@ -127,7 +127,7 @@ export default async function Handelsbetingelser() {
 
       <h2>10. Klager</h2>
       <p>
-        Skriv til {COMPANY.email}, hvis du er utilfreds. Har du købt af en erhvervssælger og kan I ikke blive enige, kan du klage til
+        Skriv til {COMPANY.email}, eller ring på <a href={COMPANY.phoneHref}>{COMPANY.phone}</a>, hvis du er utilfreds. Har du købt af en erhvervssælger og kan I ikke blive enige, kan du klage til
         Nævnenes Hus (naevneneshus.dk).
       </p>
 

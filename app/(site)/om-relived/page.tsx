@@ -22,7 +22,7 @@ export const revalidate = 300;
 export default async function OmRelived() {
   const reused = await reusedCount();
   return (
-    <LegalPage title="Om Relived og kontakt" crumb="Om Relived" updated="oktober 2026">
+    <LegalPage title="Om Relived og kontakt" crumb="Om Relived" updated="november 2026">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -52,12 +52,13 @@ export default async function OmRelived() {
       <h2>Kontakt</h2>
       <p>
         Skriv til os i chatten (<SupportLink className="sup-link inline">åbn chatten</SupportLink>, eller tryk <b>Hjælp</b> nederst på
-        siden), eller send en mail til <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. Gælder det en ordre, så brug <b>Meld et problem</b> på
+        siden), eller send en mail til <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. Du kan også ringe til os på{" "}
+        <a href={COMPANY.phoneHref}>{COMPANY.phone}</a>. Gælder det en ordre, så brug <b>Meld et problem</b> på
         ordren under Mine køb. Vil du anmelde en vare, et show eller en profil, så tryk <b>Anmeld</b> ved den.
       </p>
 
       <h2>Firmaoplysninger</h2>
-      <CompanyInfo />
+      <CompanyInfo phone />
 
       <h2>Regler</h2>
       <ul>

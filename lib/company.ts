@@ -9,6 +9,9 @@ export const COMPANY = {
   cvr: clean(process.env.NEXT_PUBLIC_COMPANY_CVR) ?? "46902297",
   address: clean(process.env.NEXT_PUBLIC_COMPANY_ADDRESS) ?? "Bymuren 107, 3. th., 2650 Hvidovre",
   email: "kontakt@relived.dk",
+  // Firmaets telefon. Står kun på Om Relived og i handelsbetingelserne, ikke i bunden af siden.
+  phone: "30 20 14 72",
+  phoneHref: "tel:+4530201472",
 };
 
 /** "Relived ApS · CVR 12345678 · Vej 1, 2650 Hvidovre", uden de dele, der ikke er udfyldt endnu. */
