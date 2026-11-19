@@ -1251,3 +1251,17 @@ Når en køber melder et problem, skal der kunne ses, hvad sælgeren viste, og h
 - Før `0038_klage_bevis.sql` er kørt, virker "Meld et problem" som før, uden billedfelt.
 
 Test: `qa_bevis.py` (`med` / `uden`).
+
+## Retur, returfragt og "Relived dækker" (0039)
+
+- **Bed om varen retur** (Admin → Sager): køberen har fået medhold og skal sende varen tilbage, før pengene refunderes.
+  Var ordren sendt til en pakkeshop, køber Relived en returlabel til en pakkeshop tæt på sælgeren (`startReturn` i
+  `lib/returns.ts`), og køberen henter den under Mine køb (`/api/orders/[id]/returlabel`). Ellers sender køberen selv.
+  Sagen står åben, indtil admin trykker "Refundér køberen". Sporingen af returpakken sætter `order_returns.sent_at`.
+- **Returfragten er sælgerens gæld** (`seller_debts`). Den trækkes fra sælgerens næste udbetalinger i `releaseOrder`
+  via `reserve_debt_for_order`, som giver samme beløb, hver gang der spørges for samme ordre.
+- **Relived dækker**: køberen får alle pengene tilbage, og sælgeren får sin udbetaling alligevel (`coverOrder`).
+  Sælgeren betales først, derefter refunderes køberen. Fejler refusionen, står sagen åben med én knap til at gøre den færdig.
+- Før `0039_retur_og_daekning.sql` er kørt, vises de to nye knapper ikke, og alt andet virker som før.
+
+Test: `qa_retur.py` (`med` / `uden`).

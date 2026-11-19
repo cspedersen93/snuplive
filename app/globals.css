@@ -2481,3 +2481,4 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
 /* Fast tekst nederst på oversigtssider (live, til salg, klip), så siden også siger noget, når der ingen varer er */
 .page-text{max-width:68ch}
 .page-text h2{margin-top:0}
+.ret-box .btn{align-self:flex-start;margin-top:4px}

@@ -3,6 +3,7 @@ import { IconBox, IconCard, IconInfo } from "@/components/Icons";
 import { itemMeta } from "@/components/Screen";
 import { CARRIERS, isCarrier, LABEL_WEIGHTS, trackingText } from "@/lib/carriers";
 import { issuePhotos } from "@/lib/issueProof";
+import { fetchReturns, sellerDebt, type OrderReturn } from "@/lib/returns";
 import { ISSUE_REASONS, isIssueReason } from "@/lib/issues";
 import { clock, dayLabel, kr } from "@/lib/format";
 import { DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS, sellerPayout, PARCELS } from "@/lib/pricing";
@@ -60,7 +61,7 @@ interface Reservation {
 const at = (iso: string | null) => (iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "");
 
 /** Køberen har meldt et problem: vis det til sælgeren. */
-function IssueNote({ o, photos }: { o: SellerOrder; photos: Record<string, string[]> }) {
+function IssueNote({ o, photos, ret }: { o: SellerOrder; photos: Record<string, string[]>; ret?: OrderReturn }) {
   const issue = (o.issues ?? []).find((i) => i.status === "open");
   if (!o.issue_open || !issue) return null;
   return (
@@ -79,7 +80,15 @@ function IssueNote({ o, photos }: { o: SellerOrder; photos: Record<string, strin
           ))}
         </span>
       ) : null}
-      <span>Pengene holdes tilbage, mens Relived kigger på sagen. Du har fået en mail, du kan svare på.</span>
+      {ret ? (
+        <span>
+          Relived har givet køberen medhold. Køberen sender varen retur
+          {ret.manual ? " til din adresse" : ` til ${ret.sp_name}, ${ret.sp_address}, ${ret.sp_zipcode} ${ret.sp_city}`} og får pengene tilbage.
+          {!ret.manual && ret.price ? ` Returfragten (${kr(ret.price)}) trækkes fra din næste udbetaling.` : ""}
+        </span>
+      ) : (
+        <span>Pengene holdes tilbage, mens Relived kigger på sagen. Du har fået en mail, du kan svare på.</span>
+      )}
     </div>
   );
 }
@@ -135,6 +144,11 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
   const openIssueIds = orders.flatMap((o) => (o.issue_open ? (o.issues ?? []).filter((i) => i.status === "open").map((i) => i.id) : []));
   const proofAdmin = openIssueIds.length ? createAdminClient() : null;
   const issuePh = proofAdmin ? await issuePhotos(proofAdmin, openIssueIds) : {};
+  // Retur i en sag og returfragt, sælgeren skylder (0039). Uden filen: ingen af delene.
+  const [returns, debt] = await Promise.all([
+    fetchReturns(supabase, orders.filter((o) => o.issue_open).map((o) => o.id)),
+    sellerDebt(supabase, uid),
+  ]);
   const notice = search ? NOTICE[search] : null;
 
   return (
@@ -271,7 +285,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                     {o.buyer_phone ? ` på ${o.buyer_phone}` : ""} og aftal tid og sted. Køberen bekræfter i appen, når varerne er hentet.
                   </p>
                 )}
-                <IssueNote o={o} photos={issuePh} />
+                <IssueNote o={o} photos={issuePh} ret={returns[o.id]} />
                 <RefundButton orderId={o.id} amount={kr(o.total_amount)} />
               </div>
             ))}
@@ -304,6 +318,13 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
         </div>
       ) : null}
 
+      {debt.open > 0 ? (
+        <div className="issue-note" data-debt>
+          <b>Du skylder {kr(debt.open)} i returfragt</b>
+          <span>En køber har fået medhold i en sag og har sendt varen retur til dig. Beløbet trækkes fra din næste udbetaling.</span>
+        </div>
+      ) : null}
+
       {sent.length || finished.length ? (
         <div className="box">
           <h2 className="h3" style={{ marginBottom: 6 }}>Sendt og afsluttet</h2>
@@ -325,9 +346,10 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                             ? "Modtaget. Pengene venter, til du har tilknyttet udbetaling."
                             : "Modtaget. Udbetalingen bliver forsøgt igen i nat."}
                   </span>
-                  <IssueNote o={o} photos={issuePh} />
+                  {debt.byOrder[o.id] ? <span>Returfragt fra en tidligere sag er trukket fra: −{kr(debt.byOrder[o.id])}.</span> : null}
+                  <IssueNote o={o} photos={issuePh} ret={returns[o.id]} />
                 </div>
-                <span className="num" style={{ fontWeight: 600 }}>{kr(sellerPayout(o))}</span>
+                <span className="num" style={{ fontWeight: 600 }}>{kr(sellerPayout(o) - (debt.byOrder[o.id] ?? 0))}</span>
               </li>
             ))}
           </ul>
