@@ -130,13 +130,25 @@ export async function releaseOrder(admin: AdminClient, stripe: Stripe, orderId: 
     return "pending";
   }
 
+  // Skylder sælgeren returfragt fra en tidligere sag, trækkes den fra her (0039). Beløbet er det samme, hver gang der spørges.
+  const gross = sellerPayout(order);
+  const debtQ = await admin.rpc("reserve_debt_for_order", { p_order: order.id, p_max: gross });
+  const debt = !debtQ.error && typeof debtQ.data === "number" ? Math.min(debtQ.data, gross) : 0;
+  if (gross - debt <= 0) {
+    await admin.from("orders").update({ transfer_status: "done" }).eq("id", order.id);
+    return "done";
+  }
+  // Har Relived dækket ordren og allerede refunderet køberen, er der ingen betaling at tage pengene fra.
+  const coverQ = await admin.from("order_covers").select("refunded_at").eq("order_id", order.id).maybeSingle();
+  const fromCharge = order.stripe_charge && !(!coverQ.error && coverQ.data?.refunded_at);
+
   try {
     const transfer = await stripe.transfers.create(
       {
-        amount: ore(sellerPayout(order)),
+        amount: ore(gross - debt),
         currency: "dkk",
         destination: acct.stripe_account_id as string,
-        ...(order.stripe_charge ? { source_transaction: order.stripe_charge } : {}),
+        ...(fromCharge ? { source_transaction: order.stripe_charge as string } : {}),
         transfer_group: order.checkout_id,
         description: `Relived ordre ${order.id.slice(0, 8)}`,
         metadata: { order_id: order.id },
@@ -433,7 +445,15 @@ export async function applyTracking(admin: AdminClient, ev: Record<string, unkno
     .select("id,status,tracking_at,delivered_at")
     .eq("shipmondo_shipment_id", shipmentId)
     .maybeSingle();
-  if (!order) return false;
+  if (!order) {
+    // Måske er det en returpakke (0039): notér, at køberen har sendt den.
+    const ret = await admin.from("order_returns").select("order_id,sent_at").eq("shipment_id", shipmentId).maybeSingle();
+    if (ret.error || !ret.data) return false;
+    const patch: Record<string, unknown> = { tracking_status: status };
+    if (MOVING.has(status) && !ret.data.sent_at) patch.sent_at = at;
+    await admin.from("order_returns").update(patch).eq("order_id", ret.data.order_id);
+    return true;
+  }
 
   // En ældre besked må ikke overskrive en nyere status.
   const newer = !order.tracking_at || Date.parse(order.tracking_at as string) <= Date.parse(at) || status === "DELIVERED";
@@ -462,7 +482,7 @@ export class IssueError extends Error {}
 export async function resolveIssues(
   admin: AdminClient,
   orderId: string,
-  resolution: "refunded" | "released" | "closed" | "buyer_confirmed",
+  resolution: "refunded" | "released" | "closed" | "buyer_confirmed" | "covered",
 ) {
   await admin
     .from("order_issues")

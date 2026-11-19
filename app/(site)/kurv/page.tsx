@@ -21,6 +21,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import ConfirmReceived from "./ConfirmReceived";
 import PayGroups, { type PayGroup } from "./PayGroups";
 import RateSeller from "./RateSeller";
+import { fetchCovers, fetchReturns, type OrderCover, type OrderReturn } from "@/lib/returns";
 import ReportProblem from "./ReportProblem";
 
 export const dynamic = "force-dynamic";
@@ -157,6 +158,9 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
     (s) => !s.order || ["pending", "cancelled"].includes(s.order.status),
   );
   const orders = (ordersQ.data ?? []) as unknown as OrderRow[];
+  // Retur i en sag og "Relived dækker" (0039_retur_og_daekning.sql). Uden filen er begge tomme.
+  const caseIds = orders.filter((o) => (o.issues ?? []).length).map((o) => o.id);
+  const [returns, covers] = await Promise.all([fetchReturns(supabase, caseIds), fetchCovers(supabase, caseIds)]);
 
   // Én pakke pr. sælger: alt, du har købt hos samme sælger, betales og sendes samlet, også fra flere shows.
   const groupsMap = new Map<string, PayGroup>();
@@ -272,7 +276,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           <div className="sec-mini">
             <h2 className="h3">På vej til dig</h2>
             {active.map((o) => (
-              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} />
+              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} ret={returns[o.id]} cover={covers[o.id]} />
             ))}
           </div>
         ) : null}
@@ -281,7 +285,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           <div className="sec-mini">
             <h2 className="h3">Tidligere køb</h2>
             {done.map((o) => (
-              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} />
+              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} ret={returns[o.id]} cover={covers[o.id]} />
             ))}
           </div>
         ) : null}
@@ -297,7 +301,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
   );
 }
 
-function OrderCard({ o, uid, photosReady }: { o: OrderRow; uid: string; photosReady: boolean }) {
+function OrderCard({ o, uid, photosReady, ret, cover }: { o: OrderRow; uid: string; photosReady: boolean; ret?: OrderReturn; cover?: OrderCover }) {
   const [cls, label] = STATUS[o.status];
   const issue = [...(o.issues ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
   const seller = o.seller;
@@ -367,7 +371,29 @@ function OrderCard({ o, uid, photosReady }: { o: OrderRow; uid: string; photosRe
                 : `Bekræfter du ikke selv, afsluttes ordren automatisk efter ${AUTO_COMPLETE_DAYS} dage.`}
             </span>
           ) : null}
-          {o.status === "completed" ? <span className="muted">Modtaget {when(o.completed_at)}. Tak for handlen!</span> : null}
+          {ret && o.issue_open && (o.status === "paid" || o.status === "shipped") ? (
+            <div className="issue-note ret-box" role="status">
+              <b>{ret.sent_at ? "Vi har set, at din returpakke er sendt" : "Send varen retur, så får du pengene tilbage"}</b>
+              {ret.sent_at ? (
+                <span>Vi giver dig pengene tilbage hurtigst muligt.</span>
+              ) : ret.manual ? (
+                <span>Vi har givet dig medhold. Send varen retur til sælgeren med sporing inden 7 dage, og svar på vores mail med sporingsnummeret.</span>
+              ) : (
+                <>
+                  <span>
+                    Vi har givet dig medhold. Pak varen, sæt returlabelen på, og aflevér pakken i en {ret.carrier}-pakkeshop inden 7 dage. Det koster dig ikke noget.
+                  </span>
+                  {ret.labelless_code ? <span>Har du ingen printer, så vis koden <b>{ret.labelless_code}</b> i pakkeshoppen.</span> : null}
+                  <a className="btn btn-ivory btn-sm" href={`/api/orders/${o.id}/returlabel`} target="_blank" rel="noopener noreferrer">Hent returlabel</a>
+                </>
+              )}
+            </div>
+          ) : null}
+          {o.status === "completed" && cover?.refunded_at ? (
+            <span className="muted">Vi har givet dig pengene tilbage ({kr(cover.amount)}). De er på vej til det kort, du betalte med.</span>
+          ) : o.status === "completed" ? (
+            <span className="muted">Modtaget {when(o.completed_at)}. Tak for handlen!</span>
+          ) : null}
           {o.status === "completed" && rated ? (
             <span className="fine">Du gav {seller?.handle ?? "sælgeren"} {rated.stars} {rated.stars === 1 ? "stjerne" : "stjerner"}.</span>
           ) : o.status === "completed" ? (

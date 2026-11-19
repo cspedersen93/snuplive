@@ -7,6 +7,7 @@ import { clipUrl, itemImage } from "@/lib/images";
 import { historyText, issuePhotos, partyHistory } from "@/lib/issueProof";
 import { ISSUE_REASONS, isIssueReason, RESOLUTION_TEXT } from "@/lib/issues";
 import { DELIVERY, sellerPayout } from "@/lib/pricing";
+import { fetchCovers, fetchReturns, returnsReady } from "@/lib/returns";
 import AdminActions from "../AdminActions";
 
 export const dynamic = "force-dynamic";
@@ -64,6 +65,8 @@ export default async function Admin() {
   const open = (openQ.data ?? []) as unknown as IssueRow[];
   const done = (doneQ.data ?? []) as unknown as IssueRow[];
   const withOrder = open.filter((i) => i.order);
+  const openOrderIds = withOrder.map((i) => i.order!.id);
+  const [retReady, returns, covers] = await Promise.all([returnsReady(admin), fetchReturns(admin, openOrderIds), fetchCovers(admin, openOrderIds)]);
   const [photos, buyers, sellers] = await Promise.all([
     issuePhotos(admin, open.map((i) => i.id)),
     partyHistory(admin, "buyer", withOrder.map((i) => i.order!.buyer_id)),
@@ -162,11 +165,33 @@ export default async function Admin() {
                 <p className="muted" style={{ fontSize: ".875rem", margin: 0 }}>Køberen har ikke vedhæftet billeder.</p>
               )}
             </div>
+            {returns[o.id] ? (
+              <div className="issue-note" data-return>
+                <b>{returns[o.id].sent_at ? "Køberen har sendt varen retur" : "Venter på, at køberen sender varen retur"}</b>
+                <span>
+                  Bedt om retur {at(returns[o.id].created_at)}.{" "}
+                  {returns[o.id].manual
+                    ? "Køberen sender selv og skal svare med et sporingsnummer."
+                    : `Returlabel med ${returns[o.id].carrier} til ${returns[o.id].sp_name}, ${returns[o.id].sp_zipcode} ${returns[o.id].sp_city}. Returfragten (${kr(returns[o.id].price)}) trækkes fra sælgerens næste udbetaling.`}
+                  {returns[o.id].sent_at ? ` Sendt ${at(returns[o.id].sent_at as string)}. Nu kan du refundere køberen.` : ""}
+                </span>
+              </div>
+            ) : null}
+            {covers[o.id] && !covers[o.id].refunded_at ? (
+              <div className="issue-note">
+                <b>Relived dækker er ikke gjort færdig</b>
+                <span>Sælgeren har fået sin udbetaling, men refusionen til køberen fejlede. Tryk på knappen for at gøre den færdig.</span>
+              </div>
+            ) : null}
             <AdminActions
               orderId={o.id}
               refundText={kr(o.total_amount)}
               releaseText={kr(sellerPayout(o))}
               canRelease={o.status === "paid" || o.status === "shipped"}
+              canReturn={retReady && !returns[o.id] && (o.status === "paid" || o.status === "shipped")}
+              canCover={retReady && (o.status === "paid" || o.status === "shipped")}
+              coverText={kr(sellerPayout(o))}
+              coverPending={Boolean(covers[o.id] && !covers[o.id].refunded_at)}
             />
           </section>
         );

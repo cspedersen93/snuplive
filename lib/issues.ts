@@ -19,6 +19,7 @@ export const BUYER_RESOLUTION_TEXT: Record<string, string> = {
   released: "Pengene er sendt til sælgeren.",
   closed: "Sagen er lukket.",
   buyer_confirmed: "Du har bekræftet, at alt er i orden.",
+  covered: "Du har fået pengene tilbage.",
 };
 
 export const RESOLUTION_TEXT: Record<string, string> = {
@@ -26,6 +27,7 @@ export const RESOLUTION_TEXT: Record<string, string> = {
   released: "Pengene er sendt til sælgeren.",
   closed: "Sagen er lukket.",
   buyer_confirmed: "Køberen har bekræftet, at alt er i orden.",
+  covered: "Relived har dækket: køberen fik pengene tilbage, og sælgeren fik sin udbetaling.",
 };
 
 /** Så mange billeder kan køberen lægge på en sag. */
