@@ -1,5 +1,5 @@
 import { fail, json } from "@/lib/api";
-import { ISSUE_PHOTOS_MAX, isIssuePhotoPath, isIssueReason, PHOTO_REASONS } from "@/lib/issues";
+import { ISSUE_PHOTOS_MAX, isIssuePhotoPath, isIssueReason, minIssuePhotos } from "@/lib/issues";
 import { IssueError, reportIssue } from "@/lib/orders";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient, getUserId } from "@/lib/supabase/server";
@@ -22,8 +22,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!rawPhotos.every((p) => isIssuePhotoPath(p, uid))) return fail("Et af billederne kunne ikke bruges. Prøv at vælge det igen.", 400);
   const photos = [...new Set(rawPhotos as string[])];
   // Billeder kræves kun, når siden selv har vist feltet (dvs. når databasen er klar til dem).
-  if (body.photosReady === true && PHOTO_REASONS.includes(body.reason) && photos.length === 0) {
-    return fail("Vedhæft mindst ét billede af varen, som den ser ud nu.", 400);
+  if (body.photosReady === true && photos.length < minIssuePhotos(body.reason)) {
+    return fail(
+      body.reason === "damaged"
+        ? "Vedhæft to billeder: ét af pakken udefra og ét af skaden."
+        : "Vedhæft mindst ét billede af varen, som den ser ud nu.",
+      400,
+    );
   }
   if (body.reason === "withdrawal") {
     const { data: o } = await admin.from("orders").select("seller:profiles!orders_seller_id_fkey(seller_type)").eq("id", id).maybeSingle();

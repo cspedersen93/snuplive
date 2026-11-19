@@ -5,7 +5,7 @@ import { CARRIERS, isCarrier, trackingText } from "@/lib/carriers";
 import { clock, dayLabel, kr } from "@/lib/format";
 import { clipUrl, itemImage } from "@/lib/images";
 import { historyText, issuePhotos, partyHistory } from "@/lib/issueProof";
-import { ISSUE_REASONS, isIssueReason, RESOLUTION_TEXT } from "@/lib/issues";
+import { CARRIER_COVER, ISSUE_REASONS, isIssueReason, RESOLUTION_TEXT } from "@/lib/issues";
 import { DELIVERY, sellerPayout } from "@/lib/pricing";
 import { fetchCovers, fetchReturns, returnsReady } from "@/lib/returns";
 import AdminActions from "../AdminActions";
@@ -127,6 +127,16 @@ export default async function Admin() {
               <br />
               <b>Sælgerens historik:</b> {historyText(sellers[o.seller_id], "salg")}
             </div>
+            {(i.reason === "damaged" || i.reason === "not_received") && isCarrier(o.sp_carrier) ? (
+              <div className="addr" data-claim>
+                <b>Krav mod fragtfirmaet:</b> Labelen er købt af Relived, så det er jer, der rejser kravet hos{" "}
+                {CARRIERS[o.sp_carrier].name}
+                {o.sp_carrier === "dao" ? " (direkte hos dao)" : " (på GLS' hjemmeside under \"Need Help?\")"}. Fragtfirmaet erstatter op til{" "}
+                {kr(CARRIER_COVER[o.sp_carrier] ?? 0)} pr. pakke. Varerne her kostede {kr(o.items_amount)}.
+                {o.tracking ? ` Pakkenummer: ${o.tracking}.` : ""}
+                {i.reason === "damaged" ? " Bed køberen gemme varen og al emballagen, til kravet er afgjort." : ""}
+              </div>
+            ) : null}
             <div className="proof">
               <h3>Det, sælgeren viste</h3>
               <div className="proof-grid">

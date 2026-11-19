@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ISSUE_PHOTOS_MAX, ISSUE_REASONS, PHOTO_REASONS, type IssueReason } from "@/lib/issues";
+import { ISSUE_PHOTOS_MAX, ISSUE_REASONS, minIssuePhotos, type IssueReason } from "@/lib/issues";
 import { fitImage } from "@/lib/resizeImage";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
@@ -20,7 +20,9 @@ export default function ReportProblem({ orderId, uid, business = false, photosRe
   const [busy, setBusy] = useState(false);
   const [photos, setPhotos] = useState<{ path: string; url: string }[]>([]);
   const [uploading, setUploading] = useState(false);
-  const needPhotos = photosReady && !!reason && PHOTO_REASONS.includes(reason);
+  const minPhotos = photosReady && reason ? minIssuePhotos(reason) : 0;
+  const needPhotos = minPhotos > 0;
+  const transit = reason === "damaged";
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = [...(e.target.files ?? [])].slice(0, ISSUE_PHOTOS_MAX - photos.length);
@@ -49,7 +51,9 @@ export default function ReportProblem({ orderId, uid, business = false, photosRe
     e.preventDefault();
     if (!reason) return toast("Vælg, hvad problemet er.");
     if (message.trim().length < 10) return toast("Skriv lidt mere om, hvad der er galt.");
-    if (needPhotos && photos.length === 0) return toast("Vedhæft mindst ét billede af varen, som den ser ud nu.");
+    if (photos.length < minPhotos) {
+      return toast(transit ? "Vedhæft to billeder: ét af pakken udefra og ét af skaden." : "Vedhæft mindst ét billede af varen, som den ser ud nu.");
+    }
     setBusy(true);
     try {
       const r = await fetch(`/api/orders/${orderId}/problem`, {
@@ -105,10 +109,12 @@ export default function ReportProblem({ orderId, uid, business = false, photosRe
       {photosReady ? (
         <div className="field">
           <span className="problem-ph-l">
-            Billeder af varen{needPhotos ? "" : " (valgfrit)"}
+            {transit ? "Billeder af pakken og skaden" : "Billeder af varen"}{needPhotos ? "" : " (valgfrit)"}
           </span>
           <p className="fine">
-            {needPhotos
+            {transit
+              ? "Tag to billeder: ét af pakken udefra, som den så ud, da du fik den, og ét af skaden. Gem varen og al emballagen, indtil sagen er afgjort. Fragtfirmaet kan bede om at se den."
+              : needPhotos
               ? "Tag billeder af varen, som den ser ud nu, og af det, der er galt. Tag også gerne et af pakken. Vi sammenligner med videoen fra showet."
               : "Har du billeder, der viser problemet, så læg dem her."}
           </p>
