@@ -34,6 +34,18 @@ export const ISSUE_PHOTOS_MAX = 4;
 /** Ved de her grunde skal køberen vise varen, som den ser ud, da den kom. */
 export const PHOTO_REASONS: readonly IssueReason[] = ["not_as_shown", "damaged", "counterfeit"];
 
+/**
+ * Er varen gået i stykker under fragten, skal vi bruge to billeder: pakken udefra og skaden. Det er dem, fragtfirmaet
+ * beder om, når Relived rejser kravet. Ved de andre grunde er ét billede nok.
+ */
+export const minIssuePhotos = (reason: IssueReason): number => (reason === "damaged" ? 2 : PHOTO_REASONS.includes(reason) ? 1 : 0);
+
+/**
+ * Det fragtfirmaet selv erstatter pr. pakke (kr, varens værdi uden moms), når labelen er købt gennem Shipmondo.
+ * Slået op hos Shipmondo den 19. november 2026. Tjek tallene igen, før de bruges i vilkår.
+ */
+export const CARRIER_COVER: Record<string, number> = { dao: 2500, gls: 4500 };
+
 /** Billeder på en sag ligger altid i køberens egen mappe: <køberens id>/sag-<tilfældigt>.jpg */
 export const isIssuePhotoPath = (path: unknown, buyerId: string): path is string =>
   typeof path === "string" && path.startsWith(`${buyerId}/sag-`) && /^[0-9a-f-]{36}\/sag-[a-z0-9-]{4,40}\.jpg$/.test(path);
