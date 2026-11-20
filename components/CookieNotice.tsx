@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import { useEffect, useRef, useState } from "react";
 import { COOKIE_NOTICE_KEY } from "@/lib/cookies";
 
@@ -10,7 +10,7 @@ import { COOKIE_NOTICE_KEY } from "@/lib/cookies";
  * Forsvinder, når man trykker OK, og kommer ikke igen på den enhed.
  */
 export default function CookieNotice() {
-  const path = usePathname();
+  const path = usePath();
   const [show, setShow] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 

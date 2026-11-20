@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import Avatar from "@/components/Avatar";
 import { IconCart, IconHome, IconLive, IconPlus, IconUser } from "@/components/Icons";
 import { useShell } from "@/components/shell/ShellContext";
@@ -13,7 +13,7 @@ export function hideTabBar(path: string) {
 
 /** Menulinjen i bunden på telefonen, som i en app. */
 export default function TabBar({ launched = false }: { launched?: boolean }) {
-  const path = usePathname();
+  const path = usePath();
   const { signedIn, me, cartCount, liveCount } = useShell();
   if (hideTabBar(path)) return null;
   const sellHref = me?.is_seller ? "/studio" : "/saelg";

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 
 const TABS = [
   { href: "/admin", label: "Overblik" },
@@ -28,7 +28,7 @@ export default function AdminNav({
   unreadSupport?: number;
   pendingAuth?: number;
 }) {
-  const path = usePathname();
+  const path = usePath();
   return (
     <nav className="adm-nav" aria-label="Backoffice">
       <span className="label">Backoffice</span>

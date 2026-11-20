@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { nextBid } from "@/lib/auction";
 import { hasSupabase } from "@/lib/env";
-import { kr } from "@/lib/format";
+import { KR_HELP, kr, parseKr } from "@/lib/format";
 import { getSupabase } from "@/lib/supabase/client";
 import { errorText, toast } from "@/lib/toast";
 import { track } from "@/lib/track";
@@ -61,8 +61,10 @@ export default function MaxBid({ item, loginHref, compact = false }: { item: Auc
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    const n = Number(value.replace(/[^\d]/g, ""));
-    if (!Number.isInteger(n) || n < min) return toast(`Dit maks-bud skal være mindst ${kr(min)}.`);
+    // "150,50" må aldrig blive til 15.050 kr: et bud er bindende.
+    const n = parseKr(value);
+    if (n === null) return toast(KR_HELP);
+    if (n < min) return toast(`Dit maks-bud skal være mindst ${kr(min)}.`);
     setBusy(true);
     const { error } = await getSupabase().rpc("set_max_bid", { p_item: item.id, p_amount: n });
     setBusy(false);

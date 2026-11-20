@@ -7,7 +7,7 @@ import { IconSparkle } from "@/components/Icons";
 import type { AiListing } from "@/lib/aiListing";
 import { askAiListing } from "@/lib/aiListingClient";
 import { pingSearchAlerts } from "@/lib/searchPing";
-import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, nameExample, pickCategories, sizeField } from "@/lib/format";
+import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, nameExample, parseKr, pickCategories, sizeField } from "@/lib/format";
 import { isParcel, itemParcel, type Parcel } from "@/lib/pricing";
 import DeliveryField from "@/components/DeliveryField";
 import { needsAuth } from "@/lib/luxury";
@@ -70,7 +70,7 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   const newOnly = NEW_ONLY_CATEGORIES.includes(cat);
   // Tøj har str., bolig og tasker har mål, skønhed har indhold, og samleobjekter har intet felt.
   const sizeF = sizeField(cat);
-  const authNeeded = needsAuth({ name, description: desc, category: cat, price: Number(price.replace(/[^\d]/g, "")) || 0 });
+  const authNeeded = needsAuth({ name, description: desc, category: cat, price: parseKr(price) ?? 0 });
 
   // Når en vare rettes, hentes den levering, sælgeren har valgt (felterne er ikke med i ITEM_COLS, før filerne er kørt).
   useEffect(() => {
@@ -155,9 +155,9 @@ export default function ItemForm({ sellerId, showId, showCategory, item, nextPos
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const n = name.trim();
-    const p = Number(price.replace(/[^\d]/g, ""));
+    const p = parseKr(price);
     if (n.length < 2) return setErr('Skriv hvad varen er, fx "Uldfrakke, kamel".');
-    if (!Number.isInteger(p) || p < 1 || p > 100000) return setErr("Skriv en pris i hele kroner mellem 1 og 100.000.");
+    if (p === null || p < 1 || p > 100000) return setErr("Skriv en pris i hele kroner mellem 1 og 100.000, uden komma.");
     if (newOnly && !newOk) return setErr("Bekræft, at produktet er nyt og uåbnet. Brugt makeup og hudpleje må ikke sælges på Relived.");
     setErr(null);
     setBusy(true);

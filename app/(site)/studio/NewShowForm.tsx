@@ -40,6 +40,8 @@ export default function NewShowForm({
     if (t.length < 3) return setErr("Giv showet en titel på mindst 3 tegn, fx \"Sommerkjoler i str. S–M\".");
     const when = start ? new Date(start) : null;
     if (when && Number.isNaN(when.getTime())) return setErr("Vælg et gyldigt tidspunkt.");
+    // Et show kan ikke starte i fortiden (ti minutters slør, hvis man vælger "nu" og bruger lidt tid på resten).
+    if (when && when.getTime() < Date.now() - 10 * 60_000) return setErr("Starttidspunktet er i fortiden. Vælg et tidspunkt, der ikke er passeret.");
     setBusy(true);
     setErr(null);
     const { data, error } = await getSupabase()

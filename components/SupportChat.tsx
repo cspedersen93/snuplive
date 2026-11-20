@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { usePathname } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SUPPORT_OPEN_EVENT } from "@/lib/support-shared";
 
@@ -23,7 +23,7 @@ const getFlag = () => {
  * fra linket "Skriv til os" i bunden af siden.
  */
 export default function SupportChat() {
-  const path = usePathname() ?? "/";
+  const path = usePath();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [unread, setUnread] = useState(0);

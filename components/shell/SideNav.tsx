@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import Avatar from "@/components/Avatar";
 import CategoryIcon from "@/components/CategoryIcon";
 import { IconBag, IconGavel, IconGrid, IconHome, IconLive, IconPlus, IconVideo } from "@/components/Icons";
@@ -23,7 +23,7 @@ const MAIN = [
  * Smal med kun ikoner på mindre skærme og i live-shows, så videoen får pladsen.
  */
 export default function SideNav({ launched = false }: { launched?: boolean }) {
-  const path = usePathname();
+  const path = usePath();
   const { me, liveCount, liveSellers, follows } = useShell();
   const sellHref = me?.is_seller ? "/studio" : "/saelg";
   const current = (href: string) => {

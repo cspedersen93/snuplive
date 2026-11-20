@@ -1,5 +1,6 @@
 "use client";
 
+import { parseKr } from "@/lib/format";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { getSupabase } from "@/lib/supabase/client";
@@ -306,7 +307,7 @@ export function ForSaleRow({ id, price, forSale }: { id: string; price: number; 
     toast(ok);
     router.refresh();
   }
-  const p = Number(value.replace(/[^\d]/g, ""));
+  const p = parseKr(value) ?? 0;
   const changed = Number.isInteger(p) && p >= 1 && p <= 100000 && p !== price;
   return (
     <div className="forsale-row">

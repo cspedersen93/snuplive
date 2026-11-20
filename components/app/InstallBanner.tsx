@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import { useEffect, useState } from "react";
 import { IconInstall } from "@/components/Icons";
 import { promptInstall, useInstall } from "@/lib/appInstall";
@@ -37,7 +37,7 @@ function cookieNoticeOpen() {
  * bruger appen, efter mindst to sider, når cookiebeskeden er væk, og ikke igen i 30 dage, når man har lukket det.
  */
 export default function InstallBanner() {
-  const path = usePathname();
+  const path = usePath();
   const st = useInstall();
   const [show, setShow] = useState(false);
 

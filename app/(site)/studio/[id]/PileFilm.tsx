@@ -5,7 +5,7 @@ import { IconSparkle } from "@/components/Icons";
 import { suggestedPrice, type AiListing } from "@/lib/aiListing";
 import { askAiListing, checkText } from "@/lib/aiListingClient";
 import { blobToBase64, sharpness } from "@/lib/bestPhoto";
-import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, pickCategories } from "@/lib/format";
+import { NEW_ONLY_CATEGORIES, NEW_ONLY_CONDITION, parseKr, pickCategories } from "@/lib/format";
 import { PILE_MAX_ITEMS, PILE_MAX_SECONDS, pickSharp, pileCandidateTimes, pileTimes, type PileSegment } from "@/lib/pile";
 import { frameFromVideo } from "@/lib/resizeImage";
 import { pingSearchAlerts } from "@/lib/searchPing";
@@ -230,7 +230,7 @@ export default function PileFilm({ sellerId, showId, showCategory, nextPosition,
   }
 
   const patch = (key: string, p: Partial<Draft>) => setDrafts((cur) => cur.map((d) => (d.key === key ? { ...d, ...p } : d)));
-  const priceOf = (d: Draft) => Number(d.price.replace(/[^\d]/g, ""));
+  const priceOf = (d: Draft) => parseKr(d.price) ?? 0;
   const ready = (d: Draft) =>
     d.name.trim().length >= 2 && Number.isInteger(priceOf(d)) && priceOf(d) >= 1 && priceOf(d) <= 100000 && (!NEW_ONLY_CATEGORIES.includes(d.category) || d.newOk);
   const todo = drafts.filter((d) => d.on && !d.saved);

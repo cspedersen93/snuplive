@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import { useEffect } from "react";
 import { MITID_RESULT } from "@/lib/mitid-text";
 import { toast } from "@/lib/toast";
@@ -9,7 +10,7 @@ import { toast } from "@/lib/toast";
 export default function MitIdResult() {
   const sp = useSearchParams();
   const router = useRouter();
-  const path = usePathname();
+  const path = usePath();
   const result = sp.get("mitid");
   useEffect(() => {
     if (!result) return;

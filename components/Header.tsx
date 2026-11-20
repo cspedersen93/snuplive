@@ -2,7 +2,8 @@
 
 import Form from "next/form";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import { useEffect, useState } from "react";
 import Avatar from "@/components/Avatar";
 import { IconBack, IconCart, IconMenu, IconSearch, IconUser } from "@/components/Icons";
@@ -23,7 +24,7 @@ const MNAV = [
  * På telefonen: logoet, søg og en knap med hele menuen (kurv og konto står i bundmenuen).
  */
 export default function Header() {
-  const path = usePathname();
+  const path = usePath();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const { signedIn, me, cartCount: count } = useShell();

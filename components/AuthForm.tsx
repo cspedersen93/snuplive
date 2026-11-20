@@ -12,7 +12,8 @@ export default function AuthForm({ cta = "Send login-link" }: { cta?: string }) 
   const router = useRouter();
   const params = useSearchParams();
   const rawNext = params.get("next") ?? "/konto";
-  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/konto";
+  // Kun adresser her på siden. "/\\side.dk" læser browseren som "//side.dk", altså et andet websted.
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") && !rawNext.includes("\\") ? rawNext : "/konto";
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);

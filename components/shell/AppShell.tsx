@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import SideNav from "@/components/shell/SideNav";
 import TabBar from "@/components/shell/TabBar";
 import InstallBanner from "@/components/app/InstallBanner";
@@ -14,7 +14,7 @@ const COMPACT = /^\/(live\/[^/]+|studio|gaest)(\/|$)/;
  */
 /** `launched`: efter lanceringen er sælg-knapperne neutrale for købere, så køberknapperne står tydeligst. */
 export default function AppShell({ children, launched = false }: { children: React.ReactNode; launched?: boolean }) {
-  const path = usePathname();
+  const path = usePath();
   return (
     <>
       <div className={`app${COMPACT.test(path) ? " app-compact" : ""}`}>

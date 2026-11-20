@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePath } from "@/lib/usePath";
 import { Fragment, useCallback, useEffect, useId, useRef, useState } from "react";
 import { clock, dayLabel } from "@/lib/format";
 import { SUPPORT_MAX, type SupportMessage } from "@/lib/support-shared";
@@ -50,7 +50,7 @@ export default function SupportPanel({
   onSeen: () => void;
 }) {
   const uid = useId();
-  const path = usePathname() ?? "/";
+  const path = usePath();
   const [state, setState] = useState<State | null>(null);
   const [failed, setFailed] = useState(false);
   const [msgs, setMsgs] = useState<SupportMessage[]>([]);

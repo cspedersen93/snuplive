@@ -286,3 +286,18 @@ export function when(iso: string | null) {
 }
 
 export const HANDLE_RE = /^[a-z0-9._]{3,24}$/;
+
+/**
+ * Læser et beløb i hele kroner, som folk skriver det: "150", "1.250", "1 250", "150 kr", "150,-" og "150,00".
+ * Alt andet giver null, også "12,50" og "12.50": før blev kommaet bare fjernet, så "12,50" blev til 1.250 kr.
+ */
+export function parseKr(text: string): number | null {
+  const m = /^\s*(\d{1,3}(?:[. \u00a0]\d{3})+|\d+)(?:,(?:-|–|0{1,2}))?\s*(?:kr\.?)?\s*$/i.exec(text ?? "");
+  if (!m) return null;
+  const n = Number(m[1].replace(/[^\d]/g, ""));
+  return Number.isSafeInteger(n) ? n : null;
+}
+
+/** Fejlteksten, når et beløb ikke kan læses som hele kroner. */
+export const KR_HELP = "Skriv beløbet i hele kroner uden komma, fx 150.";
+
