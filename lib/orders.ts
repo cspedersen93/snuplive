@@ -5,6 +5,7 @@ import { kr } from "@/lib/format";
 import { ISSUE_REASONS, type IssueReason } from "@/lib/issues";
 import { enforceFeeFreeCap, FEE_FREE_CAP } from "@/lib/feeFree";
 import { adminEmails, sendMail } from "@/lib/mail";
+import { mailOrdersPaid } from "@/lib/orderMails";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, RESERVATION_DAYS, sellerPayout } from "@/lib/pricing";
 import { cancelLabel, createLabel, ensureTrackingWebhook, hasShipmondo } from "@/lib/shipmondo";
 import { ore } from "@/lib/stripe";
@@ -84,6 +85,8 @@ export async function markCheckoutPaid(admin: AdminClient, stripe: Stripe, sessi
       .in("id", shipIds);
   }
   await admin.from("sales").update({ status: "paid" }).in("order_id", ids).eq("status", "reserved");
+  // Sælgeren får besked om at sende, og køberen får sin ordrebekræftelse. Kun for de ordrer, der blev betalt lige nu.
+  await mailOrdersPaid(admin, ids);
   // Gratis-kampagnen stopper af sig selv, når den anslåede udgift rammer loftet. Så får admins en mail.
   try {
     if ((await enforceFeeFreeCap(admin)).stopped) {

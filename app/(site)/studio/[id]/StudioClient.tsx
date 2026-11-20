@@ -539,7 +539,10 @@ export default function StudioClient(props: Props) {
     closing.current = key;
     void sb.rpc("close_auction", { p_item: auction.id }).then(({ data }) => {
       // Går urene en smule forkert, er budsalget måske ikke slut i databasen endnu: prøv igen om lidt.
-      if ((data as { status?: string } | null)?.status === "live") setTimeout(() => (closing.current = null), 700);
+      const status = (data as { status?: string } | null)?.status;
+      if (status === "live") setTimeout(() => (closing.current = null), 700);
+      // Vinderen får en mail om at betale (sendes kun én gang, uanset hvor mange der kalder).
+      if (status === "sold") void fetch("/api/sales/vundet", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ itemId: auction.id }) }).catch(() => {});
       void resync();
     });
   }, [auction, bidLeft, now, sb, resync]);

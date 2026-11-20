@@ -1,4 +1,5 @@
 import { fail, json } from "@/lib/api";
+import { mailIssueDecided } from "@/lib/orderMails";
 import { refundOrder } from "@/lib/orders";
 import { getStripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -17,6 +18,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   try {
     const ok = await refundOrder(admin, stripe, id, uid);
     if (!ok) return fail("Ordren kan ikke refunderes.", 409);
+    await mailIssueDecided(admin, id, "seller_refund");
     return json({ ok: true });
   } catch (e) {
     console.error("[snuplive] refundering fejlede", e);

@@ -1,3 +1,4 @@
+import { mailAuctionWins } from "@/lib/orderMails";
 import { fail, json } from "@/lib/api";
 import { unquoteEnv } from "@/lib/env";
 import { sendFollowDigest } from "@/lib/followDigest";
@@ -29,6 +30,8 @@ export async function GET(req: Request) {
   const searchAlerts = await sendSearchAlerts(admin);
   // Bud på varer, som sælgeren ikke har svaret på inden 48 timer (0028_bud_paa_varer.sql).
   const offersExpired = await admin.rpc("expire_offers");
+  // Vindere af budsalg, der ikke fik deres mail, da budsalget sluttede (0040_budsalg_mail.sql).
+  const auctionMails = await mailAuctionWins(admin);
   return json({
     ...(await dailyMaintenance(admin, stripe)),
     staleShowsEnded: stale.data ?? 0,
@@ -38,6 +41,7 @@ export async function GET(req: Request) {
     followDigest,
     searchAlerts,
     offersExpired: offersExpired.error ? 0 : (offersExpired.data ?? 0),
+    auctionMails,
   });
 }
 

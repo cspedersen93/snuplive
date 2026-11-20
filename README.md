@@ -1258,6 +1258,9 @@ Test: `qa_bevis.py` (`med` / `uden`).
   Var ordren sendt til en pakkeshop, køber Relived en returlabel til en pakkeshop tæt på sælgeren (`startReturn` i
   `lib/returns.ts`), og køberen henter den under Mine køb (`/api/orders/[id]/returlabel`). Ellers sender køberen selv.
   Sagen står åben, indtil admin trykker "Refundér køberen". Sporingen af returpakken sætter `order_returns.sent_at`.
+- **Mails om ordrer** (`lib/orderMails.ts`): betalt (sælger og køber, fra `markCheckoutPaid`), vundet budsalg (`/api/sales/vundet` og det
+  daglige job, kræver `0040_budsalg_mail.sql`), og afgjort sag (admin-handlingerne og sælgerens egen refundering).
+  Mailene må aldrig vælte betalingen eller afgørelsen: hver funktion fanger sine egne fejl.
 - **Returfragten er sælgerens gæld** (`seller_debts`), men først når køberen har sendt returpakken (`chargeReturnFreight` i
   `applyTracking`). Afgøres sagen uden retur (udbetalt, lukket eller dækket), annulleres den ubrugte label, og sælgeren
   betaler ikke. Gælden trækkes fra sælgerens næste udbetalinger i `releaseOrder`

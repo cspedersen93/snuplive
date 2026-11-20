@@ -1,6 +1,7 @@
 import { fail, json } from "@/lib/api";
 import { isAdminEmail } from "@/lib/mail";
 import { closeIssue, completeOrder, refundOrder } from "@/lib/orders";
+import { mailIssueDecided } from "@/lib/orderMails";
 import { cancelUnusedReturn, coverOrder, ReturnError, startReturn } from "@/lib/returns";
 import { getStripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -33,6 +34,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (!ok) return fail("Ordren kan ikke ændres sådan lige nu. Opdatér siden.", 409);
     // Afgjort uden retur: en ubrugt returlabel annulleres (refusion er undtaget, for dér kan pakken stadig være på vej).
     if (action !== "refund") await cancelUnusedReturn(admin, id).catch(() => false);
+    // Køber og sælger får besked om afgørelsen (ved retur har de allerede fået hver sin mail).
+    await mailIssueDecided(admin, id, action as "refund" | "release" | "close" | "cover");
     console.info("[snuplive] admin", user.email, action, id);
     return json({ ok: true });
   } catch (e) {
