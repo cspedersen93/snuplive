@@ -9,10 +9,11 @@ const POSTER = WELCOME_POSTER;
 
 /**
  * Videoen i det store kort på forsiden, når ingen er live: en sælger viser varer frem i stuen. Uden lyd og i ring.
+ * Med `clip` spiller den i stedet et klip fra et show (en vare, der er vist frem live og stadig er til salg).
  * Den hentes først, når kortet kan ses, og spiller ikke for folk, der har bedt om mindre bevægelse eller sparer data.
  * Der er en knap til at stoppe den.
  */
-export default function WelcomeVideo() {
+export default function WelcomeVideo({ clip, poster = POSTER, className = "ftile-img" }: { clip?: string; poster?: string; className?: string } = {}) {
   const ref = useRef<HTMLVideoElement>(null);
   // Filerne hentes først, når kortet kan ses.
   const [src, setSrc] = useState(false);
@@ -65,8 +66,8 @@ export default function WelcomeVideo() {
     <>
       <video
         ref={ref}
-        className="ftile-img"
-        poster={POSTER}
+        className={className}
+        poster={poster}
         muted
         loop
         playsInline
@@ -76,8 +77,9 @@ export default function WelcomeVideo() {
         onPause={() => setPlaying(false)}
       >
         {/* MP4 først (Safari og iPhone), WebM til browsere uden MP4-afspilning. */}
-        {src ? <source src={MP4} type="video/mp4" /> : null}
-        {src ? <source src={WEBM} type="video/webm" /> : null}
+        {src && clip ? <source src={clip} /> : null}
+        {src && !clip ? <source src={MP4} type="video/mp4" /> : null}
+        {src && !clip ? <source src={WEBM} type="video/webm" /> : null}
       </video>
       {src ? (
         <button className="ftile-vbtn" type="button" onClick={toggle} aria-label={playing ? "Stop videoen" : "Afspil videoen"}>

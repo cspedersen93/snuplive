@@ -3,11 +3,12 @@ import Avatar from "@/components/Avatar";
 import { IconPlay } from "@/components/Icons";
 import NoPhoto from "@/components/NoPhoto";
 import RemindButton from "@/components/RemindButton";
+import Countdown from "@/components/feed/Countdown";
 import WelcomeVideo from "@/components/feed/WelcomeVideo";
 import { itemMeta } from "@/components/Screen";
 import { isAuction, soldPrice } from "@/lib/auction";
 import { category, clock, dayLabel, kr, vareOrd } from "@/lib/format";
-import { itemImage, showImage } from "@/lib/images";
+import { clipUrl, itemImage, showImage } from "@/lib/images";
 import { itemHref, itemState } from "@/lib/items";
 import { itemCount } from "@/lib/queries";
 import type { FeedItem, ShowWithSeller } from "@/lib/types";
@@ -65,14 +66,41 @@ export function BigShowTile({ show }: { show: ShowWithSeller }) {
 }
 
 /**
- * Det store kort, når ingen er live eller har planlagt et show. Er der varer til salg, peger det på dem. Er der intet
- * endnu, taler det til sælgerne indtil lanceringen og til køberne bagefter (tilmelding til nyhedsbrevet).
+ * Det store kort øverst på forsiden. Det fortæller altid, hvad der er at se:
+ * 1. nogen er live → se med, 2. et show er planlagt → nedtælling og Husk mig, 3. der er et klip fra et show →
+ * klippet spiller, 4. der er varer til salg → se dem, 5. ellers: sælgerne indtil lanceringen, køberne bagefter.
  */
-export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }: { hasItems?: boolean; launched?: boolean; liveCount?: number }) {
+export function WelcomeTile({
+  hasItems = true,
+  launched = false,
+  liveCount = 0,
+  next = null,
+  clip = null,
+}: {
+  hasItems?: boolean;
+  launched?: boolean;
+  liveCount?: number;
+  next?: ShowWithSeller | null;
+  clip?: FeedItem | null;
+}) {
+  const clipSrc = !liveCount && !next && clip ? clipUrl(clip) : null;
+  const clipPoster = clip ? itemImage(clip) : null;
+  const nextHandle = next?.seller?.handle ?? "sælger";
+  const nextCount = next ? itemCount(next) : 0;
   return (
-    <div className="ftile ftile-big ftile-welcome">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <WelcomeVideo />
+    <div className={`ftile ftile-big ftile-welcome${clipSrc ? " has-clip" : ""}`}>
+      {clipSrc ? (
+        <>
+          {/* Klippet er filmet på højkant: det står i sin egen ramme, med varens billede sløret bagved. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {clipPoster ? <img className="ftile-img ftile-blur" src={clipPoster} alt="" /> : null}
+          <span className="ftile-clip">
+            <WelcomeVideo clip={clipSrc} poster={clipPoster ?? undefined} className="ftile-clipvid" />
+          </span>
+        </>
+      ) : (
+        <WelcomeVideo />
+      )}
       <span className="ftile-shade" />
       <div className="ftile-info">
         {liveCount ? (
@@ -89,10 +117,40 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
               <Link className="btn btn-line" href="/til-salg">Se varer til salg</Link>
             </span>
           </>
-        ) : null}
-        {liveCount ? null : <span className="fbadge">Ingen er live lige nu</span>}
-        {liveCount ? null : hasItems ? (
+        ) : next?.starts_at ? (
+          // Et show er på vej: hvornår, hvem og hvad, med nedtælling og Husk mig.
           <>
+            <span className="fbadge later">Næste show · {when(next.starts_at).toLowerCase()}</span>
+            <strong className="ftile-title">{next.title}</strong>
+            <span className="ftile-extra">
+              Hos {nextHandle}
+              {nextCount ? ` · ${nextCount} ${vareOrd(nextCount)} i showet` : ""}
+              <Countdown to={next.starts_at} className="ftile-count" />
+            </span>
+            <span className="ftile-btns">
+              <RemindButton showId={next.id} next="/" className="btn btn-ivory" />
+              <Link className="btn btn-line" href={`/live/${nextHandle}`}>Se showet</Link>
+            </span>
+          </>
+        ) : clipSrc && clip ? (
+          // Ingen shows i kalenderen, men der er noget at se: et klip af en vare, der stadig er til salg.
+          <>
+            <span className="fbadge">
+              <IconPlay />
+              Klip fra et show
+            </span>
+            <strong className="ftile-title">{clip.name}</strong>
+            <span className="ftile-extra">
+              {kr(clip.price)} hos {clip.handle}. Vist frem på video, og stadig til salg.
+            </span>
+            <span className="ftile-btns">
+              <Link className="btn btn-ivory" href={itemHref(clip)}>Se varen</Link>
+              <Link className="btn btn-line" href="/klip">Flere klip</Link>
+            </span>
+          </>
+        ) : hasItems ? (
+          <>
+            <span className="fbadge">Til salg nu</span>
             <strong className="ftile-title">Se varer, der allerede er vist frem på video</strong>
             <span className="ftile-extra">Eller gå selv live og sælg en hel bunke på én aften.</span>
             <span className="ftile-btns">
@@ -113,6 +171,7 @@ export function WelcomeTile({ hasItems = true, launched = false, liveCount = 0 }
         ) : (
           // Indtil lanceringen taler kortet til sælgerne, så der kommer varer på siden.
           <>
+            <span className="fbadge">Åbner snart</span>
             <strong className="ftile-title">Vær med fra starten</strong>
             <span className="ftile-extra">
               Gå live fra stuen, og sælg en hel bunke på én aften. Det er gratis at sælge, mens vi er i beta.

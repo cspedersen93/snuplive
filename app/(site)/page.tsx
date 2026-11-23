@@ -31,6 +31,8 @@ import { WELCOME_POSTER } from "@/lib/images";
 
 /** Små kort under det store kort og kasserne (12 går op i både 2, 3 og 4 kolonner). */
 const FEED_TILES = 12;
+/** Varer i rækken "Nyt til salg" øverst. */
+const FRESH = 8;
 type Tile = { kind: "show"; show: ShowWithSeller } | { kind: "item"; item: FeedItem };
 
 export const revalidate = 30;
@@ -61,8 +63,10 @@ export default async function Forside() {
   for (const s of live.slice(0, 4)) tiles.push({ kind: "show", show: s });
   // Kommende shows står kun i programmet øverst, ikke også som kort her.
   // Varer uden billede står ikke i feedet (de ligner tomme felter), men stadig i rækkerne længere nede og i showet.
-  const queues = [forSale, auctions, soon].map((q) => q.filter((it) => itemImage(it)));
-  const usedSale = new Set<string>();
+  // Øverst på siden, før det store kort: de nyeste varer til salg med billede og pris.
+  const fresh = forSale.filter((it) => itemImage(it)).slice(0, FRESH);
+  const usedSale = new Set<string>(fresh.map((it) => it.id));
+  const queues = [forSale.filter((it) => !usedSale.has(it.id)), auctions, soon].map((q) => q.filter((it) => itemImage(it)));
   while (tiles.length < FEED_TILES && queues.some((q) => q.length)) {
     for (const q of queues) {
       const it = q.shift();
@@ -73,7 +77,9 @@ export default async function Forside() {
     }
   }
   const moreForSale = forSale.filter((it) => !usedSale.has(it.id)).slice(0, 10);
-  const soonShows = upcoming.slice(0, 4);
+  // Det store kort: det næste show med nedtælling, ellers et klip fra et show, hvis der er et.
+  const nextShow = upcoming.find((s) => s.starts_at && new Date(s.starts_at).getTime() > Date.now()) ?? null;
+  const heroClip = forSale.find((it) => it.clip_path && itemImage(it)) ?? null;
   const camp = campaignState(new Date(), flags);
   const campTitle =
     camp.gf.phase !== "over" && camp.jk.phase !== "over"
@@ -137,47 +143,33 @@ export default async function Forside() {
           </nav>
 
           <Program live={live} upcoming={upcoming} />
+
+          {fresh.length ? (
+            <section className="fresh" aria-labelledby="h-fresh">
+              <div className="prog-head">
+                <h2 className="prog-h" id="h-fresh">Nyt til salg</h2>
+                <Link className="prog-more" href="/til-salg">Se alt til salg</Link>
+              </div>
+              <div className="fresh-row">
+                {fresh.map((it, i) => (
+                  <ItemCard key={it.id} item={it} priority={i < 3} />
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <section className="feed-hero" aria-labelledby="h-feed">
           <h2 className="sr-only" id="h-feed">Hvem er live, og hvad er til salg lige nu?</h2>
           <div className="feed-grid sparse">
-            <WelcomeTile hasItems={forSale.length > 0} launched={launched()} liveCount={live.length} />
+            <WelcomeTile hasItems={forSale.length > 0} launched={launched()} liveCount={live.length} next={nextShow} clip={heroClip} />
           </div>
         </section>
 
-        <aside className="feed-rail" aria-label="Til dig">
+        {/* Til den, der er logget ind: åbne bud og samlerabat. Fylder ingenting, når der ikke er noget. */}
+        <div className="feed-mine">
           <RailMine />
-          {/* Programmet står øverst på siden (components/feed/Program.tsx). Her står kun forklaringen, når det er tomt. */}
-          {soonShows.length ? null : (
-            // Tomt program: forklar, hvad der kommer til at stå her, og giv sælgerne en vej ind.
-            <section className="rail-box" aria-labelledby="h-rail-snart">
-              <div className="rail-top">
-                <h2 className="rail-h" id="h-rail-snart">Snart live</h2>
-                <Link className="rail-more" href="/live#h-sched">Program</Link>
-              </div>
-              <p className="rail-empty">
-                Programmet er tomt lige nu. Når en sælger sætter et show i programmet, står det her, og du kan trykke Husk mig.
-              </p>
-              {/* Til sælgerne indtil lanceringen, til køberne bagefter. */}
-              {launched() ? (
-                <Link className="btn btn-line btn-sm" href="/nyhedsbrev">Få besked om nye shows</Link>
-              ) : (
-                <Link className="btn btn-line btn-sm" href="/saelg">Sæt dit eget show i programmet</Link>
-              )}
-            </section>
-          )}
-          <RailHello />
-          <section className="rail-box" aria-labelledby="h-rail-tryg">
-            <h2 className="rail-h" id="h-rail-tryg">Tryg handel</h2>
-            <ul className="rail-checks">
-              <li>Sælgeren får først pengene, når du har varen.</li>
-              <li>Alt fra samme sælger i én pakke, fra {DELIVERY.ship.price} kr til pakkeshop.</li>
-              <li>Er varen ikke som vist, melder du et problem, og pengene venter.</li>
-            </ul>
-            <Link className="rail-link" href="/saadan-virker-det#priser">Priser, fragt og rabat</Link>
-          </section>
-        </aside>
+        </div>
 
         {tiles.length ? (
           <section className="feed-tiles" aria-label="Shows og varer">
@@ -192,6 +184,21 @@ export default async function Forside() {
             </div>
           </section>
         ) : null}
+
+        {/* Kasserne står under shows og varer: først det, man kan købe, så forklaringerne. */}
+        <aside className="feed-rail" aria-label="Kom godt i gang">
+          <RailHello />
+          <section className="rail-box" aria-labelledby="h-rail-tryg">
+            <h2 className="rail-h" id="h-rail-tryg">Tryg handel</h2>
+            <ul className="rail-checks">
+              <li>Sælgeren får først pengene, når du har varen.</li>
+              <li>Alt fra samme sælger i én pakke, fra {DELIVERY.ship.price} kr til pakkeshop.</li>
+              <li>Er varen ikke som vist, melder du et problem, og pengene venter.</li>
+            </ul>
+            <Link className="rail-link" href="/saadan-virker-det#priser">Priser, fragt og rabat</Link>
+          </section>
+        </aside>
+
 
         {/* Nyhedsbrev med reklame for de næste kampagner (slås til i Backoffice → Nyhedsbrev). Kortene forsvinder,
             når kampagnerne er slut. */}
