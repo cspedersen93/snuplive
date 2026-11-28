@@ -1,6 +1,6 @@
 import { fail, json } from "@/lib/api";
 import { isAdminEmail } from "@/lib/mail";
-import { closeIssue, completeOrder, refundOrder } from "@/lib/orders";
+import { closeIssue, completeOrder, markShippedByAdmin, refundOrder } from "@/lib/orders";
 import { mailIssueDecided } from "@/lib/orderMails";
 import { cancelUnusedReturn, coverOrder, ReturnError, startReturn } from "@/lib/returns";
 import { getStripe } from "@/lib/stripe";
@@ -9,7 +9,10 @@ import { createClient, getUserInfo } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-/** Admin afgør en sag: { action: "refund" | "release" | "close" | "return" | "cover" }. */
+/**
+ * Admin afgør en sag: { action: "refund" | "release" | "close" | "return" | "cover" | "shipped" }.
+ * "shipped" er til en pakke, som sporingen ikke har registreret: ordren markeres som sendt og følger så den normale vej.
+ */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await getUserInfo(await createClient());
@@ -27,6 +30,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       const r = await startReturn(admin, id);
       console.info("[snuplive] admin", user.email, action, id, r);
       return json({ ok: true, ...r });
+    } else if (action === "shipped") {
+      if (!(await markShippedByAdmin(admin, id))) return fail("Ordren kan ikke ændres sådan lige nu. Opdatér siden.", 409);
+      console.info("[relived] admin", user.email, action, id);
+      return json({ ok: true });
     } else if (action === "close") {
       await closeIssue(admin, id);
       ok = true;

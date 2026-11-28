@@ -226,7 +226,8 @@ select t.ok((select city from seller_addresses) = 'København Ø', 'Liva kan ikk
 set role anon;
 select t.throws($$select * from seller_addresses$$, 'permission denied');
 reset role;
--- Ordrer til pakkeshop: uden label kan de ikke markeres som sendt, med label beholder de labelens sporingsnummer.
+-- Ordrer til pakkeshop sendes med Reliveds label. Sælgeren kan ikke selv markere dem som sendt, hverken før eller
+-- efter labelen er lavet: det gør sporingen, når fragtfirmaet har scannet pakken (0042_rettelser.sql).
 set role service_role;
 insert into orders (id, checkout_id, buyer_id, seller_id, show_id, status, delivery, items_amount, shipping_amount, fee_amount, total_amount,
                     ship_name, ship_line1, ship_postal_code, ship_city, paid_at, sp_carrier, sp_id, sp_name)
@@ -237,7 +238,7 @@ reset role;
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
 select t.ok((select sp_name from orders where id = '30000000-0000-0000-0000-000000000002') = '7-Eleven Nørrebrogade', 'sælgeren kan se pakkeshoppen');
-select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000002')$$, 'kan ikke markeres');
+select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000002')$$, 'fragtfirmaet har scannet');
 select t.throws($$update orders set shipmondo_shipment_id = 1 where id = '30000000-0000-0000-0000-000000000002' returning 1$$, 'permission denied');
 select t.throws($$select * from shipping_labels$$, 'permission denied');
 reset role;
@@ -250,10 +251,19 @@ set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
 select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000002')$$, 'kan ikke markeres');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
-select mark_shipped('30000000-0000-0000-0000-000000000002');
-select t.ok((select status = 'shipped' and carrier = 'GLS' and tracking = '0123456789' from orders where id = '30000000-0000-0000-0000-000000000002'),
-            'pakken med label er afleveret og beholder sporingsnummeret');
+select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000002')$$, 'fragtfirmaet har scannet');
+select t.throws($$select mark_shipped('30000000-0000-0000-0000-000000000002', 'GLS', '999')$$, 'fragtfirmaet har scannet');
+select t.ok((select status = 'paid' and tracking = '0123456789' from orders where id = '30000000-0000-0000-0000-000000000002'),
+            'sælgeren kan ikke selv markere en pakke med label som sendt');
 reset role;
+-- Sporingen (serveren) markerer pakken som sendt, når fragtfirmaet har scannet den.
+set role service_role;
+update orders set status = 'shipped', shipped_at = now() where id = '30000000-0000-0000-0000-000000000002' and status = 'paid';
+update sales set status = 'shipped' where order_id = '30000000-0000-0000-0000-000000000002' and status = 'paid';
+reset role;
+select t.ok((select status = 'shipped' and carrier = 'GLS' and tracking = '0123456789' from orders where id = '30000000-0000-0000-0000-000000000002'),
+            'pakken med label er sendt og beholder sporingsnummeret');
+select t.ok((select count(*) from information_schema.columns where table_name = 'orders' and column_name = 'scan_flagged_at') = 1, 'ordren kan huske, at Relived har fået besked om en pakke uden scanning');
 
 -- ── Moderation ───────────────────────────────────────────────────────────────
 set role authenticated;
@@ -533,6 +543,34 @@ select t.ok((select is_seller from profiles where id = '00000000-0000-0000-0000-
 insert into reports (id, target_type, target_id, reason) values ('40000000-0000-0000-0000-000000000006', 'profile', '00000000-0000-0000-0000-00000000000e', 'ulovlig');
 select * from admin_moderate('40000000-0000-0000-0000-000000000006', 'remove', 'Sælger ulovlige ting');
 select t.ok((select not is_seller from profiles where id = '00000000-0000-0000-0000-00000000000e'), 'en sælgerkonto kan lukkes');
+-- En lukket sælger kan ikke åbne sig selv igen (0042_rettelser.sql).
+select t.ok((select count(*) from seller_closures where user_id = '00000000-0000-0000-0000-00000000000e') = 1, 'lukningen er husket');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000e"}', false);
+select t.throws($$select become_seller('business', 'Genbrug ApS', '12345678')$$, 'lukket din sælgerprofil');
+select t.throws($$select become_seller('private')$$, 'lukket din sælgerprofil');
+select t.ok((select not is_seller from profiles where id = auth.uid()), 'den lukkede sælger er stadig lukket');
+select t.throws($$select * from seller_closures$$, 'permission denied');
+select t.throws($$delete from seller_closures where user_id = auth.uid()$$, 'permission denied');
+reset role;
+set role anon;
+select t.throws($$select * from seller_closures$$, 'permission denied');
+reset role;
+-- En anden bruger er ikke berørt.
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select is_seller from become_seller('private')), 'andre sælgere kan stadig gemme deres sælgeroplysninger');
+reset role;
+-- Relived åbner sælgeren igen (serveren sletter lukningen). Så kan hun selv blive sælger.
+set role service_role;
+delete from seller_closures where user_id = '00000000-0000-0000-0000-00000000000e';
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000e"}', false);
+select t.ok((select is_seller and business_cvr = '12345678' from become_seller('business', 'Genbrug ApS', '12345678')), 'når Relived har åbnet sælgeren, kan hun blive sælger igen');
+reset role;
+-- Resten af testen regner med, at butikken er lukket.
+update profiles set is_seller = false where id = '00000000-0000-0000-0000-00000000000e';
 select t.ok(has_function_privilege('service_role', 'public.admin_moderate(uuid, text, text)', 'execute')
   and not has_function_privilege('authenticated', 'public.admin_moderate(uuid, text, text)', 'execute')
   and not has_function_privilege('anon', 'public.admin_moderate(uuid, text, text)', 'execute'), 'kun serveren kan afgøre anmeldelser');
@@ -890,12 +928,30 @@ grant all on t_code to authenticated;
 insert into t_code select guest_invite('10000000-0000-0000-0000-0000000000f9');
 select t.ok((select length(code) = 32 from t_code), 'værten får et invitationslink');
 select t.ok((select guest_invite('10000000-0000-0000-0000-0000000000f9')) = (select code from t_code), 'det samme link, til værten laver et nyt');
+-- Seernes invitation til et lukket show har sin egen kode (0042_rettelser.sql). Før delte de to links én kode.
+create temp table if not exists t_view (code text);
+grant all on t_view to authenticated;
+insert into t_view select show_invite_code('10000000-0000-0000-0000-0000000000f9');
+select t.ok((select length(code) = 12 from t_view) and (select code from t_view) <> (select code from t_code), 'seernes invitation er en anden kode end gæstelinket');
+select t.ok((select guest_invite('10000000-0000-0000-0000-0000000000f9')) = (select code from t_code), 'gæstelinket er uændret, efter seernes invitation er lavet');
+select t.ok((select show_invite_code('10000000-0000-0000-0000-0000000000f9', true)) <> (select code from t_view), 'værten laver et nyt link til seerne');
+select t.ok((select guest_invite('10000000-0000-0000-0000-0000000000f9')) = (select code from t_code), 'et nyt link til seerne rører ikke gæstelinket');
+delete from t_view;
+insert into t_view select show_invite_code('10000000-0000-0000-0000-0000000000f9');
 select t.throws($$select guest_join((select code from t_code))$$, 'Det er dit eget show');
 select t.throws($$select guest_invite('10000000-0000-0000-0000-000000000001')$$, 'Showet');
 -- En køber (ikke sælger) kan ikke være gæst.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
 select t.throws($$select guest_join((select code from t_code))$$, 'Bliv sælger først');
 select t.throws($$select * from show_invites$$, 'permission denied');
+select t.throws($$select * from show_guest_invites$$, 'permission denied');
+-- Ole er sælger og inviteret som seer. Seernes kode gør ham ikke til gæst, og gæstelinket er ikke en invitation til seere.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select guest_join((select code from t_view))$$, 'gælder ikke længere');
+select t.ok((select count(*) from guest_invite_info((select code from t_view))) = 0, 'seernes kode viser ingen gæsteinvitation');
+select t.ok(not is_show_guest('10000000-0000-0000-0000-0000000000f9', auth.uid()), 'en inviteret seer er ikke gæst');
+select t.ok(join_show((select code from t_view)) = '10000000-0000-0000-0000-0000000000f9', 'seernes kode giver adgang som seer');
+select t.ok(join_show((select code from t_code)) is null, 'gæstelinket giver ikke adgang som seer');
 -- Ole siger ja og lægger sine ting i værtens kø.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
 select t.ok((select title = 'Fælles loppemarked' and host_handle = 'majasgarderobe' and guests = 0 and not joined from guest_invite_info((select code from t_code))), 'invitationen viser show og vært');
@@ -952,6 +1008,7 @@ select guest_join((select code from t_code));
 select t.ok(is_show_guest('10000000-0000-0000-0000-0000000000f9', auth.uid()), 'og kan komme med igen');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
 select guest_invite('10000000-0000-0000-0000-0000000000f9', true);
+select t.ok((select show_invite_code('10000000-0000-0000-0000-0000000000f9')) = (select code from t_view), 'et nyt gæstelink rører ikke seernes invitation');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000d"}', false);
 select guest_leave('10000000-0000-0000-0000-0000000000f9');
 select t.throws($$select guest_join((select code from t_code))$$, 'gælder ikke længere');
@@ -1111,6 +1168,92 @@ reset role;
 delete from saved_searches where category = 'cykler';
 delete from items where id = '20000000-0000-0000-0000-0000000000c1';
 delete from shows where id = '10000000-0000-0000-0000-0000000000c1';
+
+-- ── Rettelser efter gennemgangen (0042_rettelser.sql): annullering under betaling og refunderede varer ──
+insert into shows (id, seller_id, title, category, status, starts_at, started_at, ended_at)
+  values ('10000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-00000000000a', 'Rettelser', 'bolig', 'ended', now() - interval '2 days', now() - interval '2 days', now() - interval '1 day');
+insert into items (id, show_id, seller_id, name, price, position, status, for_sale, listed_at) values
+  ('20000000-0000-0000-0000-0000000000a2', '10000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-00000000000a', 'Lysestage', 100, 1, 'unsold', true, now()),
+  ('20000000-0000-0000-0000-0000000000a3', '10000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-00000000000a', 'Fad', 80, 2, 'unsold', true, now());
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select buy_now('20000000-0000-0000-0000-0000000000a2');
+select buy_now('20000000-0000-0000-0000-0000000000a3');
+reset role;
+-- Liva står i betalingen: serveren har lavet en ordre, der venter på betaling.
+set role service_role;
+insert into orders (id, checkout_id, buyer_id, seller_id, show_id, status, delivery, items_amount, shipping_amount, fee_amount, total_amount)
+  values ('30000000-0000-0000-0000-0000000000a2', gen_random_uuid(), '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000a', '10000000-0000-0000-0000-0000000000a2', 'pending', 'pickup', 180, 0, 14, 194);
+update sales set order_id = '30000000-0000-0000-0000-0000000000a2' where item_id in ('20000000-0000-0000-0000-0000000000a2', '20000000-0000-0000-0000-0000000000a3') and status = 'reserved';
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.throws($$select cancel_reservation((select id from sales where item_id = '20000000-0000-0000-0000-0000000000a3' and status = 'reserved'))$$, 'ved at betale');
+select t.ok((select status = 'reserved' and order_id = '30000000-0000-0000-0000-0000000000a2' from sales where item_id = '20000000-0000-0000-0000-0000000000a3'), 'købet er stadig reserveret, mens køberen betaler');
+reset role;
+-- Betalingen hos Stripe er åben i 35 minutter. Efter 40 minutter kan sælgeren annullere igen.
+update orders set created_at = now() - interval '41 minutes' where id = '30000000-0000-0000-0000-0000000000a2';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select cancel_reservation((select id from sales where item_id = '20000000-0000-0000-0000-0000000000a3' and status = 'reserved'));
+select t.ok((select status = 'cancelled' and order_id is null from sales where item_id = '20000000-0000-0000-0000-0000000000a3'), 'når betalingen er lukket, kan sælgeren annullere købet');
+select t.ok((select status = 'unsold' and for_sale from items where id = '20000000-0000-0000-0000-0000000000a3'), 'et annulleret, ubetalt køb kommer til salg igen');
+reset role;
+-- Den anden vare bliver betalt og siden refunderet. Den må ikke komme til salg af sig selv.
+set role service_role;
+update orders set status = 'paid', paid_at = now() where id = '30000000-0000-0000-0000-0000000000a2';
+update sales set status = 'paid' where order_id = '30000000-0000-0000-0000-0000000000a2' and status = 'reserved';
+update orders set status = 'refunded', cancelled_at = now() where id = '30000000-0000-0000-0000-0000000000a2';
+select release_items_for_order('30000000-0000-0000-0000-0000000000a2');
+update sales set status = 'cancelled' where order_id = '30000000-0000-0000-0000-0000000000a2';
+reset role;
+select t.ok((select status = 'unsold' and sold_at is null and not for_sale from items where id = '20000000-0000-0000-0000-0000000000a2'), 'en refunderet vare er usolgt, men ikke til salg');
+select t.ok((select count(*) from items_feed('for_sale', null, 100) where id = '20000000-0000-0000-0000-0000000000a2') = 0, 'en refunderet vare står ikke under Til salg');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.throws($$select buy_now('20000000-0000-0000-0000-0000000000a2')$$, 'ikke til salg');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+update items set for_sale = true where id = '20000000-0000-0000-0000-0000000000a2';
+select t.ok((select for_sale from items where id = '20000000-0000-0000-0000-0000000000a2'), 'sælgeren kan selv sætte den refunderede vare til salg igen');
+reset role;
+select t.ok((select count(*) from items_feed('for_sale', null, 100) where id = '20000000-0000-0000-0000-0000000000a2') = 1, 'og så står den under Til salg igen');
+delete from sales where item_id in ('20000000-0000-0000-0000-0000000000a2', '20000000-0000-0000-0000-0000000000a3');
+delete from orders where id = '30000000-0000-0000-0000-0000000000a2';
+delete from items where show_id = '10000000-0000-0000-0000-0000000000a2';
+delete from shows where id = '10000000-0000-0000-0000-0000000000a2';
+
+-- ── Afhentning bekræftes af både køber og sælger (0041_afhentning.sql) ──
+-- Kun serveren kan sætte bekræftelserne. Køber og sælger kan se dem, og ingen af dem kan bekræfte for den anden.
+set role service_role;
+insert into shows (id, seller_id, title, category, starts_at)
+  values ('10000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-00000000000a', 'Møbler til afhentning', 'bolig', now() + interval '3 hours');
+insert into orders (id, checkout_id, buyer_id, seller_id, show_id, status, delivery, items_amount, shipping_amount, fee_amount, total_amount, paid_at)
+  values ('30000000-0000-0000-0000-0000000000a1', gen_random_uuid(), '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000a',
+          '10000000-0000-0000-0000-0000000000a1', 'paid', 'pickup', 450, 0, 28, 478, now());
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select pickup_buyer_at is null and pickup_seller_at is null and pickup_reminded_at is null and pickup_flagged_at is null from orders where id = '30000000-0000-0000-0000-0000000000a1'),
+            'afhentning: ingen har bekræftet på en ny ordre');
+select t.throws($$update orders set pickup_buyer_at = now() where id = '30000000-0000-0000-0000-0000000000a1' returning 1$$, 'permission denied');
+select t.throws($$update orders set pickup_seller_at = now() where id = '30000000-0000-0000-0000-0000000000a1' returning 1$$, 'permission denied');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.throws($$update orders set pickup_seller_at = now() where id = '30000000-0000-0000-0000-0000000000a1' returning 1$$, 'permission denied');
+select t.throws($$update orders set pickup_buyer_at = now(), pickup_seller_at = now(), status = 'completed' where id = '30000000-0000-0000-0000-0000000000a1' returning 1$$, 'permission denied');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c"}', false);
+select t.ok((select count(*) from orders where id = '30000000-0000-0000-0000-0000000000a1') = 0, 'afhentning: en fremmed kan ikke se, hvem der har bekræftet');
+reset role;
+set role service_role;
+update orders set pickup_buyer_at = now() where id = '30000000-0000-0000-0000-0000000000a1';
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select t.ok((select pickup_buyer_at is not null and pickup_seller_at is null from orders where id = '30000000-0000-0000-0000-0000000000a1'), 'afhentning: sælgeren kan se, at køberen har bekræftet');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000b"}', false);
+select t.ok((select pickup_buyer_at is not null and status = 'paid' from orders where id = '30000000-0000-0000-0000-0000000000a1'), 'afhentning: køberens bekræftelse alene afslutter ikke ordren');
+reset role;
+delete from orders where id = '30000000-0000-0000-0000-0000000000a1';
+delete from shows where id = '10000000-0000-0000-0000-0000000000a1';
 
 select t.ok((select count(*) from pg_publication_tables where pubname = 'supabase_realtime') = 4, 'realtime er slået til for shows, ting, chat og snup');
 \echo 'Alle tests bestået'

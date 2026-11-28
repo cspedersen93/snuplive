@@ -5,9 +5,20 @@ import { kr } from "@/lib/format";
 import { ISSUE_REASONS, type IssueReason } from "@/lib/issues";
 import { enforceFeeFreeCap, FEE_FREE_CAP } from "@/lib/feeFree";
 import { adminEmails, sendMail } from "@/lib/mail";
-import { mailOrdersPaid } from "@/lib/orderMails";
-import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, RESERVATION_DAYS, sellerPayout } from "@/lib/pricing";
-import { cancelLabel, createLabel, ensureTrackingWebhook, hasShipmondo } from "@/lib/shipmondo";
+import { mailIssueDecided, mailOrdersPaid, mailPickupFlag, mailPickupReminder, mailScanMissing } from "@/lib/orderMails";
+import { pickupMarks, pickupReady } from "@/lib/pickup";
+import {
+  AUTO_COMPLETE_DAYS,
+  DELIVERED_COMPLETE_DAYS,
+  LABEL_FLAG_DAYS,
+  PICKUP_FLAG_DAYS,
+  PICKUP_NUDGE_HOURS,
+  PICKUP_ONE_SIDED_DAYS,
+  PICKUP_REMIND_DAYS,
+  RESERVATION_DAYS,
+  sellerPayout,
+} from "@/lib/pricing";
+import { cancelLabel, createLabel, ensureTrackingWebhook, hasShipmondo, shipmondoSandbox } from "@/lib/shipmondo";
 import { ore } from "@/lib/stripe";
 import type { AdminClient } from "@/lib/supabase/admin";
 
@@ -85,8 +96,11 @@ export async function markCheckoutPaid(admin: AdminClient, stripe: Stripe, sessi
       .in("id", shipIds);
   }
   await admin.from("sales").update({ status: "paid" }).in("order_id", ids).eq("status", "reserved");
+  // Sikkerhedsnet: en betalt ordre, hvor alle varer er faldet fra undervejs (fx annulleret af sælgeren), refunderes
+  // med det samme. Mangler der kun nogle af varerne, får Relived besked. Se refundEmptyOrders.
+  const empty = await refundEmptyOrders(admin, stripe, session, ids);
   // Sælgeren får besked om at sende, og køberen får sin ordrebekræftelse. Kun for de ordrer, der blev betalt lige nu.
-  await mailOrdersPaid(admin, ids);
+  await mailOrdersPaid(admin, ids.filter((id) => !empty.includes(id)));
   // Gratis-kampagnen stopper af sig selv, når den anslåede udgift rammer loftet. Så får admins en mail.
   try {
     if ((await enforceFeeFreeCap(admin)).stopped) {
@@ -104,6 +118,66 @@ export async function markCheckoutPaid(admin: AdminClient, stripe: Stripe, sessi
     // Betalingen er gennemført uanset.
   }
   return ids.length;
+}
+
+/**
+ * Betalte ordrer uden varer. Sælgeren kan ikke længere annullere et køb, mens køberen står i betalingen
+ * (cancel_reservation i 0042_rettelser.sql), så det her bør ikke ske. Sker det alligevel, skal køberen ikke betale
+ * for ingenting: ordren refunderes automatisk, køberen får en mail, og Relived får besked.
+ * `sale_count` i betalingens metadata er antallet af varer, da betalingen blev startet. Er der færre nu, får Relived
+ * også besked, selv om ingen ordre er helt tom. Giver id'erne på de tomme ordrer (dem skal ingen have ordremails om).
+ */
+async function refundEmptyOrders(admin: AdminClient, stripe: Stripe, session: Stripe.Checkout.Session, orderIds: string[]) {
+  const empty: string[] = [];
+  try {
+    const { data, error } = await admin.from("sales").select("order_id").in("order_id", orderIds).in("status", ["reserved", "paid"]);
+    if (error) return empty; // Kan vi ikke tælle varerne, rører vi ikke ordrerne.
+    const lines = new Map<string, number>();
+    for (const s of (data ?? []) as { order_id: string }[]) lines.set(s.order_id, (lines.get(s.order_id) ?? 0) + 1);
+    const refunded: string[] = [];
+    const failed: string[] = [];
+    for (const id of orderIds) {
+      if (lines.get(id)) continue;
+      empty.push(id);
+      try {
+        if (await refundOrder(admin, stripe, id, null)) {
+          refunded.push(id);
+          await mailIssueDecided(admin, id, "seller_refund");
+        } else failed.push(id);
+      } catch (e) {
+        console.error("[relived] en betalt ordre uden varer kunne ikke refunderes", id, e);
+        failed.push(id);
+      }
+    }
+    const expected = Number(session.metadata?.sale_count);
+    const found = [...lines.values()].reduce((a, n) => a + n, 0);
+    const short = Number.isInteger(expected) && expected > found;
+    if (empty.length || short) {
+      await sendMail({
+        to: adminEmails(),
+        subject: failed.length
+          ? "En betalt ordre uden varer kunne ikke refunderes"
+          : refunded.length
+            ? "En betalt ordre uden varer er refunderet"
+            : "En betaling mangler varer",
+        text: [
+          empty.length
+            ? "En køber har betalt for en ordre, hvor varerne var faldet fra, mens betalingen stod åben."
+            : "En køber har betalt, men der er færre varer på ordrerne end, da betalingen blev startet. Intet er refunderet automatisk.",
+          ...(refunded.length ? [`Refunderet automatisk, og køberen har fået en mail: ${refunded.join(", ")}`] : []),
+          ...(failed.length ? [`Kunne IKKE refunderes automatisk. Giv køberen pengene tilbage i Stripe: ${failed.join(", ")}`] : []),
+          "",
+          ...(Number.isInteger(expected) ? [`Varer, da betalingen blev startet: ${expected}. Varer nu: ${found}.`] : []),
+          `Ordrer i betalingen: ${orderIds.join(", ")}`,
+          "",
+          `Se ordrerne: ${SITE_URL}/admin/ordrer`,
+        ].join("\n"),
+      });
+    }
+  } catch (e) {
+    console.error("[relived] tjek af betalte ordrer uden varer fejlede", orderIds, e);
+  }
+  return empty;
 }
 
 /** En betaling blev ikke gennemført: ordrerne annulleres, og købene kan betales igen. */
@@ -172,6 +246,8 @@ export async function releaseOrder(admin: AdminClient, stripe: Stripe, orderId: 
  * buyerId sikrer, at kun køberen selv kan gøre det (cron-jobbet sender null).
  * Er der meldt et problem, afslutter cron-jobbet ikke ordren. Køberen kan stadig selv bekræfte,
  * og en admin kan sende pengene til sælgeren (byAdmin), når sagen er afgjort.
+ * Afhentning: med 0041_afhentning.sql afsluttes ordren kun, når køber og sælger begge har bekræftet (se
+ * confirmPickup). Uden filen gælder den gamle regel, hvor køberen bekræfter alene.
  */
 export async function completeOrder(
   admin: AdminClient,
@@ -183,8 +259,11 @@ export async function completeOrder(
   const { data: order } = await admin.from("orders").select("id,buyer_id,status,delivery,issue_open").eq("id", orderId).maybeSingle();
   if (!order || (buyerId && order.buyer_id !== buyerId)) return false;
   if (!buyerId && !opts.byAdmin && order.issue_open) return false;
-  const ready =
-    order.status === "shipped" || (order.status === "paid" && (order.delivery === "pickup" || Boolean(opts.byAdmin)));
+  let ready = order.status === "shipped" || (order.status === "paid" && Boolean(opts.byAdmin));
+  if (!ready && order.status === "paid" && order.delivery === "pickup") {
+    const marks = await pickupMarks(admin, orderId);
+    ready = !marks || Boolean(marks.buyer && marks.seller);
+  }
   if (!ready) return false;
   // Opdatér kun, hvis status stadig er den samme (så to klik ikke giver to overførsler).
   const { data, error } = await admin
@@ -199,6 +278,50 @@ export async function completeOrder(
   if (order.issue_open) await resolveIssues(admin, orderId, opts.byAdmin ? "released" : "buyer_confirmed");
   await releaseOrder(admin, stripe, orderId);
   return true;
+}
+
+export class PickupError extends Error {}
+
+/**
+ * Afhentning (0041_afhentning.sql): køber eller sælger bekræfter, at varerne har skiftet hænder. Ordren afsluttes
+ * først, når begge har bekræftet, og så sendes pengene til sælgeren. Kan kaldes flere gange.
+ * Svaret fortæller, hvem der har bekræftet, og om ordren er afsluttet.
+ */
+export async function confirmPickup(admin: AdminClient, stripe: Stripe, orderId: string, uid: string) {
+  const { data: order, error } = await admin
+    .from("orders")
+    .select("id,buyer_id,seller_id,status,delivery,issue_open,pickup_buyer_at,pickup_seller_at")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!order || (order.buyer_id !== uid && order.seller_id !== uid)) throw new PickupError("Ordren findes ikke.");
+  if (order.delivery !== "pickup") throw new PickupError("Ordren skal ikke afhentes.");
+  if (order.status === "completed") return { buyer: true, seller: true, done: true };
+  if (order.status !== "paid") throw new PickupError("Ordren kan ikke bekræftes lige nu. Opdatér siden.");
+  const role = order.buyer_id === uid ? "buyer" : "seller";
+  // Har køberen meldt et problem, kan sælgeren ikke bekræfte sig til pengene. Sagen skal afgøres først.
+  if (role === "seller" && order.issue_open) {
+    throw new PickupError("Køberen har meldt et problem med ordren. Afhentningen kan først bekræftes, når Relived har kigget på sagen.");
+  }
+  const col = role === "buyer" ? "pickup_buyer_at" : "pickup_seller_at";
+  if (!order[col]) {
+    const { error: markErr } = await admin.from("orders").update({ [col]: nowIso() }).eq("id", orderId).eq("status", "paid").is(col, null);
+    if (markErr) throw markErr;
+  }
+  // Køberen står med varen og siger god for den. Så er et meldt problem løst, ligesom når køberen bekræfter en pakke.
+  if (role === "buyer" && order.issue_open) await resolveIssues(admin, orderId, "buyer_confirmed");
+  // Læs igen: den anden kan have bekræftet i mellemtiden. completeOrder tjekker selv, at begge har bekræftet,
+  // og at ordren ikke allerede er afsluttet, så to tryk på samme tid giver kun én udbetaling.
+  const marks = await pickupMarks(admin, orderId);
+  let done = false;
+  if (marks?.buyer && marks.seller) {
+    done = await completeOrder(admin, stripe, orderId, null);
+    if (!done) {
+      const { data: now } = await admin.from("orders").select("status").eq("id", orderId).maybeSingle();
+      done = now?.status === "completed";
+    }
+  }
+  return { buyer: Boolean(marks?.buyer), seller: Boolean(marks?.seller), done };
 }
 
 /**
@@ -254,7 +377,7 @@ export async function syncPayoutAccount(admin: AdminClient, stripe: Stripe, acco
 /** Dagligt oprydningsjob: afslut gamle ordrer, send ventende udbetalinger og annullér gamle ubetalte køb. */
 export async function dailyMaintenance(admin: AdminClient, stripe: Stripe) {
   const days = (n: number) => new Date(Date.now() - n * 864e5).toISOString();
-  const result = { completed: 0, transfers: 0, expired: 0, cancelledCheckouts: 0 };
+  const result = { completed: 0, transfers: 0, expired: 0, cancelledCheckouts: 0, pickupReminders: 0, pickupFlagged: 0, scanFlagged: 0 };
 
   // Ordrer med et åbent problem venter, til sagen er afgjort.
   const { data: shipped } = await admin
@@ -263,13 +386,22 @@ export async function dailyMaintenance(admin: AdminClient, stripe: Stripe) {
     .eq("status", "shipped")
     .eq("issue_open", false)
     .lt("shipped_at", days(AUTO_COMPLETE_DAYS));
-  const { data: pickups } = await admin
-    .from("orders")
-    .select("id")
-    .eq("status", "paid")
-    .eq("delivery", "pickup")
-    .eq("issue_open", false)
-    .lt("paid_at", days(AUTO_COMPLETE_DAYS));
+  // Afhentning: med 0041_afhentning.sql afsluttes ordren kun, når køber og sælger begge har bekræftet. Det sker
+  // normalt med det samme i confirmPickup, så her fanges kun dem, der blev afbrudt undervejs. Uden filen gælder
+  // den gamle regel: 7 dage efter betalingen.
+  // Kan det ikke afgøres lige nu (databasen svarer ikke), springes afhentningerne over i dag, så ingen får penge ved en fejl.
+  const bothConfirm = await pickupReady(admin).catch((e) => {
+    console.error("[relived] afhentning kunne ikke tjekkes, så de springes over i dag", e);
+    return null;
+  });
+  let pickups: { id: string }[] | null = null;
+  if (bothConfirm !== null) {
+    let pickupQ = admin.from("orders").select("id").eq("status", "paid").eq("delivery", "pickup").eq("issue_open", false);
+    pickupQ = bothConfirm
+      ? pickupQ.not("pickup_buyer_at", "is", null).not("pickup_seller_at", "is", null)
+      : pickupQ.lt("paid_at", days(AUTO_COMPLETE_DAYS));
+    pickups = (await pickupQ).data as { id: string }[] | null;
+  }
   // Pakker, der er hentet i pakkeshoppen for mere end to dage siden.
   const { data: delivered } = await admin
     .from("orders")
@@ -281,6 +413,8 @@ export async function dailyMaintenance(admin: AdminClient, stripe: Stripe) {
   for (const id of due) {
     if (await completeOrder(admin, stripe, id, null)) result.completed++;
   }
+  if (bothConfirm) Object.assign(result, await pickupFollowUp(admin));
+  Object.assign(result, await labelFollowUp(admin));
 
   const { data: retry } = await admin.from("orders").select("id").eq("status", "completed").in("transfer_status", ["pending", "failed"]);
   for (const o of retry ?? []) if ((await releaseOrder(admin, stripe, o.id as string)) === "done") result.transfers++;
@@ -323,6 +457,130 @@ export async function dailyMaintenance(admin: AdminClient, stripe: Stripe) {
     await ensureTrackingWebhook().catch((e) => console.error("[snuplive] sporing hos Shipmondo kunne ikke sættes op", e));
   }
   return result;
+}
+
+/**
+ * Afhentninger, der ikke er bekræftet af begge (0041_afhentning.sql). Ordren afsluttes ikke af sig selv:
+ *  - har kun den ene bekræftet, får den anden en påmindelse ved næste daglige kørsel,
+ *  - har ingen bekræftet PICKUP_REMIND_DAYS dage efter betalingen, får begge en påmindelse,
+ *  - og er ordren stadig ikke bekræftet af begge, får Relived besked og afgør den under Sager.
+ * Tidsstemplet sættes, før mailen sendes, så en fejl i mailen ikke giver en ny mail hver dag.
+ */
+async function pickupFollowUp(admin: AdminClient) {
+  const out = { pickupReminders: 0, pickupFlagged: 0 };
+  const { data, error } = await admin
+    .from("orders")
+    .select("id,paid_at,pickup_buyer_at,pickup_seller_at,pickup_reminded_at,pickup_flagged_at")
+    .eq("status", "paid")
+    .eq("delivery", "pickup")
+    .eq("issue_open", false);
+  if (error) {
+    console.error("[relived] afhentninger kunne ikke hentes", error.message);
+    return out;
+  }
+  const hours = (iso: string | null) => (iso ? (Date.now() - Date.parse(iso)) / 36e5 : 0);
+  type Row = {
+    id: string;
+    paid_at: string | null;
+    pickup_buyer_at: string | null;
+    pickup_seller_at: string | null;
+    pickup_reminded_at: string | null;
+    pickup_flagged_at: string | null;
+  };
+  for (const o of (data ?? []) as Row[]) {
+    if (o.pickup_buyer_at && o.pickup_seller_at) continue; // afsluttes af jobbet ovenfor
+    const one = o.pickup_buyer_at ?? o.pickup_seller_at;
+    // Påmindelsen sendes igen, hvis den sidste blev sendt, før den ene bekræftede.
+    const again = Boolean(one && o.pickup_reminded_at && Date.parse(o.pickup_reminded_at) < Date.parse(one));
+    const remind = one
+      ? hours(one) >= PICKUP_NUDGE_HOURS && (!o.pickup_reminded_at || again)
+      : !o.pickup_reminded_at && hours(o.paid_at) >= PICKUP_REMIND_DAYS * 24;
+    if (remind) {
+      // Kun den kørsel, der når at sætte tidsstemplet, sender mailen.
+      let q = admin.from("orders").update({ pickup_reminded_at: nowIso() }).eq("id", o.id).eq("status", "paid");
+      q = again && one ? q.lt("pickup_reminded_at", one) : q.is("pickup_reminded_at", null);
+      const { data: mine } = await q.select("id");
+      if (mine?.length) {
+        await mailPickupReminder(admin, o.id, { buyer: Boolean(o.pickup_buyer_at), seller: Boolean(o.pickup_seller_at) });
+        out.pickupReminders++;
+      }
+    }
+    const flag = !o.pickup_flagged_at && ((one && hours(one) >= PICKUP_ONE_SIDED_DAYS * 24) || hours(o.paid_at) >= PICKUP_FLAG_DAYS * 24);
+    if (flag) {
+      const { data: mine } = await admin.from("orders").update({ pickup_flagged_at: nowIso() }).eq("id", o.id).eq("status", "paid").is("pickup_flagged_at", null).select("id");
+      if (mine?.length) {
+        await mailPickupFlag(admin, o.id);
+        out.pickupFlagged++;
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Pakker med Reliveds label, som fragtfirmaet ikke har scannet LABEL_FLAG_DAYS dage efter, at labelen blev lavet
+ * (0042_rettelser.sql). Ordren står stadig som betalt, for kun scanningen tæller som sendt. Sælgeren får en mail,
+ * og Relived får besked og afgør ordren under Sager (markér som sendt, eller refundér). Kun én gang pr. ordre.
+ * Testlabels (sandbox) bliver aldrig scannet, så dér sendes der ikke noget. Uden filen sker der ingenting.
+ */
+async function labelFollowUp(admin: AdminClient) {
+  const out = { scanFlagged: 0 };
+  if (!hasShipmondo() || shipmondoSandbox()) return out;
+  const { data, error } = await admin
+    .from("orders")
+    .select("id")
+    .eq("status", "paid")
+    .eq("delivery", "ship")
+    .eq("issue_open", false)
+    .not("shipmondo_shipment_id", "is", null)
+    .is("scan_flagged_at", null)
+    .lt("label_created_at", new Date(Date.now() - LABEL_FLAG_DAYS * 864e5).toISOString());
+  if (error) return out; // 0042 er ikke kørt endnu
+  for (const o of (data ?? []) as { id: string }[]) {
+    // Kun den kørsel, der når at sætte tidsstemplet, sender mailene.
+    const { data: mine } = await admin.from("orders").update({ scan_flagged_at: nowIso() }).eq("id", o.id).eq("status", "paid").is("scan_flagged_at", null).select("id");
+    if (!mine?.length) continue;
+    await mailScanMissing(admin, o.id);
+    out.scanFlagged++;
+  }
+  return out;
+}
+
+/**
+ * Relived markerer en pakke som sendt, selv om sporingen ikke har registreret den (Admin → Sager). Bruges, når
+ * fragtfirmaets egen sporing viser, at pakken er afleveret. Derefter følger ordren den normale vej.
+ */
+export async function markShippedByAdmin(admin: AdminClient, orderId: string) {
+  const { data } = await admin
+    .from("orders")
+    .update({ status: "shipped", shipped_at: nowIso() })
+    .eq("id", orderId)
+    .eq("status", "paid")
+    .eq("delivery", "ship")
+    .select("id");
+  if (!data?.length) return false;
+  await admin.from("sales").update({ status: "shipped" }).eq("order_id", orderId).eq("status", "paid");
+  return true;
+}
+
+/**
+ * Testlabels (Shipmondos sandbox) bliver aldrig scannet af et fragtfirma. For at hele forløbet kan prøves i
+ * testfasen, kan sælgeren dér selv markere pakken som afleveret. Med rigtige labels tæller kun scanningen.
+ */
+export async function markHandedInTest(admin: AdminClient, orderId: string, sellerId: string) {
+  if (!shipmondoSandbox()) return false;
+  const { data } = await admin
+    .from("orders")
+    .update({ status: "shipped", shipped_at: nowIso() })
+    .eq("id", orderId)
+    .eq("seller_id", sellerId)
+    .eq("status", "paid")
+    .eq("delivery", "ship")
+    .not("shipmondo_shipment_id", "is", null)
+    .select("id");
+  if (!data?.length) return false;
+  await admin.from("sales").update({ status: "shipped" }).eq("order_id", orderId).eq("status", "paid");
+  return true;
 }
 
 // ── Fragtlabels og sporing ──────────────────────────────────────────────────

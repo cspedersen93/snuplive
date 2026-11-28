@@ -45,7 +45,7 @@ const BASE: { title: string; qa: [string, string][] }[] = [
       ["Hvad hvis jeg køber hos flere sælgere i samme show?", "Nogle shows har gæster, så flere sælgere sælger sammen. Ved hver vare står, hvem der sælger den. Køber du hos flere af dem, får du en pakke fra hver sælger, og fragten betales pr. pakke."],
       ["Hvad koster fragten?", "39 kr for en lille pakke op til 1 kg og 49 kr for en stor pakke op til 5 kg, til en DAO- eller GLS-pakkeshop. Du betaler én gang pr. sælger, uanset hvor mange varer du køber hos sælgeren, og du ser prisen i kurven. Afhentning hos sælgeren er gratis."],
       ["Hvordan vælger jeg pakkeshop?", "Under Mine køb skriver du dit postnummer, vælger DAO eller GLS og den pakkeshop, du vil hente pakken i. Fragtfirmaet giver dig besked, når pakken er klar, og du kan følge den under Mine køb."],
-      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 2 dage efter, at du har hentet pakken, eller senest 7 dage efter, at den er sendt. Har du meldt et problem, venter pengene, til sagen er afgjort."],
+      ["Hvornår får sælgeren pengene?", "Når du har modtaget pakken og bekræftet, at alt er i orden. Indtil da holder vi pengene tilbage. Bekræfter du ikke selv, sker det automatisk 2 dage efter, at du har hentet pakken, eller senest 7 dage efter, at den er sendt. Henter du varen hos sælgeren, bekræfter I begge, når du har fået den, og først derefter får sælgeren pengene. Har du meldt et problem, venter pengene, til sagen er afgjort."],
     ],
   },
   {

@@ -256,21 +256,30 @@ export function LabelMaker({
   );
 }
 
-/** Sælgeren har afleveret pakken i pakkeshoppen (sporingen gør det også af sig selv). */
+/**
+ * Kun i testfasen: en pakke med testlabel markeres som afleveret, for testlabels bliver aldrig scannet.
+ * Med rigtige labels skifter ordren først til "Sendt", når fragtfirmaet har scannet pakken (0042_rettelser.sql).
+ */
 export function HandedIn({ orderId }: { orderId: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   async function done() {
     setBusy(true);
-    const { error } = await getSupabase().rpc("mark_shipped", { p_order: orderId });
-    setBusy(false);
-    if (error) return toast(errorText(error));
-    toast("Tak! Køberen kan nu følge pakken.");
-    router.refresh();
+    try {
+      const r = await fetch(`/api/orders/${orderId}/afleveret`, { method: "POST" });
+      const j = (await r.json().catch(() => ({}))) as { error?: string };
+      if (!r.ok) throw new Error(j.error || "Det lykkedes ikke.");
+      toast("Testpakken er markeret som afleveret.");
+      router.refresh();
+    } catch (e) {
+      toast(errorText(e));
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <button className="btn btn-line btn-sm" type="button" onClick={done} disabled={busy}>
-      {busy ? "Gemmer …" : "Jeg har afleveret pakken"}
+      {busy ? "Gemmer …" : "Testlabel: markér som afleveret"}
     </button>
   );
 }

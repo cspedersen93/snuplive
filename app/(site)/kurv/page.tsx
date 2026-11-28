@@ -13,11 +13,13 @@ import { fetchBundles } from "@/lib/bundles";
 import { itemHref } from "@/lib/items";
 import { markCheckoutPaid } from "@/lib/orders";
 import { fetchPackageSizes, fetchPickupOnly } from "@/lib/parcels";
+import { fetchPickupMarks, type PickupMarks } from "@/lib/pickup";
 import { AUTO_COMPLETE_DAYS, DELIVERED_COMPLETE_DAYS, DELIVERY, itemParcel, parcelFor, PICKUP_CATEGORIES, RESERVATION_DAYS, type Parcel } from "@/lib/pricing";
 import { feeFreeDay, feeFreeState } from "@/lib/feeFree";
 import { hasShipmondo } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import PickupConfirm from "@/components/PickupConfirm";
 import ConfirmReceived from "./ConfirmReceived";
 import PayGroups, { type PayGroup } from "./PayGroups";
 import RateSeller from "./RateSeller";
@@ -161,6 +163,8 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
   // Retur i en sag og "Relived dækker" (0039_retur_og_daekning.sql). Uden filen er begge tomme.
   const caseIds = orders.filter((o) => (o.issues ?? []).length).map((o) => o.id);
   const [returns, covers] = await Promise.all([fetchReturns(supabase, caseIds), fetchCovers(supabase, caseIds)]);
+  // Afhentning, som køber og sælger begge skal bekræfte (0041_afhentning.sql). Uden filen bekræfter køberen alene.
+  const pickups = await fetchPickupMarks(supabase, orders.filter((o) => o.status === "paid" && o.delivery === "pickup").map((o) => o.id));
 
   // Én pakke pr. sælger: alt, du har købt hos samme sælger, betales og sendes samlet, også fra flere shows.
   const groupsMap = new Map<string, PayGroup>();
@@ -276,7 +280,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           <div className="sec-mini">
             <h2 className="h3">På vej til dig</h2>
             {active.map((o) => (
-              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} ret={returns[o.id]} cover={covers[o.id]} />
+              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} ret={returns[o.id]} cover={covers[o.id]} pick={pickups?.[o.id]} />
             ))}
           </div>
         ) : null}
@@ -285,7 +289,7 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
           <div className="sec-mini">
             <h2 className="h3">Tidligere køb</h2>
             {done.map((o) => (
-              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} ret={returns[o.id]} cover={covers[o.id]} />
+              <OrderCard key={o.id} o={o} uid={uid} photosReady={photosReady} ret={returns[o.id]} cover={covers[o.id]} pick={pickups?.[o.id]} />
             ))}
           </div>
         ) : null}
@@ -301,7 +305,22 @@ export default async function Kurv({ searchParams }: { searchParams: Promise<{ b
   );
 }
 
-function OrderCard({ o, uid, photosReady, ret, cover }: { o: OrderRow; uid: string; photosReady: boolean; ret?: OrderReturn; cover?: OrderCover }) {
+function OrderCard({
+  o,
+  uid,
+  photosReady,
+  ret,
+  cover,
+  pick,
+}: {
+  o: OrderRow;
+  uid: string;
+  photosReady: boolean;
+  ret?: OrderReturn;
+  cover?: OrderCover;
+  /** Afhentning: hvem har bekræftet (0041_afhentning.sql). Mangler den, bekræfter køberen alene som før. */
+  pick?: PickupMarks;
+}) {
   const [cls, label] = STATUS[o.status];
   const issue = [...(o.issues ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
   const seller = o.seller;
@@ -350,7 +369,11 @@ function OrderCard({ o, uid, photosReady, ret, cover }: { o: OrderRow; uid: stri
             </span>
           ) : null}
           {o.status === "paid" && o.delivery === "pickup" ? (
-            <span className="muted">Sælgeren kontakter dig om afhentning. Bekræft, når du har hentet varerne.</span>
+            <span className="muted">
+              {pick
+                ? `Betalt ${when(o.paid_at)}. Sælgeren har fået dit telefonnummer og kontakter dig om tid og sted.`
+                : "Sælgeren kontakter dig om afhentning. Bekræft, når du har hentet varerne."}
+            </span>
           ) : null}
           {o.status === "shipped" ? (
             <span className="muted">
@@ -414,7 +437,9 @@ function OrderCard({ o, uid, photosReady, ret, cover }: { o: OrderRow; uid: stri
           {!o.issue_open && issue?.resolution && (o.status === "completed" || o.status === "refunded") ? (
             <span className="fine">Sagen om ordren er afgjort. {BUYER_RESOLUTION_TEXT[issue.resolution] ?? ""}</span>
           ) : null}
-          {o.status === "shipped" || (o.status === "paid" && o.delivery === "pickup") ? (
+          {o.status === "paid" && o.delivery === "pickup" && pick ? (
+            <PickupConfirm orderId={o.id} role="buyer" count={o.sales.length} buyer={Boolean(pick.buyer)} seller={Boolean(pick.seller)} />
+          ) : o.status === "shipped" || (o.status === "paid" && o.delivery === "pickup") ? (
             <ConfirmReceived orderId={o.id} pickup={o.delivery === "pickup"} />
           ) : null}
           {(o.status === "paid" || o.status === "shipped") && !o.issue_open ? <ReportProblem orderId={o.id} uid={uid} photosReady={photosReady} business={seller?.seller_type === "business"} /> : null}

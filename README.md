@@ -180,7 +180,8 @@ Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der 
 5. **Test:**
    - Som sælger: gå til **Mine shows → Tilknyt udbetaling**. I testmiljøet har Stripe knapper til at udfylde med testdata.
    - Som køber (en anden konto): køb noget, gå til **Mine køb**, og betal med kortnummer `4242 4242 4242 4242`.
-   - Som sælger: markér pakken som sendt. Som køber: tryk **Jeg har fået mine varer**. Overførslen kan ses i Stripe under **Connect → Transfers**.
+   - Som sælger: markér pakken som sendt (med testlabels fra Shipmondo: knappen **Testlabel: markér som afleveret**). Som køber:
+     tryk **Jeg har fået mine varer**. Overførslen kan ses i Stripe under **Connect → Transfers**.
 
 **Før rigtige penge:** aktivér Stripe-kontoen med virksomhedsoplysninger (CVR og bankkonto), skift til de rigtige nøgler
 (`sk_live_…` og nye webhook-secrets), tjek at **Accounts v1 support** også er slået til uden for testmiljøet, opgrader Vercel til Pro, og få en revisor til at se på moms af køberbeskyttelsen.
@@ -190,13 +191,16 @@ Start i Stripes **testmiljø**. Det kræver hverken CVR eller bankkonto, og der 
 Køberen vælger en **DAO- eller GLS-pakkeshop** i kurven og betaler fragt efter pakkens størrelse (se *Fragt efter vægt*). Sælgeren trykker
 **Lav fragtlabel** under Mine shows, printer labelen og afleverer pakken. Relived betaler labelen hos Shipmondo med de penge,
 køberen har betalt i fragt, og sælgeren får beløbet for varerne. Sporingen kommer fra Shipmondo, så ordren skifter selv til
-"Sendt", når pakken bliver scannet, og afsluttes 2 dage efter, at køberen har hentet den.
+"Sendt", når pakken bliver scannet, og afsluttes 2 dage efter, at køberen har hentet den. Med Reliveds label er det **kun
+scanningen, der tæller som sendt** (se *Rettelser efter gennemgangen (0042)*).
 
 Uden Shipmondo-nøgler virker siden som før: køberen vælger ikke pakkeshop, og sælgeren sender selv og får fragten.
 
 1. **Supabase → SQL Editor:** kør [`supabase/migrations/0004_fragt.sql`](supabase/migrations/0004_fragt.sql).
 2. **Shipmondo:**
-   - Opret en gratis konto på [shipmondo.com](https://shipmondo.com) (planen **Free** er nok).
+   - Opret en konto på [shipmondo.com](https://shipmondo.com). Planen **Free** er nok til at lave labels, men sporingen
+     (Shipment Monitor) kræver ifølge Shipmondos hjælpeside **Essentials** eller **Pro**. Uden sporing bliver ingen pakker
+     registreret som sendt, så tjek abonnementet, før der sendes rigtige pakker.
    - Skriv til Shipmondos support og bed om en **testkonto (sandbox)**: dit navn, din e-mail, adresse og land, sprog (dansk)
      og grunden ("tester integration til markedsplads"). Du får login til `sandbox.shipmondo.com` på mail.
    - Log ind på testkontoen → **Indstillinger → API → Adgang**. Kopiér **API-bruger** og **API-nøgle**.
@@ -213,10 +217,13 @@ Uden Shipmondo-nøgler virker siden som før: køberen vælger ikke pakkeshop, o
 5. **Test:**
    - Som køber: køb noget, gå til **Mine køb**, skriv dit postnummer, vælg DAO eller GLS og en pakkeshop, og betal.
    - Som sælger: udfyld **Fragt og afsenderadresse** under Mine shows, og tryk **Lav fragtlabel** på ordren. Labelen er mærket
-     "SANDBOX" og kan ikke bruges.
+     "SANDBOX" og kan ikke bruges. Testlabels bliver aldrig scannet, så i testfasen (`SHIPMONDO_SANDBOX=1`) har ordren knappen
+     **Testlabel: markér som afleveret**. Den findes ikke med rigtige labels.
 
 **Før rigtige labels:** tilknyt et betalingskort i din rigtige Shipmondo-konto (labels betales løbende), lav nye API-nøgler
-dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPMONDO_SANDBOX`.
+dér, skift `SHIPMONDO_API_USER` og `SHIPMONDO_API_KEY` i Vercel, og slet `SHIPMONDO_SANDBOX`. Tjek også, at abonnementet har
+Shipment Monitor, og at webhooken "Relived sporing" står under Indstillinger → Webhooks, når den første label er lavet.
+Send én rigtig pakke som prøve, og se, at ordren selv skifter til "Sendt".
 
 ## Tryghed: moderation og "Meld et problem"
 
@@ -871,8 +878,8 @@ show, en vare eller en videoannonce. Kategorisiden findes alligevel, men er tom.
 - Adressen er `/kategori/cykler-og-barnevogne`, og nøglen i databasen er `cykler`. Den dækker cykler, børnecykler,
   ladcykler, elcykler, løbehjul, barnevogne og klapvogne.
 - **Afhentning:** cykler og barnevogne er for store til en pakkeshop. I kurven er **Afhent hos sælgeren** valgt på
-  forhånd, og varesiden siger, at varen hentes gratis. Pengene går først til sælgeren, når køberen har bekræftet, at
-  varen er hentet.
+  forhånd, og varesiden siger, at varen hentes gratis. Pengene går først til sælgeren, når køber og sælger begge har
+  bekræftet, at varen er hentet (se *Afhentning bekræftes af begge*).
 - **Stjålne cykler:** kategorisiden beder køberen tjekke stelnummeret i politiets cykelregister på politi.dk.
 - AI-annoncen kan foreslå kategorien. Søgning og søgeagenter kan bruge den.
 - Koden: `lib/format.ts` (kategorien), `lib/categoryPages.tsx` (teksterne), `lib/categories.ts` (skjuler kategorien,
@@ -1270,3 +1277,56 @@ Test: `qa_bevis.py` (`med` / `uden`).
 - Før `0039_retur_og_daekning.sql` er kørt, vises de to nye knapper ikke, og alt andet virker som før.
 
 Test: `qa_retur.py` (`med` / `uden`).
+
+## Afhentning bekræftes af begge (0041)
+
+**Kør `0041_afhentning.sql` i Supabase → SQL Editor.** Indtil da bekræfter køberen alene som før, og en afhentning
+afsluttes af sig selv 7 dage efter betalingen.
+
+- **Reglen:** ved afhentning afsluttes ordren først, når **både køber og sælger** har trykket *Bekræft afhentning*, mens de
+  står sammen med varen. Først derefter sendes pengene til sælgeren. Ordren afsluttes ikke længere af sig selv.
+- **Køberen** bekræfter på ordren under Mine køb, **sælgeren** på ordren i studiet (samme boks, `components/PickupConfirm.tsx`).
+  Et tryk åbner en advarsel, som skal bekræftes. Boksen viser, hvem der har bekræftet, og spørger serveren hvert 4. sekund
+  (`GET /api/orders/[id]/pickup`), så den ene kan se, når den anden har trykket. Knapperne er ikke røde.
+- **Serveren** (`confirmPickup` i `lib/orders.ts`, `POST /api/orders/[id]/pickup`) sætter `orders.pickup_buyer_at` eller
+  `pickup_seller_at` og afslutter ordren, når begge er sat. `completeOrder` tjekker det selv, så køberens gamle adresse
+  (`/api/orders/[id]/confirm`) heller ikke kan afslutte en afhentning alene. Kun serveren kan skrive i `orders`, så ingen
+  kan bekræfte for den anden.
+- **Meldt problem:** sælgeren kan ikke bekræfte, mens køberen har en åben sag. Bekræfter køberen selv, er sagen løst
+  (som ved pakker).
+- **Bliver det ikke bekræftet af begge** (`pickupFollowUp` i det daglige job, tiderne står i `lib/pricing.ts`):
+  har kun den ene bekræftet, får den anden en påmindelse på mail ved næste kørsel. Har ingen bekræftet 7 dage efter
+  betalingen, får begge en påmindelse. Efter 3 dage med kun én bekræftelse, eller 14 dage efter betalingen, får Relived
+  en mail, og ordren står under **Admin → Sager → Afhentninger, der ikke er bekræftet** med knapperne *Refundér køberen*
+  og *Send pengene til sælgeren*. Køber og sælger får en mail om afgørelsen (`mailIssueDecided`).
+- **Tekster:** varesiden, kurven, Sådan virker det, FAQ, guiderne og mailene om betalt ordre siger, at begge bekræfter.
+  Handelsbetingelserne og vilkårene er ikke ændret.
+- Koden: `lib/pickup.ts` (er filen kørt, og hvem har bekræftet), `lib/orders.ts`, `lib/orderMails.ts`,
+  `app/api/orders/[id]/pickup/route.ts`, `app/(site)/kurv/page.tsx`, `app/(site)/studio/SellerPayments.tsx`,
+  `app/(site)/admin/sager/page.tsx`.
+
+Test: `qa_afhentning_bekraeft.py` (med filen) og `qa_afhentning_bekraeft.py uden`.
+
+## Rettelser efter gennemgangen (0042)
+
+**Kør `0042_rettelser.sql` i Supabase → SQL Editor.** Filen retter fem af punkterne fra gennemgangen 27. november 2026.
+Før den er kørt, virker alt som før.
+
+- **Refunderede varer** (`release_items_for_order`): varen bliver taget af salg. Sælgeren sætter den selv til salg igen under
+  *Til salg* i studiet.
+- **Annullering under betaling** (`cancel_reservation`): sælgeren kan ikke annullere et køb, mens køberens betaling er åben
+  (en `pending` ordre yngre end 40 minutter). Sikkerhedsnet på serveren (`refundEmptyOrders` i `lib/orders.ts`): en betalt
+  ordre uden varer refunderes automatisk, køberen får en mail, og Relived får besked. Betalingens metadata har `sale_count`.
+- **Lukkede sælgere** (`seller_closures`, `admin_moderate`, `become_seller`): lukker Relived en sælger, huskes det i en lukket
+  tabel, og *Bliv sælger* afviser. Relived åbner igen på medlemmets side i backoffice (`/api/admin/lukket-saelger`).
+- **Gæstelink og lukkede shows** (`show_guest_invites`): gæstelinket har sin egen tabel og kode. `show_invites` er kun
+  invitationen til seerne. Gamle gæstekoder (32 tegn) flyttes.
+- **Kun scanning tæller som sendt** (`mark_shipped`): en ordre til en pakkeshop kan ikke markeres som sendt af sælgeren.
+  Den skifter, når sporingen fra Shipmondo viser, at pakken er scannet (`applyTracking`). I testfasen
+  (`SHIPMONDO_SANDBOX=1`) har sælgeren knappen *Testlabel: markér som afleveret* (`/api/orders/[id]/afleveret`).
+  Er en pakke ikke scannet 5 dage efter, at labelen er lavet (`labelFollowUp` i det daglige job, `LABEL_FLAG_DAYS`), får
+  sælgeren og Relived en mail, og ordren står under **Admin → Sager → Pakker, der ikke er scannet** med knapperne
+  *Refundér køberen* og *Markér som sendt*.
+
+Test: `qa_rettelser.py`, `qa_rettelser.py sandbox` (efter `SHIPMONDO_SANDBOX=1 bash restart_qa.sh reset`) og
+`qa_rettelser.py uden` (på en database bygget uden filen).

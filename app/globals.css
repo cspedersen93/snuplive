@@ -2512,3 +2512,18 @@ a.feed-live-cta:hover{text-decoration:underline;text-underline-offset:3px}
   .ftile-clip{inset:0;aspect-ratio:auto;border-radius:0;box-shadow:none;z-index:-2}
   .ftile.has-clip .ftile-info{max-width:100%}
 }
+
+/* ── Afhentning: køber og sælger bekræfter begge (0041_afhentning.sql, november 2026) ── */
+.pickup-box{display:flex;flex-direction:column;align-items:flex-start;gap:10px;width:100%;padding:14px;border-radius:14px;border:1px solid var(--line-2);background:var(--bg)}
+.pickup-box>b{font-size:.9375rem;font-weight:600}
+.pickup-marks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:.9375rem;color:var(--muted)}
+.pickup-marks li{display:flex;align-items:center;gap:10px}
+.pickup-marks li.is-on{color:var(--text)}
+.pickup-dot{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line-2)}
+.pickup-marks li.is-on .pickup-dot{background:var(--mint);border-color:var(--mint);color:var(--mint-ink)}
+.pickup-dot svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.pickup-ask{display:flex;flex-direction:column;gap:10px;width:100%}
+.pickup-warn{margin:0;padding:10px 12px;border-radius:12px;border:1px solid rgba(242,196,107,.35);background:rgba(242,196,107,.07);color:#F6DFAE;font-size:.875rem;line-height:1.45}
+.pickup-btns{display:flex;flex-wrap:wrap;gap:8px}
+/* Knapperne trykkes på telefonen, mens man står med varen i hånden: en stor trykflade. */
+.pickup-box .btn{min-height:44px}

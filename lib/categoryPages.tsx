@@ -201,7 +201,7 @@ export const CATEGORY_PAGES: Record<CategoryKey, CategoryPageCopy> = {
     note: (
       <>
         Cykler og barnevogne er for store til en pakkeshop. Vælg <b>Afhent hos sælgeren</b>, når du betaler, så aftaler I tid og sted.
-        Pengene bliver først sendt til sælgeren, når du har bekræftet, at du har fået varen, så du kan se den efter, når du henter den.
+        Se varen efter, når du henter den. Pengene bliver først sendt til sælgeren, når I begge har bekræftet, at du har fået den.
       </>
     ),
     sellH2: "Har du en cykel eller barnevogn, der skal videre?",

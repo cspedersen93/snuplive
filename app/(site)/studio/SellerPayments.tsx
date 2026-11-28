@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { IconBox, IconCard, IconInfo } from "@/components/Icons";
+import PickupConfirm from "@/components/PickupConfirm";
 import { itemMeta } from "@/components/Screen";
 import { CARRIERS, isCarrier, LABEL_WEIGHTS, trackingText } from "@/lib/carriers";
 import { issuePhotos } from "@/lib/issueProof";
 import { fetchReturns, sellerDebt, type OrderReturn } from "@/lib/returns";
 import { ISSUE_REASONS, isIssueReason } from "@/lib/issues";
 import { clock, dayLabel, kr } from "@/lib/format";
+import { fetchPickupMarks } from "@/lib/pickup";
 import { DELIVERED_COMPLETE_DAYS, DELIVERY, RESERVATION_DAYS, sellerPayout, PARCELS } from "@/lib/pricing";
 import { hasShipmondo, shipmondoSandbox } from "@/lib/shipmondo";
 import { getStripe, stripeTestMode } from "@/lib/stripe";
@@ -106,6 +108,8 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
   const supabase = await createClient();
   const ready = Boolean(getStripe() && createAdminClient());
   const labels = ready && hasShipmondo();
+  // Testlabels (Shipmondos sandbox) bliver aldrig scannet. Kun dér kan sælgeren selv markere pakken som afleveret.
+  const testLabels = labels && shipmondoSandbox();
 
   const [acctQ, ordersQ, resQ, addrQ] = await Promise.all([
     supabase.from("payout_accounts").select("payouts_enabled,details_submitted").eq("user_id", uid).maybeSingle(),
@@ -140,6 +144,8 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
   const finished = orders.filter((o) => o.status === "completed" || o.status === "refunded");
   const earned = orders.filter((o) => o.status === "completed").reduce((a, o) => a + sellerPayout(o), 0);
   const needsLabel = toHandle.some((o) => o.sp_id && !o.shipmondo_shipment_id);
+  // Afhentning, som køber og sælger begge skal bekræfte (0041_afhentning.sql). Uden filen bekræfter køberen alene.
+  const pickups = await fetchPickupMarks(supabase, toHandle.filter((o) => o.delivery === "pickup").map((o) => o.id));
   // Køberens billeder på åbne sager (0038). De ligger i en lukket mappe, så serveren laver links til sælgeren.
   const openIssueIds = orders.flatMap((o) => (o.issue_open ? (o.issues ?? []).filter((i) => i.status === "open").map((i) => i.id) : []));
   const proofAdmin = openIssueIds.length ? createAdminClient() : null;
@@ -186,7 +192,7 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
 
       <div className="box">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6, gap: 12, flexWrap: "wrap" }}>
-          <h2 className="h3">Skal sendes</h2>
+          <h2 className="h3">{toHandle.some((o) => o.delivery === "pickup") ? "Skal sendes eller hentes" : "Skal sendes"}</h2>
           <span className="muted" style={{ fontSize: ".875rem" }}>{earned ? `${kr(earned)} tjent i alt` : ""}</span>
         </div>
         {toHandle.length ? (
@@ -240,12 +246,22 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                         ) : null}
                         <p className="fine">
                           Pak varerne godt ind, sæt labelen på, og aflever pakken i en {isCarrier(o.sp_carrier) ? CARRIERS[o.sp_carrier].name : ""}-pakkeshop.
-                          Ordren skifter selv til &quot;Sendt&quot;, når pakken bliver scannet.
+                          Ordren skifter selv til &quot;Sendt&quot;, når fragtfirmaet har scannet pakken. Det er scanningen, der tæller, så bed om
+                          en kvittering i pakkeshoppen, og gem den, til køberen har fået pakken.
                           {o.tracking ? ` Sporingsnummer ${o.tracking}.` : ""}
                         </p>
-                        <div className="row">
-                          <HandedIn orderId={o.id} />
-                        </div>
+                        {o.tracking && isCarrier(o.sp_carrier) ? (
+                          <p className="fine">
+                            {trackingText(o.tracking_status)}{" "}
+                            <a href={CARRIERS[o.sp_carrier].track(o.tracking)} target="_blank" rel="noopener noreferrer">Se sporingen hos {CARRIERS[o.sp_carrier].name}</a>
+                          </p>
+                        ) : null}
+                        {testLabels ? (
+                          <div className="row">
+                            <HandedIn orderId={o.id} />
+                            <span className="fine">Testlabels bliver ikke scannet. Knappen findes kun i testfasen.</span>
+                          </div>
+                        ) : null}
                       </div>
                     ) : labels ? (
                       <LabelMaker
@@ -280,10 +296,23 @@ export default async function SellerPayments({ uid, search, displayName }: { uid
                     <ShipForm orderId={o.id} />
                   </>
                 ) : (
-                  <p className="addr">
-                    <b>Afhentning:</b> kontakt {o.ship_name ?? `@${o.buyer?.handle}`}
-                    {o.buyer_phone ? ` på ${o.buyer_phone}` : ""} og aftal tid og sted. Køberen bekræfter i appen, når varerne er hentet.
-                  </p>
+                  <>
+                    <p className="addr">
+                      <b>Afhentning:</b> kontakt {o.ship_name ?? `@${o.buyer?.handle}`}
+                      {o.buyer_phone ? ` på ${o.buyer_phone}` : ""} og aftal tid og sted.
+                      {pickups?.[o.id] ? "" : " Køberen bekræfter i appen, når varerne er hentet."}
+                    </p>
+                    {pickups?.[o.id] ? (
+                      <PickupConfirm
+                        orderId={o.id}
+                        role="seller"
+                        count={o.sales.length}
+                        buyer={Boolean(pickups[o.id].buyer)}
+                        seller={Boolean(pickups[o.id].seller)}
+                        locked={o.issue_open}
+                      />
+                    ) : null}
+                  </>
                 )}
                 <IssueNote o={o} photos={issuePh} ret={returns[o.id]} />
                 <RefundButton orderId={o.id} amount={kr(o.total_amount)} />

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { errorText, toast } from "@/lib/toast";
 
-type Action = "refund" | "release" | "close" | "return" | "cover";
+type Action = "refund" | "release" | "close" | "return" | "cover" | "shipped";
 
 const TEXT: Record<Action, { button: string; ask: string; done: string }> = {
   refund: { button: "Refundér køberen", ask: "Køberen får alle pengene tilbage, og varerne kan sælges igen.", done: "Køberen har fået pengene tilbage." },
@@ -20,6 +20,11 @@ const TEXT: Record<Action, { button: string; ask: string; done: string }> = {
     done: "Køberen har fået pengene tilbage, og sælgeren har fået sin udbetaling.",
   },
   close: { button: "Luk sagen", ask: "Sagen lukkes uden at flytte penge. Ordren afsluttes derefter som normalt.", done: "Sagen er lukket." },
+  shipped: {
+    button: "Markér som sendt",
+    ask: "Ordren bliver markeret som sendt, selv om sporingen ikke har registreret pakken. Køberen kan bekræfte modtagelsen eller melde et problem. Ellers afsluttes ordren efter 7 dage, og sælgeren får pengene.",
+    done: "Ordren er markeret som sendt.",
+  },
 };
 
 export default function AdminActions({
@@ -31,6 +36,8 @@ export default function AdminActions({
   canCover = false,
   coverText = "",
   coverPending = false,
+  canClose = true,
+  canShip = false,
 }: {
   orderId: string;
   refundText: string;
@@ -42,6 +49,10 @@ export default function AdminActions({
   coverText?: string;
   /** Sælgeren har fået sin udbetaling, men refusionen til køberen mangler. Så er det den eneste knap. */
   coverPending?: boolean;
+  /** Der er en sag at lukke. En afhentning uden sag har kun de to knapper, der flytter penge. */
+  canClose?: boolean;
+  /** En pakke med Reliveds label, som ikke er scannet: kan markeres som sendt i hånden. */
+  canShip?: boolean;
 }) {
   const router = useRouter();
   const [ask, setAsk] = useState<Action | null>(null);
@@ -92,6 +103,9 @@ export default function AdminActions({
   return (
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
       <button className="btn btn-red btn-sm" type="button" onClick={() => setAsk("refund")}>{TEXT.refund.button} ({refundText})</button>
+      {canShip ? (
+        <button className="btn btn-line btn-sm" type="button" onClick={() => setAsk("shipped")}>{TEXT.shipped.button}</button>
+      ) : null}
       {canRelease ? (
         <button className="btn btn-line btn-sm" type="button" onClick={() => setAsk("release")}>{TEXT.release.button} ({releaseText})</button>
       ) : null}
@@ -101,7 +115,9 @@ export default function AdminActions({
       {canCover ? (
         <button className="btn btn-line btn-sm" type="button" onClick={() => setAsk("cover")}>{TEXT.cover.button} ({coverText})</button>
       ) : null}
-      <button className="btn btn-line btn-sm" type="button" onClick={() => setAsk("close")}>{TEXT.close.button}</button>
+      {canClose ? (
+        <button className="btn btn-line btn-sm" type="button" onClick={() => setAsk("close")}>{TEXT.close.button}</button>
+      ) : null}
     </div>
   );
 }

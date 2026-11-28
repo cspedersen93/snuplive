@@ -247,7 +247,8 @@ export async function POST(req: Request) {
           description: "Køb på Relived",
           metadata: { checkout_id: checkoutId, buyer_id: user.id },
         },
-        metadata: { checkout_id: checkoutId, buyer_id: user.id },
+        // sale_count: antal varer, da betalingen blev startet (se refundEmptyOrders i lib/orders.ts).
+        metadata: { checkout_id: checkoutId, buyer_id: user.id, sale_count: String(payable.length) },
         custom_text: {
           submit: { message: "Relived holder pengene tilbage, indtil du har fået dine varer." },
         },

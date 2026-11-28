@@ -116,7 +116,7 @@ export default async function English() {
             <li><div><h3>Ask in the chat</h3><p>Ask the seller to show the label, the measurements or any wear up close. You get the answer while you watch.</p></div></li>
             <li><div><h3>Buy or bid</h3><p>The first to tap Køb (Buy) gets it. In a Budsalg (auction) you have 30 seconds to bid, and the highest bid wins.</p></div></li>
             <li><div><h3>Pay in one go</h3><p>Pay for everything under Mine køb (My purchases) within 3 days with MobilePay, card, Apple Pay or Google Pay. Everything from the same seller ships in one parcel.</p></div></li>
-            <li><div><h3>Pick it up</h3><p>Collect your parcel at a DAO or GLS pickup point, or pick the item up from the seller. Once you confirm that everything is fine, the seller gets paid.</p></div></li>
+            <li><div><h3>Pick it up</h3><p>Collect your parcel at a DAO or GLS pickup point, or pick the item up from the seller. Once you confirm that everything is fine, the seller gets paid. When you pick up from the seller, you both confirm on the spot.</p></div></li>
           </ol>
         </div>
       </section>

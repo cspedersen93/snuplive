@@ -416,10 +416,10 @@ export default async function ItemPage({ params }: Params) {
                 <li>
                   Skal hentes hos {seller.handle}
                   {seller.area ? ` i ${seller.area}` : ""}, for varen er for stor til en pakkeshop. Afhentningen er gratis, og pengene går
-                  først til sælgeren, når du har bekræftet, at du har fået varen.
+                  først til sælgeren, når I begge har bekræftet, at du har fået varen.
                 </li>
               ) : PICKUP_CATEGORIES.includes(cat.key) ? (
-                <li>Hentes gratis hos {seller.handle}. Pengene går først til sælgeren, når du har bekræftet, at du har fået varen.</li>
+                <li>Hentes gratis hos {seller.handle}. Pengene går først til sælgeren, når I begge har bekræftet, at du har fået varen.</li>
               ) : (
                 <li>Fragt fra {DELIVERY.ship.price} kr med DAO eller GLS, eller gratis afhentning.</li>
               )}

@@ -13,9 +13,10 @@ export default function ConfirmReceived({ orderId, pickup }: { orderId: string; 
     setBusy(true);
     try {
       const r = await fetch(`/api/orders/${orderId}/confirm`, { method: "POST" });
-      const j = (await r.json().catch(() => ({}))) as { error?: string };
+      const j = (await r.json().catch(() => ({}))) as { error?: string; done?: boolean };
       if (!r.ok) throw new Error(j.error || "Det lykkedes ikke.");
-      toast("Tak! Pengene sendes nu til sælgeren.");
+      // Ved afhentning skal sælgeren også bekræfte, før ordren er afsluttet (0041_afhentning.sql).
+      toast(j.done === false ? "Du har bekræftet. Handlen afsluttes, når sælgeren også har bekræftet." : "Tak! Pengene sendes nu til sælgeren.");
       router.refresh();
     } catch (e) {
       toast(errorText(e));

@@ -9,6 +9,7 @@ import ShowsTable, { type ShowRow } from "../../ShowsTable";
 import type { MemberRow } from "../../types";
 import { BadgeList, LevelChip } from "@/components/Level";
 import { toProgress } from "@/lib/levels";
+import SellerClosed from "./SellerClosed";
 import VipToggle from "./VipToggle";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +41,9 @@ export default async function Medlem({ params }: { params: Promise<{ id: string 
   const lq = await admin.rpc("member_progress", { p_id: id });
   const lv = lq.error ? null : toProgress(lq.data);
   const addr = addrQ.data as { name: string; address1: string; address2: string | null; zipcode: string; city: string; phone: string | null } | null;
+  // Har Relived lukket sælgerprofilen (0042_rettelser.sql)? Uden filen fejler kaldet, og boksen vises ikke.
+  const closedQ = await admin.from("seller_closures").select("closed_at").eq("user_id", id).maybeSingle();
+  const closedAt = closedQ.error ? null : ((closedQ.data as { closed_at: string } | null)?.closed_at ?? null);
 
   return (
     <div className="adm-page">
@@ -51,6 +55,8 @@ export default async function Medlem({ params }: { params: Promise<{ id: string 
           <span className="muted">{[m.display_name, m.area, m.is_seller ? "Sælger" : "Køber"].filter(Boolean).join(" · ")}</span>
         </div>
       </div>
+
+      {closedAt ? <SellerClosed user={id} closedAt={when(closedAt)} /> : null}
 
       <div className="box">
         <dl className="adm-facts">

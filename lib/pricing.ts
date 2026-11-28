@@ -162,3 +162,20 @@ export const RESERVATION_DAYS = 3;
 export const AUTO_COMPLETE_DAYS = 7;
 /** Så mange dage efter, at pakken er hentet i pakkeshoppen, bliver ordren afsluttet. */
 export const DELIVERED_COMPLETE_DAYS = 2;
+/**
+ * Afhentning (0041_afhentning.sql): ordren afsluttes kun, når køber og sælger begge har bekræftet. Sker det ikke,
+ * får de en påmindelse på mail, og derefter får Relived besked og afgør ordren.
+ */
+/** Ingen har bekræftet så mange dage efter betalingen: påmindelse til begge. */
+export const PICKUP_REMIND_DAYS = 7;
+/** Ordren er stadig ikke bekræftet af begge så mange dage efter betalingen: besked til Relived. */
+export const PICKUP_FLAG_DAYS = 14;
+/** Kun den ene har bekræftet: den anden får en påmindelse efter så mange timer (ved næste daglige kørsel). */
+export const PICKUP_NUDGE_HOURS = 2;
+/** Kun den ene har bekræftet, og der er gået så mange dage: besked til Relived. */
+export const PICKUP_ONE_SIDED_DAYS = 3;
+/**
+ * Pakker med Reliveds label er først sendt, når fragtfirmaet har scannet dem (0042_rettelser.sql). Er en pakke ikke
+ * scannet så mange dage efter, at labelen er lavet, får sælgeren og Relived en mail, og Relived afgør ordren.
+ */
+export const LABEL_FLAG_DAYS = 5;

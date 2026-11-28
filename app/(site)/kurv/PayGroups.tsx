@@ -204,10 +204,10 @@ export default function PayGroups({
               {g.pickupOnly ? (
                 <p className="fine pickup-note">
                   {g.items.length === 1 ? "Varen" : "En af varerne"} er for stor til en pakkeshop, så {g.items.length === 1 ? "den" : "de"} skal
-                  hentes hos sælgeren. Se varen efter, før du bekræfter, at du har fået den.
+                  hentes hos sælgeren. Se varen efter, før I bekræfter afhentningen.
                 </p>
               ) : g.pickup ? (
-                <p className="fine pickup-note">Cykler og barnevogne er for store til en pakkeshop, så de hentes hos sælgeren. Se varen efter, før du bekræfter, at du har fået den.</p>
+                <p className="fine pickup-note">Cykler og barnevogne er for store til en pakkeshop, så de hentes hos sælgeren. Se varen efter, før I bekræfter afhentningen.</p>
               ) : null}
               <div className="opts">
                 {(Object.keys(DELIVERY) as Delivery[]).filter((d) => !g.pickupOnly || d === "pickup").map((d) => (

@@ -1,12 +1,13 @@
 import { CARRIERS, isCarrier } from "@/lib/carriers";
 import { SITE_URL } from "@/lib/env";
-import { kr, vareOrd } from "@/lib/format";
+import { clock, dayLabel, kr, vareOrd } from "@/lib/format";
 import { adminEmails, sendMail } from "@/lib/mail";
-import { RESERVATION_DAYS } from "@/lib/pricing";
+import { pickupReady } from "@/lib/pickup";
+import { RESERVATION_DAYS, sellerPayout } from "@/lib/pricing";
 import type { AdminClient } from "@/lib/supabase/admin";
 
 /**
- * Mails om ordrer: betalt (til sælger og køber), vundet budsalg, og når en sag er afgjort.
+ * Mails om ordrer: betalt (til sælger og køber), vundet budsalg, afhentning, der ikke er bekræftet, og når en sag er afgjort.
  * Ingen af dem må vælte det, de fortæller om: betalingen og afgørelsen er sket, uanset om mailen kom afsted.
  * Derfor fanger hver funktion sine egne fejl.
  */
@@ -73,6 +74,8 @@ export async function mailOrdersPaid(admin: AdminClient, orderIds: string[]) {
   try {
     const orders = await fetchOrders(admin, orderIds);
     if (!orders.length) return;
+    // Afhentning: med 0041_afhentning.sql bekræfter køber og sælger begge. Uden filen bekræfter køberen alene.
+    const both = orders.some((o) => o.delivery === "pickup") && (await pickupReady(admin).catch(() => false));
 
     for (const o of orders) {
       const to = await emailOf(admin, o.seller_id);
@@ -97,7 +100,9 @@ export async function mailOrdersPaid(admin: AdminClient, orderIds: string[]) {
               : ["Køberens adresse står på ordren i dit studie. Send pakken inden 3 hverdage:"]),
           `${SITE_URL}/studio`,
           "",
-          "Pengene bliver sendt til din bankkonto, når køberen har fået varerne.",
+          o.delivery === "pickup" && both
+            ? "Når køberen står med varerne, bekræfter I begge afhentningen på jeres telefoner, før I går hver til sit. Først derefter bliver pengene sendt til din bankkonto."
+            : "Pengene bliver sendt til din bankkonto, når køberen har fået varerne.",
           ...(acct?.payouts_enabled ? [] : ["Du mangler at tilknytte din bankkonto. Gør det i dit studie, så vi kan sende pengene til dig."]),
           ...SIGN,
         ].join("\n"),
@@ -122,7 +127,9 @@ export async function mailOrdersPaid(admin: AdminClient, orderIds: string[]) {
         ...(orders.length > 1 ? [`I alt hos ${at(s?.handle, "sælgeren")}: ${kr(o.total_amount)}`] : []),
         "",
         o.delivery === "pickup"
-          ? `Du henter selv varerne hos ${at(s?.handle, "sælgeren")}. Sælgeren har fået dit telefonnummer, så I kan aftale tid og sted.`
+          ? `Du henter selv varerne hos ${at(s?.handle, "sælgeren")}. Sælgeren har fået dit telefonnummer, så I kan aftale tid og sted.${
+              both ? " Når du står med varerne, bekræfter I begge afhentningen på jeres telefoner, før I går hver til sit. Først derefter får sælgeren pengene." : ""
+            }`
           : shop
             ? `Sælgeren sender pakken til ${shop}. Fragtfirmaet giver dig besked, når den er klar.`
             : "Sælgeren sender pakken til dig.",
@@ -209,6 +216,174 @@ export async function mailAuctionWins(admin: AdminClient, itemId?: string) {
   }
 }
 
+const stamp = (iso: string | null) => (iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "");
+
+/**
+ * Afhentningen er ikke bekræftet af både køber og sælger (0041_afhentning.sql): den eller de, der mangler, får en
+ * påmindelse. `done` fortæller, hvem der allerede har bekræftet.
+ */
+export async function mailPickupReminder(admin: AdminClient, orderId: string, done: { buyer: boolean; seller: boolean }) {
+  try {
+    const [o] = await fetchOrders(admin, [orderId]);
+    if (!o) return;
+    const n = o.sales.length;
+    const it = n === 1 ? "varen" : "varerne";
+    const seller = at(o.seller?.handle, "sælgeren");
+    const buyer = at(o.buyer?.handle, "køberen");
+    if (!done.buyer) {
+      const to = await emailOf(admin, o.buyer_id);
+      if (to) {
+        await sendMail({
+          to: [to],
+          subject: done.seller ? `Bekræft, at du har hentet ${n === 1 ? "din vare" : "dine varer"} hos ${seller}` : `Har du hentet ${n === 1 ? "din vare" : "dine varer"} hos ${seller}?`,
+          text: [
+            "Hej",
+            "",
+            done.seller
+              ? `${seller} har bekræftet, at du har hentet ${it}:`
+              : `Du har betalt for ${n} ${vareOrd(n)} hos ${seller}, som du selv henter:`,
+            "",
+            ...itemLines(o),
+            "",
+            done.seller
+              ? `Har du fået ${it}, så bekræft det også selv. Handlen afsluttes først, når I begge har bekræftet, og så får sælgeren pengene.`
+              : `Afhentningen er ikke bekræftet endnu. Når du står med ${it} hos sælgeren, bekræfter I begge på jeres telefoner, før I går hver til sit. Først derefter får sælgeren pengene.`,
+            "Du bekræfter på ordren under Mine køb:",
+            `${SITE_URL}/kurv`,
+            "",
+            done.seller
+              ? `Har du ikke fået ${it}, eller er noget galt, så tryk Meld et problem på ordren.`
+              : "Har I ikke fået aftalt tid og sted, eller er noget galt, så tryk Meld et problem på ordren.",
+            ...SIGN,
+          ].join("\n"),
+        });
+      }
+    }
+    if (!done.seller) {
+      const to = await emailOf(admin, o.seller_id);
+      if (to) {
+        await sendMail({
+          to: [to],
+          subject: done.buyer ? `${buyer} har bekræftet afhentningen. Nu mangler du` : `Afhentningen til ${buyer} er ikke bekræftet`,
+          text: [
+            "Hej",
+            "",
+            done.buyer
+              ? `${buyer} har bekræftet, at ${it} er hentet hos dig:`
+              : `${buyer} har betalt for ${n} ${vareOrd(n)}, som skal hentes hos dig:`,
+            "",
+            ...itemLines(o),
+            "",
+            done.buyer
+              ? "Nu mangler kun din bekræftelse. Handlen afsluttes først, når I begge har bekræftet, og så bliver pengene sendt til din bankkonto."
+              : `Afhentningen er ikke bekræftet endnu. Når køberen står med ${it}, bekræfter I begge på jeres telefoner, før I går hver til sit. Først derefter bliver pengene sendt til din bankkonto.`,
+            "Du bekræfter på ordren i dit studie:",
+            `${SITE_URL}/studio`,
+            ...(done.buyer ? [] : ["", "Kan du ikke få fat i køberen, eller bliver handlen ikke til noget, kan du annullere ordren i dit studie. Så får køberen pengene tilbage."]),
+            ...SIGN,
+          ].join("\n"),
+        });
+      }
+    }
+  } catch (e) {
+    console.error("[relived] påmindelse om afhentning blev ikke sendt", orderId, e);
+  }
+}
+
+/**
+ * En pakke med Reliveds label er ikke scannet af fragtfirmaet flere dage efter, at labelen blev lavet
+ * (0042_rettelser.sql). Sælgeren får en mail, og Relived får besked og afgør ordren under Sager.
+ */
+export async function mailScanMissing(admin: AdminClient, orderId: string) {
+  try {
+    const [o] = await fetchOrders(admin, [orderId]);
+    if (!o) return;
+    const { data } = await admin.from("orders").select("tracking,label_created_at").eq("id", orderId).maybeSingle();
+    const t = (data ?? {}) as { tracking?: string | null; label_created_at?: string | null };
+    const admins = adminEmails();
+    const buyer = at(o.buyer?.handle, "køberen");
+    const seller = at(o.seller?.handle, "sælgeren");
+    const made = stamp(t.label_created_at ?? null);
+    const carrier = isCarrier(o.sp_carrier) ? CARRIERS[o.sp_carrier] : null;
+    const to = await emailOf(admin, o.seller_id);
+    if (to) {
+      await sendMail({
+        to: [to],
+        replyTo: admins,
+        subject: `Din pakke til ${buyer} er ikke scannet endnu`,
+        text: [
+          "Hej",
+          "",
+          `Du lavede fragtlabelen til ${buyer} ${made}, men fragtfirmaet har ikke scannet pakken endnu:`,
+          "",
+          ...itemLines(o),
+          "",
+          "Ordren skifter først til Sendt, når pakken er scannet, og pengene bliver først sendt til dig, når køberen har fået den.",
+          "",
+          "Har du afleveret pakken, så svar på den her mail, gerne med kvitteringen fra pakkeshoppen. Så kigger vi på det.",
+          "Har du ikke afleveret den endnu, så gør det nu. Kan du ikke sende den, kan du annullere ordren i dit studie, så køberen får pengene tilbage:",
+          `${SITE_URL}/studio`,
+          ...SIGN,
+        ].join("\n"),
+      });
+    }
+    await sendMail({
+      to: admins,
+      subject: `Pakke ikke scannet: ${at(o.buyer?.handle, "køber")} og ${at(o.seller?.handle, "sælger")}`,
+      text: [
+        `Labelen til en ordre blev lavet ${made}, men fragtfirmaet har ikke scannet pakken. Ordren står derfor stadig som betalt, og sælgeren får ikke sine penge.`,
+        "",
+        `Køber: ${at(o.buyer?.handle, "køber")}`,
+        `Sælger: ${seller}`,
+        "",
+        ...itemLines(o),
+        "",
+        ...(carrier && t.tracking ? [`${carrier.name}, pakkenummer ${t.tracking}: ${carrier.track(t.tracking)}`] : []),
+        ...(shopText(o) ? [`Til ${shopText(o)}`] : []),
+        `Beløb: køberen betalte ${kr(o.total_amount)}, sælgeren skal have ${kr(o.items_amount)}`,
+        `Ordre: ${orderId}`,
+        "",
+        "Sælgeren har fået en mail. Tjek sporingen hos fragtfirmaet. Er pakken afleveret, kan du markere ordren som sendt under Sager. Er den ikke, kan du give køberen pengene tilbage samme sted.",
+        `${SITE_URL}/admin/sager`,
+      ].join("\n"),
+    });
+  } catch (e) {
+    console.error("[relived] besked om pakke uden scanning blev ikke sendt", orderId, e);
+  }
+}
+
+/** Afhentningen er stadig ikke bekræftet af begge: Relived får besked og afgør ordren under Sager. */
+export async function mailPickupFlag(admin: AdminClient, orderId: string) {
+  try {
+    const [o] = await fetchOrders(admin, [orderId]);
+    if (!o) return;
+    const { data } = await admin.from("orders").select("paid_at,pickup_buyer_at,pickup_seller_at").eq("id", orderId).maybeSingle();
+    const t = (data ?? {}) as { paid_at?: string | null; pickup_buyer_at?: string | null; pickup_seller_at?: string | null };
+    const said = (iso: string | null | undefined) => (iso ? `har bekræftet ${stamp(iso)}` : "har ikke bekræftet");
+    await sendMail({
+      to: adminEmails(),
+      subject: `Afhentning ikke bekræftet: ${at(o.buyer?.handle, "køber")} og ${at(o.seller?.handle, "sælger")}`,
+      text: [
+        "En afhentning er ikke bekræftet af både køber og sælger, så pengene er ikke sendt til sælgeren.",
+        "",
+        `Køber: ${at(o.buyer?.handle, "køber")} ${said(t.pickup_buyer_at)}`,
+        `Sælger: ${at(o.seller?.handle, "sælger")} ${said(t.pickup_seller_at)}`,
+        "",
+        ...itemLines(o),
+        "",
+        `Betalt: ${stamp(t.paid_at ?? null)}`,
+        `Beløb: køberen betalte ${kr(o.total_amount)}, sælgeren skal have ${kr(sellerPayout(o))}`,
+        `Ordre: ${orderId}`,
+        "",
+        "De har fået en påmindelse på mail. Skriv til dem, og afgør ordren under Sager: send pengene til sælgeren, eller giv køberen pengene tilbage.",
+        `${SITE_URL}/admin/sager`,
+      ].join("\n"),
+    });
+  } catch (e) {
+    console.error("[relived] besked om afhentning blev ikke sendt", orderId, e);
+  }
+}
+
 export type IssueOutcome = "refund" | "release" | "close" | "cover" | "seller_refund";
 
 /**
@@ -223,7 +398,10 @@ export async function mailIssueDecided(admin: AdminClient, orderId: string, outc
     const { data: ret } = await admin.from("order_returns").select("sent_at").eq("order_id", orderId).maybeSingle();
     // En admin kan også refundere eller afslutte en ordre uden sag. Så er der ingen afgørelse at fortælle om:
     // kun en refusion får en mail, og den siger bare, at pengene er på vej tilbage.
-    if (!issue && outcome !== "seller_refund") {
+    // Undtagelsen er en afhentning, som køber og sælger ikke begge har bekræftet (0041_afhentning.sql): dér har
+    // Relived afgjort ordren, og begge får besked.
+    const pickupCase = !issue && o.delivery === "pickup" && (outcome === "refund" || outcome === "release") ? outcome : null;
+    if (!issue && outcome !== "seller_refund" && !pickupCase) {
       if (outcome !== "refund") return;
       outcome = "seller_refund";
     }
@@ -232,6 +410,28 @@ export async function mailIssueDecided(admin: AdminClient, orderId: string, outc
     const buyer = at(o.buyer?.handle, "køberen");
     const bank = "Pengene går tilbage til det kort eller den konto, du betalte med. Der kan gå nogle bankdage, før de står på din konto.";
     const ask = "Har du spørgsmål, kan du svare på den her mail.";
+    if (pickupCase) {
+      const why = "Afhentningen blev ikke bekræftet af jer begge, så vi har gennemgået ordren.";
+      const msgs: [string, string, string[]][] =
+        pickupCase === "release"
+          ? [
+              [o.buyer_id, "Din ordre er afsluttet", [`${why} Vi har afsluttet din ordre fra ${seller}, og pengene er sendt til sælgeren.`]],
+              [o.seller_id, "Ordren er afsluttet: du får din udbetaling", [`${why} Vi har afsluttet ordren til ${buyer}, og pengene bliver sendt til din bankkonto.`]],
+            ]
+          : [
+              [o.buyer_id, "Du har fået pengene tilbage", [`${why} Du får pengene tilbage for din ordre fra ${seller}: ${kr(o.total_amount)}.`, "", bank]],
+              [
+                o.seller_id,
+                "Ordren er annulleret: køberen har fået pengene tilbage",
+                [`${why} Køberen ${buyer} har fået pengene tilbage, så der kommer ingen udbetaling for ordren.`, "Varerne står ikke længere som solgt, så du kan sætte dem til salg igen."],
+              ],
+            ];
+      for (const [uid, subject, text] of msgs) {
+        const to = await emailOf(admin, uid);
+        if (to) await sendMail({ to: [to], replyTo: admins, subject, text: ["Hej", "", ...text, "", ask, ...SIGN].join("\n") });
+      }
+      return;
+    }
 
     const toBuyer: { subject: string; text: string[] } | null =
       outcome === "refund"

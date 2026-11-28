@@ -6,6 +6,7 @@ import { clock, dayLabel, kr } from "@/lib/format";
 import { clipUrl, itemImage } from "@/lib/images";
 import { historyText, issuePhotos, partyHistory } from "@/lib/issueProof";
 import { CARRIER_COVER, ISSUE_REASONS, isIssueReason, RESOLUTION_TEXT } from "@/lib/issues";
+import { fetchPickupMarks } from "@/lib/pickup";
 import { DELIVERY, sellerPayout } from "@/lib/pricing";
 import { fetchCovers, fetchReturns, returnsReady } from "@/lib/returns";
 import AdminActions from "../AdminActions";
@@ -46,6 +47,51 @@ interface IssueRow {
   } | null;
 }
 
+/** En afhentning, som køber og sælger ikke begge har bekræftet, og som Relived har fået besked om (0041_afhentning.sql). */
+interface PickupRow {
+  id: string;
+  items_amount: number;
+  shipping_amount: number;
+  total_amount: number;
+  sp_id: string | null;
+  paid_at: string | null;
+  pickup_buyer_at: string | null;
+  pickup_seller_at: string | null;
+  buyer_id: string;
+  seller_id: string;
+  buyer: { handle: string } | null;
+  seller: { handle: string } | null;
+  show: { title: string } | null;
+  sales: { id: string; price: number; item: { name: string } | null }[];
+}
+
+const PICKUP_SELECT =
+  "id,items_amount,shipping_amount,total_amount,sp_id,paid_at,pickup_buyer_at,pickup_seller_at,buyer_id,seller_id,buyer:profiles!orders_buyer_id_fkey(handle),seller:profiles!orders_seller_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales!sales_order_id_fkey(id,price,item:items(name))";
+
+/** En pakke med Reliveds label, som fragtfirmaet ikke har scannet, og som Relived har fået besked om (0042_rettelser.sql). */
+interface ScanRow {
+  id: string;
+  items_amount: number;
+  total_amount: number;
+  sp_carrier: string | null;
+  sp_name: string | null;
+  sp_zipcode: string | null;
+  sp_city: string | null;
+  tracking: string | null;
+  tracking_status: string | null;
+  paid_at: string | null;
+  label_created_at: string | null;
+  buyer_id: string;
+  seller_id: string;
+  buyer: { handle: string } | null;
+  seller: { handle: string } | null;
+  show: { title: string } | null;
+  sales: { id: string; price: number; item: { name: string } | null }[];
+}
+
+const SCAN_SELECT =
+  "id,items_amount,total_amount,sp_carrier,sp_name,sp_zipcode,sp_city,tracking,tracking_status,paid_at,label_created_at,buyer_id,seller_id,buyer:profiles!orders_buyer_id_fkey(handle),seller:profiles!orders_seller_id_fkey(handle),show:shows!orders_show_id_fkey(title),sales!sales_order_id_fkey(id,price,item:items(name))";
+
 const STATUS_TEXT: Record<string, string> = { paid: "Betalt", shipped: "Sendt", completed: "Afsluttet", refunded: "Refunderet" };
 
 const at = (iso: string | null) => (iso ? `${dayLabel(iso).toLowerCase()} kl. ${clock(iso)}` : "–");
@@ -67,11 +113,36 @@ export default async function Admin() {
   const withOrder = open.filter((i) => i.order);
   const openOrderIds = withOrder.map((i) => i.order!.id);
   const [retReady, returns, covers] = await Promise.all([returnsReady(admin), fetchReturns(admin, openOrderIds), fetchCovers(admin, openOrderIds)]);
-  const [photos, buyers, sellers] = await Promise.all([
+  // Afhentninger, der ikke er bekræftet af både køber og sælger, og som det daglige job har sendt videre hertil.
+  // Uden 0041_afhentning.sql fejler kaldet, og listen er tom.
+  const pickupQ = await admin
+    .from("orders")
+    .select(PICKUP_SELECT)
+    .eq("status", "paid")
+    .eq("delivery", "pickup")
+    .eq("issue_open", false)
+    .not("pickup_flagged_at", "is", null)
+    .order("paid_at", { ascending: true });
+  const pickups = (pickupQ.error ? [] : (pickupQ.data ?? [])) as unknown as PickupRow[];
+  // Pakker med Reliveds label, som ikke er scannet flere dage efter, at labelen blev lavet. Uden 0042_rettelser.sql
+  // fejler kaldet, og listen er tom.
+  const scanQ = await admin
+    .from("orders")
+    .select(SCAN_SELECT)
+    .eq("status", "paid")
+    .eq("delivery", "ship")
+    .eq("issue_open", false)
+    .not("scan_flagged_at", "is", null)
+    .order("label_created_at", { ascending: true });
+  const unscanned = (scanQ.error ? [] : (scanQ.data ?? [])) as unknown as ScanRow[];
+  const [photos, buyers, sellers, marks] = await Promise.all([
     issuePhotos(admin, open.map((i) => i.id)),
-    partyHistory(admin, "buyer", withOrder.map((i) => i.order!.buyer_id)),
-    partyHistory(admin, "seller", withOrder.map((i) => i.order!.seller_id)),
+    partyHistory(admin, "buyer", [...withOrder.map((i) => i.order!.buyer_id), ...pickups.map((o) => o.buyer_id), ...unscanned.map((o) => o.buyer_id)]),
+    partyHistory(admin, "seller", [...withOrder.map((i) => i.order!.seller_id), ...pickups.map((o) => o.seller_id), ...unscanned.map((o) => o.seller_id)]),
+    // Sager om en afhentning: hvem har bekræftet?
+    fetchPickupMarks(admin, withOrder.filter((i) => i.order!.delivery === "pickup").map((i) => i.order!.id)),
   ]);
+  const said = (iso: string | null | undefined) => (iso ? `har bekræftet ${at(iso)}` : "har ikke bekræftet");
 
   return (
     <div className="adm-page" style={{ maxWidth: 900 }}>
@@ -118,6 +189,12 @@ export default async function Admin() {
               <br />
               <b>Betalt:</b> {at(o.paid_at)} · <b>Sendt:</b> {at(o.shipped_at)} · <b>Hentet:</b> {at(o.delivered_at)}
               <br />
+              {marks?.[o.id] ? (
+                <>
+                  <b>Afhentning:</b> køberen {said(marks[o.id].buyer)}, sælgeren {said(marks[o.id].seller)}
+                  <br />
+                </>
+              ) : null}
               <b>Beløb:</b> køberen betalte {kr(o.total_amount)}, sælgeren skal have {kr(sellerPayout(o))}
               <br />
               <span className="muted" style={{ fontSize: ".8125rem" }}>Ordre {o.id}</span>
@@ -206,6 +283,95 @@ export default async function Admin() {
           </section>
         );
       })}
+
+      {pickups.length ? (
+        <div id="afhentning" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div>
+            <h2 className="h3">Afhentninger, der ikke er bekræftet</h2>
+            <p className="muted" style={{ marginTop: 6 }}>
+              Køber og sælger skal begge bekræfte en afhentning, før pengene går til sælgeren. Her har de ikke gjort det, selv om de har
+              fået en påmindelse. Skriv til dem, og afgør ordren.
+            </p>
+          </div>
+          {pickups.map((o) => (
+            <section className="box" key={o.id} data-pickup={o.id} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 12px", alignItems: "baseline" }}>
+                <strong>
+                  @{o.buyer?.handle ?? "køber"} henter hos @{o.seller?.handle ?? "sælger"}
+                </strong>
+                <span className="muted" style={{ fontSize: ".875rem" }}>Betalt {at(o.paid_at)}</span>
+                <span className="chip warn" style={{ marginLeft: "auto" }}>Afhentning</span>
+              </div>
+              <div className="addr">
+                <b>Køberen:</b> {said(o.pickup_buyer_at)}
+                <br />
+                <b>Sælgeren:</b> {said(o.pickup_seller_at)}
+                <br />
+                <b>Varer:</b> {o.sales.map((s) => `${s.item?.name ?? "Vare"} (${kr(s.price)})`).join(", ")} · {o.show?.title}
+                <br />
+                <b>Beløb:</b> køberen betalte {kr(o.total_amount)}, sælgeren skal have {kr(sellerPayout(o))}
+                <br />
+                <span className="muted" style={{ fontSize: ".8125rem" }}>Ordre {o.id}</span>
+              </div>
+              <div className="addr">
+                <b>Køberens historik:</b> {historyText(buyers[o.buyer_id], "køb")}
+                <br />
+                <b>Sælgerens historik:</b> {historyText(sellers[o.seller_id], "salg")}
+              </div>
+              <AdminActions orderId={o.id} refundText={kr(o.total_amount)} releaseText={kr(sellerPayout(o))} canRelease canClose={false} />
+            </section>
+          ))}
+        </div>
+      ) : null}
+
+      {unscanned.length ? (
+        <div id="scanning" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div>
+            <h2 className="h3">Pakker, der ikke er scannet</h2>
+            <p className="muted" style={{ marginTop: 6 }}>
+              Labelen er lavet, men fragtfirmaet har ikke scannet pakken. Kun scanningen tæller som sendt, så ordren står stadig som
+              betalt. Sælgeren har fået en mail. Tjek sporingen hos fragtfirmaet, og afgør ordren.
+            </p>
+          </div>
+          {unscanned.map((o) => (
+            <section className="box" key={o.id} data-scan={o.id} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 12px", alignItems: "baseline" }}>
+                <strong>
+                  @{o.buyer?.handle ?? "køber"} venter på en pakke fra @{o.seller?.handle ?? "sælger"}
+                </strong>
+                <span className="muted" style={{ fontSize: ".875rem" }}>Label lavet {at(o.label_created_at)}</span>
+                <span className="chip warn" style={{ marginLeft: "auto" }}>Ikke scannet</span>
+              </div>
+              <div className="addr">
+                <b>Sporing:</b> {trackingText(o.tracking_status) ?? "Ingen sporing endnu."}
+                {o.tracking && isCarrier(o.sp_carrier) ? (
+                  <>
+                    {" "}
+                    <a href={CARRIERS[o.sp_carrier].track(o.tracking)} target="_blank" rel="noopener noreferrer">
+                      {CARRIERS[o.sp_carrier].name} {o.tracking}
+                    </a>
+                  </>
+                ) : null}
+                <br />
+                <b>Til:</b> {o.sp_name}
+                {o.sp_zipcode ? `, ${o.sp_zipcode} ${o.sp_city ?? ""}` : ""}
+                <br />
+                <b>Varer:</b> {o.sales.map((s) => `${s.item?.name ?? "Vare"} (${kr(s.price)})`).join(", ")} · {o.show?.title}
+                <br />
+                <b>Betalt:</b> {at(o.paid_at)} · <b>Beløb:</b> køberen betalte {kr(o.total_amount)}, sælgeren skal have {kr(o.items_amount)}
+                <br />
+                <span className="muted" style={{ fontSize: ".8125rem" }}>Ordre {o.id}</span>
+              </div>
+              <div className="addr">
+                <b>Køberens historik:</b> {historyText(buyers[o.buyer_id], "køb")}
+                <br />
+                <b>Sælgerens historik:</b> {historyText(sellers[o.seller_id], "salg")}
+              </div>
+              <AdminActions orderId={o.id} refundText={kr(o.total_amount)} releaseText="" canRelease={false} canClose={false} canShip />
+            </section>
+          ))}
+        </div>
+      ) : null}
 
       {done.length ? (
         <div className="box">

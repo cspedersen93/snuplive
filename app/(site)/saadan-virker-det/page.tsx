@@ -264,7 +264,10 @@ export default async function Saadan() {
             </li>
             <li>
               <b>Afhentning: gratis</b>
-              <span>I aftaler tid og sted, og sælgeren får dit telefonnummer. Se varen efter, før du bekræfter, at du har fået den.</span>
+              <span>
+                I aftaler tid og sted, og sælgeren får dit telefonnummer. Se varen efter, når du henter den. Er den, som den blev vist,
+                bekræfter I begge på jeres telefoner, før I går hver til sit. Først derefter får sælgeren pengene.
+              </span>
             </li>
             <li>
               <b>Cykler og barnevogne</b>

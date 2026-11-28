@@ -1806,7 +1806,7 @@ export const GUIDES: Guide[] = [
               <li>Køberen betaler gennem Relived, før vognen bliver hentet.</li>
               <li>Du får køberens telefonnummer, og I aftaler tid og sted.</li>
               <li>Køberen ser vognen efter og prøver den.</li>
-              <li>Køberen bekræfter, at vognen er hentet, og så går pengene til dig.</li>
+              <li>I bekræfter begge på jeres telefoner, at vognen er hentet, før køberen går. Så går pengene til dig.</li>
             </ol>
             <p>Der er ingen kontanter og ingen diskussion om betaling på trappen.</p>
           </>
@@ -1834,7 +1834,7 @@ export const GUIDES: Guide[] = [
         "Hvad skal følge med, når man sælger en barnevogn?",
         "Alt det, der hørte til, da den var ny: lift eller kasse, sportsvogn, regnslag og myggenet. Jo mere der følger med, jo nemmere er den at sælge.",
       ],
-      ["Hvornår får jeg pengene?", "Køberen betaler gennem Relived, før vognen bliver hentet. Pengene går til dig, når køberen har bekræftet, at vognen er hentet."],
+      ["Hvornår får jeg pengene?", "Køberen betaler gennem Relived, før vognen bliver hentet. Pengene går til dig, når I begge har bekræftet på Relived, at vognen er hentet."],
       ["Hvad koster det at sælge på Relived?", `Det er gratis at sælge${BETA ? " i beta-perioden" : ""}.`],
     ],
     related: ["saelg-brugt-boernetoej", "flyttesalg", "saelg-live-foerste-gang"],
@@ -1958,8 +1958,8 @@ export const GUIDES: Guide[] = [
             </p>
             <p>
               Store møbler skal hentes. Skriv tydeligt i beskrivelsen, at møblet skal hentes, og hvor det står, fx på 3. sal uden
-              elevator. Køberen betaler gennem Relived, henter møblet gratis og bekræfter bagefter, at det er hentet. Så går pengene
-              til dig.
+              elevator. Køberen betaler gennem Relived og henter møblet gratis. Når I begge har bekræftet på jeres telefoner, at det er
+              hentet, går pengene til dig.
             </p>
           </>
         ),
@@ -1969,7 +1969,7 @@ export const GUIDES: Guide[] = [
     faq: [
       [
         "Hvordan sælger jeg store møbler, der ikke kan sendes?",
-        "Skriv i beskrivelsen, at møblet skal hentes. Køberen betaler gennem Relived og henter møblet gratis hos dig. Pengene går til dig, når køberen har bekræftet, at det er hentet.",
+        "Skriv i beskrivelsen, at møblet skal hentes. Køberen betaler gennem Relived og henter møblet gratis hos dig. Pengene går til dig, når I begge har bekræftet på Relived, at det er hentet.",
       ],
       [
         "Hvad sælger bedst af brugte møbler?",
